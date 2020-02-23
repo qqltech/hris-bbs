@@ -423,6 +423,7 @@ class ApiFixedController extends Controller
             $p->searchfield = isset($data->searchfield) ? $data->searchfield:null;
             $p->selectfield = isset($data->selectfield) ? $data->selectfield:null;
             $p->paginate    = isset($data->paginate) ? $data->paginate:25;
+            $p->page        = isset($data->page) ? $data->page:1;
             $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->caller      = null;
             $overrideParams = $model->overrideGetParams($p);

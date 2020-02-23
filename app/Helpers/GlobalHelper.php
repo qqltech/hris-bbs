@@ -1390,7 +1390,7 @@ function _customGetData($model,$params)
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
     if(!$params->caller){
-       $data = $final->paginate($params->paginate);
+       $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
        $data = $final->get(); 
     }
@@ -1416,6 +1416,7 @@ function _customGetData($model,$params)
                 $p->searchfield = null;
                 $p->selectfield = null;
                 $p->paginate    = null;
+                $p->page        = null;
                 $p->join        = true;
                 $p->caller      = $pureModel->getTable();
                 $fixedData[$index][$detail]  = $model->customGet($p);
@@ -1523,6 +1524,7 @@ function _customFind($model, $params)
         $p->searchfield = null;
         $p->selectfield = null;
         $p->paginate    = null;
+        $p->page        = null;
         $p->join        = true;
         $p->caller      = $pureModel->getTable();
         $data[$detail]  = $model->customGet($p);
