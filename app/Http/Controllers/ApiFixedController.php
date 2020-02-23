@@ -113,7 +113,7 @@ class ApiFixedController extends Controller
         $function = $this->operation."RoleCheck";
         if(method_exists($model, $function)){
             if(!$model->$function()){
-                $this->messages[] ="[UNAUTHORIZED] operasi $this->operation di [$modelName] dilarang!";
+                $this->messages[] ="[UNAUTHORIZED]operasi $this->operation di [$modelName] dilarang!";
                 $this->isAuthorized=false;
                 return false;
             }

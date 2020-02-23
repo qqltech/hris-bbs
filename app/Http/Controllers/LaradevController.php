@@ -143,7 +143,7 @@ class LaradevController extends Controller
                 $fullColumns = $columns;
                 if($toModel){
                     $columns = $columnNames;
-                    $required = count($required)>0?'["'.implode('","',$required).'"]':"[]";
+                    // $required = count($required)>0?'["'.implode('","',$required).'"]':"[]";
                 }
                 $tables[]=[
                     "table" => $table->getName(),
@@ -442,7 +442,9 @@ class LaradevController extends Controller
                 if (strpos($key, '!') !== false) {
                     $cfg[ str_replace("!", "", $key) ] = array_values( array_diff($table->columns,$cfg[$key]) ) ;
                 }
-            }      
+            }
+            $cfg['required'] = isset( $cfg['required'] )? array_merge( $cfg['required'], array_filter( $table->required,function($arr)use($cfg){ if(!in_array($arr,$cfg['required'])){return $arr;} } ) ):$table->required;
+            
             $dataForJSON[] = [
                 "model" => $tableName,
                 "fullColumns" =>$table->fullColumns,
@@ -465,9 +467,9 @@ class LaradevController extends Controller
             // File::deleteDirectory( database_path("migrations/$req->oldName" ) );
             // File::delete( \File::glob( resource_path("views/generator/$req->oldName.php" )) );
             $paste = str_replace([
-                "__namespace","__class","__table","__columns", "__required", "__lastupdate"
+                "__namespace","__class","__table","__columns",  "__lastupdate"
             ],[
-                $this->prefixNamespace, $tableName, $tableName, '["'.implode('","',$table->columns).'"]', $table->required, date('d/m/Y H:i:s')
+                $this->prefixNamespace, $tableName, $tableName, '["'.implode('","',$table->columns).'"]', date('d/m/Y H:i:s')
             ],$data);
             if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$tableName.php" ) ){
                 $pasteCustom = str_replace([
