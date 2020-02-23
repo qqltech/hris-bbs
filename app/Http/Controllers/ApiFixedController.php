@@ -100,7 +100,7 @@ class ApiFixedController extends Controller
     {
         $modelCandidate = "\App\Models\BasicModels\\$modelName";
         if( !class_exists( $modelCandidate ) ){
-            $this->errors[] ="[UNKNOWN] model [$modelName] does not exist";
+            $this->errors[] ="[UNKNOWN]Model [$modelName] does not exist";
             $this->isAuthorized=false;
             return false;
         }
@@ -137,7 +137,7 @@ class ApiFixedController extends Controller
                 });
                 if(count($notPresent)>0){
                     foreach($notPresent as $field){
-                        $this->errors[] = "[REQUIRED] The $field field is required.[$modelName] index [$i]";
+                        $this->errors[] = "[REQUIRED]The $field field is required.[$modelName] index [$i]";
                     }
                     $this->isAuthorized=false;
                     return false;
@@ -152,7 +152,7 @@ class ApiFixedController extends Controller
             });
             if(count($notPresent)>0){
                 foreach($notPresent as $field){
-                    $this->errors[] = "[REQUIRED] The $field field is required.[$modelName]";
+                    $this->errors[] = "[REQUIRED]The $field field is required.[$modelName]";
                 }
                 $this->isAuthorized=false;
                 return false;
@@ -437,7 +437,7 @@ class ApiFixedController extends Controller
         $cascade        = $model->cascade;
         $preparedModel  = $model->find($id);
         if(!$preparedModel){
-            $this->errors[]="INVALID: ID $id in model [$modelName] does not exist";
+            $this->errors[]="[NOT FOUND]ID $id in model [$modelName] does not exist";
             $this->operationOK=false;
             return;
         }
@@ -466,7 +466,7 @@ class ApiFixedController extends Controller
         $cascade        = $model->cascade;
         $preparedModel  = (new $modelCandidate)->find($id);
         if(!$preparedModel){
-            $this->errors[]="INVALID: ID $id in model [$modelName] does not exist";
+            $this->errors[]="[NOT FOUND]ID $id in model [$modelName] does not exist";
             $this->operationOK=false;
             return;
         }
