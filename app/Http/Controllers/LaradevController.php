@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Helpers\PLSQL as PLSQL;
 use App\Helpers\DBS as DBS;
 use App\Models\Defaults\User;
+use Exception;
 
 class LaradevController extends Controller
 {
