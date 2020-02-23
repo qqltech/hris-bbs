@@ -1,0 +1,107 @@
+<?php
+
+namespace __namespace;
+
+class __class extends __basicClass
+{    
+    public function __construct()
+    {        
+        $this->user = \Auth::check()?\Auth::user():null;
+    }
+    public $lastUpdate  = "__lastupdate";
+    public $createValidator = [];
+    public $updateValidator = [];
+    public $deleteValidator = [];
+    public $excepts         = [];
+    public $defaults        = __defaults;
+    public $createAdditionalData = __autocreate;
+    public $updateAdditionalData = __autoupdate;
+    public $user;
+//====================================================================USER ROLE LOGIC
+    public function createRoleCheck()
+    {
+        return true;
+    }
+    public function updateRoleCheck()
+    {
+        return true;
+    }
+    public function deleteRoleCheck()
+    {
+        return true;
+    }
+    public function readRoleCheck()
+    {
+        return true;
+    }
+//======================================================================CREATE EVENT LOGIC
+    public function createBefore($model, $arrayData, $metaData, $id=null)
+    {
+        $newModel = $model;
+        $newArrayData  = array_merge($arrayData,[]);
+        return [
+            "model"  => $newModel,
+            "data"   => $newArrayData,
+        ];
+    }
+
+    public function createAfter($model, $arrayData, $metaData, $id=null)
+    {        
+
+    }
+//======================================================================UPDATE EVENT LOGIC
+
+    public function updateBefore($model, $arrayData, $metaData, $id=null)
+    {
+        $newModel = $model;
+        $newArrayData  = array_merge($arrayData,[]);
+        return [
+            "model"  => $newModel,
+            "data"   => $newArrayData,
+        ];
+    }
+
+    public function updateAfter($model, $arrayData, $metaData, $id=null){
+
+    }
+//======================================================================DELETE EVENT LOGIC
+    public function deleteBefore($model, $arrayData, $metaData, $id=null)
+    {
+        $newModel = $model;
+        return [
+            "model" => $newModel
+        ];
+    }
+    public function deleteAfter($model, $arrayData, $metaData, $id=null)
+    {
+        
+    }    
+//======================================================================READ EVENT & OVERRIDE PARAMETER GET DATA JIKA PERLU
+    public function overrideGetParams($params, $id=null)
+    {
+        if($id){
+            $params->selectfield = $params->selectfield; //"id,kolom1,kolom2"
+            $params->join        = $params->join;        //true(default)/false {TABLE AUTO JOIN DENGAN INDUK}
+            $params->single      = $params->single;      //true/false(default) {AMBIL CHILDREN ATAU SINGLE}
+        }else{
+            $params->where_raw   = $params->where_raw;      //raw WHERE
+            $params->order_by    = $params->order_by;       //nama_kolom
+            $params->order_type  = $params->order_type;     //ASC/DESC
+            $params->order_by_raw= $params->order_by_raw;   //nama_kolom1,nama_kolom2 ASC/DESC
+            $params->search      = $params->search;         //string kata
+            $params->searchfield = $params->searchfield;    //kolom1,kolom2 yang akan dimatching dengan where like
+            $params->selectfield = $params->selectfield;    //id,kolom1,kolom2,kolom3
+            $params->paginate    = $params->paginate;       //integer angka default 25
+            $params->join        = $params->join;           //true(default)/false {ROW AUTO JOIN DENGAN INDUK}
+        }
+        return $params;
+    }  
+//======================================================================READ EVENT & TRANSFORM DATA PER ROW
+    public function transformRowData($row){
+        return array_merge($row,[]);
+    }
+//========================================================================CUSTOM FUNCTION BEBAS TOTAL FUNGSINYA DIPREFIX "custom_"
+    public function custom_getdraftid($request){
+        return "CODE".crc32(uniqid());
+    }
+}

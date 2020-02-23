@@ -1,0 +1,15 @@
+/vendor
+/.idea
+Homestead.json
+Homestead.yaml
+/public/uploads
+/public/models.json
+.env
+.editorconfig
+/database/migrations/projects
+/app/Models/CustomModels
+/app/Models/BasicModels
+customscript.sh
+customscript.bat
+custommigrate.sh
+custommigrate.bat

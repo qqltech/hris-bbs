@@ -1,0 +1,2 @@
+
+CALL php artisan migrate:fresh --force --path=database/migrations/__defaults --seed

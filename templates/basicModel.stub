@@ -1,0 +1,44 @@
+<?php
+
+namespace __namespace;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
+class __class extends Model
+{    
+    public $lastUpdate  = "__lastupdate";
+    protected $table    = '__table';
+    protected $guarded  = __config_guarded;
+    protected $hidden   = __config_hidden;
+    public $columns     = __columns;
+    public $joins       = __joins;
+    public $details     = __details;
+    public $heirs       = __heirs;
+    public $detailsChild= __detailsChild;
+    public $detailsHeirs= __detailsHeirs;
+    public $unique      = __config_unique;
+    public $required    = __config_required;
+    public $createable  = __config_createable;
+    public $updateable  = __config_updateable;
+    public $searchable  = __config_searchable;
+    public $deleteable  = __config_deleteable;
+    public $cascade     = __config_cascade;
+    public $extendable  = __config_extendable;
+    protected $casts    = __config_casts;
+    __hasMany
+    __hasManyThrough
+    __belongsTo
+    public function getCreatedAtAttribute($date)
+    {
+        return $date?Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('d-m-Y H:i'):date("d-m-Y");
+    }
+    public function getUpdatedAtAttribute($date)
+    {
+        return $date?Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('d-m-Y H:i'):date("d-m-Y");
+    }
+    public function customFind($p){return _customFind($this, $p);}
+    public function customGet($p){return _customGetData($this,$p);}
+    __customfunction__
+}

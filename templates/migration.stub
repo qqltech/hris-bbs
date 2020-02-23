@@ -1,0 +1,49 @@
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class __class__ extends Migration
+{
+    public function up()
+    {
+        Schema::create('__table__', function (Blueprint $table) {
+            $table->bigIncrements('id');
+
+            $table->string('samplecolumn',100)->nullable();
+
+            $table->dateTime('created_at')->nullable();
+            $table->dateTime('updated_at')->nullable();
+        });
+
+        table_config('__table__', [
+            // pilihan isian: 'all', 'none', ['kolom'], except key pakai tanda !(not) misal: '!required'
+            "hidden"        => "none", //kolom disembunyikan ketika GET
+            "guarded"       => ["id"], //kolom dilarang diCREATE
+            "required"      => [], //kolom wajib ada saat CREATE
+            "!createable"   => ["id","created_at","updated_at"], //kolom yang bisa diCREATE mirip fillable tapi bukan fillable
+            "!updateable"   => ["id","created_at","updated_at"], //kolom yang bisa diUPDATE
+            "searchable"    => "all", //kolom yang bisa di BULK-WHERE LIKE
+            "deleteable"    => "true", //row apakah bisa di DELETE
+            "extendable"    => "false", //table apakah bisa otomatis nambah kolom saat kolom tidak ada saat CREATE
+            "casts"     => [ // cek https://laravel.com/docs/6.x/eloquent-mutators#attribute-casting
+                'created_at' => 'datetime:d-m-Y',
+                'updated_at' => 'datetime:d-m-Y'
+            ],
+            "autocreate"    => [ //default VALUE saat CREATE data
+            ],
+            "autoupdate"    => [ //default VALUE saat UPDATE data
+            ],
+            "readers"     =>[],
+            "writers"     =>[]
+        ]);
+        //SEEDING 1 data
+        \DB::table("__table__")->insert([
+            "samplecolumn"=>"contohdata"
+        ]);
+    }
+    public function down()
+    {
+        Schema::dropIfExists('__table__');
+    }
+}
