@@ -1514,7 +1514,7 @@ function _customFind($model, $params)
                 return $join;
             }
         });
-        $fk_child = explode( "=",$fk_child [ 0 ] )[1];
+        $fk_child = explode( "=",array_values($fk_child) [ 0 ] )[1];
         $p = (Object)[];
         $p->where_raw   = "$fk_child=$id";
         $p->order_by    = null;
