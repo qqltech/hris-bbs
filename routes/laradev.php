@@ -1,10 +1,11 @@
 <?php
+use Illuminate\Http\Request;
 $router->group(['prefix'=>'laradev'], function () use ($router) {
     $router->group(['middleware' => 'laradev'], function () use ($router) {
         $router->get('/environment', 'LaradevController@readEnv');
         $router->put('/environment', 'LaradevController@setEnv');
 
-        $router->get('/databases', 'LaradevController@readDatabases');
+        $router->get('/databases', 'LaradevController@databaseCheck');
         $router->post('/databases', 'LaradevController@createDatabase');
         $router->delete('/databases/{databaseName}', 'LaradevController@deleteDatabase');
 
@@ -35,9 +36,11 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
     });
 
 
-    $router->get('/', function(){
+    $router->get('/', function(Request $req){
+        if(!isset($req->kode) || $req->kode!=env("BACKENDPASSWORD","pulangcepat")){
+            return response()->json("Unauthorized",401);
+        }
         return view("defaults.laradev");
     });
-
     $router->delete('/trio/{table}', 'LaradevController@deleteAll');
 });

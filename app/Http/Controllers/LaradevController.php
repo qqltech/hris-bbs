@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Mail;
+use Doctrine\DBAL\Types\FloatType;
+use Doctrine\DBAL\Types\Type;
 use App\Helpers\PLSQL as PLSQL;
 use App\Helpers\DBS as DBS;
 use App\Models\Defaults\User;
@@ -35,6 +37,109 @@ class LaradevController extends Controller
         if( ! File::exists(base_path("database/migrations/projects")) ){
             File::makeDirectory( base_path("database/migrations/projects"), 493, true);
         }
+    }
+
+    private function getConnection($conn){
+        $conn = (object)$conn;
+        $defaultConn = config('database.connections.flying'.$conn->driver);
+        $newConn     = array_merge($defaultConn, (array)$conn);
+        config(['database.connections.flying'.$conn->driver=>$newConn]);
+        return DB::connection('flying'.$conn->driver);
+    }
+
+    public function databaseCheck(Request $request)
+    {
+        if($request->db_autocreate && $request->db_autocreate=="true"){
+            return $this->databaseCreateLocal($request);
+        }
+        try {
+            if($request->host){
+                // driver,host,port,username,password,database
+                if($request->driver=="pgsql" && !isset($request->database) ){                
+                    $connection->database = "postgres";
+                }else{
+                    $connection = $request->all();
+                }
+                $conn = $this->getConnection($connection);
+                $dbname = $conn->getDatabaseName();
+                $conn=$conn->getDoctrineSchemaManager();
+            }else{
+                $conn=DB::getDoctrineSchemaManager();
+                $dbname = DB::getDatabaseName();
+            }
+        } catch (Exception $e) {
+            return response()->json(['status'=>$e->getMessage()], 422);
+        }
+        return response()->json("Database ".$dbname." Exists");
+    }
+    public function databaseCreateLocal($request,$connection=null)
+    {
+        $dbname = "";
+        try {
+            if($connection!=null){
+                // $connection = [
+                //     'driver'=>'mysql',
+                //     'host'=>'localhost',
+                //     'port'=>'3306',
+                //     'username'=>'root',
+                //     'password'=>'root',
+                //     'database'=>'db'
+                // ];
+                $dbname = $connection['database'];
+                $conn = $this->getConnection($connection);
+                $conn=$conn->getDoctrineSchemaManager();
+            }else{
+                $dbname = env("DB_DATABASE","");
+                $conn=DB::getDoctrineSchemaManager();
+            }
+        } catch (Exception $e) {
+            try {
+                if($connection!=null){
+                    $dbname = $connection['database'];
+                    if($connection['database']=='pgsql'){
+                        $connection['database']='postgres';
+                    }
+                    $conn = $this->getConnection($connection);
+                }else{
+                    $dbname = env("DB_DATABASE","");
+                    $default = [
+                        'driver' => env('DB_CONNECTION', '127.0.0.1'),
+                        'host' => env('DB_HOST', '127.0.0.1'),
+                        'port' => env('DB_PORT', '5432'),
+                        'username' => env('DB_USERNAME', 'forge'),
+                        'password' => env('DB_PASSWORD', '')
+                    ];
+                    if(env('DB_CONNECTION', 'mysql')=='pgsql'){
+                        $default['database']='postgres';
+                    }
+                    $conn = $this->getConnection($default);
+                }
+                $conn=$conn->getDoctrineSchemaManager();
+                $conn->createDatabase($dbname);
+                return response()->json("database $dbname created successfully");
+            }catch(Exception $e2){
+                return response()->json($e2->getMessage(), 422);
+            }           
+        }
+        $migrate="no";
+        try{
+            if($request->db_migrate && $request->db_migrate=="true"){
+                Artisan::call("migrate:".($request->db_fresh && $request->db_fresh=="true"?"fresh":"refresh"),[
+                    "--path"=>"database/migrations/__defaults" , "--force"=>true
+                ]
+                );
+                if($request->db_seed && $request->db_seed=="true"){
+                    Artisan::call("db:seed");
+                }
+                if($request->db_passport && $request->db_passport=="true"){
+                    Artisan::call("passport:install");
+                }
+                $migrate="yes";
+            }
+        }catch(Exception $e){
+            return response()->json($e->getMessage(), 422);
+        }
+        return response()->json("Database ".$dbname." is already created before,migrate = $migrate");
     }
     private function getBasicModel(){
         return File::get( base_path("templates/basicModel.stub") );
@@ -195,7 +300,7 @@ class LaradevController extends Controller
                     'triggers'=>[]
                 ];
             }
-        }catch(\Exception $e){
+        }catch(Exception $e){
             return null;
         }
         $data = [

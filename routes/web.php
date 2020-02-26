@@ -20,6 +20,7 @@ $router->get('/api','NonApiController@resources');
 $router->get('/', function () use ($router) {
     return response()->json(["info"=>"welcome to the jungle!",
         "data"=>[
+            "config" => url("/laradev"),
             "frontend" => url("/docs/frontend"),
             "backend" => url("/docs/backend"),
             "operation" => url("/operation"),

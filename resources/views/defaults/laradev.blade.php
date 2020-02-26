@@ -52,6 +52,8 @@
             'APP_NAME' => 'Project',
             'APP_TIMEZONE' => 'Asia/Jakarta',
             'APP_URL' => 'http://localhost',
+            'AUTHORIZATION' => 'true',
+            'BACKENDPASSWORD' => 'pulangcepat',
             'DB_CONNECTION' => 'mysql',
             'DB_DATABASE' => 'trial2',
             'DB_HOST' => 'localhost',
@@ -81,26 +83,9 @@
     </textarea>
     </p><button href="javascript:void(0)">Copy to Editor</button></p>
 </div>
-
-
+{{-- 
 <div>
-    <p class="title">DATABASES READ</p>
-    <textarea class="samplecode" readonly>
-{
-    "url"       : "/laradev/databases",
-    "method"    : "GET",
-    "headers"   :{
-        "laradev"   : "quantumleap15067",
-        "Cache-Control" : "no-cache"
-    },
-    "body"  : {}
-}
-    </textarea>
-    </p><button href="javascript:void(0)">Copy to Editor</button></p>
-</div>
-
-<div>
-    <p class="title">DATABASES CREATE</p>
+    <p class="title">DATABASES FRESH CONFIGURATION</p>
     <textarea class="samplecode" readonly>
 {
     "url"       : "/laradev/databases",
@@ -110,18 +95,45 @@
         "Cache-Control" : "no-cache"
     },
     "body"  : {
-        "name" : "mydatabase"
+        "db_migrate" : false,
+        "db_fresh"   : true,
+        "db_seed"    : true,
+        "db_passport": true
+
+    }
+}
+    </textarea>
+    </p><button href="javascript:void(0)">Copy to Editor</button></p>
+</div> --}}
+
+<div>
+    <p class="title">DATABASES READ or CREATE</p>
+    <textarea class="samplecode" readonly>
+{
+    "url"       : "/laradev/databases",
+    "method"    : "GET",
+    "headers"   :{
+        "laradev"   : "quantumleap15067",
+        "Cache-Control" : "no-cache"
+    },
+    "body"  : {
+        "db_autocreate":false,
+        "db_migrate" : false,
+        "db_fresh"   : true,
+        "db_seed"    : true,
+        "db_passport": true
     }
 }
     </textarea>
     </p><button href="javascript:void(0)">Copy to Editor</button></p>
 </div>
 
+
 <div>
     <p class="title">DATABASES DELETE @database</p>
     <textarea class="samplecode" readonly>
 {
-    "url"       : "/laradev/databases/mydatabase",
+    "url"       : "/laradev/databases/nama_database",
     "method"    : "DELETE",
     "headers"   :{
         "laradev"   : "quantumleap15067",
