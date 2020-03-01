@@ -47,8 +47,8 @@ class UserController extends Controller
             return response()->json("username or email is required",401);
         }
         if($request->email){
-            $user = User::where('email', $request->email)->first();
-        }elseif($request->email){
+            $user = User::where('email', $request->email)->orWhere('username',$request->email)->first();
+        }elseif($request->username){
             $user = User::where('username', $request->username)->first();
         }
         if ($user) {
