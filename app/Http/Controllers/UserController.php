@@ -37,14 +37,20 @@ class UserController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
             'password' => 'required|string',
             // 'remember_me' => 'boolean'
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(),401);
         }
-        $user = User::where('email', $request->email)->first();
+        if( !$request->email && !$request->username){
+            return response()->json("username or email is required",401);
+        }
+        if($request->email){
+            $user = User::where('email', $request->email)->first();
+        }elseif($request->email){
+            $user = User::where('username', $request->username)->first();
+        }
         if ($user) {
 
             if (Hash::check($request->password, $user->password)) {
