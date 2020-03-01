@@ -587,10 +587,13 @@ class LaradevController extends Controller
                                 $string = explode(') is not present in table "', $string);
                                 $id = $string[0];
                                 $table = explode('"',$string[1])[0];
-                                $sample = DB::table($table)->first();
-                                return response()->json(['id'=>$id, 'table'=>$table, 'string'=> $e->getMessage()],400);
+                                $sample = (array)DB::table($table)->first();
+                                // foreach($sample as $key=>$val){
+                                //     if(!in_array($key,['id','created_']) )
+                                // }
+                                // return response()->json(['id'=>$id, 'table'=>$table, 'string'=> $e->getMessage()],400);
                                 $sample['id'] = $id;
-                                DB::table($table)->insert((array) $sample);
+                                DB::table($table)->insert( $sample);
                                 goto addFK;
                             }else{
                                 return response()->json($e->getMessage(),400);
