@@ -14,7 +14,7 @@ class DefaultUsers extends Migration
     public function up()
     {
         Schema::create('default_users', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('name')->nullable();
             $table->string('email')->unique()->nullable();
             $table->string('username',60)->unique()->nullable();

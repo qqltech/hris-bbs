@@ -11,6 +11,7 @@ class __class extends __basicClass
     public $lastUpdate  = "__lastupdate";
     public $createValidator = [];
     public $updateValidator = [];
+    public $importValidator = [];
     public $deleteValidator = [];
     public $excepts         = [];
     public $defaults        = __defaults;
@@ -95,13 +96,34 @@ class __class extends __basicClass
             $params->join        = $params->join;           //true(default)/false {ROW AUTO JOIN DENGAN INDUK}
         }
         return $params;
-    }  
+    }
 //======================================================================READ EVENT & TRANSFORM DATA PER ROW
-    public function transformRowData($row){
+    public function transformRowData($row)
+    {
         return array_merge($row,[]);
     }
+//======================================================================IMPORT EXCEL
+    public function custom_importexcel($request)
+    {
+        if(!$request->hasFile("file")){
+            return response()->json("file harus ada",400);
+        }
+        return _uploadexcel($this, $request);
+    }
+//=======================================================================EXPORT EXCEL 
+  	public function custom_exportexcel($request)
+    {
+      	$query = \DB::table($this->getTable())->get();
+      	if( count($query)==0 ){
+        	return "data kosong";
+        }else{
+    		return \Excel::download(new \ExportExcel($query), \Carbon\Carbon::now()->format('d-m-Y')."_".$this->getTable().'.xlsx');    
+        }
+    }
 //========================================================================CUSTOM FUNCTION BEBAS TOTAL FUNGSINYA DIPREFIX "custom_"
-    public function custom_getdraftid($request){
+    public function custom_getdraftid($request)
+    {
         return "CODE".crc32(uniqid());
     }
+
 }

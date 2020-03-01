@@ -39,7 +39,8 @@ class LaradevController extends Controller
         }
     }
 
-    private function getConnection($conn){
+    private function getConnection($conn)
+    {
         $conn = (object)$conn;
         $defaultConn = config('database.connections.flying'.$conn->driver);
         $newConn     = array_merge($defaultConn, (array)$conn);
@@ -131,9 +132,9 @@ class LaradevController extends Controller
                 if($request->db_seed && $request->db_seed=="true"){
                     Artisan::call("db:seed");
                 }
-                if($request->db_passport && $request->db_passport=="true"){
-                    Artisan::call("passport:install");
-                }
+                // if($request->db_passport && $request->db_passport=="true"){
+                //     Artisan::call("passport:install");
+                // }
                 $migrate="yes";
             }
         }catch(Exception $e){
@@ -150,7 +151,8 @@ class LaradevController extends Controller
     private function getMigration(){
         return File::get( base_path("templates/migration.stub") );
     }
-    private function getFullTables($toModel=false,$tableKhusus=null){
+    private function getFullTables($toModel=false,$tableKhusus=null)
+    {
         try{
             $schemaManager = DB::getDoctrineSchemaManager();
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
@@ -159,6 +161,9 @@ class LaradevController extends Controller
             $fks = [];
             $cds = [];
             foreach ($data as $table) {
+                if( strpos($table->getname(),"pg_catalog.")!==false || strpos($table->getname(),"information_schema.")!==false ){
+                    continue;
+                }
                 $foreignKeys = [];
                 $required = [];
                 $defaults = [];
@@ -168,7 +173,8 @@ class LaradevController extends Controller
                 foreach ($rawForeignKeys as $fk) {
                     $fktemp= [
                         "child"=> $fk->getLocalTableName(), "child_column"=>implode($fk->getLocalColumns()),
-                        "parent"=> $fk->getForeignTableName(), "parent_column"=>implode($fk->getForeignColumns())
+                        "parent"=> $fk->getForeignTableName(), "parent_column"=>implode($fk->getForeignColumns()), "cascade"=>true,
+                        "real"=>false, "physical"=>true
                     ];
                     $foreignKeys[]=$fktemp;
                     $fks[$fk->getForeignTableName()][] = $fktemp;
@@ -206,11 +212,13 @@ class LaradevController extends Controller
                             if($arrayFK[1]=="id"){
                                 $fktemp= [
                                     "child"=> $table->getName(), "child_column"=>$column->getName(),
-                                    "parent"=> $arrayFK[0], "parent_column"=> $arrayFK[1], "cascade"=>true
+                                    "parent"=> $arrayFK[0], "parent_column"=> $arrayFK[1], "cascade"=>true,
+                                    "real" => true, "physical"=>false
                                 ];
                                 $foreignKeys[]=$fktemp;
                                 $fks[ $arrayFK[0]][] = $fktemp;
                                 $cds[ $table->getName() ][]   = $fktemp;
+                                $column->setUnsigned(true);
                             }
                         }
                         if( isset($comment->src) && $comment->src!="false" ){
@@ -219,11 +227,13 @@ class LaradevController extends Controller
                             if($arrayFK[1]=="id"){
                                 $fktemp= [
                                     "child"=> $table->getName(), "child_column"=>$column->getName(),
-                                    "parent"=> $arrayFK[0], "parent_column"=> $arrayFK[1], "cascade"=>false
+                                    "parent"=> $arrayFK[0], "parent_column"=> $arrayFK[1], "cascade"=>false,
+                                    "real" =>false, "physical"=>false
                                 ];
                                 $foreignKeys[] = $fktemp;
                                 $fks[ $arrayFK[0]][] = $fktemp;
                                 $cds[ $table->getName() ][]   = $fktemp;
+                                $column->setUnsigned(true);
                             }
                         }
                         if( isset($comment->required) ){
@@ -235,15 +245,16 @@ class LaradevController extends Controller
                         if( isset($comment->value) ){
                             $defaults[$column->getName()] = $comment->value;
                         }
-                    }elseif(strpos($columnName, '_id') !== false){                         
-                        $fktemp= [
-                            "child"=> $table->getName(), "child_column"=>$columnName,
-                            "parent"=> str_replace("_id","",$columnName), "parent_column"=> "id" , "cascade"=>true
-                        ];
-                        $foreignKeys[]=$fktemp;
-                        $fks[ str_replace("_id","",$columnName)][] = $fktemp;
-                        $cds[ $table->getName() ][]   = $fktemp;                        
                     }
+                    // elseif(strpos($columnName, '_id') !== false){
+                    //     $fktemp= [
+                    //         "child"=> $table->getName(), "child_column"=>$columnName,
+                    //         "parent"=> str_replace("_id","",$columnName), "parent_column"=> "id" , "cascade"=>true
+                    //     ];
+                    //     $foreignKeys[]=$fktemp;
+                    //     $fks[ str_replace("_id","",$columnName)][] = $fktemp;
+                    //     $cds[ $table->getName() ][]   = $fktemp;                        
+                    // }
                 }
                 $fullColumns = $columns;
                 if($toModel){
@@ -266,6 +277,10 @@ class LaradevController extends Controller
             }
             $views = $schemaManager->listViews();
             foreach($views as $view){
+                
+                if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
+                    continue;
+                }
                 $columnNames = [];
                 $columns     = [];
                 $selectString = str_replace("SELECT ","",explode(" FROM",$view->getSql())[0]);
@@ -387,7 +402,7 @@ class LaradevController extends Controller
         foreach ($tables as $table) {
             $tableNames[]=$table->getName();
         }
-        return $tableNames;        
+        return $tableNames;
     }
 
     public function createTables(Request $request){
@@ -468,9 +483,9 @@ class LaradevController extends Controller
         if($request->seed){
             Artisan::call("db:seed");
         }
-        if($request->passport){
-            Artisan::call("passport:install");
-        }
+        // if($request->passport){
+        //     Artisan::call("passport:install");
+        // }
         return "migration ok";
     }
 
@@ -498,10 +513,78 @@ class LaradevController extends Controller
     }
 
     public function updateModelsOne(Request $request, $tableName=null){
-        $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);        
-        return "update Model OK";
+        $tempFile=app()->path()."/Models/CustomModels/$tableName"."_temp.php";
+        File::put($tempFile,$request->text);
+        $result = exec("php -l $tempFile", $output, $return);
+        File::delete($tempFile);
+        if($return===0){
+            $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
+            return "update Model OK";
+        }else{
+            return response()->json($output,422);
+        };
     }
-
+    public function getPhysicalForeignKeys(){
+        $schema = $this->getFullTables(true);
+        return (array)$schema;
+    }
+    public function setPhysicalForeignKeys(Request $request){
+        $schema = $this->getFullTables(true);
+        $tables = $schema['tables'];
+        Schema::disableForeignKeyConstraints();
+        if($request->drop){
+            foreach($schema['children'] as $child => $data){
+                foreach($data as $ch){
+                if($ch['physical']){
+                        Schema::table($ch['child'], function (Blueprint $table)use($ch) {
+                            $table->dropForeign( [  $ch['child_column']] );
+                        });
+                    }
+                }
+            }            
+        }else{
+            foreach($schema['children'] as $child => $data){
+                foreach($data as $ch){
+                    if($ch['physical']){
+                            Schema::table($ch['child'], function (Blueprint $table)use($ch) {
+                                $table->dropForeign( [  $ch['child_column']] );
+                            });
+                    }
+                }
+                foreach($data as $ch){
+                    if(!$ch['physical']){
+                        $type="";
+                        foreach($tables as $table){
+                            if($table['table']==$ch['parent']){
+                                foreach($table['fullColumns'] as $col){
+                                    if($col['name'] == $ch['parent_column']){
+                                        $type = strtolower($col['type']);
+                                    }
+                                }
+                            }
+                        }
+                        if(strpos($type,"big")!==false){
+                            $type="unsignedBigInteger";
+                        }elseif(strpos($type,"medium")!==false){
+                            $type="unsignedMediumInteger";
+                        }elseif(strpos($type,"small")!==false){
+                            $type="unsignedSmallInteger";
+                        }elseif(strpos($type,"tiny")!==false){
+                            $type="unsignedTinyInteger";
+                        }else{
+                            $type="unsignedInteger";
+                        }
+                        Schema::table($ch['child'], function (Blueprint $table)use($ch,$type) {
+                            $table->$type($ch['child_column'])->nullable(false)->change();
+                            $table->foreign($ch['child_column'])->references($ch['parent_column'])->on($ch['parent']);
+                        });
+                    }
+                }
+            }
+        }
+        Schema::enableForeignKeyConstraints();
+        return "OK";
+    }
     public function createModels(Request $request, $tableName=null) {
         $this->prefixNamespace = "App\Models\BasicModels";
         $this->prefixNamespaceCustom = "App\Models\CustomModels";
@@ -594,6 +677,7 @@ class LaradevController extends Controller
             if(in_array($tableName, array_keys($schema['foreignkeys']) )){
                 foreach($schema['foreignkeys'][$tableName] as $fk){
                     $fk=(object)$fk;
+                    if(!$fk->real){continue;}
                     if($fk->cascade){
                         $details[] = $fk->child;
                     }else{
@@ -621,11 +705,11 @@ class LaradevController extends Controller
                     }
                 }
                 
-                // $paste = str_replace("__hasManyThrough",$hasManyThrough,$paste);
-                // $paste = str_replace("__hasMany",$hasMany,$paste);
-                
                 $paste = str_replace("__hasManyThrough","",$paste);
-                $paste = str_replace("__hasMany","",$paste);
+                $paste = str_replace("__hasMany",$hasMany,$paste);
+                
+                // $paste = str_replace("__hasManyThrough","",$paste);
+                // $paste = str_replace("__hasMany","",$paste);
             }
             $paste = str_replace("__detailsHeirs", count($detailsHeirs)==0?"[]":'["'.implode('","',$detailsHeirs).'"]' ,$paste);
             $paste = str_replace("__heirs", count($heirs)==0?"[]":'["'.implode('","',$heirs).'"]' ,$paste);
@@ -793,14 +877,22 @@ class LaradevController extends Controller
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
             $tables = $schemaManager->listTables();
             $arrayTables = [];
+            $fk = 0;
             foreach ($tables as $table) {
                 $arrayTables[] =  $table->getName();
+                $FK = $table->getForeignKeys();
+                $fk += count($FK);
+                $triggers=\App\Helpers\DBS::getTriggers($table->getName());
+                foreach($triggers as $trigger){
+                    $arrayTables[] = $trigger->trigger_name;
+                }
             }
             $views = $schemaManager->listViews();
             foreach ($views as $view) {
                 $arrayTables[] =  str_replace("public.","",$view->getName() );
             }
             $models = [];
+            
             foreach($data as $file){
                 if($file==""){continue;};
                 $stringClass = str_replace([".php","create_","_table"],["","",""], $file);
@@ -812,11 +904,12 @@ class LaradevController extends Controller
                     "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false
                 ];
             }
-            return $models;
+            return ["models"=>$models,"realfk"=>$fk];
         }
     }
 
     public function doMigrate(Request $req, $table=null){
+        Schema::disableForeignKeyConstraints();
         File::delete(glob(base_path('database/migrations')."/*.*"));
         $data = $this->getDirFullContents( base_path('database/migrations') );
         $data = array_filter($data,function($file)use ($table){
@@ -827,10 +920,20 @@ class LaradevController extends Controller
         if(count($data)==0){
             return response()->json("migration file [$table] tidak ada",400);
         }
-        if(Schema::hasTable($table)){
+        if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
+            $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
+            $tableName = explode("_timing_",$samaran)[0];
+            DB::unprepared("                    
+                DROP TRIGGER IF EXISTS $table ON $tableName;
+                DROP FUNCTION IF EXISTS fungsi_"."$table();
+            ");
+        }elseif(Schema::hasTable($table)){
             Schema::dropIfExists($table);
         }else{
             DB::unprepared("DROP VIEW IF EXISTS $table;");
+        }
+        if($req->down){
+            return "database migration ok, $table model downed successfully";
         }
         // return File::get( array_values($data)[0] );
         try{
@@ -858,6 +961,7 @@ class LaradevController extends Controller
             }
             return response()->json(["error"=>$e->getMessage()], 422);
         }
+        Schema::enableForeignKeyConstraints();
         return "database migration ok, $table model recreated successfully";
     }
     public function deleteAll(Request $req, $table){

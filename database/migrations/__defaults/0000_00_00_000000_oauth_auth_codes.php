@@ -15,7 +15,7 @@ class OauthAuthCodes extends Migration
     {
         Schema::create('oauth_auth_codes', function (Blueprint $table) {
             $table->string('id', 100)->primary();
-            $table->integer('user_id')->comment('{"src": "default_users.id"}');;
+            $table->unsignedInteger('user_id')->comment('{"src": "default_users.id"}');;
             $table->unsignedInteger('client_id');
             $table->text('scopes')->nullable();
             $table->boolean('revoked');

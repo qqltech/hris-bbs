@@ -32,6 +32,9 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->put('/migrations/{table}', 'LaradevController@editMigrations');
 
         
+        $router->get('/realfk', 'LaradevController@getPhysicalForeignKeys');
+        $router->get('/dorealfk', 'LaradevController@setPhysicalForeignKeys');
+
         $router->get('/migrate/{table}', 'LaradevController@doMigrate');
     });
 

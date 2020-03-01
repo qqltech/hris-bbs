@@ -14,11 +14,13 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
             return response()->json("Unauthorized",401);
         }
         try{
-            $models = (new \App\Http\Controllers\LaradevController)->readMigrations(new Request(),null);
+            $modelData = (new \App\Http\Controllers\LaradevController)->readMigrations(new Request(),null);
+            $models = $modelData['models'];
+            $realfk = $modelData['realfk'];
         }catch(Exception $e){
             return $e->getMessage();
         }
-        return view("defaults.backend",compact('models'));
+        return view("defaults.backend",compact('models','realfk'));
     });
 
 });

@@ -13,12 +13,17 @@ class OauthPersonalAccessClients extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('oauth_personal_access_clients');
         Schema::create('oauth_personal_access_clients', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('client_id')->index();
             $table->timestamps();
         });
+        
+        \DB::table("oauth_personal_access_clients")->insert([
+            "client_id" => 1,
+            "created_at"=>\Carbon\Carbon::now(),
+            "updated_at"=>\Carbon\Carbon::now()
+        ]);
     }
 
     /**

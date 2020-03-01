@@ -51,7 +51,7 @@
             <table border="1">
                 <thead>
                     <th>Migrations<button id="new" style="background-color:greenyellow">+</button></th>
-                    <th colspan="5">Actions </th>
+                    <th colspan="6">Actions <button id="real_fk" style="background-color:greenyellow">Set FK</button><button id="drop_fk" style="background-color:pink">Drop ({{$realfk}}) FK</button></th>
                 </thead>
                 <tbody>
                     @foreach($models as $key => $model)
@@ -65,6 +65,9 @@
                                 <td><button class="migrate" href="javascript:void(0)" style="font-size:10px" index={{$key}} 
                                     @if( $model['alias'] ) disabled @endif
                                     >@if($model['alias']) Alias&nbsp;&nbsp; @else Migrate @endif</button></td>
+                                <td><button class="down" href="javascript:void(0)" style="font-size:10px" index={{$key}} 
+                                        @if( $model['alias'] ) disabled @endif
+                                        >@if($model['alias']) Alias&nbsp;&nbsp; @else Down @endif</button></td>
                                 <td><button class="rename" href="javascript:void(0)" style="font-size:10px" 
                                     @if( strpos($model['file'],"_after_" ) !==false || strpos($model['file'],"_before_" ) !==false || (strpos($model['file'], 'default_') !== false || $model['alias']) ) disabled @endif
                                     index={{$key}}>Rename</button></td>
@@ -121,9 +124,11 @@
                         $options["params"] = data.body;
                     }
                     axios($options).then(response => {
+                        window.console.clear();
                         console.log(response);
                         callback(response);
                     }).catch(error => {
+                        window.console.clear();
                         alert("gagal, lihat console!");
                         console.log(error.response);
                     }).then(function () {
@@ -144,7 +149,32 @@
                             }
                         },function(response){
                             window.location.reload();
-                            // codemirror.setValue(response.data);
+                            console.log(response);
+                        });
+                    }
+                });
+                document.getElementById("real_fk").addEventListener("click",function(e){                   
+                    if(confirm('Pasang semua Pyhsical Foreign Keys??')){
+                        var url = "{{url('laradev/dorealfk')}}";
+                        submitApi({
+                            url : url,
+                            method: "get",
+                            body:null
+                        },function(response){
+                            window.location.reload();
+                            console.log(response);
+                        });
+                    }
+                });
+                document.getElementById("drop_fk").addEventListener("click",function(e){                    
+                    if(confirm('Hapus semua Physical Foreign Keys?')){
+                        var url = "{{url('laradev/dorealfk')}}?drop=true";
+                        submitApi({
+                            url : url,
+                            method: "get",
+                            body:null
+                        },function(response){
+                            window.location.reload();
                             console.log(response);
                         });
                     }
@@ -182,7 +212,9 @@
                     //     codemirror.setValue(localStorage.valueText);
                     // }
 
-                var isToggled=false;
+                var isToggled=true;
+                document.getElementById("codemirror").style.display = "none";
+                document.getElementById("modelSelected").style.display = "none";
                 // var isFull = false;
                 // document.getElementById("toggle_full").onclick = function(){
                 //     if(isFull){
@@ -359,6 +391,33 @@
                                 }
                             },function(response){
                                 window.location.reload();
+                            });
+                        }
+                    });
+                });
+                var classname = document.getElementsByClassName("down");
+                Array.from(classname).forEach(function(element) {
+                    
+                    let index = element.getAttribute("index");
+                    let arrayData = data[index];
+                    if(arrayData.table){
+                        element.style.backgroundColor="yellow";
+                    }else{
+                        element.setAttribute("disabled",true);
+                    }
+                    element.addEventListener("click",function(){                        
+                        if(confirm('Migrate down akan dilakukan?')){
+                            let index = element.getAttribute("index");
+                            let arrayData = data[index];
+                            var url = "{{url('laradev/migrate')}}/"+(arrayData.file).replace(".php","")+"?down=true";
+                            submitApi({
+                                url : url,
+                                method: "get",
+                                body:null
+                            },function(response){
+                                // codemirror.setValue(response.data.text);
+                                window.location.reload();
+                                // console.log(response);
                             });
                         }
                     });

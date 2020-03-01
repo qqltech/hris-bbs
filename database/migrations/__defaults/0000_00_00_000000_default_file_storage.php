@@ -13,11 +13,10 @@ class DefaultFileStorage extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('default_file_storage');
         Schema::create('default_file_storage', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('table',20)->nullable();
-            $table->bigInteger('parent_id')->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->enum('type',['file','image'])->nullable();
             $table->text('filename')->nullable();
             $table->timestamps();

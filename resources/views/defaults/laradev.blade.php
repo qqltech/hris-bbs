@@ -120,8 +120,7 @@
         "db_autocreate":false,
         "db_migrate" : false,
         "db_fresh"   : true,
-        "db_seed"    : true,
-        "db_passport": true
+        "db_seed"    : true
     }
 }
     </textarea>

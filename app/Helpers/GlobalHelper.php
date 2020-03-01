@@ -11,7 +11,6 @@ use Illuminate\Support\HigherOrderTapProxy;
 use Dotenv\Environment\Adapter\PutenvAdapter;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
-
 if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
@@ -1540,4 +1539,46 @@ function sanitizeString( $string, $force_lowercase = true, $anal = false ) {
     $clean = preg_replace('/\s+/', "-", $clean);
     $clean = ($anal) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
     return $clean;
+}
+function _uploadexcel($model, $request)
+{
+    $data = \Excel::toArray( null,$request->file);
+      	$rows = $data[0];
+        $headings = $rows[0];
+        $forbiddenHeadings = [];
+      	$bulkData = [];
+        $invalidRows = [];
+        foreach($headings as $col => $heading){
+            if( !in_array($heading,$model->columns) ){
+                $forbiddenHeadings[] = $heading;
+            }
+        }
+        if(count($forbiddenHeadings)>0){
+            return response()->json(["invalid_columns"=>$forbiddenHeadings],400);
+        }
+        try{
+            foreach($rows as $baris => $array){
+              if($baris==0){ continue; }
+                $row = [];
+                foreach($headings as $col => $heading){
+                    $row[$heading] = $array[$col];
+                }
+                array_merge($row,["created_at"=>\Carbon\Carbon::now(),"updated_at"=>\Carbon\Carbon::now() ]);
+                    $validator = \Validator::make($row, $model->importValidator);
+                  if ( $validator->fails()) {
+                      foreach($validator->errors()->all() as $error){
+                          $invalidRows[] = "[INVALID]".$error." in row[$baris]";
+                      }
+                  }
+                $bulkData[]=$row;
+           }
+            if( count($invalidRows)>0 ){
+              return response()->json($invalidRows,400);
+           }
+            DB::table($model->getTable())->insert($bulkData);
+
+        }catch(\Exception $e){
+            return response()->json([$e->getMessage()],400);
+        }
+      	return response()->json(["status"=>"success","data"=>$bulkData],200);
 }
