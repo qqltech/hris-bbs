@@ -588,8 +588,8 @@ class LaradevController extends Controller
                                 $id = $string[0];
                                 $table = explode('"',$string[1])[0];
                                 $sample = DB::table($table)->first();
-                                return response()->json((array)$sample,400);
-                                $sample->id = $id;
+                                return response()->json(['id'=>$id, 'table'=>$table, 'string'=> $e->getMessage()],400);
+                                $sample['id'] = $id;
                                 DB::table($table)->insert((array) $sample);
                                 goto addFK;
                             }else{
