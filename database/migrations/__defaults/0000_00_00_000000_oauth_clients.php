@@ -27,7 +27,6 @@ class OauthClients extends Migration
             $table->timestamps();
         });
         DB::table("oauth_clients")->insert([[
-            "user_id"      => 1,
             "name"      => "Password Grant Client",
             "secret"    => "ZJpXX9gGYqMhruw5gl5lgC4FywMwuHxe24uIw0Dk",
             "redirect"  => url(),
@@ -37,7 +36,6 @@ class OauthClients extends Migration
             "created_at"=>\Carbon\Carbon::now(),
             "updated_at"=>\Carbon\Carbon::now()
         ],[
-            "user_id"      => 1,
             "name"      => "Personal Access Client",
             "secret"    => "TiRlLOaIcy98aO6LgqTyPkNqyl31AL9wf1dcHGuV",
             "redirect"  => url(),
