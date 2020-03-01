@@ -546,17 +546,16 @@ class LaradevController extends Controller
             foreach($schema['children'] as $child => $data){
                 foreach($data as $ch){
                     if($ch['physical']){
-                            Schema::table($ch['child'], function (Blueprint $table)use($ch) {
-                                $table->dropForeign( [  $ch['child_column']] );
-                            });
+                        Schema::table($ch['child'], function (Blueprint $table)use($ch) {
+                            $table->dropForeign( [  $ch['child_column']] );
+                        });
                     }
                 }
                 foreach($data as $ch){
                     if(!$ch['physical']){
                         $type="";
                         foreach($tables as $table){
-                            if($table['table']==$ch['parent']){
-                                
+                            if($table['table']==$ch['parent']){                                
                                 foreach($table['fullColumns'] as $col){
                                     if($col['name'] == $ch['parent_column']){
                                         $type = strtolower($col['type']);
@@ -575,10 +574,14 @@ class LaradevController extends Controller
                         }else{
                             $type="unsignedInteger";
                         }
-                        Schema::table($ch['child'], function (Blueprint $table)use($ch,$type) {
-                            $table->$type($ch['child_column'])->nullable(false)->change();
-                            $table->foreign($ch['child_column'])->references($ch['parent_column'])->on($ch['parent']);
-                        });
+                        try{
+                            Schema::table($ch['child'], function (Blueprint $table)use($ch,$type) {
+                                $table->$type($ch['child_column'])->nullable(false)->change();
+                                $table->foreign($ch['child_column'])->references($ch['parent_column'])->on($ch['parent']);
+                            });
+                        }catch(Exception $e){
+                            return response()->json($e->getMessage(),400);
+                        }
                     }
                 }
             }
