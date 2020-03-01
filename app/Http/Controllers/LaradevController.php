@@ -582,7 +582,7 @@ class LaradevController extends Controller
                         try{
                             $updateArray = [];
                             $updateArray[$ch['child_column']] = "1";
-                            DB::table($ch['child'])->update($updateArray)->where($ch['child_column'],null);
+                            DB::table($ch['child'])->where($ch['child_column'],null)->update($updateArray);
                             Schema::table($ch['child'], function (Blueprint $table)use($ch,$type) {
                                 $table->$type($ch['child_column'])->nullable(false)->change();
                                 $table->foreign($ch['child_column'])->references($ch['parent_column'])->on($ch['parent']);
