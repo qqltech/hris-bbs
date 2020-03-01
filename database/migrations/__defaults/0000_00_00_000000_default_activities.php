@@ -18,7 +18,7 @@ class DefaultActivities extends Migration
             $table->bigIncrements('id');
             $table->integer('user_id')->nullable();
             $table->string('table',100)->nullable();
-            $table->unsignedBigInteger('table_id')->nullable();
+            $table->unsignedBigInteger('table_id')->nullable()->comment('{"fk": "false"}');
             $table->enum('action',[ 'update','delete','create' ])->nullable();
             $table->string('status')->nullable();
             $table->text('value')->nullable();

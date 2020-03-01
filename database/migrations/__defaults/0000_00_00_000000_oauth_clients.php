@@ -16,7 +16,8 @@ class OauthClients extends Migration
         Schema::dropIfExists('oauth_clients');
         Schema::create('oauth_clients', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id')->index()->nullable()->comment('{"src": "default_users.id"}');
+            $table->unsignedInteger('user_id')->index()
+            ->nullable()->comment('{"fk": "false"}');
             $table->string('name');
             $table->string('secret', 100);
             $table->text('redirect');
