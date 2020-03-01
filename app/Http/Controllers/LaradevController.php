@@ -588,9 +588,18 @@ class LaradevController extends Controller
                                 $id = $string[0];
                                 $table = explode('"',$string[1])[0];
                                 $sample = (array)DB::table($table)->first();
-                                // foreach($sample as $key=>$val){
-                                //     if(!in_array($key,['id','created_']) )
-                                // }
+                                foreach($sample as $key=>$val){
+                                    if(!in_array($key,['id','created_at','updated_at']) ){
+                                        if (DateTime::createFromFormat('Y-m-d H:i:s', $val) !== FALSE) {
+                                            continue;
+                                        }else if( DateTime::createFromFormat('Y-m-d', $val) !== FALSE ){
+                                            continue;
+                                        }else if( strpos($key,"_id") !== FALSE ){
+                                            continue;
+                                        }
+                                        $sample[$key] = $val.$id;
+                                    }
+                                }                                
                                 // return response()->json(['id'=>$id, 'table'=>$table, 'string'=> $e->getMessage()],400);
                                 $sample['id'] = $id;
                                 DB::table($table)->insert( $sample);
