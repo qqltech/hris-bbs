@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
                 'password' => $hasher->make("trial")
             ]
         );
-        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+        // DB::statement('SET FOREIGN_KEY_CHECKS = 1');
         DB::table("oauth_clients")->insert([
             "id"        => 1,
             "name"      => "Personal Access Client",
