@@ -555,7 +555,7 @@ class ApiFixedController extends Controller
                     "status"    => "$this->operation data gagal", 
                     "warning"  => $this->messages, 
                     "success"  => $this->success, 
-                    "errors"    => ["error"=>$e->getMessage(),"line"=>$e->getLine(),"file"=>$e->getFile(),"trace"=>$e->getTrace()],
+                    "errors"    => ["error"=>$e->getMessage(),"line"=>$e->getLine(),"file"=>$e->getFile()],
                     "request" => $this->requestData,
                     "id"        => $this->operationId
                 ],400);
