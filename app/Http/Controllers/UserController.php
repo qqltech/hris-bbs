@@ -49,7 +49,7 @@ class UserController extends Controller
         if($request->email){
             $user = User::where('email', $request->email)->orWhere('username',$request->email)->first();
         }elseif($request->username){
-            $user = User::where('username', $request->username)->first();
+            $user = User::where('email', $request->username)->orWhere('username',$request->username)->first();
         }
         if ($user) {
 
