@@ -353,7 +353,7 @@ class ApiFixedController extends Controller
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
                     if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){
-                        $this->createOperation($key, $value,$finalModel->id, $modelName);
+                        $this->createOperation($key, $value,$finalModel->id, $model->getTable());
                     }
                 }
             }
@@ -394,7 +394,7 @@ class ApiFixedController extends Controller
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
             foreach( $data as $key => $value ){
                 if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
-                    $this->createOperation($key, $value, $finalModel->id, $modelName);
+                    $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
             }
         }
@@ -512,7 +512,7 @@ class ApiFixedController extends Controller
         $this->success[] = "SUCCESS: data update in ".$model->getTable()." id: $id";
         foreach( $data as $key => $value ){
             if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
-                $this->createOperation($key, $value, $id, $modelName);
+                $this->createOperation($key, $value, $id, $model->getTable());
             }
         }
         $model = null;  
