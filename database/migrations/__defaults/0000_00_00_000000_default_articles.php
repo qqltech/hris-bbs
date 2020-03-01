@@ -13,7 +13,6 @@ class DefaultArticles extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('articles');
         Schema::create('default_articles', function (Blueprint $table) {
             $table->bigIncrements('id');           
             $table->longText('content');
@@ -33,6 +32,6 @@ class DefaultArticles extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('articles');
+        Schema::dropIfExists('default_articles');
     }
 }

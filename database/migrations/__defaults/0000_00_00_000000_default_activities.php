@@ -13,7 +13,6 @@ class DefaultActivities extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('default_activities');
         Schema::create('default_activities', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('user_id')->nullable();

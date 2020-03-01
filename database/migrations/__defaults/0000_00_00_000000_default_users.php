@@ -13,7 +13,6 @@ class DefaultUsers extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('default_users');
         Schema::create('default_users', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->nullable();

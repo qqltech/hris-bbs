@@ -13,7 +13,6 @@ class OauthAuthCodes extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('oauth_auth_codes');
         Schema::create('oauth_auth_codes', function (Blueprint $table) {
             $table->string('id', 100)->primary();
             $table->unsignedInteger('user_id')->comment('{"src": "default_users.id"}');;
