@@ -133,9 +133,9 @@ class LaradevController extends Controller
                 if($request->db_seed && $request->db_seed=="true"){
                     Artisan::call("db:seed");
                 }
-                // if($request->db_passport && $request->db_passport=="true"){
-                //     Artisan::call("passport:install");
-                // }
+                if($request->db_passport && $request->db_passport=="true"){
+                    Artisan::call("passport:install");
+                }
                 $migrate="yes";
             }
         }catch(Exception $e){
@@ -484,9 +484,9 @@ class LaradevController extends Controller
         if($request->seed){
             Artisan::call("db:seed");
         }
-        // if($request->passport){
-        //     Artisan::call("passport:install");
-        // }
+        if($request->passport){
+            Artisan::call("passport:install");
+        }
         return "migration ok";
     }
 
