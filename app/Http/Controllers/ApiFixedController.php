@@ -550,7 +550,8 @@ class ApiFixedController extends Controller
                     ],400);
                 }
             }catch(Exception $e){
-                DB::rollback();
+                // DB::rollback();
+                return "a";
                 // return response()->json([
                 //     "status"    => "$this->operation data gagal", 
                 //     "warning"  => $this->messages, 
