@@ -898,7 +898,7 @@ class LaradevController extends Controller
     public function readMigrations(Request $req, $table=null){
         
         if($table!=null){
-            $data = $this->getDirFullContents( base_path('database/migrations') );
+            $data = $this->getDirFullContents( base_path('database/migrations/projects') );
             $data = array_filter($data,function($file)use ($table){
                 if(strpos("$file.php", "$table.php")!==false){
                     return $file;
@@ -948,7 +948,7 @@ class LaradevController extends Controller
     public function doMigrate(Request $req, $table=null){
         Schema::disableForeignKeyConstraints();
         File::delete(glob(base_path('database/migrations')."/*.*"));
-        $data = $this->getDirFullContents( base_path('database/migrations') );
+        $data = $this->getDirFullContents( base_path('database/migrations/projects') );
         $data = array_filter($data,function($file)use ($table){
             if(strpos("$file.php", "$table.php")!==false){
                 return $file;
@@ -975,9 +975,9 @@ class LaradevController extends Controller
         // return File::get( array_values($data)[0] );
         try{
             $file = base_path( 'database/migrations/projects')."/0_0_0_0_"."$table.php";
-            if( strpos($table,"default_")!==FALSE || strpos($table,"oauth_")!==FALSE ){
-                $file = base_path( 'database/migrations/__defaults')."/0000_00_00_000000_$table.php";
-            }
+            // if( strpos($table,"default_")!==FALSE || strpos($table,"oauth_")!==FALSE ){
+            //     $file = base_path( 'database/migrations/__defaults')."/0000_00_00_000000_$table.php";
+            // }
             File::put(base_path('database/migrations')."/0_0_0_0_"."$table.php",File::get( $file ));
             $exitCode = Artisan::call('migrate:refresh', [
                 '--force' => true,
@@ -988,7 +988,7 @@ class LaradevController extends Controller
             if($table=="default_users"){
                 $hasher = app()->make('hash');
                 User::create([
-                        'name' => "trial",'email' => "trial@trial.trial", 'username'=>"trial",'password' => $hasher->make("trial")
+                    'name' => "trial",'email' => "trial@trial.trial", 'username'=>"trial",'password' => $hasher->make("trial")
                 ]);
             }
         }catch(Exception $e){
