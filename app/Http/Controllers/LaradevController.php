@@ -909,7 +909,7 @@ class LaradevController extends Controller
             }
             return File::get( array_values($data)[0] );
         }else{
-            $data = $this->getDirContents( base_path('database/migrations') );            
+            $data = $this->getDirContents( base_path('database/migrations/projects') );            
             $schemaManager = DB::getDoctrineSchemaManager();
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
             $tables = $schemaManager->listTables();
