@@ -556,6 +556,11 @@ class LaradevController extends Controller
                         $type="";
                         foreach($tables as $table){
                             if($table['table']==$ch['parent']){
+                                if(Schema::getConnection()->getDriverName()=='pgsql'){
+                                    DB::unprepared("
+                                        ALTER TABLE ".$table['table']." DISABLE TRIGGER ALL;
+                                    ");
+                                }
                                 foreach($table['fullColumns'] as $col){
                                     if($col['name'] == $ch['parent_column']){
                                         $type = strtolower($col['type']);
@@ -578,6 +583,15 @@ class LaradevController extends Controller
                             $table->$type($ch['child_column'])->nullable(false)->change();
                             $table->foreign($ch['child_column'])->references($ch['parent_column'])->on($ch['parent']);
                         });
+                        if(Schema::getConnection()->getDriverName()=='pgsql'){
+                            foreach($tables as $table){
+                                if($table['table']==$ch['parent']){
+                                    DB::unprepared("
+                                        ALTER TABLE ".$table['table']." ENABLE TRIGGER ALL;
+                                    ");
+                                }
+                            }
+                        }
                     }
                 }
             }
