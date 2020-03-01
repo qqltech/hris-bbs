@@ -19,12 +19,6 @@ class OauthPersonalAccessClients extends Migration
             $table->unsignedInteger('client_id')->index()->comment('{"fk": "false"}');
             $table->timestamps();
         });
-        
-        \DB::table("oauth_personal_access_clients")->insert([
-            "client_id" => 1,
-            "created_at"=>\Carbon\Carbon::now(),
-            "updated_at"=>\Carbon\Carbon::now()
-        ]);
     }
 
     /**

@@ -26,25 +26,6 @@ class OauthClients extends Migration
             $table->boolean('revoked');
             $table->timestamps();
         });
-        DB::table("oauth_clients")->insert([[
-            "name"      => "Password Grant Client",
-            "secret"    => "ZJpXX9gGYqMhruw5gl5lgC4FywMwuHxe24uIw0Dk",
-            "redirect"  => url(),
-            "personal_access_client" => false,
-            "password_client"   =>   true,
-            "revoked"   => false,
-            "created_at"=>\Carbon\Carbon::now(),
-            "updated_at"=>\Carbon\Carbon::now()
-        ],[
-            "name"      => "Personal Access Client",
-            "secret"    => "TiRlLOaIcy98aO6LgqTyPkNqyl31AL9wf1dcHGuV",
-            "redirect"  => url(),
-            "personal_access_client" => true,
-            "password_client"   =>   false,
-            "revoked"   => false,
-            "created_at"=>\Carbon\Carbon::now(),
-            "updated_at"=>\Carbon\Carbon::now()
-        ]]);
     }
 
     /**
