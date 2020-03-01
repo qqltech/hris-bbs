@@ -1051,13 +1051,7 @@ class LaradevController extends Controller
     }
     public function editMigrations(Request $req, $table=null){
         if($table!=null){
-            $dir = "projects";
-            $prefix = "0_0_0_0_";
-            if(strpos($table,"default_")!==FALSE){
-                $dir = "__defaults";
-                $prefix = "0000_00_00_000000_";
-            }
-            $data = $this->getDirFullContents( base_path("database/migrations/$dir") );
+            $data = $this->getDirFullContents( base_path('database/migrations/projects') );
             $data = array_filter($data,function($file)use ($table){
                 if(strpos("$file.php", "$table.php")!==false){
                     return $file;
@@ -1066,10 +1060,10 @@ class LaradevController extends Controller
             if( count($data) <1){
                 return response()->json("maaf nama model $table tidak ada", 400);
             }
-            $file = File::put( base_path("database/migrations/$dir")."/$prefix"."$table.php" , $req->text); 
+            $file = File::put( base_path('database/migrations/projects')."/0_0_0_0_"."$table.php" , $req->text); 
             return "update Migrations OK [".count($data)."]";
         }
-        $data = $this->getDirContents( base_path('database/migrations') );
+        $data = $this->getDirContents( base_path('database/migrations/projects') );
         if(strpos("x".$req->modul, "alias ")!==false && count(explode(" ",$req->modul))==3 ){
             $modul = explode(" ",  $req->modul)[2];
             $tableSrc   = explode(" ",  $req->modul)[1];
