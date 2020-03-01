@@ -13,6 +13,7 @@ class DefaultFileStorage extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('file_storage');
         Schema::create('default_file_storage', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('table',20)->nullable();
