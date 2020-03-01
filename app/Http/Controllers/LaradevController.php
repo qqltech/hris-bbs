@@ -574,13 +574,24 @@ class LaradevController extends Controller
                         }else{
                             $type="unsignedInteger";
                         }
+                        addFK:
                         try{
                             Schema::table($ch['child'], function (Blueprint $table)use($ch,$type) {
                                 $table->$type($ch['child_column'])->nullable(false)->change();
                                 $table->foreign($ch['child_column'])->references($ch['parent_column'])->on($ch['parent']);
                             });
                         }catch(Exception $e){
-                            return response()->json($e->getMessage(),400);
+                            if(strpos($e->getMessage(),") is not present in table ")!==false ){
+                                $string = $e->getMessage();
+                                $string = explode(")=(",$string)[1];
+                                $string = explode(') is not present in table "', $string);
+                                $id = $string[0];
+                                $table = explode('"',$string[1])[0];
+                                DB::table($table)->insert(["id"=>$id]);
+                                goto addFK;
+                            }else{
+                                return response()->json($e->getMessage(),400);
+                            }
                         }
                     }
                 }
