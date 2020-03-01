@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use App\Models\Defaults\User;
 
 class DefaultUsers extends Migration
 {
@@ -24,6 +25,15 @@ class DefaultUsers extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+        $hasher = app()->make('hash');
+        User::create(
+            [
+                'name' => "trial",
+                'email' => "trial@trial.trial",
+                'username'=>"trial",
+                'password' => $hasher->make("trial")
+            ]
+        );
     }
 
     /**

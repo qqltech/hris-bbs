@@ -985,12 +985,12 @@ class LaradevController extends Controller
             // $req->rewrite_custom = $req->rewrite_custom;
             $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
             File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php");
-            if($table=="default_users"){
-                $hasher = app()->make('hash');
-                User::create([
-                    'name' => "trial",'email' => "trial@trial.trial", 'username'=>"trial",'password' => $hasher->make("trial")
-                ]);
-            }
+            // if($table=="default_users"){
+            //     $hasher = app()->make('hash');
+            //     User::create([
+            //         'name' => "trial",'email' => "trial@trial.trial", 'username'=>"trial",'password' => $hasher->make("trial")
+            //     ]);
+            // }
         }catch(Exception $e){
             File::delete(glob(base_path('database/migrations')."/*.*"));
             if( File::exists( base_path('database/migrations')."/0_0_0_0_"."$table.php" ) ){
