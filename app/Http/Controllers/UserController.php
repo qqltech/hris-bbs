@@ -52,7 +52,9 @@ class UserController extends Controller
             $user = User::where('email', $request->username)->orWhere('username',$request->username)->first();
         }
         if ($user) {
-
+            if( isset($user->status) && strtolower($user->status)!='active'){
+                return response()->json("username is inactive", 401);
+            }
             if (Hash::check($request->password, $user->password)) {
                 $tokenResult = $user->createToken($request->email);
                 // $token = $tokenResult->token;

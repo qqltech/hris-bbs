@@ -22,6 +22,7 @@ class DefaultUsers extends Migration
             $table->string('username',60)->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->string('status',20)->default("ACTIVE");
             $table->rememberToken();
             $table->timestamps();
         });
