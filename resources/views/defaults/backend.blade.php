@@ -355,11 +355,11 @@
                 var classname = document.getElementsByClassName("delete");
                 Array.from(classname).forEach(function(element) {
                     element.addEventListener("click",function(){
-                        var password = prompt("Migration, Model, Table akan hilang!, password:", "");
+                        let index = element.getAttribute("index");
+                        let arrayData = data[index];
+                        var password = prompt(`[${(arrayData.file).replace(".php","")}] Migration, Model, Table akan hilang!, password:`, "");
                         if (password == null || password == "") {
                         } else {
-                            let index = element.getAttribute("index");
-                            let arrayData = data[index];
                             var url = "{{url('laradev/trio')}}/"+(arrayData.file).replace(".php","");
                             submitApi({
                                 url : url,
