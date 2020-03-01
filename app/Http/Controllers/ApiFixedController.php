@@ -551,14 +551,14 @@ class ApiFixedController extends Controller
                 }
             }catch(Exception $e){
                 DB::rollback();
-                return response()->json([
-                    "status"    => "$this->operation data gagal", 
-                    "warning"  => $this->messages, 
-                    "success"  => $this->success, 
-                    "errors"    => $e->getMessage(),
-                    "request" => $this->requestData,
-                    "id"        => $this->operationId
-                ],400);
+                // return response()->json([
+                //     "status"    => "$this->operation data gagal", 
+                //     "warning"  => $this->messages, 
+                //     "success"  => $this->success, 
+                //     "errors"    => $e->getMessage(),
+                //     "request" => $this->requestData,
+                //     "id"        => $this->operationId
+                // ],400);
             }
             if($this->operationOK){
                 DB::commit();
