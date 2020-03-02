@@ -966,6 +966,7 @@ class LaradevController extends Controller
             $alterFile = str_replace(  "\\projects\\","\\alters\\",array_values($data)[0]);
             if(!File::exists( $alterFile ) ){
                 $realmigration = File::get( array_values($data)[0] );
+                return explode("public function down",$realmigration);
                 $realmigration = explode("public function down",$realmigration)[0];
                 $realmigration = str_replace(["});","]);","Schema::create"],["==;//","..;//","Schema::table"],$realmigration);
                 $realmigration = str_replace([");"],[")->change();"],$realmigration);
