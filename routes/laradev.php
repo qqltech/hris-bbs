@@ -27,6 +27,8 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
 
         
         $router->get('/migrations', 'LaradevController@readMigrations');
+        $router->get('/alter/{table}', 'LaradevController@readAlter');
+        $router->put('/alter/{table}', 'LaradevController@editAlter');
         $router->get('/migrations/{table}', 'LaradevController@readMigrations');
         $router->post('/migrations', 'LaradevController@editMigrations');
         $router->put('/migrations/{table}', 'LaradevController@editMigrations');
@@ -36,8 +38,8 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->get('/dorealfk', 'LaradevController@setPhysicalForeignKeys');
 
         $router->get('/migrate/{table}', 'LaradevController@doMigrate');
+        $router->get('/refreshalias/{table}', 'LaradevController@refreshAlias');
     });
-
 
     $router->get('/', function(Request $req){
         if(!isset($req->kode) || $req->kode!=env("BACKENDPASSWORD","pulangcepat")){

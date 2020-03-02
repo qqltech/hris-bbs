@@ -51,29 +51,25 @@
             <table border="1">
                 <thead>
                     <th>Migrations<button id="new" style="background-color:greenyellow">+</button></th>
-                    <th colspan="6">Actions <button id="real_fk" style="background-color:greenyellow">Set FK</button><button id="drop_fk" style="background-color:pink">Drop ({{$realfk}}) FK</button></th>
+                    <th colspan="8">Actions <button id="real_fk" style="background-color:greenyellow">Set FK</button><button id="drop_fk" style="background-color:pink">Drop ({{$realfk}}) FK</button></th>
                 </thead>
                 <tbody>
                     @foreach($models as $key => $model)
                         @if( !(strpos($model['file'], 'oauth') !== false))
                             <tr>
                                 <td style="padding:0 5 0 5" id="data-{{$key}}">{{ str_replace(".php","",$model['file'])}}</td>
+                                <td><button class="alter" href="javascript:void(0)" style="font-size:10px" index={{$key}}>Alter</button></td>
                                 <td><button class="migration" href="javascript:void(0)" style="font-size:10px" index={{$key}}>Migration</button></td>
-                                <td><button class="model" href="javascript:void(0)" style="font-size:10px;"  index={{$key}}
-                                    @if( strpos($model['file'],"_after_" ) !==false || strpos($model['file'],"_before_" ) !==false ) disabled @endif
-                                    >Model</button></td>
-                                <td><button class="migrate" href="javascript:void(0)" style="font-size:10px" index={{$key}} 
-                                    @if( $model['alias'] ) disabled @endif
-                                    >@if($model['alias']) Alias&nbsp;&nbsp; @else Migrate @endif</button></td>
-                                <td><button class="down" href="javascript:void(0)" style="font-size:10px" index={{$key}} 
-                                        @if( $model['alias'] ) disabled @endif
-                                        >@if($model['alias']) Alias&nbsp;&nbsp; @else Down @endif</button></td>
+                                <td><button class="model" href="javascript:void(0)" style="font-size:10px;"  index={{$key}}>Model</button></td>
+                                <td><button class="migrate" href="javascript:void(0)" style="font-size:10px" index={{$key}}>UP @if($model['alias'])<button class="refreshalias" href="javascript:void(0)" style="font-size:10px" index={{$key}}>REF</button> @endif</button></td>
+                                <td><button class="down" href="javascript:void(0)" style="font-size:10px" index={{$key}}>DROP</button></td>
+                                <td><button class="alt" href="javascript:void(0)" style="font-size:10px" index={{$key}}>ALT</button></td>
                                 <td><button class="rename" href="javascript:void(0)" style="font-size:10px" 
                                     @if( strpos($model['file'],"_after_" ) !==false || strpos($model['file'],"_before_" ) !==false || (strpos($model['file'], 'default_') !== false || $model['alias']) ) disabled @endif
                                     index={{$key}}>Rename</button></td>
                                 <td><button class="delete" href="javascript:void(0)" style="font-size:10px" 
                                     @if( (strpos($model['file'], 'default_') !== false) ) disabled @endif
-                                    index={{$key}}>Delete</button></td>
+                                    index={{$key}}>[X]</button></td>
                             </tr>
                         @endif
                     @endforeach
@@ -125,12 +121,17 @@
                     }
                     axios($options).then(response => {
                         window.console.clear();
-                        console.log(response);
+                        let operationText  = document.getElementById("modelSelected").innerText;
+                        if(operationText.includes("MIGRATION") || operationText.includes("ALTER")|| operationText.includes("MODEL")){
+                            console.log(`%c ${operationText} OK`, 'color: green');
+                        }else{
+                            console.log(response.data);
+                        }
                         callback(response);
                     }).catch(error => {
                         window.console.clear();
                         alert("gagal, lihat console!");
-                        console.log(error.response);
+                        throw(error.response.data);
                     }).then(function () {
                         //GAGAL BERHASIL SELALU DILAKSANAKAN
                     });  ;
@@ -149,7 +150,7 @@
                             }
                         },function(response){
                             window.location.reload();
-                            console.log(response);
+                            // console.log(response);
                         });
                     }
                 });
@@ -162,7 +163,7 @@
                             body:null
                         },function(response){
                             window.location.reload();
-                            console.log(response);
+                            // console.log(response);
                         });
                     }
                 });
@@ -175,7 +176,7 @@
                             body:null
                         },function(response){
                             window.location.reload();
-                            console.log(response);
+                            // console.log(response);
                         });
                     }
                 });
@@ -192,9 +193,19 @@
                     lint: true,
                   });
                     var map = {"Ctrl-S": function(cm){
+                        let operationText  = document.getElementById("modelSelected").innerText;
+                        let file = operationText.split(".php")[0];
+                        let operation = "";
+                        if(operationText.includes("ALTER")){
+                            operation = "alter";
+                        }else if(operationText.includes("MODEL")){
+                            operation = "models";
+                        }else if(operationText.includes("MIGRATION")){
+                            operation = "migrations";
+                        }
                         var valueText = cm.getValue();
                         var currentData = currentmodel==null?currentmigration:currentmodel;
-                        var url = `{{url('laradev')}}/${currentmodel==null?'migrations':'models'}/`+(currentData).replace(".php","");
+                        var url = `{{url('laradev')}}/${operation}/${file}`;
                         submitApi({
                             url : url,
                             method: "put",
@@ -202,8 +213,8 @@
                                 text : valueText
                             }
                         },function(response){
-                            console.log(response);
-                            alert(`${currentmodel==null?'migration':'model'} berhasil tersimpan`);
+                            // console.log(response);
+                            alert(`${operation} berhasil tersimpan`);
                         });
 
                     }}
@@ -250,14 +261,83 @@
                         }
                     }
                 });
+                
+                var classname = document.getElementsByClassName("refreshalias");
+                Array.from(classname).forEach(function(element) {                                        
+                    let index = element.getAttribute("index");
+                    let arrayData = data[index];
+                    element.addEventListener("click",function(e){
+                        document.getElementById(`data-${index}`).style.backgroundColor = "red";
+                        document.getElementById(`data-${index}`).style.color = "white";                        
+                        setTimeout(function() {
+                            var confirmation = confirm(`REFRESH ALIAS [${(arrayData.file).replace(".php","")}]?`);
+                            if (!confirmation) {   
+                                document.getElementById(`data-${index}`).style.backgroundColor = "white";
+                                document.getElementById(`data-${index}`).style.color = "black";
+                            } else {
+                                var url = "{{url('laradev/refreshalias')}}/"+(arrayData.file).replace(".php","");
+                                submitApi({
+                                    url : url,
+                                    method: "get",
+                                    body:null
+                                },function(response){
+                                    alert("refresh Alias Successfully")
+                                    document.getElementById(`data-${index}`).style.backgroundColor = "white";
+                                    document.getElementById(`data-${index}`).style.color = "black";
+                                });
+                            }
+                        },1);
+                    });
+                });
+                var classname = document.getElementsByClassName("alter");
+                Array.from(classname).forEach(function(element) {                                        
+                    let index = element.getAttribute("index");
+                    let arrayData = data[index];
+                    if(!arrayData.model && !arrayData.alias ){
+                        element.style.backgroundColor="red";
+                    }
+                    if( (arrayData.file).includes("_after_") || (arrayData.file).includes("_before_") || arrayData.table===false || arrayData.view===true){
+                        element.style.display="none";
+                    }
+                    element.addEventListener("click",function(){
+                        var url = "{{url('laradev/alter')}}/"+(arrayData.file).replace(".php","");
+                        submitApi({
+                            url : url,
+                            method: "get",
+                            body:null
+                        },function(response){
+                            codemirror.setValue(response.data);
+                            currentmodel = null;
+                            currentmigration = (arrayData.file).replace(".php","");
+                            if(lastid!==null){
+                                document.getElementById(`data-${lastid}`).style.backgroundColor = "transparent";
+                                document.getElementById(`data-${lastid}`).style.color = "black";
+                            }
+                            document.getElementById(`data-${index}`).style.backgroundColor = "brown";
+                            document.getElementById(`data-${index}`).style.color = "white";
+                            lastid=index;
+
+                        });
+                        document.getElementById("modelSelected").innerText=arrayData.file+" [ALTER]";
+                        document.getElementById("codemirror").style.display = "block";
+                        isToggled = false;
+                        document.getElementById("modelSelected").style.display = "block";
+                    });
+                });
+
                 var classname = document.getElementsByClassName("migration");
-                Array.from(classname).forEach(function(element) {
+                Array.from(classname).forEach(function(element) {                    
+                    let index = element.getAttribute("index");
+                    let arrayData = data[index];
+                    if( (arrayData.file).includes("_after_") || (arrayData.file).includes("_before_")){
+                        element.innerHTML="&nbsp;"+"&nbsp;"+"Trigger"+"&nbsp;";
+                    }else if(arrayData.alias){
+                        element.innerHTML="&nbsp;"+"&nbsp;"+"&nbsp;"+"&nbsp;"+"Alias"+"&nbsp;"+"&nbsp;";
+                    }else if(arrayData.view){
+                        element.innerHTML="&nbsp;"+"&nbsp;"+"&nbsp;"+"&nbsp;"+"View"+"&nbsp;"+"&nbsp;";
+                    }
                     element.addEventListener("click",function(){
                         
-                        // Array.from(classname).forEach(function(el){
-                        //     el.style.backgroundColor="white";
-                        // });
-                        // element.style.backgroundColor="green";
                         
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
@@ -281,6 +361,7 @@
                         });
                         document.getElementById("modelSelected").innerText=arrayData.file+" [MIGRATION]";
                         document.getElementById("codemirror").style.display = "block";
+                        isToggled = false;
                         document.getElementById("modelSelected").style.display = "block";
                     });
                 });
@@ -323,6 +404,7 @@
                         });
                         document.getElementById("modelSelected").innerText=arrayData.file+" [MODEL]";
                         document.getElementById("codemirror").style.display = "block";
+                        isToggled = false;
                         document.getElementById("modelSelected").style.display = "block";
                     });
                 });
@@ -334,65 +416,132 @@
                     if(!arrayData.table && !arrayData.alias){
                         element.style.backgroundColor="red";
                     }
-                    element.addEventListener("click",function(){
-                       
+                    if( arrayData.alias){
+                        element.style.display="none";
+                    }
+                    element.addEventListener("click",function(){                       
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
-                        if(confirm('Table dan BasicModel akan ter-replace?')){
-                            var url = "{{url('laradev/migrate')}}/"+(arrayData.file).replace(".php","");
-                            submitApi({
-                                url : url,
-                                method: "get",
-                                body:null
-                            },function(response){
-                                // codemirror.setValue(response.data.text);
-                                window.location.reload();
-                                // console.log(response);
-                            });
-                        }
+                        document.getElementById(`data-${index}`).style.backgroundColor = "red";
+                        document.getElementById(`data-${index}`).style.color = "white";
+                        let isTrue;
+                        setTimeout(function() {
+                            isTrue = confirm('[MIGRATE:refresh] Table dan BasicModel akan ter-replace?'); 
+                            if(isTrue){
+                                var url = "{{url('laradev/migrate')}}/"+(arrayData.file).replace(".php","");
+                                submitApi({
+                                    url : url,
+                                    method: "get",
+                                    body:null
+                                },function(response){
+                                    // codemirror.setValue(response.data.text);
+                                    window.location.reload();
+                                    // console.log(response);
+                                });
+                            }else{
+                                document.getElementById(`data-${index}`).style.backgroundColor = "white";
+                                document.getElementById(`data-${index}`).style.color = "black";
+                            }
+                        },1);
                     });
                 });
+
+                
+                var classname = document.getElementsByClassName("alt");
+                Array.from(classname).forEach(function(element) {
+                    
+                    let index = element.getAttribute("index");
+                    let arrayData = data[index];
+                    if(!arrayData.table || arrayData.alias){
+                        element.style.display="none";
+                    }
+
+                    if( (arrayData.file).includes("_after_") || (arrayData.file).includes("_before_") || arrayData.table===false || arrayData.view===true){
+                        element.style.display="none";
+                    }
+                    element.addEventListener("click",function(){                       
+                        let index = element.getAttribute("index");
+                        let arrayData = data[index];
+                        document.getElementById(`data-${index}`).style.backgroundColor = "red";
+                        document.getElementById(`data-${index}`).style.color = "white";
+                        let isTrue;
+                        setTimeout(function() {
+                            isTrue = confirm('[ALTER] Table dan BasicModel akan ter-update?'); 
+                            if(isTrue){
+                                var url = "{{url('laradev/migrate')}}/"+(arrayData.file).replace(".php","")+"?alter=true";
+                                submitApi({
+                                    url : url,
+                                    method: "get",
+                                    body:null
+                                },function(response){
+                                    // codemirror.setValue(response.data.text);
+                                    window.location.reload();
+                                    // console.log(response);
+                                });
+                            }else{
+                                document.getElementById(`data-${index}`).style.backgroundColor = "white";
+                                document.getElementById(`data-${index}`).style.color = "black";
+                            }
+                        },1);
+                    });
+                });
+
                 var classname = document.getElementsByClassName("delete");
                 Array.from(classname).forEach(function(element) {
                     element.addEventListener("click",function(){
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
-                        var password = prompt(`[${(arrayData.file).replace(".php","")}] Migration, Model, Table akan hilang!, password:`, "");
-                        if (password == null || password == "") {
-                        } else {
-                            var url = "{{url('laradev/trio')}}/"+(arrayData.file).replace(".php","");
-                            submitApi({
-                                url : url,
-                                method: "delete",
-                                body:{
-                                    password : password
-                                }
-                            },function(response){
-                                window.location.reload();
-                            });
-                        }
+                        document.getElementById(`data-${index}`).style.backgroundColor = "red";
+                        document.getElementById(`data-${index}`).style.color = "white";                        
+                        setTimeout(function() {
+                            var password = prompt(`[${(arrayData.file).replace(".php","")}] Migration, Model, Table akan hilang!, password:`, "");
+                            if (password == null || password == "") {   
+                                document.getElementById(`data-${index}`).style.backgroundColor = "white";
+                                document.getElementById(`data-${index}`).style.color = "black";
+                            } else {
+                                var url = "{{url('laradev/trio')}}/"+(arrayData.file).replace(".php","");
+                                submitApi({
+                                    url : url,
+                                    method: "delete",
+                                    body:{
+                                        password : password
+                                    }
+                                },function(response){
+                                    window.location.reload();
+                                });
+                            }
+                        },1);
                     });
                 });
                 var classname = document.getElementsByClassName("rename");
                 Array.from(classname).forEach(function(element) {
-                    element.addEventListener("click",function(){
-                        var table = prompt("New Migration Name:", "");
-                        if (table == null || table == "") {
-                        } else {
-                            let index = element.getAttribute("index");
-                            let arrayData = data[index];
-                            var url = "{{url('laradev/tables')}}/"+(arrayData.file).replace(".php","");
-                            submitApi({
-                                url     : url,
-                                method  : "PUT",
-                                body    : {
-                                    "name": table,
-                                    "models": true
-                                }
-                            },function(response){
-                                window.location.reload();
-                            });
-                        }
+                    element.addEventListener("click",function(){                        
+                        let index = element.getAttribute("index");
+                        let arrayData = data[index];
+                        document.getElementById(`data-${index}`).style.backgroundColor = "red";
+                        document.getElementById(`data-${index}`).style.color = "white";
+                        setTimeout(function() {
+                            var table = prompt((arrayData.file).replace(".php","")+" ->New Migration Name:", "");
+                            if (table == null || table == "") {                                    
+                                document.getElementById(`data-${index}`).style.backgroundColor = "white";
+                                document.getElementById(`data-${index}`).style.color = "black";
+                            } else {
+                                let index = element.getAttribute("index");
+                                let arrayData = data[index];
+                                var url = "{{url('laradev/tables')}}/"+(arrayData.file).replace(".php","");
+                                submitApi({
+                                    url     : url,
+                                    method  : "PUT",
+                                    body    : {
+                                        "name": table,
+                                        "models": true
+                                    }
+                                },function(response){
+                                    window.location.reload();
+                                });
+                            }
+                        },1);  
+                        
                     });
                 });
                 var classname = document.getElementsByClassName("down");
@@ -405,21 +554,33 @@
                     }else{
                         element.setAttribute("disabled",true);
                     }
+                    if( arrayData.alias){
+                        element.style.display="none";
+                    }
                     element.addEventListener("click",function(){                        
-                        if(confirm('Migrate down akan dilakukan?')){
-                            let index = element.getAttribute("index");
-                            let arrayData = data[index];
-                            var url = "{{url('laradev/migrate')}}/"+(arrayData.file).replace(".php","")+"?down=true";
-                            submitApi({
-                                url : url,
-                                method: "get",
-                                body:null
-                            },function(response){
-                                // codemirror.setValue(response.data.text);
-                                window.location.reload();
-                                // console.log(response);
-                            });
-                        }
+                        document.getElementById(`data-${index}`).style.backgroundColor = "red";
+                        document.getElementById(`data-${index}`).style.color = "white";
+                        let isTrue;
+                        setTimeout(function() {
+                            isTrue = confirm('Migrate down akan dilakukan?'); 
+                            if(isTrue){
+                                let index = element.getAttribute("index");
+                                let arrayData = data[index];
+                                var url = "{{url('laradev/migrate')}}/"+(arrayData.file).replace(".php","")+"?down=true";
+                                submitApi({
+                                    url : url,
+                                    method: "get",
+                                    body:null
+                                },function(response){
+                                    // codemirror.setValue(response.data.text);
+                                    window.location.reload();
+                                    // console.log(response);
+                                });
+                            }else{
+                                document.getElementById(`data-${index}`).style.backgroundColor = "white";
+                                document.getElementById(`data-${index}`).style.color = "black";
+                            }
+                        },1);
                     });
                 });
             </script>

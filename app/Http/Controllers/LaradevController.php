@@ -38,6 +38,9 @@ class LaradevController extends Controller
         if( ! File::exists(base_path("database/migrations/projects")) ){
             File::makeDirectory( base_path("database/migrations/projects"), 493, true);
         }
+        if( ! File::exists(base_path("database/migrations/alters")) ){
+            File::makeDirectory( base_path("database/migrations/alters"), 493, true);
+        }
     }
 
     private function getConnection($conn)
@@ -446,6 +449,8 @@ class LaradevController extends Controller
             return response()->json("maaf nama model $request->name telah terpakai", 400);
         }
         if(Schema::hasTable($tableName)){
+            Schema::rename($tableName, $request->name);
+        }else{
             Schema::rename($tableName, $request->name);
         }
         if($request->models){
@@ -896,7 +901,6 @@ class LaradevController extends Controller
     }
 
     public function readMigrations(Request $req, $table=null){
-        
         if($table!=null){
             $data = $this->getDirFullContents( base_path('database/migrations/projects') );
             $data = array_filter($data,function($file)use ($table){
@@ -913,7 +917,7 @@ class LaradevController extends Controller
             $schemaManager = DB::getDoctrineSchemaManager();
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
             $tables = $schemaManager->listTables();
-            $arrayTables = [];
+            $arrayTables = []; $arrayViews = [];
             $fk = 0;
             foreach ($tables as $table) {
                 $arrayTables[] =  $table->getName();
@@ -926,7 +930,9 @@ class LaradevController extends Controller
             }
             $views = $schemaManager->listViews();
             foreach ($views as $view) {
-                $arrayTables[] =  str_replace("public.","",$view->getName() );
+                $viewName = str_replace("public.","",$view->getName() );
+                $arrayTables[] =  $viewName;
+                $arrayViews[]=$viewName;
             }
             $models = [];
             
@@ -938,14 +944,39 @@ class LaradevController extends Controller
                     "file" => $file,
                     "model"=> class_exists( $modelCandidate )?true:false,
                     "table"=> in_array($stringClass, $arrayTables)?true:false,
-                    "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false
+                    "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false,
+                    "view" => in_array($stringClass, $arrayViews)?true:false,
                 ];
             }
             return ["models"=>$models,"realfk"=>$fk];
         }
     }
 
+    public function readAlter(Request $req, $table=null){
+        if($table!=null){
+            $data = $this->getDirFullContents( base_path('database/migrations/projects') );
+            $data = array_filter($data,function($file)use ($table){
+                if(strpos("$file.php", "$table.php")!==false){
+                    return $file;
+                }
+            });
+            if(count($data)==0){
+                return response()->json("migration file [$table] tidak ada",400);
+            }
+            $alterFile = str_replace(  "\\projects\\","\\alters\\",array_values($data)[0]);
+            if(!File::exists( $alterFile ) ){
+                $realmigration = File::get( array_values($data)[0] );
+                $realmigration = explode("public function down",$realmigration)[0];
+                $realmigration = str_replace(["});","]);","Schema::create"],["==;//","..;//","Schema::table"],$realmigration);
+                $realmigration = str_replace([");"],[")->change();"],$realmigration);
+                $realmigration = str_replace(["==;//","..;//","Schema::create"],["});//","]);//","Schema::table"],$realmigration);
+                return $realmigration."\n}";
+            }
+            return File::get( $alterFile );
+        }
+    }
     public function doMigrate(Request $req, $table=null){
+        
         Schema::disableForeignKeyConstraints();
         File::delete(glob(base_path('database/migrations')."/*.*"));
         $data = $this->getDirFullContents( base_path('database/migrations/projects') );
@@ -957,24 +988,30 @@ class LaradevController extends Controller
         if(count($data)==0){
             return response()->json("migration file [$table] tidak ada",400);
         }
-        if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
-            $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
-            $tableName = explode("_timing_",$samaran)[0];
-            DB::unprepared("                    
-                DROP TRIGGER IF EXISTS $table ON $tableName;
-                DROP FUNCTION IF EXISTS fungsi_"."$table();
-            ");
-        }elseif(Schema::hasTable($table)){
-            Schema::dropIfExists($table);
-        }else{
-            DB::unprepared("DROP VIEW IF EXISTS $table;");
+        if(!$req->alter){
+            if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
+                $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
+                $tableName = explode("_timing_",$samaran)[0];
+                DB::unprepared("                    
+                    DROP TRIGGER IF EXISTS $table ON $tableName;
+                    DROP FUNCTION IF EXISTS fungsi_"."$table();
+                ");
+            }elseif(Schema::hasTable($table)){
+                Schema::dropIfExists($table);
+            }else{
+                DB::unprepared("DROP VIEW IF EXISTS $table;");
+            }
         }
         if($req->down){
             return "database migration ok, $table model downed successfully";
         }
         // return File::get( array_values($data)[0] );
         try{
-            $file = base_path( 'database/migrations/projects')."/0_0_0_0_"."$table.php";
+            $dir = "projects";
+            if($req->alter){
+                $dir = "alters";
+            }
+            $file = base_path( "database/migrations/$dir")."/0_0_0_0_"."$table.php";
             // if( strpos($table,"default_")!==FALSE || strpos($table,"oauth_")!==FALSE ){
             //     $file = base_path( 'database/migrations/__defaults')."/0000_00_00_000000_$table.php";
             // }
@@ -999,7 +1036,11 @@ class LaradevController extends Controller
             return response()->json(["error"=>$e->getMessage()], 422);
         }
         Schema::enableForeignKeyConstraints();
-        return "database migration ok, $table model recreated successfully";
+        if($req->alter){
+            return "database alter ok, $table model altered successfully";
+        }else{
+            return "database migration ok, $table model recreated successfully";
+        }
     }
     public function deleteAll(Request $req, $table){
         if(!$req->password){
@@ -1048,6 +1089,30 @@ class LaradevController extends Controller
             return response()->json($e->getMessage(),400);
         }
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
+    }
+    public function editAlter(Request $req, $table=null){
+        $file = File::put( base_path('database/migrations/alters')."/0_0_0_0_"."$table.php" , $req->text); 
+        return "update Alter OK";
+    }
+    public function refreshAlias(Request $req,$table){
+        // return response()->json($parent,400);
+        $className = "\\App\\Models\\BasicModels\\$table";   
+        $class = new $className();
+        $parent = $class->getTable();
+        try{
+            $stringModelSrc = File::get("$this->modelsPath/BasicModels/$parent.php");
+            $stringModelSrc = str_replace( [
+                "class $parent",
+                "public \$lastUpdate"
+            ],[
+                "class $table",
+                "public \$alias=true;\npublic \$lastUpdate"
+            ],$stringModelSrc);
+            File::put( "$this->modelsPath/BasicModels/$table.php",$stringModelSrc);
+        }catch(Exception $e){
+            return response()->json($e,400);
+        }
+        return "update Basic Model Alias from $parent OK";
     }
     public function editMigrations(Request $req, $table=null){
         if($table!=null){

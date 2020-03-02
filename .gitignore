@@ -7,6 +7,7 @@ Homestead.yaml
 .env
 .editorconfig
 /database/migrations/projects
+/database/migrations/alters
 /app/Models/CustomModels
 /app/Models/BasicModels
 customscript.sh
