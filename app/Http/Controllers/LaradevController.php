@@ -964,16 +964,15 @@ class LaradevController extends Controller
                 return response()->json("migration file [$table] tidak ada",400);
             }
             $alterFile = str_replace(  "\\projects\\","\\alters\\",array_values($data)[0]);
+            $alterFile = str_replace(  "/projects/","/alters/",array_values($data)[0]);
             if(!File::exists( $alterFile ) ){
                 $realmigration = File::get( array_values($data)[0] );
-                return "abc";
                 $realmigration = explode("public function down",$realmigration)[0];
                 $realmigration = str_replace(["});","]);","Schema::create"],["==;//","..;//","Schema::table"],$realmigration);
                 $realmigration = str_replace([");"],[")->change();"],$realmigration);
                 $realmigration = str_replace(["==;//","..;//","Schema::create"],["});//","]);//","Schema::table"],$realmigration);
                 return $realmigration."\n}";
             }
-            return $alterFile;
             return File::get( $alterFile );
         }
     }
