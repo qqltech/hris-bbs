@@ -963,8 +963,11 @@ class LaradevController extends Controller
             if(count($data)==0){
                 return response()->json("migration file [$table] tidak ada",400);
             }
-            $alterFile = str_replace(  "\\projects\\","\\alters\\",array_values($data)[0]);
-            $alterFile = str_replace(  "/projects/","/alters/",array_values($data)[0]);
+            if(strpos($alterFile, "\\projects")){
+                $alterFile = str_replace(  "\\projects\\","\\alters\\",array_values($data)[0]);
+            }else{
+                $alterFile = str_replace(  "/projects/","/alters/",array_values($data)[0]);
+            }
             if(!File::exists( $alterFile ) ){
                 $realmigration = File::get( array_values($data)[0] );
                 $realmigration = explode("public function down",$realmigration)[0];
