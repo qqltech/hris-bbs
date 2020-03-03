@@ -963,7 +963,7 @@ class LaradevController extends Controller
             if(count($data)==0){
                 return response()->json("migration file [$table] tidak ada",400);
             }
-            if(strpos($alterFile, "\\projects")){
+            if(strpos(array_values($data)[0], "\\projects")){
                 $alterFile = str_replace(  "\\projects\\","\\alters\\",array_values($data)[0]);
             }else{
                 $alterFile = str_replace(  "/projects/","/alters/",array_values($data)[0]);
