@@ -973,7 +973,7 @@ class LaradevController extends Controller
                 $realmigration = str_replace(["==;//","..;//","Schema::create"],["});//","]);//","Schema::table"],$realmigration);
                 return $realmigration."\n}";
             }
-            return "abc";
+            return $alterFile;
             return File::get( $alterFile );
         }
     }
