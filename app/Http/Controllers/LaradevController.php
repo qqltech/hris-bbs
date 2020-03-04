@@ -203,7 +203,15 @@ class LaradevController extends Controller
                     ];
                     
                     if( !in_array($column->getName(), ["id","created_at","updated_at"]) &&  $column->getNotnull()){
-                        $required[]=$column->getName();
+                        $comment    = $column->getComment();
+                        if($comment!=null && $comment!=""){
+                            $comment = json_decode($comment);
+                            if( isset($comment->required) && $comment->required!="false" ){
+                                $required[]=$column->getName();
+                            }
+                        }else{                            
+                            $required[]=$column->getName();
+                        }
                     }
                     $comment    = $column->getComment();
                     $columnName = $column->getName();
@@ -240,13 +248,13 @@ class LaradevController extends Controller
                                 $column->setUnsigned(true);
                             }
                         }
-                        if( isset($comment->required) ){
+                        if( isset($comment->required) && $comment->required!="false" ){
                             $isRequired = $comment->required;
                             if($isRequired){
                                 $required[]=$column->getName();
                             }
                         }
-                        if( isset($comment->value) ){
+                        if( isset($comment->value)){
                             $defaults[$column->getName()] = $comment->value;
                         }
                     }
