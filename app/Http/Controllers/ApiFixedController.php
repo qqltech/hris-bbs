@@ -52,7 +52,7 @@ class ApiFixedController extends Controller
             case 'delete' :
                 $this->operation = "delete";
                 break;
-            case 'put' :            
+            case 'patch' :            
             case 'put' :
                 $this->operation = "update";
                 break;

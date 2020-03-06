@@ -208,6 +208,8 @@ class LaradevController extends Controller
                             $comment = json_decode($comment);
                             if( isset($comment->required) && $comment->required!="false" ){
                                 $required[]=$column->getName();
+                            }else if(!isset($comment->required) ){
+                                $required[]=$column->getName();
                             }
                         }else{                            
                             $required[]=$column->getName();
