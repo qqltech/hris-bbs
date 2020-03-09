@@ -5,4 +5,4 @@ git push sisthaserver master
 git push igaserver master
 git push efiserver master
 git push hsiserver master
-git push kmnuserver master
+git push kmnuserver master 
