@@ -1,7 +1,7 @@
 composer install
 mkdir database/migrations/projects
 mkdir database/migrations/alters
-cp database/migrations/__defaults/*.* database/migrations/projects
+cp database/migrations/__defaults/*.* database/migrations/projects/
 cp .env-example .env
 chmod 777 .env
 chmod 777 -R app/Models
