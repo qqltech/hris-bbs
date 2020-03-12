@@ -698,6 +698,7 @@ class LaradevController extends Controller
                     'searchable'=> isset($cfg['searchable'])? $cfg['searchable']:array_values(array_filter($table->columns,function($dt){ if($dt!='id'){return $dt;} } )),
                     'deleteable'=> isset($cfg['deleteable'])?($cfg['deleteable']=="false"?false:true):true,
                     'extendable'=> isset($cfg['extendable'])?($cfg['extendable']=="false"?false:true):false,
+                    'deleteOnUse'=> isset($cfg['deleteOnUse'])?($cfg['deleteOnUse']=="false"?false:true):false,
                     'casts'     => isset($cfg['casts'])?$cfg['casts']:['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']
                 ]
             ];
@@ -729,12 +730,12 @@ class LaradevController extends Controller
             if(in_array($tableName, array_keys($schema['foreignkeys']) )){
                 foreach($schema['foreignkeys'][$tableName] as $fk){
                     $fk=(object)$fk;
-                    if(!$fk->real){continue;}
                     if($fk->cascade){
                         $details[] = $fk->child;
                     }else{
                         $heirs[] = $fk->child;
                     }
+                    if(!$fk->real){continue;}
                     $hasMany.=str_replace([
                         "__child", "__cld_column","__parent_column"
                     ],[
@@ -790,7 +791,7 @@ class LaradevController extends Controller
             $paste = str_replace([
                 "__config_guarded", "__config_hidden","__config_required","__config_createable",
                 "__config_updateable","__config_searchable","__config_deleteable","__config_extendable",
-                "__config_cascade","__config_casts", "__config_unique"
+                "__config_cascade","__config_deleteOnUse","__config_casts", "__config_unique"
             ], [
                 isset($cfg['guarded'])? (!is_array($cfg['guarded'])? "'".$cfg['guarded']."'":'["'.implode('","',$cfg['guarded']).'"]'):"['id']", 
                 isset($cfg['hidden'])? (!is_array($cfg['hidden'])? "'".$cfg['hidden']."'":'["'.implode('","',$cfg['hidden']).'"]'):"[]", 
@@ -801,6 +802,7 @@ class LaradevController extends Controller
                 isset($cfg['deleteable'])?$cfg['deleteable']:"true",
                 isset($cfg['extendable'])?$cfg['extendable']:"false",
                 isset($cfg['cascade'])?$cfg['cascade']:"true",
+                isset($cfg['deleteOnUse'])?$cfg['deleteOnUse']:"false",
                 isset($cfg['casts'])?str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($cfg['casts'], JSON_PRETTY_PRINT)):"['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']",
                 str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->uniques, JSON_PRETTY_PRINT))
             ],$paste);

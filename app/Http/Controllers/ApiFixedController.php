@@ -265,19 +265,26 @@ class ApiFixedController extends Controller
         $modelCandidate = "\App\Models\BasicModels\\$modelName";
         $model          = new $modelCandidate;
         $detailsArray   = $model->details; 
+        $heirs          = $model->heirs; 
         $cascade        = $model->cascade;
         $deleteable     = $model->deleteable;
+        $deleteOnUse    = isset($model->deleteOnUse)?$model->deleteOnUse:false;
         if(!$deleteable){
             $this->messages[] = "UNDELETABLE: cannot delete [$modelName]";
             $this->isAuthorized=false;
             return false;
+        }
+        if(!$deleteOnUse){
+            foreach( $heirs as $heir ){
+                $modelCandidateHeir = "\App\Models\BasicModels\\$heir";
+                
+            }
         }
         if($cascade){
             foreach( $detailsArray as $detail ){             
                 $this->is_model_deletable($detail, null);
             }
         }
-
         $model = null;
         return true;
     }

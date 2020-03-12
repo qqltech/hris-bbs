@@ -26,6 +26,7 @@ class __class extends Model
     public $deleteable  = __config_deleteable;
     public $cascade     = __config_cascade;
     public $extendable  = __config_extendable;
+    public $deleteOnUse = __config_deleteOnUse;
     protected $casts    = __config_casts;
     __hasMany
     __hasManyThrough

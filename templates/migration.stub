@@ -25,6 +25,7 @@ class __class__ extends Migration
             "!updateable"   => ["id","created_at","updated_at"], //kolom yang bisa diUPDATE
             "searchable"    => "all", //kolom yang bisa di BULK-WHERE LIKE
             "deleteable"    => "true", //row apakah bisa di DELETE
+            "deleteOnUse"   => "false", //row apakah bisa di DELETE
             "extendable"    => "false", //table apakah bisa otomatis nambah kolom saat kolom tidak ada saat CREATE
             "casts"     => [ // cek https://laravel.com/docs/6.x/eloquent-mutators#attribute-casting
                 'created_at' => 'datetime:d-m-Y',
