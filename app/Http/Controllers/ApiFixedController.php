@@ -439,8 +439,8 @@ class ApiFixedController extends Controller
             return $model->customFind($overrideParams);
         }else{
             $p->where_raw   = isset($data->where) ? $data->where : null;
-            $p->order_by    = isset($data->orderby) ? $data->orderby:null;
-            $p->order_type  = isset($data->ordertype) ? $data->ordertype:null;
+            $p->order_by    = isset($data->orderby) ? $data->orderby:"$model->table.updated_at";
+            $p->order_type  = isset($data->ordertype) ? $data->ordertype:"DESC";
             $p->order_by_raw= isset($data->orderbyraw) ? $data->orderbyraw:null;
             $p->search      = isset($data->search) ? $data->search:null;
             $p->searchfield = isset($data->searchfield) ? $data->searchfield:null;
