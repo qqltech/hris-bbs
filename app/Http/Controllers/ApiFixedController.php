@@ -284,8 +284,6 @@ class ApiFixedController extends Controller
                         $colArr = explode("=", $relation)[1];
                         $col    = explode(".", $colArr)[1];
                         $existing = $modelHeir->where($col, $this->operationId )->limit(1)->get();
-                        file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-                    .json_encode($existing));
                         if(count($existing)>0){
                             $this->messages[] = "USED: cannot delete id $this->operationId in [$modelName]. It is being used in child $heir";
                             $this->errors[] = "FAILED: cannot delete this resource. It is still being used in another resource";
