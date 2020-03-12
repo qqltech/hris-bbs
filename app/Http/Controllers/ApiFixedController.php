@@ -283,7 +283,7 @@ class ApiFixedController extends Controller
                     if(strpos($relation,$modelName)!==false){
                         $colArr = explode("=", $relation)[1];
                         $col    = explode(".", $colArr)[1];
-                        if($modelCandidateHeir->where($col, $this->operationId )->limit(1)->get()){
+                        if($modelHeir->where($col, $this->operationId )->limit(1)->get()){
                             $this->errors[] = "USED: cannot delete id $this->operationId in [$modelName]. It is being used in child $heir";
                             $this->isAuthorized=false;
                             return false;
