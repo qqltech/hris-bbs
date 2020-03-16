@@ -11,6 +11,7 @@ use Validator;
 use Jenssegers\Agent\Agent;
 use Illuminate\Support\Facades\Hash;
 use Stevebauman\Location\Location;
+use Exception;
 class UserController extends Controller
 {
     public function register(Request $request)
@@ -94,13 +95,18 @@ class UserController extends Controller
 
     public function user(Request $request)
     {
-        $agent = new Agent();
-        $request->user()->platform = $agent->platform();
-        $request->user()->platformversion = $agent->version($agent->platform());
-        $request->user()->browser=$agent->browser();
-        $request->user()->browserversion=$agent->version($agent->browser());
-        $request->user()->location=(new Location)->get($request->ip());
-        return response()->json($request->user());
+        try{
+            $agent = new Agent();
+            $request->user()->platform = $agent->platform();
+            $request->user()->platformversion = $agent->version($agent->platform());
+            $request->user()->browser=$agent->browser();
+            $request->user()->browserversion=$agent->version($agent->browser());
+            $request->user()->location=(new Location)->get($request->ip());
+            return response()->json($request->user());
+        }catch(Exception $e){
+            $response = 'You Need Logged in';
+            return response($response, 422);
+        }
     }
     
     public function changePassword(Request $request)
