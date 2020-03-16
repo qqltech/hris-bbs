@@ -105,7 +105,7 @@ class UserController extends Controller
             return response()->json($request->user());
         }catch(Exception $e){
             $response = 'You Need Logged in';
-            return response($response, 422);
+            return response($response, 401);
         }
     }
     
