@@ -611,7 +611,7 @@ class LaradevController extends Controller
                                 $table = explode('"',$string[1])[0];
                                 $sample = (array)DB::table($table)->first();
                                 foreach($sample as $key=>$val){
-                                    if(!in_array($key,['id','created_at','updated_at']) ){
+                                    if(!in_array($key,['id','created_at','updated_at']) && $sample[$key]!=null ){
                                         if (DateTime::createFromFormat('Y-m-d H:i:s', $val) !== FALSE) {
                                             continue;
                                         }else if( DateTime::createFromFormat('Y-m-d', $val) !== FALSE ){
