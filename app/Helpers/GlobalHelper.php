@@ -1388,7 +1388,7 @@ function _customGetData($model,$params)
                    
             file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
             .json_encode( $params->order_type ));
-            // $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);            
+            $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);            
             file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
             .json_encode( "jalan" ));
         }
