@@ -1380,8 +1380,8 @@ function _customGetData($model,$params)
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
     if($params->order_by){
-        $order =  str_replace("this.","$table.",$params->order_by);
-        $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
+        // $order =  str_replace("this.","$table.",$params->order_by);
+        // $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
     }
     if($params->order_by_raw){
         $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );
