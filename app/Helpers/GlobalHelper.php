@@ -1396,8 +1396,8 @@ function _customGetData($model,$params)
             $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );        
             file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
             .json_encode( $params->order_by_raw ));
-        }
-        $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );        
+            $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );  
+        }      
         file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
         .json_encode( $fieldSelected ));
         $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
