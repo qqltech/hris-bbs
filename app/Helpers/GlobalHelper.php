@@ -1379,35 +1379,14 @@ function _customGetData($model,$params)
     if($params->where_raw){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
-    try{
-        if($params->order_by){
-                   
-            file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-            .json_encode( $params->order_by ));
-            $order =  str_replace("this.","$table.",$params->order_by);
-                   
-        file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-        .json_encode($model->toSql()  ));
-            file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-            .json_encode( $params->order_type ));
-            $model->orderBy("id","asc");            
-            file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-            .json_encode( "jalan" ));
-        }
-        if($params->order_by_raw){
-            $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );        
-            file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-            .json_encode( $params->order_by_raw ));
-            $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );  
-        }      
-        file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-        .json_encode($model->toSql()  ));
-        $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
-
-    }catch(Exception $er){        
-        file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-            .json_encode( $er->getMessage() ));
+    if($params->order_by){
+        $order =  str_replace("this.","$table.",$params->order_by);
+        $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
     }
+    if($params->order_by_raw){
+        $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );
+    }
+    $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
     if(!$params->caller){
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
