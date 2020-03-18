@@ -1381,7 +1381,13 @@ function _customGetData($model,$params)
     }
     try{
         if($params->order_by){
+                   
+            file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
+            .json_encode( $params->order_by ));
             $order =  str_replace("this.","$table.",$params->order_by);
+                   
+            file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
+            .json_encode( $order ));
             $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);            
             file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
             .json_encode( $params->order_by ));
