@@ -1402,9 +1402,9 @@ function _customGetData($model,$params)
         .json_encode( $fieldSelected ));
         $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
-    }catch(Exception $e){        
+    }catch(Exception $er){        
         file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-            .json_encode( $e->getMessage() ));
+            .json_encode( $er->getMessage() ));
     }
 
     if(!$params->caller){
