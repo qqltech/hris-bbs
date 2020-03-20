@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<!-- saved from url=(0068)https://laradev.dejozz.com/generator/visual/davidhsiproductionresult -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="defaults/konva.min.js"></script>
+    
+    <title>Database Models</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="position:fixed;background-color:none;right:5px;top:5px;z-index:91;height: 100vh;overflow-y: scroll;" id="list"></div>
+    <div id="container" style="cursor: default;">
+      <div class="konvajs-content" role="presentation" style="position: relative; user-select: none; width: 100vh; height: 100vh;">
+            <canvas width="100vh" height="100vh" style="padding: 0px; margin: 0px; border: 0px; background-color: transparent; position: absolute; top: 0px; left: 0px; width: 1366px; height: 667px; display: block;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    var json = null
+//===========================================WAJIB
+    var stage = new Konva.Stage({
+        container: 'container',
+        width: window.innerWidth,
+        height: window.innerHeight,
+        draggable:true
+    });
+
+    var layer = new Konva.Layer();
+//=========================================GROUPING
+
+var tableX  = 20;
+var tableY  = 50;
+var headerHeight    = 30;
+var belongs = [];
+var childs = [];
+var referencings = [];
+function createTable(data, isReferenced=false, caller=null){
+  data['table'] = data['model'];
+  let lebar = data.table.length*5.4;
+  if( stage.find("#"+data.table).length >0 ){
+    return false;
+  }
+    var Table = new Konva.Group({
+        x: tableX,
+        y: tableY,
+        draggable: true,
+        name:"table",
+        id: data.table
+    });
+// kolom
+    var bodyTable = new Konva.Group({
+        y: headerHeight,
+        // draggable: true,
+        name:"bodyTable"
+    });
+
+    var col1 = new Konva.Group({
+        name:"col1"
+    });
+    var longText = 0;
+    var lastY=0;
+//===============================================PRIMARYKEY
+    if(lastY ==0){
+        lastY = col1.getPosition().y;
+    }
+    var columnText = new Konva.Text({
+        y: lastY,
+        fontSize: 10,
+        fontFamily: 'Calibri',
+        fontStyle:"bold", 
+        text: "id",
+        fill: "red",
+        padding: 8,
+        align:"right",
+        name:"kolom",
+        id: data.table+"_id"
+    });
+//==========================================================
+    col1.add(columnText);
+    lastY += columnText.height();
+    if(longText<columnText.width()){
+        longText=columnText.width();
+    }
+    data['columns'] = data.fullColumns;
+    for(let i=1; i<data.columns.length;i++){
+        let comment={};let required=true;
+        if(data.columns[i].comment!=''){
+          comment = JSON.parse(data.columns[i].comment);
+        }
+        if(comment['src']!==undefined){
+          data.columns[i].table_reference = comment['src'].split(".")[0];
+          data.columns[i].column_reference = comment['src'].split(".")[1];
+        }
+        if(comment['fk']!==undefined && comment['fk']!="false"){
+          data.columns[i].table_reference = comment['fk'].split(".")[0];
+          data.columns[i].column_reference = comment['fk'].split(".")[1];
+        }
+        if( data.columns[i].nullable===false ) {required=false;}
+        if(comment['required']!==undefined && comment['required']=="false"){
+          required=false;
+        }
+        if(lastY ==0){
+            lastY = col1.getPosition().y;
+        }
+//=============================================================NAMA KOLOM
+        var columnText = new Konva.Text({
+            y: lastY,
+            fontSize: 11,
+            fontFamily: 'Calibri',
+            text: data.columns[i].name+(data.config.required.includes(data.columns[i].name)?"*":""),
+            fontStyle:"bold",
+            textDecoration:"underline",
+            fill: data.config.createable.includes(data.columns[i].name)?'green':'red',
+            padding: 8,
+            align:"right",
+            name: (data.columns[i].table_reference!==undefined)?"kolomForeign":"kolom",
+            id:   (data.columns[i].table_reference!==undefined)? data.columns[i].table_reference+"_"+data.columns[i].name : data.table+"_"+data.columns[i].name
+        });
+        if(data.columns[i].table_reference!==undefined){
+            console.log(`${data.table}.${data.columns[i].name} refer ke ${data.columns[i].table_reference}`);
+            // referencings.push({table_reference:data.columns[i].table_reference, column_reference:data.columns[i].column_reference,table_caller:data.table, id:data.columns[i].table_reference+"_"+data.columns[i].name});
+            belongs.push( { color:"#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}) ,
+                id: data.columns[i].table_reference+"_"+data.columns[i].name, parent: data.columns[i].table_reference, position:i+1, 
+                yAxis: lastY+columnText.height()/2
+            });
+            childs[data.columns[i].table_reference]=childs[data.columns[i].table_reference]===undefined?[]:childs[data.columns[i].table_reference];
+            childs[data.columns[i].table_reference].push({id: data.columns[i].table_reference+"_"+data.columns[i].name, 
+                parent:data.columns[i].table_reference, child: data.table, position:i+1}) ;
+        }
+        col1.add(columnText);
+        lastY += columnText.height();
+        if(longText<columnText.width()){
+            longText=columnText.width();
+        }
+
+    }
+    var temp = longText;
+
+    var col2 = new Konva.Group({
+        x: col1.getPosition().x+temp+10,
+        name:"col2"
+    });
+
+    longText=0;
+    lastY=0;
+  // ============================================tulisan PK
+    if(lastY ==0){
+          lastY = col2.getPosition().y;
+      }
+      var columnText = new Konva.Text({
+          // x: col1.getPosition().x+temp,
+          y: lastY,
+          fontSize: 11,
+          fontFamily: 'Calibri',
+          text: "BigInt(PK)",
+          fill: "red",
+          // fill: 'black',
+          padding: 8,
+          align:"right",
+          name:"kolom2"
+      });
+      col2.add(columnText);
+      lastY += columnText.height();
+      if(longText<columnText.width()){
+          longText=columnText.width();
+      }
+  // ===============================================datatype
+    for(let i=1; i<data.columns.length;i++){
+        if(lastY ==0){
+            lastY = col2.getPosition().y;
+        }
+        let color = data.config.createable.includes(data.columns[i].name)?'green':'red';
+        var columnText = new Konva.Text({
+            // x: col1.getPosition().x+temp,
+            y: lastY,
+            fontSize: 11,
+            fontFamily: 'Calibri',
+            text: data.columns[i].type+(data.columns[i].table_reference!==undefined?"[FK]":""),
+            color: '#01040a',
+            fill: (data.columns[i].table_reference!==undefined?"orange":color),
+            padding: 8,
+            align:"right",
+            name:"kolom2"
+        });
+        col2.add(columnText);
+        lastY += columnText.height();
+        if(longText<columnText.width()){
+            longText=columnText.width();
+        }
+    }
+    bodyTable.add(col1).add(col2);
+
+// jugacolumns
+    var headerText = new Konva.Text({
+        fontSize: 11,
+        // width: lebar,
+        height: headerHeight ,
+        fontFamily: 'Calibri',
+        text: data.table,
+        wrap:"char",
+        // fill: 'black',
+        lineHeight:2,
+        padding: 8,
+        align: 'center'
+    });
+    var color ="#83bede";
+    lebar = lebar<(temp+longText+5)?(temp+longText+5):lebar;
+    var headerRect = new Konva.Rect({
+        stroke: '#555',
+        // strokeWidth: 5,
+        fill: color,
+        width: lebar+5 ,
+        height: headerText.height() ,
+        shadowColor: 'black',
+        shadowBlur: 10,
+        shadowOffset: [10, 10],
+        shadowOpacity: 0.2,
+        name:"headerRect"
+        // cornerRadius: 10
+    });
+
+    var bodyRect = new Konva.Rect({
+        // x:bodyText.getPosition().x,
+        y: bodyTable.getPosition().y ,
+        stroke: '#555',
+        // strokeWidth: 5,
+        fill: "#ffff",
+        width: lebar+5 ,
+        height: lastY,
+        shadowColor: 'black',
+        shadowBlur: 10,
+        shadowOffset: [10, 10],
+        shadowOpacity: 0.2,
+        name: "bodyTable"
+        // cornerRadius: 10
+    });
+    //=========================================
+
+    Table.add(headerRect);
+    Table.add(headerText);
+    Table.add(bodyRect);
+    // Table.add(bodyText);
+    Table.add(bodyTable);
+    layer.add(Table);
+    stage.draw();
+
+    tableX = tableX + stage.find(".bodyTable")[ stage.find(".bodyTable").length-1 ].width()+80;
+    // console.log(referencings);
+    // for(let i=0; i<referencings.length;i++){      
+    //   for(let j=0; j<otherTables.length;j++){
+    //     if(referencings[i].table_reference == otherTables[j].table){
+        // createTable( {
+        //         "table": "coba",
+        //         "type": "master",
+        //         "columns": [
+        //         ]
+        //     }, true, referencings[i] );
+        // break;
+        // }
+    //   }
+    // }
+    // referencings=[];
+}
+
+stage.add(layer);
+let tercheck = [];
+function jsonGet(json){
+        json = json;
+        var doc = document.getElementById("list");
+        let list = "";
+        json.sort((a, b) => a.model.localeCompare(b.model));
+        json.forEach(function(dt){
+          list+=`<li><input type='checkbox' class='tables' id='${dt.model}'>${dt.model}</li>`;
+        });
+        doc.innerHTML=`<ul>${list}</ul>`;
+        
+        Array.from(document.getElementsByClassName("tables")).forEach(function(table){
+          table.addEventListener("change",function(e){
+            let el = e.target.getAttribute("id");
+            let checked = localStorage.checked!==undefined?JSON.parse(localStorage.checked):[];
+            if(e.target.checked){
+              if(!checked.includes(el)){
+                checked.push(el);
+                tercheck.push(el);
+                localStorage.checked=JSON.stringify(checked);
+              }
+              createTable(json.find(dt=>dt.model==el));
+              doactionPerEl(stage.find("#"+el));
+            }else{
+              checked = checked.filter(dt=>dt!==el);
+              tercheck = checked;
+              localStorage.checked=JSON.stringify(checked);
+              let tbl = stage.find("#"+el);
+              let keys = [];
+              tbl[0].find(".kolomForeign").forEach(function(e){
+                keys.push( "connector_"+e.getId());
+              });
+              let fks = stage.find(".connectors");
+              fks.forEach(function(e){
+                if(e.getId().includes(el) || keys.includes(e.getId()) ){
+                  e.destroy();
+                };
+              });
+              tbl.destroy();
+              layer.draw();
+              tableX = tableX -80;
+            };
+          });
+        });
+        let checkeds = localStorage.checked!==undefined?JSON.parse(localStorage.checked):[];
+        checkeds.forEach(function(tab){
+          if(!tercheck.includes(tab)){
+            document.getElementById(tab).click();
+          }
+        });
+    };
+    var xmlhttp = new XMLHttpRequest();
+    var url = "models.json";
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var myArr = JSON.parse(this.responseText);
+            jsonGet(myArr);
+        }
+    };
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+
+      stage.find(".table").on('mouseenter', function() {
+        stage.container().style.cursor = 'move';
+      });
+
+      stage.find(".table").on('mouseleave', function() {
+        stage.container().style.cursor = 'default';
+      });
+
+      stage.on('mousedown', function() {
+        stage.container().style.cursor = 'move';
+      });
+
+      stage.on('mouseup', function() {
+        stage.container().style.cursor = 'default';
+      });
+
+
+    var scaleBy = 1.09;
+      stage.on('wheel', e => {
+        e.evt.preventDefault();
+        var oldScale = stage.scaleX();
+
+        var mousePointTo = {
+          x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+          y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
+        };
+
+        var newScale =
+          e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+        stage.scale({ x: newScale, y: newScale });
+
+        var newPos = {
+          x:
+            -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
+            newScale,
+          y:
+            -(mousePointTo.y - stage.getPointerPosition().y / newScale) *
+            newScale
+        };
+        stage.position(newPos);
+        stage.batchDraw();
+      });
+
+
+      stage.on('click tap', function(e) {
+        if (e.target === stage) {
+          stage.find('Transformer').destroy();
+          layer.draw();
+          return;
+        }
+        
+        if (!e.target.parent.hasName('table')) {
+          return;
+        }
+        stage.find('Transformer').destroy();
+
+        var tr = new Konva.Transformer();
+        layer.add(tr);
+        tr.attachTo(e.target.parent);
+        layer.draw();
+      });      
+
+      function drawForeign(keyForeign, parent){
+        var rows = parent.find(".col1")[0].find('Text');
+        var index = parent.find(".col1")[0].find("#"+keyForeign)[0].index;
+        for(let i=0; i<belongs.length;i++){
+
+          if(belongs[i].id == keyForeign){
+
+            var moveX = parent.getPosition().x;
+            var moveY = parent.getPosition().y;
+            if(stage.find("#"+belongs[i].parent)[0]===undefined){continue;}
+            var dstX = stage.find("#"+belongs[i].parent)[0].getPosition().x;
+            var dstY = stage.find("#"+belongs[i].parent)[0].getPosition().y + stage.find("#"+belongs[i].parent)[0].find(".headerRect")[0].height() + (stage.find("#"+belongs[i].parent)[0].find(".bodyTable")[0].height()/(stage.find("#"+belongs[i].parent)[0].find(".col1")[0].find("Text").length))*1- (stage.find("#"+belongs[i].parent)[0].find(".bodyTable")[0].height()/(stage.find("#"+belongs[i].parent)[0].find(".col1")[0].find("Text").length))/2 ;
+
+            var FixedX;
+
+            if (moveX<dstX){
+                fixedX = moveX + parent.find(".headerRect")[0].width();
+                fixedY = moveY + (parent.find(".bodyTable")[0].height()/rows.length)*(index+1)- (parent.find(".bodyTable")[0].height()/rows.length)/2 +parent.find(".headerRect")[0].height();
+            }else{
+                dstX = dstX+stage.find("#"+belongs[i].parent)[0].find(".headerRect")[0].width();
+                fixedX = moveX ;
+                fixedY = moveY + (parent.find(".bodyTable")[0].height()/rows.length)*(index+1)- (parent.find(".bodyTable")[0].height()/rows.length)/2 +parent.find(".headerRect")[0].height();
+            }
+
+              stage.find('#dot_'+keyForeign).destroy();
+              var circle = new Konva.Circle({
+                x:fixedX-moveX,
+                y:(parent.find(".bodyTable")[0].height()/rows.length)*(index+1)- (parent.find(".bodyTable")[0].height()/rows.length)/2 ,
+                radius: 1,
+                fill: belongs[i].color,
+                stroke: belongs[i].color,
+                strokeWidth: 5,
+                id:"dot_"+keyForeign,
+                name:"foreign_dots"
+              });
+              parent.find("Group")[0].add(circle);
+
+            stage.find('#connector_'+keyForeign).destroy();
+            var line = new Konva.Arrow(
+            {
+                points: [ fixedX, fixedY,
+                          (fixedX+dstX)/2, fixedY, 
+                          (dstX+fixedX)/2, dstY,               
+                          dstX, dstY],
+                stroke: belongs[i].color,
+                fill:belongs[i].color,
+                id:"connector_"+keyForeign,
+              //   tension: ,
+                pointerLength : 5,
+                pointerWidth : 5,
+                name:"connectors",
+            });
+            layer.add(line);
+            layer.batchDraw();
+
+            break;
+
+          }
+        }
+      }
+      function doactionPerEl(el){
+        el.on("dragmove xChange yChange scaleYChange scaleXChange", function(e){
+            var src;
+            if(e.type=='dragmove'){
+              src = e.target;
+            }else{
+              src=e.currentTarget;
+            }
+            
+            for(let i=0;i<src.find(".kolomForeign").length;i++){
+              let kol_id  = src.find(".kolomForeign")[i].getId();
+              drawForeign( kol_id , src );
+            }
+            if( childs[src.getId()] !== undefined ){
+                for(let i=0; i<childs[src.getId()].length;i++){
+                if(src.getId() == childs[src.getId()][i].parent){
+                    var parent = stage.find( "#"+childs[src.getId()][i].child)[0] ;
+                    if(parent!=undefined){
+                        drawForeign(childs[src.getId()][i].id , stage.find( "#"+childs[src.getId()][i].child)[0] );
+                    }
+                }
+                
+                }
+            };
+            stage.find(".connectors").zIndex(0);
+          });
+      }
+      function doaction(){
+        stage.find(".table").on("dragmove xChange yChange scaleYChange scaleXChange", function(e){
+            var src;
+            if(e.type=='dragmove'){
+              src = e.target;
+            }else{
+              src=e.currentTarget;
+            }
+            
+            for(let i=0;i<src.find(".kolomForeign").length;i++){
+              let kol_id  = src.find(".kolomForeign")[i].getId();
+              drawForeign( kol_id , src );
+            }
+            if( childs[src.getId()] !== undefined ){
+                for(let i=0; i<childs[src.getId()].length;i++){
+                if(src.getId() == childs[src.getId()][i].parent){
+                    var parent = stage.find( "#"+childs[src.getId()][i].child)[0] ;
+                    if(parent!=undefined){
+                        drawForeign(childs[src.getId()][i].id , stage.find( "#"+childs[src.getId()][i].child)[0] );
+                    }
+                }
+                
+                }
+            };
+            stage.find(".connectors").zIndex(0);
+          });
+
+      }
+
+    </script>
+  
+</body></html>
