@@ -97,10 +97,12 @@ function createTable(data, isReferenced=false, caller=null){
         if(comment['src']!==undefined){
           data.columns[i].table_reference = comment['src'].split(".")[0];
           data.columns[i].column_reference = comment['src'].split(".")[1];
+          data.columns[i].connection = 'SRC';
         }
         if(comment['fk']!==undefined && comment['fk']!="false"){
           data.columns[i].table_reference = comment['fk'].split(".")[0];
           data.columns[i].column_reference = comment['fk'].split(".")[1];
+          data.columns[i].connection = 'FK';
         }
         if( data.columns[i].nullable===false ) {required=false;}
         if(comment['required']!==undefined && comment['required']=="false"){
@@ -121,17 +123,18 @@ function createTable(data, isReferenced=false, caller=null){
             padding: 8,
             align:"right",
             name: (data.columns[i].table_reference!==undefined)?"kolomForeign":"kolom",
-            id:   (data.columns[i].table_reference!==undefined)? data.columns[i].table_reference+"_"+data.columns[i].name : data.table+"_"+data.columns[i].name
+            id:   (data.columns[i].table_reference!==undefined)? data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name 
+                : data.table+"_"+data.columns[i].name
         });
         if(data.columns[i].table_reference!==undefined){
             console.log(`${data.table}.${data.columns[i].name} refer ke ${data.columns[i].table_reference}`);
-            // referencings.push({table_reference:data.columns[i].table_reference, column_reference:data.columns[i].column_reference,table_caller:data.table, id:data.columns[i].table_reference+"_"+data.columns[i].name});
+            // referencings.push({table_reference:data.columns[i].table_reference, column_reference:data.columns[i].column_reference,table_caller:data.table, id:data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name});
             belongs.push( { color:"#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}) ,
-                id: data.columns[i].table_reference+"_"+data.columns[i].name, parent: data.columns[i].table_reference, position:i+1, 
+                id: data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name, parent: data.columns[i].table_reference, position:i+1, 
                 yAxis: lastY+columnText.height()/2
             });
             childs[data.columns[i].table_reference]=childs[data.columns[i].table_reference]===undefined?[]:childs[data.columns[i].table_reference];
-            childs[data.columns[i].table_reference].push({id: data.columns[i].table_reference+"_"+data.columns[i].name, 
+            childs[data.columns[i].table_reference].push({id: data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name, 
                 parent:data.columns[i].table_reference, child: data.table, position:i+1}) ;
         }
         col1.add(columnText);
@@ -182,7 +185,7 @@ function createTable(data, isReferenced=false, caller=null){
             y: lastY,
             fontSize: 11,
             fontFamily: 'Calibri',
-            text: data.columns[i].type+(data.columns[i].table_reference!==undefined?"[FK]":""),
+            text: data.columns[i].type+(data.columns[i].table_reference!==undefined?"["+data.columns[i].connection+"]":""),
             color: '#01040a',
             fill: (data.columns[i].table_reference!==undefined?"orange":color),
             padding: 8,
