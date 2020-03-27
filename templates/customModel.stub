@@ -84,6 +84,8 @@ class __class extends __basicClass
             $params->selectfield = $params->selectfield; //"id,kolom1,kolom2"
             $params->join        = $params->join;        //true(default)/false {TABLE AUTO JOIN DENGAN INDUK}
             $params->single      = $params->single;      //true/false(default) {AMBIL CHILDREN ATAU SINGLE}
+            $params->addSelect   = null;
+            $params->addJoin     = null;
         }else{
             $params->where_raw   = $params->where_raw;      //raw WHERE
             $params->order_by    = $params->order_by;       //nama_kolom
@@ -94,6 +96,8 @@ class __class extends __basicClass
             $params->selectfield = $params->selectfield;    //id,kolom1,kolom2,kolom3
             $params->paginate    = $params->paginate;       //integer angka default 25
             $params->join        = $params->join;           //true(default)/false {ROW AUTO JOIN DENGAN INDUK}
+            $params->addSelect   = null;
+            $params->addJoin     = null;
         }
         return $params;
     }

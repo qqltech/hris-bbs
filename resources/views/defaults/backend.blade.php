@@ -583,6 +583,27 @@
                         },1);
                     });
                 });
+
+                var ws = new WebSocket("wss://connect.websocket.in/v2/{{env('LOG_CHANNEL',888)}}?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjY5NmY1MmRhMTU5ZDg1MGUzNDFlYWQ0NWU5YjMwMTdkOGJiYmIzN2ZlNmIyNzEwNzEwN2UxZTQ1NDBhZTg3YzkyZTU2M2ZhZWFiODA3YWQ1In0.eyJhdWQiOiI4IiwianRpIjoiNjk2ZjUyZGExNTlkODUwZTM0MWVhZDQ1ZTliMzAxN2Q4YmJiYjM3ZmU2YjI3MTA3MTA3ZTFlNDU0MGFlODdjOTJlNTYzZmFlYWI4MDdhZDUiLCJpYXQiOjE1ODIzMDMxMjgsIm5iZiI6MTU4MjMwMzEyOCwiZXhwIjoxNjEzOTI1NTI4LCJzdWIiOiI1NjMiLCJzY29wZXMiOltdfQ.WFf4tZL5ME9TKyo5z4cQYn9_up7QuDV9YS2YsCWKLKkDpDG1DdaqXJIjHaokcdg0Bq2taa2z3rMVqCCHi-Q0c-qTmk69HO47-CS-rEQE3TJkrA-kAXLkkdM40eTLteFXhIEhlbdnWqXBAciD20gRNq7iszYJq5A0HfXIl2J01ceYSCFxw7c70e25mqYMG1WNxt-5mrTa7yZjVmAJLAnYE97R6TOm6ZB6UKnjpRInoxWRPeNtavK9lV5PwRZiFQx5AluRglPfkt5bJcy0oSVZpux8AT_GhpcIOwu7bQTwlgYi0UDklsEyOcCQ1m0xoi_V46hf9Vsbjdk9xpdFGRcDduZ-VD4z0vFwAp1qKW1EBdoZs-PJITgPfHUqMlh0OkAy-zXRQEuz9MXzbO6otYs3ddI04ku6dyaGTw5Ysfm3ab_XLNg4C9vLsP3mX-n8q_-BGB7geJAyn62DPIh5XTEUdYBv0bHXl_SluhRQ6uKZnFkDUYoM9NERIiR19Xrl0kIegOjvvuaKAIqBCSKyV4t4d2kq-T9SIMtUcGcMxMdzO-smbdaQ_y1W39grwxQ0YWU9acR_SyofpOzeBgw1Rz1kXYYUjQqyjEXl8dhht06tygHOWHKyWg-F97pf5r5nq1aQnEIMkX4p85s0Q8bJV64n__q1H0kvw-5446MD0pEb9uc");
+				
+                ws.onopen = function() {
+                    // ws.send();
+                    console.log("debug is ready to use");
+                };
+
+                ws.onmessage = function (evt) { 
+                var received_msg = evt.data;
+                    try{
+                        received_msg=JSON.parse(received_msg);
+                        console.log(received_msg.debug_id,received_msg);
+                    }catch(e){
+                        console.log(received_msg);
+                    }
+                };
+
+                ws.onclose = function() {
+                    console.log("connection is closed");
+                };
             </script>
     </body>
 </html>

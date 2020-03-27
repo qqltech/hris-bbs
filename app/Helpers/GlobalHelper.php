@@ -1358,7 +1358,35 @@ function _customGetData($model,$params)
             }
         });
     }
+
+    if( isset($params->addSelect) && $params->addSelect!=null ){
+        $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
+    }
     
+    if( isset($params->addJoin) && $params->addJoin!=null ){
+        $joins = explode( ",", $params->addJoin );
+        foreach($joins as $join){
+            if(strpos( $join, " and ")!==FALSE){
+                $join = explode(" and ",$join);
+                $joinedTable=explode(".",$join[0])[0];
+                $model = $model->leftJoin($joinedTable, function($q)use($join){
+                    foreach($join as $statement){
+                        $statement = str_replace(" ","",$statement);
+                        $parent = explode(".",$statement)[0];
+                        $onParent = explode("=",$statement)[0];
+                        $onMe = explode("=",$statement)[1];
+                        $q->on($onParent,"=",$onMe);
+                    }
+                });
+            }else{
+                $parent = explode(".",$join)[0];
+                $onParent = explode("=",$join)[0];
+                $onMe = explode("=",$join)[1];
+                $model = $model->leftJoin($parent,$onParent,"=",$onMe);
+            }
+        }
+    }
+
     if($params->search){
         $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
@@ -1416,6 +1444,8 @@ function _customGetData($model,$params)
                 $p->selectfield = null;
                 $p->paginate    = null;
                 $p->page        = null;
+                $p->addSelect   = null;
+                $p->addJoin     = null;
                 $p->join        = true;
                 $p->caller      = $pureModel->getTable();
                 $fixedData[$index][$detail]  = $model->customGet($p);
@@ -1494,7 +1524,35 @@ function _customFind($model, $params)
             }
         });
     }
-    $data =  $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
+    
+    if( isset($params->addSelect) && $params->addSelect!=null ){
+        $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
+    }
+
+    if( isset($params->addJoin) && $params->addJoin!=null ){
+        $joins = explode( ",", $params->addJoin );
+        foreach($joins as $join){
+            if(strpos( $join, " and ")!==FALSE){
+                $join = explode(" and ",$join);
+                $joinedTable=explode(".",$join[0])[0];
+                $model = $model->leftJoin($joinedTable, function($q)use($join){
+                    foreach($join as $statement){
+                        $statement = str_replace(" ","",$statement);
+                        $parent = explode(".",$statement)[0];
+                        $onParent = explode("=",$statement)[0];
+                        $onMe = explode("=",$statement)[1];
+                        $q->on($onParent,"=",$onMe);
+                    }
+                });
+            }else{
+                $parent = explode(".",$join)[0];
+                $onParent = explode("=",$join)[0];
+                $onMe = explode("=",$join)[1];
+                $model = $model->leftJoin($parent,$onParent,"=",$onMe);
+            }
+        }
+    }
+    $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
     
     $modelCandidate = "\App\Models\CustomModels\\".$pureModel->getTable();
     $modelExtender  = new $modelCandidate;
@@ -1524,6 +1582,8 @@ function _customFind($model, $params)
         $p->selectfield = null;
         $p->paginate    = null;
         $p->page        = null;
+        $p->addSelect   = null;
+        $p->addJoin     = null;
         $p->join        = true;
         $p->caller      = $pureModel->getTable();
         $data[$detail]  = $model->customGet($p);
@@ -1581,4 +1641,20 @@ function _uploadexcel($model, $request)
             return response()->json([$e->getMessage()],400);
         }
       	return response()->json(["status"=>"success","data"=>$bulkData],200);
+}
+
+function ff($data,$id="debug"){
+    if(is_string($data)){
+        $data = [$data];
+    }
+    $data = is_object($data)?array($data):$data;
+    $data = array_merge($data,["debug_id"=>$id]);
+    $channel=env("LOG_CHANNEL",888);
+    $client = new \GuzzleHttp\Client();
+    $client->post(
+        "https://backend.dejozz.com/chatbot/public/websocket-send/$channel",
+        [
+            'form_params' => $data
+        ]
+    );
 }
