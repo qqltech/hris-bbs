@@ -1617,6 +1617,7 @@ function _uploadexcel($model, $request)
             return response()->json(["invalid_columns"=>$forbiddenHeadings],400);
         }
         try{
+            $hitung=0;
             foreach($rows as $baris => $array){
               if($baris==0){ continue; }
                 $row = [];
@@ -1631,10 +1632,19 @@ function _uploadexcel($model, $request)
                       }
                   }
                 $bulkData[]=$row;
+                $hitung++;
+                if($hitung%1000==0){
+                    if( count($invalidRows)>0 ){
+                      return response()->json($invalidRows,400);
+                    }
+                    $hitung=0;                 
+                    DB::table($model->getTable())->insert($bulkData);
+                    $bulkData=[];
+                }
            }
             if( count($invalidRows)>0 ){
               return response()->json($invalidRows,400);
-           }
+            }
             DB::table($model->getTable())->insert($bulkData);
 
         }catch(\Exception $e){
