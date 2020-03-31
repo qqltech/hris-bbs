@@ -1633,7 +1633,7 @@ function _uploadexcel($model, $request)
                   }
                 $bulkData[]=$row;
                 $hitung++;
-                if($hitung%1000==0){
+                if($hitung>999){
                     if( count($invalidRows)>0 ){
                       return response()->json($invalidRows,400);
                     }
