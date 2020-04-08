@@ -1676,15 +1676,15 @@ function reformatData($arrayData){
         $isDate=false;
         foreach($dataKey as $dateString){
             if(strpos($dateString, strtolower($key))!==false && count(explode("/",$data))>2){
-                file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-                        ."$dateString - $key - $data");
-                $isDate=true;
                 break;
             }
         }
         if($isDate){
             try{
                 $newData = Carbon::createFromFormat($dateFormat, $data)->format('Y-m-d');
+                file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
+                        .$arrayData[$key]);
+                $isDate=true;
                 $arrayData[$key] = $newData;
             }catch(Exception $e){}
         }
