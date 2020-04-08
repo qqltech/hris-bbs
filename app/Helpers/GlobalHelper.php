@@ -1674,8 +1674,8 @@ function reformatData($arrayData){
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
         $isDate=false;
-        foreach($dateKey as $dateString){
-            if(strpos($dataKey, strtolower($key))!==false && count(explode("/",$data))>2){
+        foreach($dataKey as $dateString){
+            if(strpos($dateString, strtolower($key))!==false && count(explode("/",$data))>2){
                 $isDate=true;
                 break;
             }
@@ -1694,8 +1694,8 @@ function reformatDataResponse($arrayData){
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
         $isDate=false;
-        foreach($dateKey as $dateString){
-            if(strpos($dataKey, strtolower($key))!==false && count(explode("-",$data))>2){
+        foreach($dataKey as $dateString){
+            if(strpos($dateString, strtolower($key))!==false && count(explode("-",$data))>2){
                 $isDate=true;
                 break;
             }
