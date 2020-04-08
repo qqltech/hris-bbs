@@ -1676,6 +1676,7 @@ function reformatData($arrayData){
         $isDate=false;
         foreach($dataKey as $dateString){
             if(strpos($dateString, strtolower($key))!==false && count(explode("/",$data))>2){
+                $isDate=true;
                 break;
             }
         }
