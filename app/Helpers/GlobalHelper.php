@@ -11,6 +11,7 @@ use Illuminate\Support\HigherOrderTapProxy;
 use Dotenv\Environment\Adapter\PutenvAdapter;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
+use Carbon\Carbon;
 if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
@@ -1667,4 +1668,24 @@ function ff($data,$id="debug"){
             'form_params' => $data
         ]
     );
+}
+function reformatData($arrayData){
+    $dataKey=["date","tgl","tanggal"];
+    $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
+    foreach($arrayData as $key=>$data){
+        $isDate=false;
+        foreach($dateKey as $dateString){
+            if(strpos($dataKey, strtolower($key))!==false && count(explode("/",$data))>2){
+                $isDate=true;
+                break;
+            }
+        }
+        if($isDate){
+            try{
+                $newData = Carbon::createFromFormat($dateFormat, $data)->format('Y-m-d');
+                $arrayData[$key] = $newData;
+            }catch(Exception $e){}
+        }
+    }
+    return $arrayData;
 }
