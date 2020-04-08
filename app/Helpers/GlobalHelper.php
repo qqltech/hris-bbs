@@ -1430,7 +1430,7 @@ function _customGetData($model,$params)
     if($params->caller){
         $fixedData=[];
         foreach($data->toArray() as $index => $row){
-            $fixedData[$index] = $modelExtender->transformRowData($row);
+            $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
             foreach($pureModel->details as $detail){           
                 $modelCandidate = "\App\Models\CustomModels\\$detail";
                 $model          = new $modelCandidate;
@@ -1457,7 +1457,7 @@ function _customGetData($model,$params)
         $tempData = $data->toArray()["data"];
         $fixedData=[];
         foreach($tempData as $row){
-            $fixedData[] = $modelExtender->transformRowData($row);
+            $fixedData[] = $modelExtender->transformRowData(reformatDataResponse($row));
         }
         $data = array_merge(["data"=>$fixedData],[
             "total"=>$data->total(),
