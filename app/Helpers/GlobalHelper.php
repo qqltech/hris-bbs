@@ -1689,3 +1689,23 @@ function reformatData($arrayData){
     }
     return $arrayData;
 }
+function reformatDataResponse($arrayData){
+    $dataKey=["date","tgl","tanggal"];
+    $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
+    foreach($arrayData as $key=>$data){
+        $isDate=false;
+        foreach($dateKey as $dateString){
+            if(strpos($dataKey, strtolower($key))!==false && count(explode("-",$data))>2){
+                $isDate=true;
+                break;
+            }
+        }
+        if($isDate){
+            try{
+                $newData = Carbon::createFromFormat("Y-m-d", $data)->format($dateFormat);
+                $arrayData[$key] = $newData;
+            }catch(Exception $e){}
+        }
+    }
+    return $arrayData;
+}
