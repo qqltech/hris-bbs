@@ -71,7 +71,7 @@
             'MAIL_USERNAME' => 'starlight93@gmail.com',
             'TG_TOKEN' => 'xxx',
             'TG_CHATID' => 'xxx',
-            'LOG_CHANNEL'=>'777'
+            'LOG_CHANNEL'=>'777',
             'FIREBASE_KEY' => 'xxx'
         ];
         $env = [];

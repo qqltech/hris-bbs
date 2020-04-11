@@ -86,6 +86,7 @@ class __class extends __basicClass
             $params->single      = $params->single;      //true/false(default) {AMBIL CHILDREN ATAU SINGLE}
             $params->addSelect   = null;
             $params->addJoin     = null;
+          	$params->joinMax 	 = $params->joinMax; //default 0
         }else{
             $params->where_raw   = $params->where_raw;      //raw WHERE
             $params->order_by    = $params->order_by;       //nama_kolom
@@ -98,6 +99,7 @@ class __class extends __basicClass
             $params->join        = $params->join;           //true(default)/false {ROW AUTO JOIN DENGAN INDUK}
             $params->addSelect   = null;
             $params->addJoin     = null;
+          	$params->joinMax 	 = $params->joinMax; //default 0
         }
         return $params;
     }

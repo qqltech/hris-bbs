@@ -1300,8 +1300,55 @@ if (! function_exists('createMany')) {
         
     }
 }
+function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,&$model,$tableName,$params){
+    $tableStringClass = "\App\Models\BasicModels\\$tableName";
+    $currentModel = new $tableStringClass;
+    
+    foreach( $currentModel->joins as $join ){
+        $parent = explode(".",$join)[0];
+        if(in_array($parent, $joined)){
+            continue;
+        }
+        $joined[]=$parent;
+        $onParent = explode("=",$join)[0];
+        $onMe = explode("=",$join)[1];
+        $parentClassString = "\App\Models\BasicModels\\$parent";
+
+        if( !class_exists($parentClassString) ){
+            continue;
+        }
+        if(isset($params->caller) && $params->caller==$parent){
+            continue;                
+        }
+        if( !isset($kembar[$parent]) ){
+            $kembar[$parent] = 1;
+        }else{
+            $kembar[$parent] = $kembar[$parent]+1;
+        }
+        $parentName = $parent;
+        if($kembar[$parent]>1){
+            $parentName = "$parent AS ".$parent.(string)$kembar[$parent];
+            $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
+        }
+        $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
+        $parentClass = new $parentClassString;
+        if($kembar[$parent]>1){
+            $parentName = $parent.(string)$kembar[$parent];
+        }
+        foreach($parentClass->columns as $column){
+            $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+            $fieldSelected[]= $colTemp;
+            $allColumns[]   = "$parentName.$column";
+        }
+        if($joinMax>1){
+            _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+        }
+    }
+    
+}
 function _customGetData($model,$params)
 {
+    $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $table = $model->getTable();
     $pureModel=$model;
     $fieldSelected=[];
@@ -1309,10 +1356,12 @@ function _customGetData($model,$params)
         $fieldSelected[] = "$table.$column";
     }
     $allColumns = $fieldSelected;
+    $kembar = [];
+    $joined = [];
     if( $params->join ){
-        $kembar = [];
         foreach( $model->joins as $join ){
             $parent = explode(".",$join)[0];
+            $joined[]=$parent;
             $onParent = explode("=",$join)[0];
             $onMe = explode("=",$join)[1];
             $parentClassString = "\App\Models\BasicModels\\$parent";
@@ -1342,6 +1391,9 @@ function _customGetData($model,$params)
                 $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
+            }
+            if($joinMax>0){
+                _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
             }
         }
     }
@@ -1476,17 +1528,20 @@ function _customGetData($model,$params)
 
 function _customFind($model, $params)
 {
+    $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;
     $table = $model->getTable();
     $fieldSelected=[];
     foreach($model->columns as $column){
         $fieldSelected[] = "$table.$column";
     }
+    $joined=[];
     $allColumns = $fieldSelected;
     if( $params->join ){
         $kembar = [];
         foreach( $model->joins as $join ){
             $parent = explode(".",$join)[0];
+            $joined[]=$parent;
             $onParent = explode("=",$join)[0];
             $onMe = explode("=",$join)[1];
             $parentClassString = "\App\Models\BasicModels\\$parent";
@@ -1514,6 +1569,9 @@ function _customFind($model, $params)
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
             }
+        }
+        if($joinMax>0){
+            _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
         }
     }
     if($params->selectfield){
@@ -1709,4 +1767,22 @@ function reformatDataResponse($arrayData){
         }
     }
     return $arrayData;
+}
+
+function getReportHeader($model,$params){
+    $p = (object)[
+        "where_raw"=>null,
+        "order_by"=>"id",
+        "order_type"=>"ASC",
+        "page"=>"1",
+        "order_by_raw"=>null,
+        "search"=>null,
+        "searchfield"=>null,
+        "selectfield"=>null,
+        "paginate"=>999999,
+        "join"=>true,
+        "caller"=>null,
+        "joinMax"=>3
+    ];
+    return $model->customGet($params);
 }

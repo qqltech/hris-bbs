@@ -437,6 +437,7 @@ class ApiFixedController extends Controller
             $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->single      = isset($data->single) ? ($data->single=="false"?false:true):false;
             $p->id          = $id;
+            $p->joinMax        = isset($data->joinMax) ? $data->joinMax:0;
             $overrideParams = $model->overrideGetParams($p,$id);
             return $model->customFind($overrideParams);
         }else{
@@ -449,6 +450,7 @@ class ApiFixedController extends Controller
             $p->selectfield = isset($data->selectfield) ? $data->selectfield:null;
             $p->paginate    = isset($data->paginate) ? $data->paginate:25;
             $p->page        = isset($data->page) ? $data->page:1;
+            $p->joinMax        = isset($data->joinMax) ? $data->joinMax:0;
             $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->caller      = null;
             $overrideParams = $model->overrideGetParams($p);
