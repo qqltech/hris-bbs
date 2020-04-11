@@ -1769,8 +1769,8 @@ function reformatDataResponse($arrayData){
     return $arrayData;
 }
 
-function getReportHeader($model){
-    $p = (object)[
+function getReportHeader($model,$params=[]){
+    $p = (object)array_merge([
         "where_raw"=>null,
         "order_by"=>"id",
         "order_type"=>"ASC",
@@ -1783,6 +1783,6 @@ function getReportHeader($model){
         "join"=>true,
         "caller"=>null,
         "joinMax"=>3
-    ];
+    ], $params);
     return $model->customGet($p);
 }
