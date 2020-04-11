@@ -1769,7 +1769,7 @@ function reformatDataResponse($arrayData){
     return $arrayData;
 }
 
-function getReportHeader($model,$params){
+function getReportHeader($model){
     $p = (object)[
         "where_raw"=>null,
         "order_by"=>"id",
@@ -1779,10 +1779,10 @@ function getReportHeader($model,$params){
         "search"=>null,
         "searchfield"=>null,
         "selectfield"=>null,
-        "paginate"=>999999,
+        "paginate"=>9999,
         "join"=>true,
         "caller"=>null,
         "joinMax"=>3
     ];
-    return $model->customGet($params);
+    return $model->customGet($p);
 }
