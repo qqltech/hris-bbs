@@ -502,7 +502,7 @@ class ApiFixedController extends Controller
             $modelCandidate = "\App\Models\CustomModels\\$detail";
             $modelChild = new $modelCandidate;
             $columns    = $modelChild->columns;
-            $fkName     = $modelName;
+            $fkName     = $model->getTable();
             if(!in_array($fkName."_id",$columns)){
                 $realJoins = $modelChild->joins;
                 foreach($realJoins as $val){
@@ -515,7 +515,7 @@ class ApiFixedController extends Controller
             }else{
                 $fkName.="_id";
             }
-            $dataDetail = $modelChild->where('awef',$id)->get();                
+            $dataDetail = $modelChild->where($fkName,$id)->get();                
             foreach( $dataDetail as $dtl ){
                 $this->deleteOperation($detail, null, $dtl->id, $id);
             }
