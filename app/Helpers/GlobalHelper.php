@@ -1485,10 +1485,24 @@ function _customGetData($model,$params)
             $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
             foreach($pureModel->details as $detail){           
                 $modelCandidate = "\App\Models\CustomModels\\$detail";
-                $model          = new $modelCandidate;
-                $details       = $model->details;
+                $model      = new $modelCandidate;
+                $details    = $model->details;
+                $columns    = $model->columns;
+                $fkName     = $pureModel->getTable();
+                if(!in_array($fkName."_id",$columns)){
+                    $realJoins = $model->joins;
+                    foreach($realJoins as $val){
+                        $valArray = explode("=",$val);
+                        if($valArray[0]==$fkName.".id"){
+                            $fkName = $valArray[1];
+                            break;
+                        }
+                    }
+                }else{
+                    $fkName.="_id";
+                }
                 $p = (Object)[];
-                $p->where_raw   = $pureModel->getTable()."_id=".$fixedData[$index]["id"];
+                $p->where_raw   = $fkName."=".$fixedData[$index]["id"];
                 $p->order_by    = null;
                 $p->order_type  = null;
                 $p->order_by_raw= null;
