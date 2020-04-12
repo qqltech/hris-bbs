@@ -500,8 +500,22 @@ class ApiFixedController extends Controller
         }
         foreach( $detailsArray as $detail ){
             $modelCandidate = "\App\Models\CustomModels\\$detail";
-            $modelChild          = new $modelCandidate;
-            $dataDetail = $modelChild->where($modelName."_id","=",$id)->get();                
+            $modelChild = new $modelCandidate;
+            $columns    = $modelChild->columns;
+            $fkName     = $modelName;
+            if(!in_array($fkName."_id",$columns)){
+                $realJoins = $modelChild->joins;
+                foreach($realJoins as $val){
+                    $valArray = explode("=",$val);
+                    if($valArray[0]==$fkName.".id"){
+                        $fkName = $valArray[1];
+                        break;
+                    }
+                }
+            }else{
+                $fkName.="_id";
+            }
+            $dataDetail = $modelChild->where($fkName,"=",$id)->get();                
             foreach( $dataDetail as $dtl ){
                 $this->deleteOperation($detail, null, $dtl->id, $id);
             }
