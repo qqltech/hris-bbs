@@ -515,7 +515,7 @@ class ApiFixedController extends Controller
             }else{
                 $fkName.="_id";
             }
-            $dataDetail = $modelChild->where($fkName,"=",$id)->get();                
+            $dataDetail = $modelChild->where('awef',$id)->get();                
             foreach( $dataDetail as $dtl ){
                 $this->deleteOperation($detail, null, $dtl->id, $id);
             }
