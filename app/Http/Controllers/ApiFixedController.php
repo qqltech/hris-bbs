@@ -368,7 +368,21 @@ class ApiFixedController extends Controller
                 $eliminatedData = $this->createEliminationData($model, $isiData);
                 $processedData  = array_merge($eliminatedData, $additionalData);
                 if($parentId!=null){
-                    $processedData[$parentName."_id"] = $parentId;
+                    $columns    = $model->columns;
+                    $fkName     = $parentName;
+                    if(!in_array($fkName."_id",$columns)){
+                        $realJoins = $model->joins;
+                        foreach($realJoins as $val){
+                            $valArray = explode("=",$val);
+                            if($valArray[0]==$fkName.".id"){
+                                $fkName = explode(".",$valArray[1])[1];
+                                break;
+                            }
+                        }
+                    }else{
+                        $fkName.="_id";
+                    }
+                    $processedData[$fkName] = $parentId;
                 }
                 $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
                 $finalData  = $createBeforeEvent["data"];
@@ -387,7 +401,21 @@ class ApiFixedController extends Controller
             $eliminatedData = $this->createEliminationData($model, $data);
             $processedData  = array_merge($eliminatedData, $additionalData);
             if($parentId!=null){
-                $processedData[$parentName."_id"] = $parentId;
+                $columns    = $model->columns;
+                $fkName     = $parentName;
+                if(!in_array($fkName."_id",$columns)){
+                    $realJoins = $model->joins;
+                    foreach($realJoins as $val){
+                        $valArray = explode("=",$val);
+                        if($valArray[0]==$fkName.".id"){
+                            $fkName = explode(".",$valArray[1])[1];
+                            break;
+                        }
+                    }
+                }else{
+                    $fkName.="_id";
+                }
+                $processedData[$fkName] = $parentId;
             }
             $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
             $finalData  = $createBeforeEvent["data"];
