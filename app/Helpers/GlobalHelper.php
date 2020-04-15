@@ -1548,7 +1548,7 @@ function _customGetData($model,$params)
         }
         $data = array_merge([
             "data"=>$fixedData],[
-            "metaScriptList"=>method_exists( $model, "metaScriptList" )?$model->metaScriptList():null,
+            "metaScript"=>method_exists( $modelExtender, "metaScriptList" )?$modelExtender->metaScriptList():null,
             "total"=>$data->total(),
             "current_page"=>$data->currentPage(),
             "per_page"=>$data->perPage(),
