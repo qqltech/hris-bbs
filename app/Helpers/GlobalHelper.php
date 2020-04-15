@@ -1348,12 +1348,21 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
 }
 function _customGetData($model,$params)
 {
-    $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $table = $model->getTable();
+    $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;
     $fieldSelected=[];
+    $metaColumns = [];
     foreach($model->columns as $column){
         $fieldSelected[] = "$table.$column";
+        $metaColumns[$column] = "frontend";
+    }
+    if(!in_array($table,array_keys(config('tables')))){
+        $func = "metaFields";
+        if( method_exists( $model, $func) ){
+            $metaColumns = array_merge( $metaColumns, [$table=>$model->$func($model->columns)] );
+        }
+        config(['tables'=>array_merge(config('tables'), [$table=>$metaColumns]) ]);
     }
     $allColumns = $fieldSelected;
     $kembar = [];
@@ -1483,6 +1492,12 @@ function _customGetData($model,$params)
         $fixedData=[];
         foreach($data->toArray() as $index => $row){
             $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
+            foreach(["create","update","delete","read"] as $akses){
+                $func = $akses."roleCheck";
+                if( method_exists( $modelExtender, $func) ){
+                    $fixedData[$index] = array_merge( $fixedData[$index], ["meta_$akses"=>$modelExtender->$func()] );
+                }
+            }
             foreach($pureModel->details as $detail){           
                 $modelCandidate = "\App\Models\CustomModels\\$detail";
                 $model      = new $modelCandidate;
@@ -1522,10 +1537,17 @@ function _customGetData($model,$params)
     }else{
         $tempData = $data->toArray()["data"];
         $fixedData=[];
-        foreach($tempData as $row){
+        foreach($tempData as $index => $row){
             $fixedData[] = $modelExtender->transformRowData(reformatDataResponse($row));
+            foreach(["create","update","delete","read"] as $akses){
+                $func = $akses."roleCheck";
+                if( method_exists( $modelExtender, $func) ){
+                    $fixedData[$index] = array_merge( $fixedData[$index], ["meta_$akses"=>$modelExtender->$func()] );
+                }
+            }
         }
-        $data = array_merge(["data"=>$fixedData],[
+        $data = array_merge([
+            "data"=>$fixedData],[
             "total"=>$data->total(),
             "current_page"=>$data->currentPage(),
             "per_page"=>$data->perPage(),
@@ -1542,12 +1564,21 @@ function _customGetData($model,$params)
 
 function _customFind($model, $params)
 {
+    $table = $model->getTable();
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;
-    $table = $model->getTable();
     $fieldSelected=[];
+    $metaColumns=[];
     foreach($model->columns as $column){
         $fieldSelected[] = "$table.$column";
+        $metaColumns[$column] = "frontend";
+    }
+    if(!in_array($table,array_keys(config('tables')))){
+        $func = "metaFields";
+        if( method_exists( $model, $func) ){
+            $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
+        }
+        config(['tables'=>array_merge(config('tables'), [$table=>$metaColumns]) ]);
     }
     $joined=[];
     $allColumns = $fieldSelected;

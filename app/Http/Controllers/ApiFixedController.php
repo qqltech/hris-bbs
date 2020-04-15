@@ -38,6 +38,9 @@ class ApiFixedController extends Controller
         if( ! File::isDirectory(base_path('public/uploads') ) ) {
             File::makeDirectory(base_path('public/uploads') , 493, true);
         }
+        if(config('tables')==null){
+            config(['tables'=>[]]);
+        }
         $this->formatDate=env("FORMAT_DATE_FRONTEND","d/m/Y");
         $this->isMultipart = (strpos($request->header("Content-Type"),"multipart") !==FALSE)?true:false;
         $this->originalRequest = $request->capture();
@@ -467,7 +470,11 @@ class ApiFixedController extends Controller
             $p->id          = $id;
             $p->joinMax        = isset($data->joinMax) ? $data->joinMax:0;
             $overrideParams = $model->overrideGetParams($p,$id);
-            return [ "data"=>$model->customFind($overrideParams)];
+            return [
+                "data"=>$model->customFind($overrideParams),
+                "meta"=>config('tables'),
+                "metaScript"=>method_exists( $model, "metaScript" )?$model->metaScript():null
+            ];
         }else{
             $p->where_raw   = isset($data->where) ? $data->where : null;
             $p->order_by    = isset($data->orderby) ? $data->orderby:$model->getTable().".updated_at";
