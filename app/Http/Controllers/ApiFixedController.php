@@ -468,7 +468,9 @@ class ApiFixedController extends Controller
             $p->joinMax        = isset($data->joinMax) ? $data->joinMax:0;
             $overrideParams = $model->overrideGetParams($p,$id);
             return [ "data"=>$model->customFind($overrideParams),
-                        "meta"=>["form"=>["a"=>"abc"]]
+                        "meta"=>[
+                        "form"=>["a"=>"abc"]
+                    ]
                 ];
             $p->where_raw   = isset($data->where) ? $data->where : null;
             $p->order_by    = isset($data->orderby) ? $data->orderby:$model->getTable().".updated_at";
