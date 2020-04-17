@@ -1360,7 +1360,7 @@ function _customGetData($model,$params)
     if(!in_array($table,array_keys(config('tables')))){
         $func = "metaFields";
         if( method_exists( $model, $func) ){
-            $metaColumns = array_merge( $metaColumns, [$table=>$model->$func($model->columns)] );
+            $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
         }
         config(['tables'=>array_merge(config('tables'), [$table=>$metaColumns]) ]);
     }
