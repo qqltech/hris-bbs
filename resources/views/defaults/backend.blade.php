@@ -594,7 +594,7 @@
                 var received_msg = evt.data;
                     try{
                         received_msg=JSON.parse(received_msg);
-                        console.log("%c "+received_msg.debug_id,"background: #222; color: #a0ff5c;font-weight: bold;","%c "+received_msg,"background: #222; color: #a0ff5c;font-weight: bold;");
+                        console.log("%c "+received_msg.debug_id,"background: #222; color: #a0ff5c;font-weight: bold;",received_msg);
                     }catch(e){
                         console.log(received_msg);
                     }
