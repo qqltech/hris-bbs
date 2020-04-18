@@ -584,7 +584,7 @@
                     });
                 });
 
-                var ws = new WebSocket("wss://backend.dejozz.com:9001");
+                var ws = new WebSocket("wss://backend.dejozz.com:9001/{{env('LOG_CHANNEL',999)}}");
 				
                 ws.onopen = function() {
                     // ws.send();
