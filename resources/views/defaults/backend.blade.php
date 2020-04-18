@@ -587,15 +587,14 @@
                 var ws = new WebSocket("wss://backend.dejozz.com:9001/{{env('LOG_CHANNEL',999)}}");
 				
                 ws.onopen = function() {
-                    // ws.send();
-                    console.log("debug is ready to use");
+                    console.log("%c debug is ready to use","background: #222; color: #a0ff5c;font-weight: bold;");
                 };
 
                 ws.onmessage = function (evt) { 
                 var received_msg = evt.data;
                     try{
                         received_msg=JSON.parse(received_msg);
-                        console.log(received_msg.debug_id,received_msg);
+                        console.log("%c "+received_msg.debug_id,"background: #222; color: #a0ff5c;font-weight: bold;",received_msg);
                     }catch(e){
                         console.log(received_msg);
                     }
