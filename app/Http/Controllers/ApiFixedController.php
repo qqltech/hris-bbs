@@ -569,19 +569,23 @@ class ApiFixedController extends Controller
             if( !in_array($detail,array_keys($data) )){
                 continue;
             }
+
+            $modelCandidate = "\App\Models\CustomModels\\$detail";
+            $modelChild = new $modelCandidate;
+            
             $detailIds = [];
             $detailNew = [];
             $detailOld = [];
             foreach($data[$detail] as $index => $valDetail){
-                if(isset($valDetail['id']) && is_numeric($valDetail['id'])){
+                if(isset($valDetail['id']) && is_numeric($valDetail['id']) && (new $modelCandidate)->where('id',$valDetail['id'])->count()>0){
+                    $this->updateOperation($detail, $valDetail, $valDetail['id']);
                     $detailIds[]=$valDetail['id'];
                     $detailOld [] = $valDetail;
                 }else{
                     $detailNew [] = $valDetail;
                 }
             };
-            $modelCandidate = "\App\Models\CustomModels\\$detail";
-            $modelChild = new $modelCandidate;
+            
             $columns    = $modelChild->columns;
             $fkName     = $model->getTable();
             if(!in_array($fkName."_id",$columns)){
@@ -600,10 +604,12 @@ class ApiFixedController extends Controller
             foreach( $dataDetail as $dtl ){
                 $this->deleteOperation($detail, null, $dtl->id, $id);
             }
-            $this->createOperation($detail, $detailNew, $id, $model->getTable());
-            foreach($detailOld as $oldDetail){
-                $this->updateOperation($detail, $oldDetail, $oldDetail['id']);
+            if( count($detailNew)>0){
+                $this->createOperation($detail, $detailNew, $id, $model->getTable());
             }
+            // foreach($detailOld as $oldDetail){
+            //     $this->updateOperation($detail, $oldDetail, $oldDetail['id']);
+            // }
         }
         // foreach( $data as $key => $value ){
         //     if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){
