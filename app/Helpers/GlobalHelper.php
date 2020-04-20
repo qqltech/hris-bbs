@@ -1777,6 +1777,9 @@ function reformatData($arrayData){
     $dataKey=["date","tgl","tanggal","_at"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
+        if(is_array($data)){
+            continue;
+        }
         $isDate=false;
         foreach($dataKey as $dateString){
             if(strpos(strtolower($key),$dateString)!==false && count(explode("/",$data))>2){
@@ -1791,7 +1794,7 @@ function reformatData($arrayData){
                 $arrayData[$key] = $newData;                
             }catch(Exception $e){}
         }
-        if( str_replace(" ","",$data)==''){
+        if( str_replace(["null","NULL"," "],["","",""],$data)==''){
             $arrayData[$key] = null;
         }
     }

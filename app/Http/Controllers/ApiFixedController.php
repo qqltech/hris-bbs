@@ -458,6 +458,16 @@ class ApiFixedController extends Controller
     }
     private function readOperation( $modelName, $params=null, $id=null )
     {
+        $params=(array)$params;
+        foreach($params as $key => $param){
+            if(is_array($param)){
+                continue;
+            }
+            if( str_replace(["null","NULL"," "],["","",""],$param)==""){
+                $params[$key] = null;
+            }
+        }
+        $params=(object)$params;
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
         $model          = new $modelCandidate;
         $details       = $model->details;
