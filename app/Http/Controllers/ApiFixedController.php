@@ -533,28 +533,6 @@ class ApiFixedController extends Controller
             $this->operationOK=false;
             return;
         }
-        foreach( $detailsArray as $detail ){
-            $modelCandidate = "\App\Models\CustomModels\\$detail";
-            $modelChild = new $modelCandidate;
-            $columns    = $modelChild->columns;
-            $fkName     = $model->getTable();
-            if(!in_array($fkName."_id",$columns)){
-                $realJoins = $modelChild->joins;
-                foreach($realJoins as $val){
-                    $valArray = explode("=",$val);
-                    if($valArray[0]==$fkName.".id"){
-                        $fkName = $valArray[1];
-                        break;
-                    }
-                }
-            }else{
-                $fkName.="_id";
-            }
-            $dataDetail = $modelChild->where($fkName,$id)->get();                
-            foreach( $dataDetail as $dtl ){
-                $this->deleteOperation($detail, null, $dtl->id, $id);
-            }
-        }
         $additionalData = $this->createAdditionalData($model, $data);
         $eliminatedData = $this->createEliminationData($model, $data);
         $processedData  = array_merge($eliminatedData, $additionalData);
@@ -586,11 +564,58 @@ class ApiFixedController extends Controller
         $finalModel = $preparedModel->update(reformatData($finalData));
         $model->updateAfter($finalModel, $processedData, $this->requestMeta, $id);
         $this->success[] = "SUCCESS: data update in ".$model->getTable()." id: $id";
-        foreach( $data as $key => $value ){
-            if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
-                $this->createOperation($key, $value, $id, $model->getTable());
+        
+        foreach( $detailsArray as $detail ){
+            if( !in_array($detail,array_keys($data) )){
+                continue;
+            }
+            $detailIds = [];
+            $detailNew = [];
+            $detailOld = [];
+            foreach($data[$detail] as $index => $valDetail){
+                if(isset($valDetail['id']) && is_numeric($valDetail['id'])){
+                    $detailIds[]=$valDetail['id'];
+                    $detailOld [] = $valDetail;
+                }else{
+                    $detailNew [] = $valDetail;
+                }
+            };
+            $modelCandidate = "\App\Models\CustomModels\\$detail";
+            $modelChild = new $modelCandidate;
+            $columns    = $modelChild->columns;
+            $fkName     = $model->getTable();
+            if(!in_array($fkName."_id",$columns)){
+                $realJoins = $modelChild->joins;
+                foreach($realJoins as $val){
+                    $valArray = explode("=",$val);
+                    if($valArray[0]==$fkName.".id"){
+                        $fkName = $valArray[1];
+                        break;
+                    }
+                }
+            }else{
+                $fkName.="_id";
+            }
+            $dataDetail = $modelChild->where($fkName,$id)->whereNotIn('id',$detailIds)->get();                
+            foreach( $dataDetail as $dtl ){
+                $this->deleteOperation($detail, null, $dtl->id, $id);
+            }
+            $this->createOperation($detail, $detailNew, $id, $model->getTable());
+            foreach($detailOld as $oldDetail){
+                $this->updateOperation($detail, $oldDetail, $oldDetail['id']);
             }
         }
+        // foreach( $data as $key => $value ){
+        //     if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){
+        //         $detailIds = [];
+        //         foreach($data[$key] as $valDetail){
+        //             if(isset($valDetail['id']) && is_numeric($valDetail['id'])){
+        //                 $detailIds[]=$valDetail['id'];
+        //             }
+        //         };
+        //         $this->createOperation($key, $value, $id, $model->getTable());
+        //     }
+        // }
         $model = null;  
     }
     public function router(Request $request, $modelname, $id=null)
