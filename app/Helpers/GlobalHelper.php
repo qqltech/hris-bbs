@@ -1791,7 +1791,7 @@ function reformatData($arrayData){
                 $arrayData[$key] = $newData;                
             }catch(Exception $e){}
         }
-        if( str_replace(" ",$data)==''){
+        if( str_replace(" ","",$data)==''){
             $arrayData[$key] = null;
         }
     }
