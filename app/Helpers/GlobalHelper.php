@@ -1491,13 +1491,14 @@ function _customGetData($model,$params)
     if($params->caller){
         $fixedData=[];
         foreach($data->toArray() as $index => $row){
-            $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
+            $fixedData[$index] = reformatDataResponse($row);
             foreach(["create","update","delete","read","print"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( $fixedData[$index], ["meta_$akses"=>$modelExtender->$func()] );
                 }
             }
+            $fixedData[$index] = $modelExtender->transformRowData($fixedData[$index]);
             foreach($pureModel->details as $detail){           
                 $modelCandidate = "\App\Models\CustomModels\\$detail";
                 $model      = new $modelCandidate;
@@ -1538,13 +1539,14 @@ function _customGetData($model,$params)
         $tempData = $data->toArray()["data"];
         $fixedData=[];
         foreach($tempData as $index => $row){
-            $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
+            $fixedData[$index] = reformatDataResponse($row);
             foreach(["create","update","delete","read","print"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( $fixedData[$index], ["meta_$akses"=>$modelExtender->$func()] );
                 }
-            }
+            }            
+            $fixedData[$index] = $modelExtender->transformRowData($fixedData[$index]);
         }
         $data = array_merge([
             "data"=>$fixedData],[
