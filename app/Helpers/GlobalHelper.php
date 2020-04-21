@@ -1492,7 +1492,7 @@ function _customGetData($model,$params)
         $fixedData=[];
         foreach($data->toArray() as $index => $row){
             $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
-            foreach(["create","update","delete","read"] as $akses){
+            foreach(["create","update","delete","read","print"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( $fixedData[$index], ["meta_$akses"=>$modelExtender->$func()] );
@@ -1538,8 +1538,8 @@ function _customGetData($model,$params)
         $tempData = $data->toArray()["data"];
         $fixedData=[];
         foreach($tempData as $index => $row){
-            $fixedData[] = $modelExtender->transformRowData(reformatDataResponse($row));
-            foreach(["create","update","delete","read"] as $akses){
+            $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
+            foreach(["create","update","delete","read","print"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( $fixedData[$index], ["meta_$akses"=>$modelExtender->$func()] );
