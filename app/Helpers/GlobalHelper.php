@@ -1774,7 +1774,7 @@ function ff($data,$id="debug"){
     );
 }
 function reformatData($arrayData){
-    $dataKey=["date","tgl","tanggal","_at"];
+    $dataKey=["date","tgl","tanggal","_at","etd"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
         if(is_array($data)){
@@ -1801,7 +1801,7 @@ function reformatData($arrayData){
     return $arrayData;
 }
 function reformatDataResponse($arrayData){
-    $dataKey=["date","tgl","tanggal","_at"];
+    $dataKey=["date","tgl","tanggal","_at","etd"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
         $isDate=false;

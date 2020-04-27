@@ -48,6 +48,9 @@ class ApiFixedController extends Controller
         $this->requestMeta = $request->getMetaData();
         if(config('request')==null){
             config(['request'=>$this->requestData]);
+            config(['requestHeader'=>$this->requestMeta->header()]);
+            config(['requestMethod'=>$this->requestMeta->method()]);
+            config(['requestOrigin'=>$this->requestMeta->path()]);
         }
         if($this->isMultipart){
             $this->serializeMultipartData();
