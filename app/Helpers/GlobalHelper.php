@@ -1350,7 +1350,9 @@ function _customGetData($model,$params)
 {
     $table = $model->getTable();
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
-    $pureModel=$model;
+    $pureModel=$model;    
+    $modelCandidate = "\App\Models\CustomModels\\".$pureModel->getTable();
+    $modelExtender  = new $modelCandidate;
     $fieldSelected=[];
     $metaColumns = [];
     foreach($model->columns as $column){
@@ -1448,6 +1450,10 @@ function _customGetData($model,$params)
             }
         }
     }
+    
+    if(method_exists($modelExtender, "extendJoin")){
+        $model = $modelExtender->extendJoin($model);
+    }
 
     if($params->search){
         $searchfield = $params->searchfield;
@@ -1483,8 +1489,6 @@ function _customGetData($model,$params)
     }else{
        $data = $final->get(); 
     }
-    $modelCandidate = "\App\Models\CustomModels\\".$pureModel->getTable();
-    $modelExtender  = new $modelCandidate;
     if(!method_exists($modelExtender, "transformRowData")){
         return $data;
     }
@@ -1568,6 +1572,8 @@ function _customFind($model, $params)
     $table = $model->getTable();
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;
+    $modelCandidate = "\App\Models\CustomModels\\".$pureModel->getTable();
+    $modelExtender  = new $modelCandidate;
     $fieldSelected=[];
     $metaColumns=[];
     foreach($model->columns as $column){
@@ -1657,10 +1663,12 @@ function _customFind($model, $params)
             }
         }
     }
+    
+    if(method_exists($modelExtender, "extendJoin")){
+        $model = $modelExtender->extendJoin($model);
+    }
     $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
     
-    $modelCandidate = "\App\Models\CustomModels\\".$pureModel->getTable();
-    $modelExtender  = new $modelCandidate;
     if(method_exists($modelExtender, "transformRowData")){
         $data = $modelExtender->transformRowData($data->toArray());
     }
