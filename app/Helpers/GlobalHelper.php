@@ -1787,6 +1787,10 @@ function reformatData($arrayData){
     $dataKey=["date","tgl","tanggal","_at","etd"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
+        if( strtolower(gettype($data))=='null'){
+            unset($arrayData[$key]);
+            continue;
+        };
         if(is_array($data)){
             continue;
         }
