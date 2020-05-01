@@ -1351,8 +1351,8 @@ function _customGetData($model,$params)
     $table = $model->getTable();
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;    
-    // $modelCandidate = "\\".get_class($model);
-    $modelCandidate = "\App\Models\CustomModels\\$table";
+    $modelCandidate = "\\".get_class($model);
+    // $modelCandidate = "\App\Models\CustomModels\\$table";
     $modelExtender  = new $modelCandidate;
     $fieldSelected=[];
     $metaColumns = [];
@@ -1573,8 +1573,8 @@ function _customFind($model, $params)
     $table = $model->getTable();
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;
-    // $modelCandidate = "\\".get_class($model);
-    $modelCandidate = "\App\Models\CustomModels\\$table";
+    $modelCandidate = "\\".get_class($model);
+    // $modelCandidate = "\App\Models\CustomModels\\$table";
     $modelExtender  = new $modelCandidate;
     $fieldSelected=[];
     $metaColumns=[];
