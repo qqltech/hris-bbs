@@ -453,6 +453,7 @@ class ApiFixedController extends Controller
             }
             $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
             $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
+            $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
             foreach( $data as $key => $value ){
                 if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
@@ -462,7 +463,7 @@ class ApiFixedController extends Controller
         }
         $model = null;   
     }
-    private function readOperation( $modelName, $params=null, $id=null )
+    public function readOperation( $modelName, $params=null, $id=null )
     {
         $params=(array)$params;
         foreach($params as $key => $param){
@@ -660,6 +661,12 @@ class ApiFixedController extends Controller
             }
             DB::beginTransaction();
             try{
+                $modelCandidate = "\App\Models\CustomModels\\$modelname";
+                $model = new $modelCandidate;
+                $oldData = [];
+                if(method_exists($model, $this->operation."AfterTransaction") && $this->operationId!==null){
+                    $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
+                }
                 $function = $this->operation."Operation";
                 $this->$function($this->parentModelName,$this->requestData, $id);
                 if(!$this->operationOK){
@@ -669,7 +676,7 @@ class ApiFixedController extends Controller
                         "success"  => $this->success, 
                         "errors"  => $this->errors, 
                         "request" => $this->requestData,
-                        "id"        => $this->operationId
+                        "id"      => $this->operationId
                     ],400);
                 }
             }catch(Exception $e){
@@ -684,6 +691,16 @@ class ApiFixedController extends Controller
                 ],400);
             }
             if($this->operationOK){
+                $newData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
+                if(method_exists($model, $this->operation."AfterTransaction")){
+                    $newfunction = $this->operation."AfterTransaction";
+                    $model->$newfunction( 
+                        $newData,
+                        $oldData, 
+                        $this->requestData,
+                        $this->requestMeta
+                    );
+                }
                 DB::commit();
                 return response()->json([
                     "status"    => "$this->operation data berhasil", 

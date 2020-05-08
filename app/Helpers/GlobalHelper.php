@@ -1769,19 +1769,28 @@ function _uploadexcel($model, $request)
 }
 
 function ff($data,$id="debug"){
-    if(is_string($data)){
-        $data = [$data];
-    }
-    $data = is_object($data)?array($data):$data;
-    $data = array_merge($data,["debug_id"=>$id]);
     $channel=env("LOG_CHANNEL",888);
     $client = new \GuzzleHttp\Client();
-    $client->post(
-        "https://backend.dejozz.com/chatbot/public/websocket-send/$channel",
-        [
-            'form_params' => $data
-        ]
-    );
+    try{
+        if(is_string($data)){
+            $data = [$data];
+        }
+        $data = is_object($data)?array($data):$data;
+        $data = array_merge($data,["debug_id"=>$id]);        
+        $client->post(
+            "https://backend.dejozz.com/chatbot/public/websocket-send/$channel",
+            [
+                'form_params' => $data
+            ]
+        );
+    }catch(\Exception $e){
+        $client->post(
+            "https://backend.dejozz.com/chatbot/public/websocket-send/$channel",
+            [
+                'form_params' => ["debug_error"=>$e->getMessage(),"debug_id"=>$id]
+            ]
+        );
+    }
 }
 function reformatData($arrayData){
     $dataKey=["date","tgl","tanggal","_at","etd"];
