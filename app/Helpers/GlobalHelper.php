@@ -1360,12 +1360,12 @@ function _customGetData($model,$params)
         $fieldSelected[] = "$table.$column";
         $metaColumns[$column] = "frontend";
     }
-    if(!in_array($table,array_keys(config('tables')))){
+    if(!in_array(class_basename($model),array_keys(config('tables')))){
         $func = "metaFields";
         if( method_exists( $model, $func) ){
             $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
         }
-        config(['tables'=>array_merge(config('tables'), [$table=>$metaColumns]) ]);
+        config(['tables'=>array_merge(config('tables'), [class_basename($model)=>$metaColumns]) ]);
     }
     $allColumns = $fieldSelected;
     $kembar = [];
@@ -1582,12 +1582,12 @@ function _customFind($model, $params)
         $fieldSelected[] = "$table.$column";
         $metaColumns[$column] = "frontend";
     }
-    if(!in_array($table,array_keys(config('tables')))){
+    if(!in_array(class_basename($model),array_keys(config('tables')))){
         $func = "metaFields";
         if( method_exists( $model, $func) ){
             $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
         }
-        config(['tables'=>array_merge(config('tables'), [$table=>$metaColumns]) ]);
+        config(['tables'=>array_merge(config('tables'), [class_basename($model)=>$metaColumns]) ]);
     }
     $joined=[];
     $allColumns = $fieldSelected;
