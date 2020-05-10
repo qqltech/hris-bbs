@@ -80,6 +80,9 @@ class __class extends __basicClass
 //======================================================================READ EVENT & OVERRIDE PARAMETER GET DATA JIKA PERLU
     public function overrideGetParams($params, $id=null)
     {
+        if( $params->where_raw != '' && $params->where_raw != null ){
+        	$params->where_raw = $params->where_raw." AND ";
+        }
         if($id){
             $params->selectfield = $params->selectfield; //"id,kolom1,kolom2"
             $params->join        = $params->join;        //true(default)/false {TABLE AUTO JOIN DENGAN INDUK}
@@ -126,6 +129,22 @@ class __class extends __basicClass
     		return \Excel::download(new \ExportExcel($query), \Carbon\Carbon::now()->format('d-m-Y')."_".$this->getTable().'.xlsx');    
         }
     }
+//==========================================================================
+
+/*    public function metaFields($fields)
+    {
+        return [
+            "nama_field"=>"readonly"
+        ];
+    }*/
+/*    public function metaScript()
+    {
+        return js("alert('dari backend saat edit')");
+    }*/
+/*    public function custom_initialize()
+    {
+        return js("alert('dari backend saat create')");
+    }*/
 //========================================================================CUSTOM FUNCTION BEBAS TOTAL FUNGSINYA DIPREFIX "custom_"
     public function custom_getdraftid($request)
     {
