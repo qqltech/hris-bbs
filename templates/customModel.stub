@@ -80,9 +80,9 @@ class __class extends __basicClass
 //======================================================================READ EVENT & OVERRIDE PARAMETER GET DATA JIKA PERLU
     public function overrideGetParams($params, $id=null)
     {
-        if( $params->where_raw != '' && $params->where_raw != null ){
+        /*if( $params->where_raw != '' && $params->where_raw != null ){
         	$params->where_raw = $params->where_raw." AND ";
-        }
+        }*/
         if($id){
             $params->selectfield = $params->selectfield; //"id,kolom1,kolom2"
             $params->join        = $params->join;        //true(default)/false {TABLE AUTO JOIN DENGAN INDUK}
