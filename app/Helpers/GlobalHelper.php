@@ -1861,3 +1861,7 @@ function getReportHeader($model,$params=[]){
     ], $params);
     return $model->customGet($p);
 }
+
+function js($script){
+    return base64_encode(base64_encode($script)); 
+}
