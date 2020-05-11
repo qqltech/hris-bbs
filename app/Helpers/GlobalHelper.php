@@ -1495,8 +1495,13 @@ function _customGetData($model,$params)
     }
     if($params->caller){
         $fixedData=[];
-        foreach($data->toArray() as $index => $row){
-            $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
+        $index=0;
+        foreach($data->toArray() as $row){
+            $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
+            if( gettype($transformedData)=='boolean' ){
+                continue;
+            }
+            $fixedData[$index] = $transformedData;
             foreach(["create","update","delete","read","print"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
@@ -1537,19 +1542,26 @@ function _customGetData($model,$params)
                 $p->caller      = $pureModel->getTable();
                 $fixedData[$index][$detail]  = $model->customGet($p);
             }
+            $index++;
         }
         $data   = $fixedData;
     }else{
         $tempData = $data->toArray()["data"];
         $fixedData=[];
-        foreach($tempData as $index => $row){
-            $fixedData[$index] = $modelExtender->transformRowData(reformatDataResponse($row));
+        $index=0;
+        foreach($tempData as $row){
+            $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
+            if( gettype($transformedData)=='boolean' ){
+                continue;
+            }
+            $fixedData[$index] = $transformedData;
             foreach(["create","update","delete","read","print"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( ["meta_$akses"=>$modelExtender->$func()], $fixedData[$index] );
                 }
             }
+            $index++;
         }
         $data = array_merge([
             "data"=>$fixedData],[
