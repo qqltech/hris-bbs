@@ -1784,7 +1784,7 @@ function ff($data,$id="debug"){
     $channel=env("LOG_CHANNEL",888);
     $client = new \GuzzleHttp\Client();
     try{
-        if(is_string($data)){
+        if(!in_array(gettype($data),["object","array"])){
             $data = [$data];
         }
         $data = is_object($data)?array($data):$data;
@@ -1877,3 +1877,138 @@ function getReportHeader($model,$params=[]){
 function js($script){
     return base64_encode(base64_encode($script)); 
 }
+
+function str_replace_once($needle, $replace, $haystack) {
+    $pos = strpos($haystack, $needle);
+    if ($pos === false) {
+        return $haystack;
+    }
+    return substr_replace($haystack, $replace, $pos, strlen($needle));
+}
+
+function getArrayFromString($formula){     
+    $arr=[];   	
+    $string="";
+    foreach(str_split($formula) as $i => $char ){          	
+        if( in_array($char,["-","+","/","*"]) ){
+            $arr[]=$string;
+            $string="";
+            $arr[]=$char;
+        }else{
+            $string.=$char;
+        }
+    }
+    $arr[]=$string;
+    return $arr;
+};
+function testingformula(&$formula){
+    $arr=getArrayFromString($formula);
+    foreach($arr as $index => $calc){
+        if(in_array($calc,["/","*"])){
+        if($calc=='/'){
+            $hasil=$arr[$index-1]/$arr[$index+1];
+            $formula=str_replace_once($arr[$index-1].$arr[$index].$arr[$index+1],$hasil,$formula);
+        }elseif($calc=='*'){
+            $hasil=$arr[$index-1]*$arr[$index+1];
+            $formula=str_replace_once($arr[$index-1].$arr[$index].$arr[$index+1],$hasil,$formula);
+        }
+    break;
+    }
+}
+    if(strpos($formula,"/")!==false ||  strpos($formula,"*")!==false){
+        testingformula($formula);
+    }
+}
+function mathString($formula){
+    $formula = str_replace(" ","",$formula);
+    testingformula($formula);
+    $arr = getArrayFromString($formula);
+    $hasil = 0;
+    foreach($arr as $index => $calc){
+        if($index%2==0){
+        if($index==0){
+            $hasil=$calc;
+        }else{
+            if($arr[$index-1]=='-'){
+                $hasil-=$calc;
+            }elseif($arr[$index-1]=='+'){
+                $hasil+=$calc;
+            }elseif($arr[$index-1]=='/'){
+                $hasil/=$calc;
+            }elseif($arr[$index-1]=='*'){
+                $hasil*=$calc;
+            }
+        }          
+        }
+    }
+    return $hasil;
+}
+function getOutStanding($model, $row,$formula){
+    $formula = str_replace(" ","",$formula);
+    $arr = getArrayFromString($formula);
+    $simpanan=[];
+    foreach($arr as $index => $mathString){
+        if($index%2==0 && !is_numeric($mathString)){
+            $arrString = explode(".",$mathString);
+            if(count($arrString)==1){
+                $formula = str_replace_once($mathString, $row[$mathString], $formula);
+            }else{
+                $heirs = $model->heirs;
+                $var = "\App\Models\BasicModels\\".$arrString[0];
+                $simpanan[$arrString[0]]=[];
+                $child = new $var;
+                $childJoins = $child->joins;
+                $simpanan[$arrString[0]]['heirs']=$child->heirs;
+                if(in_array($arrString[0], $heirs)){
+                    $whereKey = "";
+                    foreach($childJoins as $join){
+                        if( strpos($join,$model->getTable().".id") !==false ){
+                            $whereKey = explode("=", $join)[1];
+                            break;
+                        }
+                    };
+                    $data = $child->selectRaw("sum($arrString[1]) as sumqty")
+                            ->where($whereKey, $row['id'])
+                            ->first();
+                    $sum = $data->sumqty?$data->sumqty:0;
+                    $formula = str_replace_once($mathString, $sum, $formula);
+                    if($sum>0){
+                        $simpanan[$arrString[0]]['data']=$child->select("id")
+                            ->where($whereKey, $row['id'])->get()->toArray();
+                    }else{
+                        $simpanan[$arrString[0]]['data']=[];
+                    }
+                }else{
+                    foreach($simpanan as $key => $keys ){                          
+                        if(in_array($arrString[0], $keys['heirs'])){                            
+                            $whereKey = "";
+                            foreach($childJoins as $join){
+                                if( strpos($join,"$key.id") !==false ){
+                                    $whereKey = explode("=", $join)[1];
+                                    break;
+                                }
+                            };
+                            $ids=[];
+                            foreach($keys['data'] as $row){
+                            $ids[] = $row["id"];
+                            }
+                            $data = $child->selectRaw("sum($arrString[1]) as sumqty")
+                                    ->whereIn($whereKey, $ids)
+                                    ->first();
+                            $sum = $data->sumqty?$data->sumqty:0;
+                            $formula = str_replace_once($mathString, $sum, $formula);
+                            if($sum>0){
+                                $simpanan[$arrString[0]]['data']=$child->select("id")
+                                    ->where($whereKey, $row['id'])->get()->toArray();
+                            }else{
+                                $simpanan[$arrString[0]]['data']=[];
+                            }
+                            break;                            
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return mathString($formula);
+};
