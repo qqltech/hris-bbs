@@ -663,9 +663,12 @@ class ApiFixedController extends Controller
             try{
                 $modelCandidate = "\App\Models\CustomModels\\$modelname";
                 $model = new $modelCandidate;
+                
                 if( (isset($model->transaction_config) || method_exists($model, $this->operation."AfterTransaction")) && $this->operationId!==null){
-                    ff($model->transaction_config,'tes');
+                    
                     $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
+                }else{
+                    ff(['g masuk'],'tes');
                 }
                 $function = $this->operation."Operation";
                 $this->$function($this->parentModelName,$this->requestData, $id);
