@@ -667,9 +667,6 @@ class ApiFixedController extends Controller
                 if( (isset($model->transaction_config) || method_exists($model, $this->operation."AfterTransaction")) && $this->operationId!==null){
                     
                     $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
-                }else{
-                    ff(['g masuk'],'tes');
-                    ff([$this->operationId],'tes');
                 }
                 $function = $this->operation."Operation";
                 $this->$function($this->parentModelName,$this->requestData, $id);
@@ -700,7 +697,7 @@ class ApiFixedController extends Controller
                     $newfunction = $this->operation."AfterTransaction";
                     $model->$newfunction( 
                         $newData,
-                        $oldData, 
+                        isset($oldData)?$oldData:[], 
                         $this->requestData,
                         $this->requestMeta
                     );
