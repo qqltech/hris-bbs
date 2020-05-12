@@ -150,5 +150,4 @@ class __class extends __basicClass
     {
         return "CODE".crc32(uniqid());
     }
-
 }
