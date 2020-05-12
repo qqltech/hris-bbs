@@ -669,6 +669,7 @@ class ApiFixedController extends Controller
                     $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
                 }else{
                     ff(['g masuk'],'tes');
+                    ff([$this->operationId],'tes');
                 }
                 $function = $this->operation."Operation";
                 $this->$function($this->parentModelName,$this->requestData, $id);
