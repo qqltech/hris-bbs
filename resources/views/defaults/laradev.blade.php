@@ -54,6 +54,7 @@
             'APP_URL' => 'http://localhost',
             'AUTHORIZATION' => 'true',
             'BACKENDPASSWORD' => 'pulangcepat',
+            'SERVERSTATUS' => 'OPEN',
             'DB_CONNECTION' => 'mysql',
             'DB_DATABASE' => 'trial2',
             'DB_HOST' => 'localhost',

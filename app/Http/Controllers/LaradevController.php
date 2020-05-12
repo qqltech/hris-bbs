@@ -353,6 +353,7 @@ class LaradevController extends Controller
                 'APP_URL' => 'http://localhost',
                 'DB_CONNECTION' => 'mysql',
                 'DB_DATABASE' => 'trial2',
+                'SERVERSTATUS' => 'OPEN',
                 'DB_HOST' => 'localhost',
                 'DB_PORT' => '3306',
                 'DB_PASSWORD' => '',

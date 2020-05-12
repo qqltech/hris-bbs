@@ -28,6 +28,9 @@ $router->group(['prefix'=>'operation'], function () use ($router) {
     });
 
     $router->get('/', function(){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
         return view("defaults.operation");
     });
 
