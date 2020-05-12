@@ -1990,7 +1990,7 @@ function getOutStanding($model, $row,$formula){
                             };
                             $ids=[];
                             foreach($keys['data'] as $row){
-                            $ids[] = $row["id"];
+                                $ids[] = $row["id"];
                             }
                             $data = $child->selectRaw("sum($arrString[1]) as sumqty")
                                     ->whereIn($whereKey, $ids)
@@ -1999,7 +1999,7 @@ function getOutStanding($model, $row,$formula){
                             $formula = str_replace_once($mathString, $sum, $formula);
                             if($sum>0){
                                 $simpanan[$arrString[0]]['data']=$child->select("id")
-                                    ->where($whereKey, $row['id'])->get()->toArray();
+                                    ->whereIn($whereKey, $ids)->get()->toArray();
                             }else{
                                 $simpanan[$arrString[0]]['data']=[];
                             }
