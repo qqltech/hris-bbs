@@ -33,8 +33,11 @@ class ApiFixedController extends Controller
     private $isMultipart = false;
     private $formatDate='Y-m-d';
 
-    public function __construct(Request $request)
+    public function __construct(Request $request,$backdoor=false)
     {
+        if($backdoor){
+            return;
+        }
         if( ! File::isDirectory(base_path('public/uploads') ) ) {
             File::makeDirectory(base_path('public/uploads') , 493, true);
         }
