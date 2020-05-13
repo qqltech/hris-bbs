@@ -1459,7 +1459,7 @@ function _customGetData($model,$params)
     if($params->search){
         $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
-        $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
+        $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"":"";
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
                 foreach($allColumns as $column){
