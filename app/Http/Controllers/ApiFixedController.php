@@ -364,7 +364,7 @@ class ApiFixedController extends Controller
         }
         return $fixedArray;
     }
-    private function createOperation( $modelName, $data, $parentId=null, $parentName=null )
+    public function createOperation( $modelName, $data, $parentId=null, $parentName=null )
     {
         if(!$this->operationOK){return;}
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
