@@ -17,7 +17,7 @@ class ApiFixedController extends Controller
 {
     private $requestData;
     private $requestMeta;
-    private $operation;
+    private $operation='create';
     private $user;
     private $isAuthorized   = true;
     private $messages       = [];
@@ -32,9 +32,11 @@ class ApiFixedController extends Controller
     private $originalRequest;
     private $isMultipart = false;
     private $formatDate='Y-m-d';
+    private $isBackdoor = false;
 
     public function __construct(Request $request,$backdoor=false)
     {
+        $this->isBackdoor = $backdoor;
         if($backdoor){
             return;
         }
