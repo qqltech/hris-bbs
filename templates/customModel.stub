@@ -103,6 +103,7 @@ class __class extends __basicClass
             $params->addSelect   = null;
             $params->addJoin     = null;
           	$params->joinMax 	 = $params->joinMax; //default 0
+            $params->group_by    = $params->group_by; //pastikan selectnya sama dg yg digroupby
         }
         return $params;
     }
