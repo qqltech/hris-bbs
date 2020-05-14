@@ -1478,7 +1478,7 @@ function _customGetData($model,$params)
     }
     
     if(isset($params->group_by) && $params->group_by!=null){
-        $model = $model->groupByRaw($params->group_by);
+        $model = $model->groupBy(DB::raw($params->group_by));
     }
 
     if($params->order_by){
