@@ -1413,7 +1413,7 @@ function _customGetData($model,$params)
         $selectFields = $params->selectfield;
         $selectFields = explode(",", $selectFields);
         $fieldSelected= array_filter($fieldSelected,function($dt)use($selectFields){
-            if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields) || strpos($dt,"SUM(")!==false || strpos($dt,"COUNT(")!==false){
+            if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields) || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
                 return $dt;
             }
         });
@@ -1649,7 +1649,7 @@ function _customFind($model, $params)
         $selectFields = $params->selectfield;
         $selectFields = explode(",", $selectFields);
         $fieldSelected= array_filter($fieldSelected,function($dt)use($selectFields){
-            if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields)   || strpos($dt,"SUM(")!==false || strpos($dt,"COUNT(")!==false){
+            if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields)  || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
                 return $dt;
             }
         });
