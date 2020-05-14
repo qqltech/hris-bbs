@@ -1476,6 +1476,11 @@ function _customGetData($model,$params)
     if($params->where_raw){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
+    
+    if(isset($params->group_by) && $params->group_by!=null){
+        $model = $model->groupByRaw($params->group_by);
+    }
+
     if($params->order_by){
         $order =  str_replace("this.","$table.",$params->order_by);
         $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
