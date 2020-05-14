@@ -1409,8 +1409,8 @@ function _customGetData($model,$params)
             }
         }
     }
-    ff($params);
     if($params->selectfield){
+        ff($params);
         $selectFields = $params->selectfield;
         $selectFields = explode(",", $selectFields);
         $fieldSelected= array_filter($fieldSelected,function($dt)use($selectFields){
