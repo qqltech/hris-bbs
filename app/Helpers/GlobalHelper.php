@@ -1412,12 +1412,12 @@ function _customGetData($model,$params)
     if($params->selectfield){
         $selectFields = $params->selectfield;
         $selectFields = explode(",", $selectFields);
-        $fieldSelected= array_filter($fieldSelected,function($dt)use($selectFields){
-            ff( $dt);
-            if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields) || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
-                return $dt;
-            }
-        });
+        $fieldSelected= $selectFields;
+        // array_filter($selectFields,function($dt)use($selectFields){
+        //     if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields) || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
+        //         return $dt;
+        //     }
+        // });
         $allColumns = array_filter($allColumns,function($dt)use($selectFields){                
             if( in_array(explode( ".", $dt)[1], $selectFields) ){
                 return $dt;
@@ -1425,7 +1425,7 @@ function _customGetData($model,$params)
         });
     }
 
-    ff($fieldSelected);
+    
     if( isset($params->addSelect) && $params->addSelect!=null ){
         $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
     }
@@ -1650,17 +1650,18 @@ function _customFind($model, $params)
     if($params->selectfield){
         $selectFields = $params->selectfield;
         $selectFields = explode(",", $selectFields);
-        $fieldSelected= array_filter($fieldSelected,function($dt)use($selectFields){
-            if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields)  || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
-                return $dt;
-            }
-        });
+        $fieldSelected= $selectFields;
+        // array_filter($fieldSelected,function($dt)use($selectFields){
+        //     if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields)  || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
+        //         return $dt;
+        //     }
+        // });
     }
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
         $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
     }
-    ff($fieldSelected);
+    
     if( isset($params->addJoin) && $params->addJoin!=null ){
         $joins = explode( ",", $params->addJoin );
         foreach($joins as $join){
