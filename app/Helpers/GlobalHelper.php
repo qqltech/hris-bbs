@@ -1410,10 +1410,10 @@ function _customGetData($model,$params)
         }
     }
     if($params->selectfield){
-        ff($params);
         $selectFields = $params->selectfield;
         $selectFields = explode(",", $selectFields);
         $fieldSelected= array_filter($fieldSelected,function($dt)use($selectFields){
+            ff( strpos(strtolower($dt),"sum(")!==false?"ada sum":"nothing");
             if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields) || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
                 return $dt;
             }
