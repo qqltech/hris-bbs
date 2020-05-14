@@ -501,7 +501,7 @@ class ApiFixedController extends Controller
             $p->where_raw   = isset($data->where) ? $data->where : null;
             $p->order_by    = isset($data->orderby) ? $data->orderby:$model->getTable().".updated_at";
             $p->order_type  = isset($data->ordertype) ? $data->ordertype:"DESC";
-            $p->addSelect  = isset($data->addselect) ? urldecode($data->addselect):null;
+            $p->addselect  = isset($data->addselect) ? urldecode($data->addselect):null;
             $p->order_by_raw= isset($data->orderbyraw) ? $data->orderbyraw:null;
             $p->search      = isset($data->search) ? $data->search:null;
             $p->searchfield = isset($data->searchfield) ? $data->searchfield:null;
