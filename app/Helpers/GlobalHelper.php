@@ -1424,6 +1424,7 @@ function _customGetData($model,$params)
         });
     }
 
+    ff($fieldSelected);
     if( isset($params->addSelect) && $params->addSelect!=null ){
         $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
     }
