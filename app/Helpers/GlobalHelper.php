@@ -1788,7 +1788,8 @@ function _uploadexcel($model, $request)
       	return response()->json(["status"=>"success","data"=>$bulkData],200);
 }
 function uploadfile($model,$req){
-    $modelName = end(explode("\\",get_class($model)));
+    $modelArray = explode("\\",get_class($model));
+    $modelName = end($modelArray);
     $validator = Validator::make($req->all(), [
         'file' => 'max:25000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,jpeg,png,bmp,mp4,mp3,mpg,mpeg,mkv,3gp'
     ]);
