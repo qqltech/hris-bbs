@@ -1796,7 +1796,7 @@ function uploadfile($model,$req){
     if ( $validator->fails()) {
         return null;
     }
-    $code= Carbon::now()->format('his');
+    $code= Carbon::now()->format('his').crc32(uniqid());
     $fileName = sanitizeString($req->file->getClientOriginalName());
     Storage::disk('uploads')->putFileAs(
         $modelName, $req->file, $code."_".$fileName
