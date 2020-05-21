@@ -4,6 +4,6 @@ REM git push origin master
 git push sisthaserver master
 git push igaserver master
 git push efiserverproduction master
-git aaa efiserverproduction master
+git push aaa master
 REM git push hsiserver master
 REM git push kmnuserver master
