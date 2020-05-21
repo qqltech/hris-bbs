@@ -112,12 +112,17 @@ class __class extends __basicClass
     {
         return array_merge($row,[]);
     }
+//======================================================================SINGLE UPLOAD LANGSUNG RESPONSE
+    public function custom_fileupload($request)
+    {
+        if(!$request->hasFile("file")){return response()->json("file harus ada",400);}
+        $response = uploadfile($this,$request);
+        return response()->json(is_array($response)?implode("\n",$response):$response,is_array($response)?400:200);
+    }
 //======================================================================IMPORT EXCEL
     public function custom_importexcel($request)
     {
-        if(!$request->hasFile("file")){
-            return response()->json("file harus ada",400);
-        }
+        if(!$request->hasFile("file")){return response()->json("file harus ada",400);}
         return _uploadexcel($this, $request);
     }
 //=======================================================================EXPORT EXCEL 
