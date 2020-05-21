@@ -1794,7 +1794,7 @@ function uploadfile($model,$req){
         'file' => 'max:25000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,jpeg,png,bmp,mp4,mp3,mpg,mpeg,mkv,3gp'
     ]);
     if ( $validator->fails()) {
-        return null;
+        return $validator->errors()->all();
     }
     $code= Carbon::now()->format('his').crc32(uniqid());
     $fileName = sanitizeString($req->file->getClientOriginalName());
