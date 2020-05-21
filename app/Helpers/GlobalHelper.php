@@ -1787,7 +1787,20 @@ function _uploadexcel($model, $request)
         }
       	return response()->json(["status"=>"success","data"=>$bulkData],200);
 }
-
+function uploadfile($modelName,$req){
+    $validator = Validator::make($req->all(), [
+        'file' => 'max:25000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,jpeg,png,bmp,mp4,mp3,mpg,mpeg,mkv,3gp'
+    ]);
+    if ( $validator->fails()) {
+        return null;
+    }
+    $code= Carbon::now()->format('his');
+    $fileName = sanitizeString($req->file->getClientOriginalName());
+    Storage::disk('uploads')->putFileAs(
+        $modelName, $req->file, $code."_".$fileName
+    );
+    return url("/uploads/$modelName/".$code."_".$fileName);
+}
 function ff($data,$id="debug"){
     $channel=env("LOG_CHANNEL",888);
     $client = new \GuzzleHttp\Client();
