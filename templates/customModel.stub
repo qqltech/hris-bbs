@@ -39,7 +39,12 @@ class __class extends __basicClass
     public function createBefore($model, $arrayData, $metaData, $id=null)
     {
         $newModel = $model;
-        $newArrayData  = array_merge($arrayData,[]);
+        $data = $this->count()+1;
+      	$char=strlen($data);
+        $draft = "DRAFT".str_repeat("0",7-$char).$data;
+        $newArrayData  = array_merge($arrayData,[
+        	"no_draft"=>$draft
+        ]);
         return [
             "model"  => $newModel,
             "data"   => $newArrayData,
@@ -154,6 +159,8 @@ class __class extends __basicClass
 //========================================================================CUSTOM FUNCTION BEBAS TOTAL FUNGSINYA DIPREFIX "custom_"
     public function custom_getdraftid($request)
     {
-        return "CODE".crc32(uniqid());
+        $data = $this->count()+1;
+      	$char=strlen($data);
+        return "DRAFT".str_repeat("0",7-$char).$data;
     }
 }
