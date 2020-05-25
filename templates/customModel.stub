@@ -38,13 +38,9 @@ class __class extends __basicClass
 //======================================================================CREATE EVENT LOGIC
     public function createBefore($model, $arrayData, $metaData, $id=null)
     {
+        //$arrayData["no_draft"] = $this->custom_getdraftid(null);
         $newModel = $model;
-        $data = $this->count()+1;
-      	$char=strlen($data);
-        $draft = "DRAFT".str_repeat("0",7-$char).$data;
-        $newArrayData  = array_merge($arrayData,[
-        	"no_draft"=>$draft
-        ]);
+        $newArrayData  = array_merge($arrayData,[]);
         return [
             "model"  => $newModel,
             "data"   => $newArrayData,
