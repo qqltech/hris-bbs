@@ -711,51 +711,19 @@ class ApiFixedController extends Controller
                     );
                 }
                 if( isset($model->transaction_config) ){
-                    if(!isset($newData)){
-                        if($this->operation=='delete'){
-                            $newData = $oldData;
-                        }else{
-                            $newData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
-                        }
-                    }
-                    $config = (object)$model->transaction_config;
-                    $isMultiple = $config->current_pivot_header_multiple;
-                    // $details = $newData[$config->current_detail_table];
-                    if(!$isMultiple){
-                        $beforeTransactionId = $newData[$config->current_pivot_header_column];
-                        $beforeTransactionData = $this->readOperation( $config->before_transaction_table, (object)[], $beforeTransactionId )['data'];
-                        $beforeTransactionDetails = $beforeTransactionData[$config->before_transaction_detail_table];
-                        $lolos = true;
-                        foreach($beforeTransactionDetails as $i => $dtl){
-                            $detail_id  = $dtl['id'];
-                            $detail_qty = $dtl[$config->before_transaction_detail_column_qty];
-                            if(\DB::table($config->current_detail_table)->where($config->current_pivot_detail_column,$detail_id)->count()>0){
-                                $sum = \DB::table($config->current_detail_table)
-                                        ->selectRaw("SUM($config->current_detail_column_qty) as qtysum")
-                                        ->where($config->current_pivot_detail_column,$detail_id)
-                                        ->first();
-                                if($sum->qtysum<$detail_qty){
-                                    $lolos = false;
-                                    break;
-                                };
+                    try{
+                        if(!isset($newData)){
+                            if($this->operation=='delete'){
+                                $newData = $oldData;
                             }else{
-                                $lolos = false;
-                                break;
+                                $newData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
                             }
                         }
-                        \DB::table($config->before_transaction_table)
-                            ->where("id", $beforeTransactionId)->update([
-                                $config->before_transaction_column_status => $lolos?$config->status_close:$config->status_open
-                            ]);
-                    }else{
-                        $arrayBeforeTransactionIds = [];
-                        $currentDetails = $newData[$config->current_detail_table];
-                        foreach($currentDetails as $dtl){
-                            if(!in_array($dtl[$config->current_pivot_header_column],$arrayBeforeTransactionIds)){
-                                $arrayBeforeTransactionIds[]=$dtl[$config->current_pivot_header_column];
-                            }
-                        }
-                        foreach($arrayBeforeTransactionIds as $beforeTransactionId){
+                        $config = (object)$model->transaction_config;
+                        $isMultiple = $config->current_pivot_header_multiple;
+                        // $details = $newData[$config->current_detail_table];
+                        if(!$isMultiple){
+                            $beforeTransactionId = $newData[$config->current_pivot_header_column];
                             $beforeTransactionData = $this->readOperation( $config->before_transaction_table, (object)[], $beforeTransactionId )['data'];
                             $beforeTransactionDetails = $beforeTransactionData[$config->before_transaction_detail_table];
                             $lolos = true;
@@ -780,8 +748,43 @@ class ApiFixedController extends Controller
                                 ->where("id", $beforeTransactionId)->update([
                                     $config->before_transaction_column_status => $lolos?$config->status_close:$config->status_open
                                 ]);
+                        }else{
+                            $arrayBeforeTransactionIds = [];
+                            $currentDetails = $newData[$config->current_detail_table];
+                            foreach($currentDetails as $dtl){
+                                if(!in_array($dtl[$config->current_pivot_header_column],$arrayBeforeTransactionIds)){
+                                    $arrayBeforeTransactionIds[]=$dtl[$config->current_pivot_header_column];
+                                }
+                            }
+                            foreach($arrayBeforeTransactionIds as $beforeTransactionId){
+                                $beforeTransactionData = $this->readOperation( $config->before_transaction_table, (object)[], $beforeTransactionId )['data'];
+                                $beforeTransactionDetails = $beforeTransactionData[$config->before_transaction_detail_table];
+                                $lolos = true;
+                                foreach($beforeTransactionDetails as $i => $dtl){
+                                    $detail_id  = $dtl['id'];
+                                    $detail_qty = $dtl[$config->before_transaction_detail_column_qty];
+                                    if(\DB::table($config->current_detail_table)->where($config->current_pivot_detail_column,$detail_id)->count()>0){
+                                        $sum = \DB::table($config->current_detail_table)
+                                                ->selectRaw("SUM($config->current_detail_column_qty) as qtysum")
+                                                ->where($config->current_pivot_detail_column,$detail_id)
+                                                ->first();
+                                        if($sum->qtysum<$detail_qty){
+                                            $lolos = false;
+                                            break;
+                                        };
+                                    }else{
+                                        $lolos = false;
+                                        break;
+                                    }
+                                }
+                                \DB::table($config->before_transaction_table)
+                                    ->where("id", $beforeTransactionId)->update([
+                                        $config->before_transaction_column_status => $lolos?$config->status_close:$config->status_open
+                                    ]);
+                            }
                         }
-                    }
+                        
+                    }catch(\Exception $e){}
                 }
 
                 DB::commit();
