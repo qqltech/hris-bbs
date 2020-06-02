@@ -1752,6 +1752,7 @@ function _uploadexcel($model, $request)
             return response()->json(["invalid_columns"=>$forbiddenHeadings],400);
         }
         try{
+            DB::beginTransaction();
             $hitung=0;
             foreach($rows as $baris => $array){
               if($baris==0){ continue; }
@@ -1783,8 +1784,10 @@ function _uploadexcel($model, $request)
             DB::table($model->getTable())->insert($bulkData);
 
         }catch(\Exception $e){
+            DB::rollback();
             return response()->json([$e->getMessage()],400);
         }
+        DB::commit();
       	return response()->json(["status"=>"success","data"=>$bulkData],200);
 }
 function uploadfile($model,$req){
