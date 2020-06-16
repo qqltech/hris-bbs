@@ -1495,6 +1495,7 @@ function _customGetData($model,$params)
     if(!$params->caller){
         ff('finallah tanpa caller');
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
+       ff('finallah tanpa caller sukses');
     }else{
        $data = $final->get(); 
     }
