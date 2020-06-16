@@ -672,11 +672,11 @@ class ApiFixedController extends Controller
                 $result = $model->$function($this->originalRequest);
                 return $result;
             }
-            if($this->operation=='read'){
-                return $this->readOperation($modelname,$this->requestData,$id);
-            }
-            DB::beginTransaction();
-            try{
+            try{                
+                if($this->operation=='read'){
+                    return $this->readOperation($modelname,$this->requestData,$id);
+                }
+                DB::beginTransaction();
                 $modelCandidate = "\App\Models\CustomModels\\$modelname";
                 $model = new $modelCandidate;
                 
