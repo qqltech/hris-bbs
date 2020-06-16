@@ -1552,7 +1552,6 @@ function _customGetData($model,$params)
             }
             $index++;
         }
-        ff($fixedData);
         $data   = $fixedData;
     }else{
         $tempData = $data->toArray()["data"];
@@ -1572,6 +1571,7 @@ function _customGetData($model,$params)
             }
             $index++;
         }
+        ff($fixedData);
         $data = array_merge([
             "data"=>$fixedData],[
             "metaScript"=>method_exists( $modelExtender, "metaScriptList" )?$modelExtender->metaScriptList():null,
