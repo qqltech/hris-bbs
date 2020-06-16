@@ -1497,10 +1497,10 @@ function _customGetData($model,$params)
     }else{
        $data = $final->get(); 
     }
+    ff($data);
     if(!method_exists($modelExtender, "transformRowData")){
         return $data;
     }
-    ff('sek iso transformRowData');
     if($params->caller){
         $fixedData=[];
         $index=0;
