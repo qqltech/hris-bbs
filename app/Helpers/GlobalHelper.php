@@ -1493,8 +1493,8 @@ function _customGetData($model,$params)
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
     if(!$params->caller){
-        ff('finallah tanpa caller');
-       $data = $final->get();
+        ff($final->toSql());
+       $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
        ff('finallah tanpa caller sukses');
     }else{
        $data = $final->get(); 
