@@ -1484,6 +1484,7 @@ function _customGetData($model,$params)
         $model = $model->groupBy(DB::raw($params->group_by));
     }
 
+    ff('sek iso group_by');
     if($params->order_by){
         $order =  str_replace("this.","$table.",$params->order_by);
         $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
