@@ -1557,6 +1557,7 @@ function _customGetData($model,$params)
         $tempData = $data->toArray()["data"];
         $fixedData=[];
         $index=0;
+        ff($tempData);
         foreach($tempData as $row){
             $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
             if( gettype($transformedData)=='boolean' ){
@@ -1571,7 +1572,6 @@ function _customGetData($model,$params)
             }
             $index++;
         }
-        ff($fixedData);
         $data = array_merge([
             "data"=>$fixedData],[
             "metaScript"=>method_exists( $modelExtender, "metaScriptList" )?$modelExtender->metaScriptList():null,
