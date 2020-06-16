@@ -1453,11 +1453,10 @@ function _customGetData($model,$params)
             }
         }
     }
-    ff('sek iso extend');
+    
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
-    ff('sek iso search');
 
     if($params->search){
         $searchfield = $params->searchfield;
@@ -1501,6 +1500,7 @@ function _customGetData($model,$params)
     if(!method_exists($modelExtender, "transformRowData")){
         return $data;
     }
+    ff('sek iso transformRowData');
     if($params->caller){
         $fixedData=[];
         $index=0;
@@ -1557,7 +1557,6 @@ function _customGetData($model,$params)
         $tempData = $data->toArray()["data"];
         $fixedData=[];
         $index=0;
-        ff($tempData);
         foreach($tempData as $row){
             $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
             if( gettype($transformedData)=='boolean' ){
