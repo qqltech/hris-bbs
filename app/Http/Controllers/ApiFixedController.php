@@ -491,12 +491,16 @@ class ApiFixedController extends Controller
             $p->single      = isset($data->single) ? ($data->single=="false"?false:true):false;
             $p->id          = $id;
             $p->joinMax        = isset($data->joinMax) ? $data->joinMax:0;
-            $overrideParams = $model->overrideGetParams($p,$id);
-            return [
-                "data"=>$model->customFind($overrideParams),
-                "meta"=>config('tables'),
-                "metaScript"=>method_exists( $model, "metaScript" )?$model->metaScript():null
-            ];
+            $overrideParams = $model->overrideGetParams($p,$id);            
+            try{
+                return [
+                    "data"=>$model->customFind($overrideParams),
+                    "meta"=>config('tables'),
+                    "metaScript"=>method_exists( $model, "metaScript" )?$model->metaScript():null
+                ];
+            }catch(\Exception $e){
+                return [$e->getMessage()];
+            }
         }else{
             $p->where_raw   = isset($data->where) ? $data->where : null;
             $p->order_by    = isset($data->orderby) ? $data->orderby:$model->getTable().".updated_at";
@@ -514,7 +518,11 @@ class ApiFixedController extends Controller
             $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->caller      = null;
             $overrideParams = $model->overrideGetParams($p);
-            return $model->customGet($overrideParams);
+            try{
+                return $model->customGet($overrideParams);
+            }catch(\Exception $e){
+                return [$e->getMessage()];
+            }
         }
     }
     private function deleteOperation( $modelName, $params=null, $id=null, $fk=null )
