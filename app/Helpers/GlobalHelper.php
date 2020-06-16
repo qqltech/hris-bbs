@@ -1492,8 +1492,8 @@ function _customGetData($model,$params)
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
-    ff('finallah');
     if(!$params->caller){
+        ff('finallah tanpa caller');
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
        $data = $final->get(); 
