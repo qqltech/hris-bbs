@@ -10,6 +10,7 @@ Homestead.yaml
 /database/migrations/alters
 /app/Models/CustomModels
 /app/Models/BasicModels
+/app/Models/SuperModels
 customscript.sh
 customscript.bat
 custommigrate.sh

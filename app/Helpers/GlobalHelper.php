@@ -1453,10 +1453,11 @@ function _customGetData($model,$params)
             }
         }
     }
-    
+    ff('sek iso extend');
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
+    ff('sek iso search');
 
     if($params->search){
         $searchfield = $params->searchfield;
