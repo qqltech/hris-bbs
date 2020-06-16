@@ -1493,7 +1493,6 @@ function _customGetData($model,$params)
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
-    ff('sek iso final');
     if(!$params->caller){
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
@@ -1553,6 +1552,7 @@ function _customGetData($model,$params)
             }
             $index++;
         }
+        ff($fixedData);
         $data   = $fixedData;
     }else{
         $tempData = $data->toArray()["data"];
