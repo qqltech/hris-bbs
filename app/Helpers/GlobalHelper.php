@@ -1484,7 +1484,6 @@ function _customGetData($model,$params)
         $model = $model->groupBy(DB::raw($params->group_by));
     }
 
-    ff('sek iso group_by');
     if($params->order_by){
         $order =  str_replace("this.","$table.",$params->order_by);
         $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
@@ -1494,6 +1493,7 @@ function _customGetData($model,$params)
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
+    ff('sek iso final');
     if(!$params->caller){
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
