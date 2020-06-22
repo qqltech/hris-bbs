@@ -1409,6 +1409,7 @@ function _customGetData($model,$params)
             }
         }
     }
+    ff($allColumns);
     if($params->selectfield){
         $selectFields = $params->selectfield;
         $selectFields = explode(",", $selectFields);
