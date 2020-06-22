@@ -1466,14 +1466,14 @@ function _customGetData($model,$params)
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
                 foreach($allColumns as $column){
                     if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
-                        ff("LOWER($column$additionalString) pedot karena id");
+                        // ff("LOWER($column$additionalString) pedot karena id");
                         continue;
                     }
                     if($searchfield!=null && !in_array(explode(".",$column)[1], explode(",", $searchfield))){
-                        ff("LOWER($column$additionalString) pedot karena g ada disearch");
+                        // ff("LOWER($column$additionalString) pedot karena g ada disearch");
                         continue;
                     }
-                    ff("LOWER($column$additionalString) LIKE '%$string%'");
+                    // ff("LOWER($column$additionalString) LIKE '%$string%'");
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                 }
         });
