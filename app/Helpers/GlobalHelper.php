@@ -1491,7 +1491,7 @@ function _customGetData($model,$params)
         $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
-    ff($final->toSql());
+    ff([$final->toSql()]);
     if(!$params->caller){
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
