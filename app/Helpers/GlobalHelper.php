@@ -1470,6 +1470,7 @@ function _customGetData($model,$params)
                         continue;
                     }
                     $pecahan = explode(".",$column);
+                    ff($column." guwak");
                     if($searchfield!=null && count($pecahan)>1 && !in_array($pecahan, explode(",", $searchfield))){
                         continue;
                     }
