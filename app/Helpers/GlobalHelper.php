@@ -1462,7 +1462,10 @@ function _customGetData($model,$params)
         $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
-        ff($allColumns);
+        if($table='inv_tra_mutation_list'){
+            ff($allColumns);
+
+        }
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
                 foreach($allColumns as $column){
