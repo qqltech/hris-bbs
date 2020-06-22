@@ -1464,7 +1464,7 @@ function _customGetData($model,$params)
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
-                ff($allColumns);
+                // ff($allColumns);
                 foreach($allColumns as $column){
                     if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
                         // ff("LOWER($column$additionalString) pedot karena id");
