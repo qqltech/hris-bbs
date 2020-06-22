@@ -1411,7 +1411,7 @@ function _customGetData($model,$params)
     }
     ff($allColumns);
     if($params->selectfield){
-        $selectFields = $params->selectfield;
+        $selectFields = str_replace(["\n","  "],["",""],$params->selectfield);
         $selectFields = explode(",", $selectFields);
         $fieldSelected= $selectFields;
         // array_filter($selectFields,function($dt)use($selectFields){
