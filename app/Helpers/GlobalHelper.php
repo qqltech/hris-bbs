@@ -1463,18 +1463,14 @@ function _customGetData($model,$params)
         $string  = strtolower($params->search);
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
         $model = $model->where(
-            function ($query)use($fieldSelected,$string,$additionalString, $searchfield) {
-                foreach($fieldSelected as $column){
-                    $column = str_replace("\n","",$column);
-                    if((strpos($column, '(') !== false)||(strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
+            function ($query)use($allColumns,$string,$additionalString, $searchfield) {
+                foreach($allColumns as $column){
+                    if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
                         continue;
                     }
-                    $pecahan = explode(".",$column);
-                    ff($column." guwak");
-                    if($searchfield!=null && count($pecahan)>1 && !in_array($pecahan, explode(",", $searchfield))){
+                    if($searchfield!=null && !in_array(explode(".",$column)[1], explode(",", $searchfield))){
                         continue;
                     }
-                    ff($column);
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                 }
         });
