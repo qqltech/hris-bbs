@@ -1409,24 +1409,16 @@ function _customGetData($model,$params)
             }
         }
     }
-    ff($allColumns);
     if($params->selectfield){
         $selectFields = str_replace(["\n","  ","\t"],["","",""],$params->selectfield);
         $selectFields = explode(",", $selectFields);
         $fieldSelected= $selectFields;
-        // array_filter($selectFields,function($dt)use($selectFields){
-        //     if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields) || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
-        //         return $dt;
-        //     }
-        // });
         $allColumns = array_filter($allColumns,function($dt)use($selectFields){                
             if( in_array(explode( ".", $dt)[1], $selectFields) ){
                 return $dt;
             }
         });
-        ff($selectFields);
     }
-    ff($allColumns);
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
         $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
@@ -1464,9 +1456,6 @@ function _customGetData($model,$params)
         $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
-        if($table='inv_tra_mutation_list'){
-            ff($allColumns);
-        }
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
                 foreach($allColumns as $column){
