@@ -1465,6 +1465,7 @@ function _customGetData($model,$params)
         $model = $model->where(
             function ($query)use($fieldSelected,$string,$additionalString, $searchfield) {
                 foreach($fieldSelected as $column){
+                    ff($column);
                     if((strpos($column, '(') !== false)||(strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
                         continue;
                     }
