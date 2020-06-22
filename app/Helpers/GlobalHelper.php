@@ -1466,6 +1466,7 @@ function _customGetData($model,$params)
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
                 ff($allColumns);
                 ff($searchfield);
+                ff($fieldSelected);
 
                 foreach($allColumns as $column){
                     if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
