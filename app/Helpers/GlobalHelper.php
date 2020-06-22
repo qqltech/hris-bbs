@@ -1424,7 +1424,7 @@ function _customGetData($model,$params)
             }
         });
     }
-
+    ff($allColumns);
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
         $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
@@ -1464,7 +1464,6 @@ function _customGetData($model,$params)
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
         if($table='inv_tra_mutation_list'){
             ff($allColumns);
-
         }
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
