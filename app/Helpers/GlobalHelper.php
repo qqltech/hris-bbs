@@ -1465,7 +1465,7 @@ function _customGetData($model,$params)
         $model = $model->where(
             function ($query)use($fieldSelected,$string,$additionalString, $searchfield) {
                 foreach($fieldSelected as $column){
-                    ff($column);
+                    $column = str_replace("\n","",$column);
                     if((strpos($column, '(') !== false)||(strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
                         continue;
                     }
@@ -1473,6 +1473,7 @@ function _customGetData($model,$params)
                     if($searchfield!=null && count($pecahan)>1 && !in_array($pecahan, explode(",", $searchfield))){
                         continue;
                     }
+                    ff($column);
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                 }
         });
