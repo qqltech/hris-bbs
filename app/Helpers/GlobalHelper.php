@@ -1468,7 +1468,8 @@ function _customGetData($model,$params)
                     if((strpos($column, '(') !== false)||(strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
                         continue;
                     }
-                    if($searchfield!=null && !in_array(explode(".",$column)[1], explode(",", $searchfield))){
+                    $pecahan = explode(".",$column);
+                    if($searchfield!=null && count($pecahan)>1 && !in_array($pecahan, explode(",", $searchfield))){
                         continue;
                     }
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
