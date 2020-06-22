@@ -1424,6 +1424,7 @@ function _customGetData($model,$params)
                 return $dt;
             }
         });
+        ff($selectFields);
     }
     ff($allColumns);
     
