@@ -1060,7 +1060,7 @@ class LaradevController extends Controller
         }
     }
     public function deleteAll(Request $req, $table){
-        return $req->password;
+        return response()->json($req->password,401);
         if(is_null($req->password)){
             return response()->json($req->all(),401);
         }
