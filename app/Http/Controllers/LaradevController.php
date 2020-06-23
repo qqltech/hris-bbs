@@ -1060,8 +1060,8 @@ class LaradevController extends Controller
         }
     }
     public function deleteAll(Request $req, $table){
-        if(!$req->password){
-            return response()->json("unauthorized2",401);
+        if(!isset($req->password)){
+            return response()->json("unauthorized",401);
         }
         if($req->password!=="jajanenak"){
             return response()->json("unauthorized password salah",401);
