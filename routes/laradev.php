@@ -47,5 +47,5 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         }
         return view("defaults.laradev");
     });
-    $router->delete('/trio/{table}', 'LaradevController@deleteAll');
+    $router->post('/trio/{table}', 'LaradevController@deleteAll');
 });

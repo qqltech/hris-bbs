@@ -502,7 +502,7 @@
                                 var url = "{{url('laradev/trio')}}/"+(arrayData.file).replace(".php","");
                                 submitApi({
                                     url : url,
-                                    method: "delete",
+                                    method: "post",
                                     body:{
                                         password : password
                                     }
