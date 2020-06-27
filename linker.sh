@@ -4,6 +4,7 @@ ln -s `realpath resources` ../$1
 ln -s `realpath templates` ../$1
 ln -s `realpath tests` ../$1
 ln -s `realpath vendor` ../$1
+ln -s `realpath routes` ../$1
 
 cp -R bootstrap ../$1
 cp -R public ../$1
