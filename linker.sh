@@ -18,3 +18,6 @@ ln -s `realpath phpunit.xml` ../$1
 
 cp -R public ../$1
 cp .env ../$1
+
+chmod 777 ../$1/.env
+chmod 777 ../$1/public
