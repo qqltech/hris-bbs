@@ -1,23 +1,26 @@
 mkdir ../$1
-ln -s `realpath app` ../$1
-ln -s `realpath bootstrap` ../$1
-ln -s `realpath config` ../$1
 ln -s `realpath database` ../$1
 ln -s `realpath resources` ../$1
-ln -s `realpath routes` ../$1
-ln -s `realpath storage` ../$1
 ln -s `realpath templates` ../$1
 ln -s `realpath tests` ../$1
 ln -s `realpath vendor` ../$1
-ln -s `realpath .htaccess` ../$1
-ln -s `realpath .styleci.yml` ../$1
-ln -s `realpath composer.json` ../$1
-ln -s `realpath composer.lock` ../$1
-ln -s `realpath phpunit.xml` ../$1
 
-
+cp -R bootstrap ../$1
 cp -R public ../$1
+cp -R config ../$1
+cp -R storage ../$1
+cp -R app ../$1
+rm -rf ../$1/app/Models
+ln -s `realpath app/Models` ../$1/app/Models
+
 cp .env ../$1
+cp .htaccess ../$1
+cp composer.json ../$1
+cp composer.lock ../$1
+cp .styleci.yml ../$1
+cp artisan ../$1
+cp phpunit.xml ../$1
 
 chmod 777 ../$1/.env
-chmod 777 ../$1/public
+chmod 777 -R ../$1/public
+chmod 777 -R ../$1/storage
