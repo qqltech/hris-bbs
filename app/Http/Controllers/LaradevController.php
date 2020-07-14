@@ -933,7 +933,13 @@ class LaradevController extends Controller
             $arrayTables = []; $arrayViews = [];
             $fk = 0;
             foreach ($tables as $table) {
-                $arrayTables[] =  $table->getName();
+                $tableNames = explode('.', $table->getName());
+                if( $tableNames>1 ){
+                    $tableName=$tableNames[1];
+                }else{
+                    $tableName=$tableNames[0];
+                }
+                $arrayTables[] =  $tableName;
                 $FK = $table->getForeignKeys();
                 $fk += count($FK);
                 $triggers=\App\Helpers\DBS::getTriggers($table->getName());
@@ -941,8 +947,6 @@ class LaradevController extends Controller
                     $arrayTables[] = $trigger->trigger_name;
                 }
             }
-            file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='
-                .json_encode($arrayTables));
             $views = $schemaManager->listViews();
             foreach ($views as $view) {
                 $viewName = str_replace("public.","",$view->getName() );
