@@ -934,7 +934,7 @@ class LaradevController extends Controller
             $fk = 0;
             foreach ($tables as $table) {
                 $tableNames = explode('.', $table->getName());
-                if( $tableNames>1 ){
+                if( count($tableNames)>1 ){
                     $tableName=$tableNames[1];
                 }else{
                     $tableName=$tableNames[0];
