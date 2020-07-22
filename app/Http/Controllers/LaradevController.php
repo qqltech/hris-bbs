@@ -532,7 +532,13 @@ class LaradevController extends Controller
     public function updateModelsOne(Request $request, $tableName=null){
         $tempFile=app()->path()."/Models/CustomModels/$tableName"."_temp.php";
         File::put($tempFile,$request->text);
-        $result = exec("php -l $tempFile", $output, $return);
+        try{
+            $result = exec("php -l $tempFile", $output, $return);
+        }catch(\Exception $e){
+            File::delete($tempFile);            
+            $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
+            return "update Model OK but check by your self okay?";
+        }
         File::delete($tempFile);
         if($return===0){
             $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
