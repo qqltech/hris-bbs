@@ -399,6 +399,11 @@ class ApiFixedController extends Controller
                     $processedData[$fkName] = $parentId;
                 }
                 $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
+                if(isset($createBeforeEvent['errors'])){
+                    $this->operationOK=false;
+                    $this->errors = $createBeforeEvent['errors'];
+                    return;
+                }
                 $finalData  = $createBeforeEvent["data"];
                 
                 $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
@@ -432,6 +437,11 @@ class ApiFixedController extends Controller
                 $processedData[$fkName] = $parentId;
             }
             $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
+            if(isset($createBeforeEvent['errors'])){
+                $this->operationOK=false;
+                $this->errors = $createBeforeEvent['errors'];
+                return;
+            }
             $finalData  = $createBeforeEvent["data"];
             if($this->isMultipart){
                 $req = $this->originalRequest;
@@ -562,6 +572,11 @@ class ApiFixedController extends Controller
         $eliminatedData = $this->createEliminationData($model, $data);
         $processedData  = array_merge($eliminatedData, $additionalData);
         $updateBeforeEvent = $model->updateBefore($model, $processedData, $this->requestMeta);
+        if(isset($updateBeforeEvent['errors'])){
+            $this->operationOK=false;
+            $this->errors = $updateBeforeEvent['errors'];
+            return;
+        }
         $finalData  = $updateBeforeEvent["data"];
         if($this->isMultipart){
             $req = $this->originalRequest;
