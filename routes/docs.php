@@ -29,4 +29,14 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         return view("defaults.backend",compact('models','realfk'));
     });
 
+    $router->get('/documentation', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        return view("docs.docs");
+    });
+    
+    $router->get('/documentation/{dt}', function($dt){
+        return view("docs.docs-".(str_replace([".md","_"],["",""],strtolower($dt))) );
+    });
 });

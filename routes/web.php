@@ -28,6 +28,7 @@ $router->get('/', function () use ($router) {
             "backend" => url("/docs/backend"),
             "visual" => url("/visual.html"),
             "operation" => url("/operation"),
+            "documentation" => url("/docs/documentation"),
         ]
     ]);
 });

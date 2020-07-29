@@ -1,9 +1,10 @@
 git add .
 git commit -m 'new'
 REM git push origin master
+git push aaa master
 git push sisthaserver master
 git push igaserver master
 git push efiserver master
-git push aaa master
+git push dejozzlarahan master
+git push pciserver master
 REM git push hsiserver master
-REM git push kmnuserver master
