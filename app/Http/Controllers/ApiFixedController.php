@@ -539,7 +539,12 @@ class ApiFixedController extends Controller
             $this->operationOK=false;
             return;
         }
-        $model->deleteBefore($model, $preparedModel, $this->requestMeta, $id);
+        $deleteBeforeEvent = $model->deleteBefore($model, $preparedModel, $this->requestMeta, $id);        
+        if(isset($deleteBeforeEvent['errors'])){
+            $this->operationOK=false;
+            $this->errors = $deleteBeforeEvent['errors'];
+            return;
+        }
         $preparedModel->delete(); 
         $model->deleteAfter($model, $preparedModel, $this->requestMeta, $id);
         $this->success[] = "SUCCESS: data deleted in ".$model->getTable()." id: $id";
