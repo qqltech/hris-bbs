@@ -6,15 +6,34 @@
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css" />
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">Loading ...</div>
   <script>
     window.$docsify = {
       loadSidebar: true,
       coverpage: true,
-      subMaxLevel: 2,
+      subMaxLevel: 3,
       repo: 'rahasia/rahasia',
+      name: 'Larahan',
+      search: {
+        noData: {
+          '/': 'No results!'
+        },
+        paths: 'auto',
+        placeholder: {
+          '/': 'Search'
+        },
+      loadNavbar: true,
+      mergeNavbar: true,
+      },
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/mermaid/dist/mermaid.js"></script>
+  <script src="//unpkg.com/docsify-mermaid@latest/dist/docsify-mermaid.js">
+  <script>mermaid.initialize({ startOnLoad: true });</script>
 </body>
 </html>

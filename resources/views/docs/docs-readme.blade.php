@@ -1,7 +1,7 @@
 ## Catatan Rilis
 > Larahan 6.0 sampai 6.x
 
-Commit terus vroh...
+Commit terus vroh... :punch::punch::punch:
 
 ## Motivasi
 
@@ -20,4 +20,4 @@ Hanya kepingin tidak memegang laptop setelah jam 5 sore. Camkan itu!
 ## Komunitas
 The creators of the library are always open to discussions/suggestions. Their social-media accounts:
 
-- Fajar Firmansyah [Facebook](https://web.facebook.com/firmansyah.fajar)
+- Anak Bangun Tidur [Facebook](https://web.facebook.com/firmansyah.fajar)
