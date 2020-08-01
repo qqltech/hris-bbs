@@ -9,7 +9,8 @@ require_once __DIR__.'/../vendor/autoload.php';
 $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
-
+$locale = strtolower(env("LOCALE","EN"));
+app('translator')->setLocale($locale);
 $app->withFacades();
 
 $app->withEloquent();
