@@ -350,6 +350,7 @@ class LaradevController extends Controller
                 'APP_KEY' => 'base64:C4zyfJxLlJ8nxA6y6ENFK3qsq9fghPqscFaSr2wB7Uc=',
                 'APP_NAME' => 'Project',
                 'APP_TIMEZONE' => 'Asia/Jakarta',
+                'LOCALE' => 'EN',
                 'APP_URL' => 'http://localhost',
                 'DB_CONNECTION' => 'mysql',
                 'DB_DATABASE' => 'trial2',
