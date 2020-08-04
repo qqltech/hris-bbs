@@ -189,7 +189,7 @@ class LaradevController extends Controller
                 foreach ($table->getColumns() as $column) {
                     foreach($indexes as $key=>$index){
                         if(in_array($column->getName(), $index->getColumns()) && !$index->isPrimary() && $index->isUnique()){
-                            $unique[$column->getName()] = "unique:".$table->getName().",".$column->getName();
+                            $unique[$column->getName()] = "unique:".(  count(explode('.', $table->getName() ) )>1? env("DB_CONNECTION",'').".":"" ).$table->getName().",".$column->getName();
                         }
                     }
                     $columnNames[] = $column->getName();
