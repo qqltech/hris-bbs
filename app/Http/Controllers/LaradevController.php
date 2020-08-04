@@ -222,15 +222,15 @@ class LaradevController extends Controller
                         $comment = json_decode($comment);
                         if( isset($comment->fk) && $comment->fk!="false" ){
                             $fk = $comment->fk;
-                            $arrayFK = explode(".", $fk);
-                            if($arrayFK[1]=="id"){
+                            $arrayFK = explode(".", $fk);                            
+                            if(end($arrayFK)=="id"){
                                 $fktemp= [
                                     "child"=> $table->getName(), "child_column"=>$column->getName(),
-                                    "parent"=> $arrayFK[0], "parent_column"=> $arrayFK[1], "cascade"=>true,
+                                    "parent"=> str_replace(".".end($arrayFK),"",$fk), "parent_column"=>end($arrayFK), "cascade"=>true,
                                     "real" => true, "physical"=>false
                                 ];
                                 $foreignKeys[]=$fktemp;
-                                $fks[ $arrayFK[0]][] = $fktemp;
+                                $fks[ str_replace(".".end($arrayFK),"",$fk)][] = $fktemp;
                                 $cds[ $table->getName() ][]   = $fktemp;
                                 $column->setUnsigned(true);
                             }
@@ -238,14 +238,14 @@ class LaradevController extends Controller
                         if( isset($comment->src) && $comment->src!="false" ){
                             $fk = $comment->src;
                             $arrayFK = explode(".", $fk);
-                            if($arrayFK[1]=="id"){
+                            if(end($arrayFK)=="id"){
                                 $fktemp= [
                                     "child"=> $table->getName(), "child_column"=>$column->getName(),
-                                    "parent"=> $arrayFK[0], "parent_column"=> $arrayFK[1], "cascade"=>false,
+                                    "parent"=> str_replace(".".end($arrayFK),"",$fk), "parent_column"=> end($arrayFK), "cascade"=>false,
                                     "real" =>false, "physical"=>false
                                 ];
                                 $foreignKeys[] = $fktemp;
-                                $fks[ $arrayFK[0]][] = $fktemp;
+                                $fks[ str_replace(".".end($arrayFK),"",$fk)][] = $fktemp;
                                 $cds[ $table->getName() ][]   = $fktemp;
                                 $column->setUnsigned(true);
                             }
@@ -681,6 +681,7 @@ class LaradevController extends Controller
             // file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='.json_encode( $table ));
             $table = (object)$table;
             $tableName = $table->table;
+            $className = count(explode('.',$tableName))>1?explode('.',$tableName)[1]:$tableName;
             $cfg = (array)$table->config;
             $configKeys = array_keys($cfg);
             foreach($configKeys as $key){
@@ -722,13 +723,13 @@ class LaradevController extends Controller
             $paste = str_replace([
                 "__namespace","__class","__table","__columns",  "__lastupdate"
             ],[
-                $this->prefixNamespace, $tableName, $tableName, '["'.implode('","',$table->columns).'"]', date('d/m/Y H:i:s')
+                $this->prefixNamespace, $className, $tableName, '["'.implode('","',$table->columns).'"]', date('d/m/Y H:i:s')
             ],$data);
-            if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$tableName.php" ) ){
+            if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
                 $pasteCustom = str_replace([
                     "__namespace","__class","__basicClass", "__lastupdate"
                 ],[
-                    $this->prefixNamespaceCustom, $tableName, "\\$this->prefixNamespace\\$tableName", date('d/m/Y H:i:s')
+                    $this->prefixNamespaceCustom, $className, "\\$this->prefixNamespace\\$className", date('d/m/Y H:i:s')
                 ],$dataCustom);
             }
             $hasMany = "";
@@ -838,12 +839,12 @@ class LaradevController extends Controller
                 }
             }
             $paste = str_replace("__customfunction__",$customfunction,$paste);
-            if( ! File::exists( "$this->modelsPath/BasicModels/$tableName.php") ){
-                File::delete("$this->modelsPath/BasicModels/$tableName.php" );
+            if( ! File::exists( "$this->modelsPath/BasicModels/$className.php") ){
+                File::delete("$this->modelsPath/BasicModels/$className.php" );
             }
-            File::put( "$this->modelsPath/BasicModels/$tableName.php",$paste);
-            if( $tableKhusus!==null && $table->table!==$tableKhusus ){continue;}
-            if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$tableName.php" ) ){
+            File::put( "$this->modelsPath/BasicModels/$className.php",$paste);
+            if( $tableKhusus!==null && $className!==$tableKhusus ){continue;}
+            if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
                 $pasteCustom = str_replace([
                     "__defaults","__autocreate","__autoupdate","__readers","__writers"
                 ],[
@@ -853,7 +854,7 @@ class LaradevController extends Controller
                     isset($cfg['readers'])?str_replace(["{","}",'":',"\\","\n"," "],["[","]",'"=>',"","",""],json_encode($cfg['readers'], JSON_PRETTY_PRINT)):"[]",
                     isset($cfg['writers'])?str_replace(["{","}",'":',"\\","\n"," "],["[","]",'"=>',"","",""],json_encode($cfg['writers'], JSON_PRETTY_PRINT)):"[]"
                 ],$pasteCustom);
-                File::put( "$this->modelsPath/CustomModels/$tableName.php",$pasteCustom);
+                File::put( "$this->modelsPath/CustomModels/$className.php",$pasteCustom);
             }
         }
         File::put( base_path('public/models.json'), json_encode($dataForJSON, JSON_PRETTY_PRINT) );
@@ -1023,6 +1024,13 @@ class LaradevController extends Controller
             return response()->json("migration file [$table] tidak ada",400);
         }
         if(!$req->alter){
+            $aliasTable=null;
+            $tableStringClass = "\App\Models\BasicModels\\$table";
+            if(class_exists( $tableStringClass )){
+                $currentModel = new $tableStringClass;
+                $aliasTable=$currentModel->getTable();
+                \DB::unprepared("DROP TABLE IF EXISTS $aliasTable");
+            }
             if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
                 $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
                 $tableName = explode("_timing_",$samaran)[0];
@@ -1030,11 +1038,14 @@ class LaradevController extends Controller
                     DROP TRIGGER IF EXISTS $table ON $tableName;
                     DROP FUNCTION IF EXISTS fungsi_"."$table();
                 ");
-            }elseif(Schema::hasTable($table)){
-                Schema::dropIfExists($table);
+            }elseif(Schema::hasTable($aliasTable===null?$table:$aliasTable)){
+                Schema::dropIfExists($aliasTable===null?$table:$aliasTable);
             }else{
                 DB::unprepared("DROP VIEW IF EXISTS $table;");
             }
+           
+            // Schema::connection('flyingpgsql')->dropIfExists($currentModel->getTable());
+            // return response()->json([Schema::hasTable($currentModel->getTable())?'ada':'tidak'],422);
         }
         if($req->down){
             return "database migration ok, $table model downed successfully";

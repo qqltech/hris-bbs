@@ -1305,13 +1305,22 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
     $currentModel = new $tableStringClass;
     
     foreach( $currentModel->joins as $join ){
-        $parent = explode(".",$join)[0];
-        if(in_array($parent, $joined)){
-            continue;
+        $arrayJoins=explode("=",$join);
+        $arrayParents=explode(".",$arrayJoins[0]);
+
+        if(count($arrayParents)>2){
+            $parent = $arrayParents[1];
+            $fullParent = $arrayParents[0].".".$arrayParents[1];
+        }else{
+            $parent = $arrayParents[0];
+            $fullParent=$parent;
         }
-        $joined[]=$parent;
-        $onParent = explode("=",$join)[0];
-        $onMe = explode("=",$join)[1];
+        // if(in_array($parent, $joined)){        
+        //     continue;
+        // }//PENTING
+        $onParent = $arrayJoins[0];
+        $onMe = $arrayJoins[1];
+        $joined[]=$fullParent;
         $parentClassString = "\App\Models\BasicModels\\$parent";
 
         if( !class_exists($parentClassString) ){
@@ -1325,9 +1334,10 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
         }else{
             $kembar[$parent] = $kembar[$parent]+1;
         }
-        $parentName = $parent;
+        
+        $parentName = $fullParent;
         if($kembar[$parent]>1){
-            $parentName = "$parent AS ".$parent.(string)$kembar[$parent];
+            $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
             $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
         }
         $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
@@ -1372,12 +1382,22 @@ function _customGetData($model,$params)
     $joined = [];
     if( $params->join ){
         foreach( $model->joins as $join ){
-            $parent = explode(".",$join)[0];
-            $joined[]=$parent;
-            $onParent = explode("=",$join)[0];
-            $onMe = explode("=",$join)[1];
-            $parentClassString = "\App\Models\BasicModels\\$parent";
+            $arrayJoins=explode("=",$join);
+            $arrayParents=explode(".",$arrayJoins[0]);
 
+            if(count($arrayParents)>2){
+                $parent = $arrayParents[1];
+                $fullParent = $arrayParents[0].".".$arrayParents[1];
+            }else{
+                $parent = $arrayParents[0];
+                $fullParent=$parent;
+            }
+            
+            $joined[]=$parent;
+            $onParent = $arrayJoins[0];
+            $onMe = $arrayJoins[1];
+            $parentClassString = "\App\Models\BasicModels\\$parent";
+            
             if( !class_exists($parentClassString) ){
                 continue;
             }
@@ -1389,9 +1409,9 @@ function _customGetData($model,$params)
             }else{
                 $kembar[$parent] = $kembar[$parent]+1;
             }
-            $parentName = $parent;
+            $parentName = $fullParent;
             if($kembar[$parent]>1){
-                $parentName = "$parent AS ".$parent.(string)$kembar[$parent];
+                $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
             $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
@@ -1404,6 +1424,7 @@ function _customGetData($model,$params)
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
             }
+            
             if($joinMax>0){
                 _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
             }
@@ -1607,10 +1628,20 @@ function _customFind($model, $params)
     if( $params->join ){
         $kembar = [];
         foreach( $model->joins as $join ){
-            $parent = explode(".",$join)[0];
+            $arrayJoins=explode("=",$join);
+            $arrayParents=explode(".",$arrayJoins[0]);
+
+            if(count($arrayParents)>2){
+                $parent = $arrayParents[1];
+                $fullParent = $arrayParents[0].".".$arrayParents[1];
+            }else{
+                $parent = $arrayParents[0];
+                $fullParent = $parent;
+            }
+
             $joined[]=$parent;
-            $onParent = explode("=",$join)[0];
-            $onMe = explode("=",$join)[1];
+            $onParent = $arrayJoins[0];
+            $onMe = $arrayJoins[1];
             $parentClassString = "\App\Models\BasicModels\\$parent";
     
             if( !class_exists($parentClassString) ){
@@ -1621,9 +1652,9 @@ function _customFind($model, $params)
             }else{
                 $kembar[$parent] = $kembar[$parent]+1;
             }
-            $parentName = $parent;
+            $parentName = $fullParent;
             if($kembar[$parent]>1){
-                $parentName = "$parent AS ".$parent.(string)$kembar[$parent];
+                $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
             $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
