@@ -531,6 +531,7 @@ class ApiFixedController extends Controller
     {
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
         $model          = new $modelCandidate;
+        $table          = $model->getTable();
         $detailsArray   = $model->details; 
         $cascade        = $model->cascade;
         $preparedModel  = $model->find($id);
@@ -552,7 +553,7 @@ class ApiFixedController extends Controller
             foreach( $detailsArray as $detail ){
                 $modelCandidate = "\App\Models\CustomModels\\$detail";
                 $model          = new $modelCandidate;
-                $dataDetail = $model->where($modelName."_id","=",$id)->get();                
+                $dataDetail = $model->where($table."_id","=",$id)->get();                
                 foreach( $dataDetail as $dtl ){
                     $this->deleteOperation($detail, null, $dtl->id, $id);
                 }
