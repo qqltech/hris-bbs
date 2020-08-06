@@ -290,7 +290,7 @@ class ApiFixedController extends Controller
             $this->isAuthorized=false;
             return false;
         }
-        if(!$deleteOnUse){
+        if($deleteOnUse===true){
             foreach( $heirs as $heir ){
                 $modelCandidateHeir = "\App\Models\BasicModels\\$heir";
                 $modelHeir          = new $modelCandidateHeir;
