@@ -278,7 +278,7 @@ class ApiFixedController extends Controller
     private function is_model_deletable($modelName, $data)
     {
         if( !in_array($this->operation,["delete"]) ){return;}
-        $modelCandidate = "\App\Models\CustomModels\\$modelName";
+        $modelCandidate = "\App\Models\BasicModels\\$modelName";
         $model          = new $modelCandidate;
         $detailsArray   = $model->details; 
         $heirs          = $model->heirs; 
@@ -290,7 +290,7 @@ class ApiFixedController extends Controller
             $this->isAuthorized=false;
             return false;
         }
-        if($deleteOnUse===true){
+        if(!$deleteOnUse){
             foreach( $heirs as $heir ){
                 $modelCandidateHeir = "\App\Models\BasicModels\\$heir";
                 $modelHeir          = new $modelCandidateHeir;
