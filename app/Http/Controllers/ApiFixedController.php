@@ -420,12 +420,13 @@ class ApiFixedController extends Controller
                 }
                 $finalData  = $createBeforeEvent["data"];
                 
+                ff($finalData,"pintu 1");
                 $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
                 $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
                     if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){
-                        ff("$modelName=".$finalModel->id." $key");
+                        ff($modelName,"pintu 1"); 
                         $this->createOperation($key, $value,$finalModel->id, $modelName);
                     }
                 }
@@ -481,6 +482,8 @@ class ApiFixedController extends Controller
                     }
                 }
             }
+            
+            ff($finalData,"pintu 2");
             $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
             $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
@@ -492,7 +495,6 @@ class ApiFixedController extends Controller
                     if( count($tableSingleArray)>1){
                         $tableSingle = $tableSingleArray[1];
                     }
-                    ff($model->getTable()."=parent, $tableSingle(single)".$finalModel->id." $key"); 
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
             }
