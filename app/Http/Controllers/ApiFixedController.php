@@ -398,6 +398,7 @@ class ApiFixedController extends Controller
                 if($parentId!=null){
                     $columns    = $model->columns;
                     $fkName     = $parentName;
+                    ff($parentName,"pintu 1 fk name"); 
                     if(!in_array($fkName."_id",$columns)){
                         $realJoins = $model->joins;
                         foreach($realJoins as $val){
@@ -410,7 +411,7 @@ class ApiFixedController extends Controller
                     }else{
                         $fkName.="_id";
                     }
-                    ff($fkName,"pintu 1 fk"); 
+                    ff($fkName,"pintu 1 fk fix"); 
                     $processedData[$fkName] = $parentId;
                 }
                 $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
