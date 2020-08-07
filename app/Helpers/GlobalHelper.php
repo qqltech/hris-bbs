@@ -1737,7 +1737,12 @@ function _customFind($model, $params)
     }
     $id = $params->id;
     foreach($pureModel->details as $detail){
-        $modelCandidate = "\App\Models\CustomModels\\$detail";
+        $detailArray = explode(".",$detail);
+        $detailClass = $detail;
+        if( count($detailArray)>1 ){
+            $detailClass = $detailArray[1];
+        }
+        $modelCandidate = "\App\Models\CustomModels\\$detailClass";
         $model          = new $modelCandidate;
         $fk_child = array_filter($model->joins,function($join)use($pureModel){
             if( explode(".",$join)[0] ==$pureModel->getTable() ){
