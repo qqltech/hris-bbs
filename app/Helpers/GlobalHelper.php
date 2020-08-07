@@ -1745,12 +1745,18 @@ function _customFind($model, $params)
         $modelCandidate = "\App\Models\CustomModels\\$detailClass";
         $model          = new $modelCandidate;
         $fk_child = array_filter($model->joins,function($join)use($pureModel){
+            $parentString       = explode("=",$join)[0];
+            $parentArray        = explode(".",$parentString);
+            $parentNameString   = $parentArray[ 0 ] ;
+            if( count( $parentArray )>2 ){
+                $parentNameString   = $parentArray[ 0 ].".".$parentArray[ 1 ] ;
+            }
             ff([
                 'table'=>$pureModel->getTable(),
-                'join'=>$join
+                'join'=>$parentNameString
                 ] ,'nitip');
-            if( explode(".",$join)[0] ==$pureModel->getTable() ){
-                return $join;
+            if( $parentNameString == $pureModel->getTable() ){
+                return $parentNameString;
             }
         });
         $fk_child = explode( "=",array_values($fk_child) [ 0 ] )[1];
