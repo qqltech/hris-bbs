@@ -252,11 +252,12 @@ class ApiFixedController extends Controller
                 $detailString = $detailString[1];
             }
             if($detailString==$key){
-                ff( $key, "ada");
+                ff($key, "ada");
                 return true;
                 break;
             }
         }
+        ff($key, "tidak ada");
         return false;
     }
     private function is_detail_valid($modelName, $data)
@@ -279,7 +280,7 @@ class ApiFixedController extends Controller
             }
         }else{
             foreach( $data as $key => $value ){
-                if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
+                if(is_array($value) && count($value)>0 && checkDetailExist($key, $detailsArray) ){                
                     $this->is_model_exist($key);
                     $this->is_operation_authorized($key );
                     $this->is_data_required($key, $value);
