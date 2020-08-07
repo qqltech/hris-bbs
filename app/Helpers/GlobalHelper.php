@@ -1338,6 +1338,10 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
         $parentName = $fullParent;
         if($kembar[$parent]>1){
             $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
+            $onParentArray=explode(".",$onParent);
+            if( count( $onParentArray )>2 ){
+                $onParent = $onParentArray[1].".".$onParentArray[2];
+            }
             $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
         }
         $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
@@ -1412,6 +1416,11 @@ function _customGetData($model,$params)
             $parentName = $fullParent;
             if($kembar[$parent]>1){
                 $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
+                // $onParent = str_replace($parent,"tes".$parent.(string)$kembar[$parent],$onParent); //OLD CODE
+                $onParentArray=explode(".",$onParent);
+                if( count( $onParentArray )>2 ){
+                    $onParent = $onParentArray[1].".".$onParentArray[2];
+                }
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
             $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
@@ -1655,6 +1664,10 @@ function _customFind($model, $params)
             $parentName = $fullParent;
             if($kembar[$parent]>1){
                 $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
+                $onParentArray=explode(".",$onParent);
+                if( count( $onParentArray )>2 ){
+                    $onParent = $onParentArray[1].".".$onParentArray[2];
+                }
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
             $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
