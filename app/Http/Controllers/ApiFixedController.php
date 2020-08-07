@@ -270,7 +270,7 @@ class ApiFixedController extends Controller
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 foreach( $isiData as $key => $value ){
-                    if(is_array($value) && count($value)>0 && checkDetailExist($key, $detailsArray) ){                
+                    if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){                
                         $this->is_model_exist($key);
                         $this->is_operation_authorized($key );
                         $this->is_data_required($key, $value);
@@ -281,7 +281,7 @@ class ApiFixedController extends Controller
             }
         }else{
             foreach( $data as $key => $value ){
-                if(is_array($value) && count($value)>0 && checkDetailExist($key, $detailsArray) ){                
+                if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){                
                     $this->is_model_exist($key);
                     $this->is_operation_authorized($key );
                     $this->is_data_required($key, $value);
@@ -490,7 +490,7 @@ class ApiFixedController extends Controller
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
             foreach( $data as $key => $value ){
-                if(is_array($value) && count($value)>0 && checkDetailExist($key, $detailsArray) ){                
+                if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){                
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
             }
