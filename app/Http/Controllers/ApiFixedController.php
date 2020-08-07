@@ -488,11 +488,11 @@ class ApiFixedController extends Controller
             foreach( $data as $key => $value ){
                 if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){    
                     $tableSingle = $model->getTable();  
-                    ff($model->getTable()."=parent, $tableSingle(single)".$finalModel->id." $key"); 
                     $tableSingleArray = explode(".", $model->getTable());
                     if( count($tableSingle)>1){
                         $tableSingle = $tableSingleArray[1];
                     }
+                    ff($model->getTable()."=parent, $tableSingle(single)".$finalModel->id." $key"); 
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
             }
