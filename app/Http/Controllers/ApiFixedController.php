@@ -262,6 +262,7 @@ class ApiFixedController extends Controller
     }
     private function is_detail_valid($modelName, $data)
     {
+        ff($modelName,"kecheck");
         if( !in_array($this->operation,["create","update"]) ){return true;}
         $modelCandidate = "\App\Models\BasicModels\\$modelName";
         $model          = new $modelCandidate;
