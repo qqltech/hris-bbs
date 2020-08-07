@@ -1749,6 +1749,7 @@ function _customFind($model, $params)
                 return $join;
             }
         });
+        ff($fk_child,'nitip');
         $fk_child = explode( "=",array_values($fk_child) [ 0 ] )[1];
         $p = (Object)[];
         $p->where_raw   = "$fk_child=$id";
