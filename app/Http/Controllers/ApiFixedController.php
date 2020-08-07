@@ -397,8 +397,12 @@ class ApiFixedController extends Controller
                 $processedData  = array_merge($eliminatedData, $additionalData);
                 if($parentId!=null){
                     $columns    = $model->columns;
-                    $fkName     = $parentName;
-                    ff($parentName,"pintu 1 fk name"); 
+                    ff($parentName,"pintu 1 fk name");                       
+                    $fkName = $parentName;  
+                    $tableSingleArray = explode(".", $parentName);
+                    if( count($tableSingleArray)>1){
+                        $fkName = $tableSingleArray[1];
+                    }
                     if(!in_array($fkName."_id",$columns)){
                         $realJoins = $model->joins;
                         foreach($realJoins as $val){
