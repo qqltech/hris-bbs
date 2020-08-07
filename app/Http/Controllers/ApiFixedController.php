@@ -394,6 +394,7 @@ class ApiFixedController extends Controller
         $detailsArray   = $model->details;
         ff('create');
         if(isset($data[0]) && is_array($data[0])){
+            ff("$modelName create header");
             foreach ($data as $i => $isiData){
                 $additionalData = $this->createAdditionalData($model, $isiData);
                 $eliminatedData = $this->createEliminationData($model, $isiData);
@@ -433,6 +434,7 @@ class ApiFixedController extends Controller
                 }
             }
         }else{
+            ff("$modelName create header");
             $additionalData = $this->createAdditionalData($model, $data);
             $eliminatedData = $this->createEliminationData($model, $data);
             $processedData  = array_merge($eliminatedData, $additionalData);
@@ -488,7 +490,7 @@ class ApiFixedController extends Controller
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
             foreach( $data as $key => $value ){
-                if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
+                if(is_array($value) && count($value)>0 && checkDetailExist($key, $detailsArray) ){                
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
             }
