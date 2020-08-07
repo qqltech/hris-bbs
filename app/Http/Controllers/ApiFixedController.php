@@ -410,6 +410,7 @@ class ApiFixedController extends Controller
                     }else{
                         $fkName.="_id";
                     }
+                    ff($fkName,"pintu 1 fk"); 
                     $processedData[$fkName] = $parentId;
                 }
                 $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
@@ -426,7 +427,6 @@ class ApiFixedController extends Controller
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
                     if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){
-                        ff($modelName,"pintu 1 dalam"); 
                         $this->createOperation($key, $value,$finalModel->id, $modelName);
                     }
                 }
