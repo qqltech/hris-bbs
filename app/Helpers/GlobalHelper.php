@@ -1751,10 +1751,6 @@ function _customFind($model, $params)
             if( count( $parentArray )>2 ){
                 $parentNameString   = $parentArray[ 0 ].".".$parentArray[ 1 ] ;
             }
-            ff([
-                'table'=>$pureModel->getTable(),
-                'join'=>$parentNameString
-                ] ,'nitip');
             if( $parentNameString == $pureModel->getTable() ){
                 return $parentNameString;
             }
