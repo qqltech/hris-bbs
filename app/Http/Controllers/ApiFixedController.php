@@ -251,19 +251,15 @@ class ApiFixedController extends Controller
             if( count( $detailStringArray )>1 ){
                 $detailString = $detailStringArray[1];
             }
-            ff("$key VS $detailString", "ada");
             if($detailString==$key){
-                ff($key, "ada");
                 return true;
                 break;
             }
         }
-        ff($key, "tidak ada");
         return false;
     }
     private function is_detail_valid($modelName, $data)
     {
-        ff($modelName,"kecheck");
         if( !in_array($this->operation,["create","update"]) ){return true;}
         $modelCandidate = "\App\Models\BasicModels\\$modelName";
         $model          = new $modelCandidate;
@@ -393,9 +389,8 @@ class ApiFixedController extends Controller
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
         $model          = new $modelCandidate;
         $detailsArray   = $model->details;
-        ff('create');
+        
         if(isset($data[0]) && is_array($data[0])){
-            ff("$modelName create header");
             foreach ($data as $i => $isiData){
                 $additionalData = $this->createAdditionalData($model, $isiData);
                 $eliminatedData = $this->createEliminationData($model, $isiData);
@@ -429,13 +424,13 @@ class ApiFixedController extends Controller
                 $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
-                    if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){
+                    if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){
+                        ff("$modelName=".$finalModel->id." $key");
                         $this->createOperation($key, $value,$finalModel->id, $modelName);
                     }
                 }
             }
         }else{
-            ff("$modelName create header");
             $additionalData = $this->createAdditionalData($model, $data);
             $eliminatedData = $this->createEliminationData($model, $data);
             $processedData  = array_merge($eliminatedData, $additionalData);
