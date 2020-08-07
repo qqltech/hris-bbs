@@ -749,6 +749,9 @@ class LaradevController extends Controller
                         $heirs[] = $fk->child;
                     }
                     if(!$fk->real){continue;}
+                    if( count( explode(".", $fk->child) )>1 ){
+                        $fk->child = explode(".", $fk->child)[1];
+                    }
                     $hasMany.=str_replace([
                         "__child", "__cld_column","__parent_column"
                     ],[
