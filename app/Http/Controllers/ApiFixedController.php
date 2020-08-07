@@ -244,6 +244,21 @@ class ApiFixedController extends Controller
         }
         return true;
     }
+    private function checkDetailExist($key, $detailsArray){
+        foreach( $detailsArray as $detail ){
+            $detailStringArray = explode( ".", $detail);
+            $detailString = $detail;
+            if( count( $detailStringArray )>1 ){
+                $detailString = $detailString[1];
+            }
+            if($detailString==$key){
+                ff( $key, "ada");
+                return true;
+                break;
+            }
+        }
+        return false;
+    }
     private function is_detail_valid($modelName, $data)
     {
         if( !in_array($this->operation,["create","update"]) ){return true;}
@@ -253,7 +268,7 @@ class ApiFixedController extends Controller
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 foreach( $isiData as $key => $value ){
-                    if(is_array($value) && count($value)>0 && in_array($key, $detailsArray) ){                
+                    if(is_array($value) && count($value)>0 && checkDetailExist($key, $detailsArray) ){                
                         $this->is_model_exist($key);
                         $this->is_operation_authorized($key );
                         $this->is_data_required($key, $value);
