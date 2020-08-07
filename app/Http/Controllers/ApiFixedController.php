@@ -251,6 +251,7 @@ class ApiFixedController extends Controller
             if( count( $detailStringArray )>1 ){
                 $detailString = $detailString[1];
             }
+            ff("$key VS $detailString", "ada");
             if($detailString==$key){
                 ff($key, "ada");
                 return true;
