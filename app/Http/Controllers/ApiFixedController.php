@@ -249,7 +249,7 @@ class ApiFixedController extends Controller
             $detailStringArray = explode( ".", $detail);
             $detailString = $detail;
             if( count( $detailStringArray )>1 ){
-                $detailString = $detailString[1];
+                $detailString = $detailStringArray[1];
             }
             ff("$key VS $detailString", "ada");
             if($detailString==$key){
