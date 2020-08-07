@@ -489,7 +489,7 @@ class ApiFixedController extends Controller
                 if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){    
                     $tableSingle = $model->getTable();  
                     $tableSingleArray = explode(".", $model->getTable());
-                    if( count($tableSingle)>1){
+                    if( count($tableSingleArray)>1){
                         $tableSingle = $tableSingleArray[1];
                     }
                     ff($model->getTable()."=parent, $tableSingle(single)".$finalModel->id." $key"); 
