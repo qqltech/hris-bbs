@@ -486,7 +486,8 @@ class ApiFixedController extends Controller
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
             foreach( $data as $key => $value ){
-                if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){                
+                if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){     
+                    ff($model->getTable()."=parent, ".$finalModel->id." $key");           
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
             }
