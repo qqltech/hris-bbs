@@ -396,8 +396,7 @@ class ApiFixedController extends Controller
                 $eliminatedData = $this->createEliminationData($model, $isiData);
                 $processedData  = array_merge($eliminatedData, $additionalData);
                 if($parentId!=null){
-                    $columns    = $model->columns;
-                    ff($parentName,"pintu 1 fk name");                       
+                    $columns    = $model->columns;                   
                     $fkName = $parentName;  
                     $tableSingleArray = explode(".", $parentName);
                     if( count($tableSingleArray)>1){
@@ -415,7 +414,6 @@ class ApiFixedController extends Controller
                     }else{
                         $fkName.="_id";
                     }
-                    ff($fkName,"pintu 1 fk fix"); 
                     $processedData[$fkName] = $parentId;
                 }
                 $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
@@ -426,7 +424,6 @@ class ApiFixedController extends Controller
                 }
                 $finalData  = $createBeforeEvent["data"];
                 
-                ff($finalData,"pintu 1");
                 $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
                 $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
@@ -488,7 +485,6 @@ class ApiFixedController extends Controller
                 }
             }
             
-            ff($finalData,"pintu 2");
             $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
             $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
