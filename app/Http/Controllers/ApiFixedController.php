@@ -548,6 +548,7 @@ class ApiFixedController extends Controller
         }
         $preparedModel->delete(); 
         $model->deleteAfter($model, $preparedModel, $this->requestMeta, $id);
+        file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=$table pra");
         $this->success[] = "SUCCESS: data deleted in $table id: $id";
         file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=$table");
         if($cascade){
