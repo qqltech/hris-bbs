@@ -392,7 +392,7 @@ class ApiFixedController extends Controller
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
         $model          = new $modelCandidate;
         $detailsArray   = $model->details;
-        
+        ff('create');
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 $additionalData = $this->createAdditionalData($model, $isiData);
