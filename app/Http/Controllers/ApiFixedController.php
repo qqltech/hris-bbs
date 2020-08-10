@@ -577,7 +577,8 @@ class ApiFixedController extends Controller
         // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=$table");
         if($cascade){
             foreach( $detailsArray as $detail ){
-                $modelCandidate = "\App\Models\CustomModels\\$detail";
+                $detailsExplode = explode('.', $detail);
+                $modelCandidate = "\App\Models\CustomModels\\".(count($detailsExplode)==1?$detail:$detailsExplode[1]);
                 $model          = new $modelCandidate;
                 $dataDetail = $model->where($table."_id","=",$id)->get();              
                 // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=gagal");  
