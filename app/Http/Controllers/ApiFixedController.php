@@ -292,7 +292,8 @@ class ApiFixedController extends Controller
     private function is_model_deletable($modelName, $data)
     {
         if( !in_array($this->operation,["delete"]) ){return;}
-        $modelCandidate = "\App\Models\BasicModels\\$modelName";
+        $modelNameExplode = explode('.', $modelName);
+        $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$detail:$modelNameExplode[1]);
         $model          = new $modelCandidate;
         $detailsArray   = $model->details; 
         $heirs          = $model->heirs; 
