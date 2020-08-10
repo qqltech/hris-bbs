@@ -41,11 +41,37 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->get('/refreshalias/{table}', 'LaradevController@refreshAlias');
     });
 
+    // $router->get('/', function(Request $req){
+    //     if(!isset($req->kode) || $req->kode!=env("BACKENDPASSWORD","pulangcepat")){
+    //         return response()->json("Unauthorized",401);
+    //     }
+    //     return view("defaults.laradev");
+    // });
+    
     $router->get('/', function(Request $req){
-        if(!isset($req->kode) || $req->kode!=env("BACKENDPASSWORD","pulangcepat")){
-            return response()->json("Unauthorized",401);
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
         }
-        return view("defaults.laradev");
+        return view('defaults.unauthorized')->with('data',[
+            'page'=>'halaman config',
+            'url'=>url("/laradev")
+        ]);
     });
+
+    $router->post('/', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
+            return view('defaults.unauthorized')->with('data',[
+                'page'=>'halaman config',
+                'url'=>url("/laradev"),
+                'salah'=>true
+            ]);
+        }else{            
+            return view("defaults.laradev");
+        }
+    });
+
     $router->post('/trio/{table}', 'LaradevController@deleteAll');
 });

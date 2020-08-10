@@ -8,13 +8,14 @@
         <link rel="stylesheet" href="{{url('defaults/addon/hint/show-hint.css')}}">
         <style>
             #codemirror{
-                width:60% !important;
+                width:60%;
                 bottom:0px !important;
+                transition: all .23s linear;
             }
             
             .CodeMirror{
                 z-index: 50;
-                height:98% !important;
+                height:100% !important;
                 width:auto !important;
             }
             .cm-s-monokai span.cm-keyword {
@@ -40,12 +41,15 @@
         </style>
     </head>
     <body>
-        <p><span style="padding:5 20px 5 20px;position:fixed;right:40px;top:10px;font-weight:bold;background-color:green;color:white" id="modelSelected"></span>
-            <button style="position:fixed;right:0px;top:10px; background-color:red;color:white" id="toggle">Hide!</button>
+        <form id="form" method="POST" action="{{$data['url']}}" style="display:none">
+            <input id="password" type="hidden" name="password" value="{{$data['password']}}">
+        </form>
+        <p><span style="padding:0 20px 5 20px;position:fixed;right:40px;top:0px;font-weight:bold;background-color:green;color:white" id="modelSelected"></span>
+            <button style="position:fixed;right:0px;top:0px; background-color:red;color:white" id="toggle">Hide!</button>
         </p>
-        <button style="position:fixed;right:0px;bottom:10px; background-color:green;color:white;z-index:51" id="toggle_full">full!</button>
+        <button style="position:fixed;right:0px;bottom:3px; background-color:green;color:white;z-index:51" id="toggle_full">full!</button>
         <div id="codemirror">
-            <textarea id="code"></textarea>
+            <textarea id="code" style="display:none"></textarea>
         </div>
         <div>
             <table border="1">
@@ -57,7 +61,7 @@
                     @foreach($models as $key => $model)
                         @if( !(strpos($model['file'], 'oauth') !== false))
                             <tr>
-                                <td style="padding:0 5 0 5" id="data-{{$key}}">{{ str_replace(".php","",$model['file'])}}</td>
+                                <td style="padding:0 5 0 5;font-size:13.5px" id="data-{{$key}}">{{ str_replace(".php","",$model['file'])}}</td>
                                 <td><button class="alter" href="javascript:void(0)" style="font-size:10px" index={{$key}}>Alter</button></td>
                                 <td><button class="migration" href="javascript:void(0)" style="font-size:10px" index={{$key}}>Migration</button></td>
                                 <td><button class="model" href="javascript:void(0)" style="font-size:10px;"  index={{$key}}>Model</button></td>
@@ -130,8 +134,25 @@
                         callback(response);
                     }).catch(error => {
                         window.console.clear();
-                        alert("gagal, lihat console!");
-                        throw(error.response.data);
+                        if(error.response.data=='nopassword'){
+                            var password = prompt("file telah dipassword, masukkan password:", "");
+                            if (password == null || password == "") {
+                            }else{
+                                let url = (error.config.url).split("?")['0'];
+                                submitApi({
+                                    url : url+"?password="+password,
+                                    method: "get",
+                                    body:null
+                                },function(response){
+                                    if(url.includes('laradev/models')){
+                                        codemirror.setValue(response.data.text);
+                                    }
+                                });                                
+                            }
+                        }else{
+                            alert("gagal, lihat console!");
+                            throw(error.response.data);
+                        }
                     }).then(function () {
                         //GAGAL BERHASIL SELALU DILAKSANAKAN
                     });  ;
@@ -149,7 +170,7 @@
                                 modul:modul
                             }
                         },function(response){
-                            window.location.reload();
+                            document.getElementById("form").submit();
                             // console.log(response);
                         });
                     }
@@ -162,7 +183,7 @@
                             method: "get",
                             body:null
                         },function(response){
-                            window.location.reload();
+                            document.getElementById("form").submit();
                             // console.log(response);
                         });
                     }
@@ -175,7 +196,7 @@
                             method: "get",
                             body:null
                         },function(response){
-                            window.location.reload();
+                            document.getElementById("form").submit();
                             // console.log(response);
                         });
                     }
@@ -184,6 +205,9 @@
                 var data = @php echo json_encode($models); @endphp;
                 var codemirror = CodeMirror.fromTextArea(document.getElementById("code"), {
                     lineNumbers: false,
+                    firstLineNumber:1,
+                    // foldGutter: true,
+                    // gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
                     mode: "php",
                     viewportMargin: Infinity,
                     theme:"monokai",
@@ -226,16 +250,18 @@
                 var isToggled=true;
                 document.getElementById("codemirror").style.display = "none";
                 document.getElementById("modelSelected").style.display = "none";
-                // var isFull = false;
-                // document.getElementById("toggle_full").onclick = function(){
-                //     if(isFull){
-                //         codemirror.setSize(300,200);
-                //         isFull = false;
-                //     }else{
-                //         codemirror.setSize(500,1200);
-                //         isFull = true;
-                //     }
-                // };
+                var isFull = false;
+                document.getElementById("toggle_full").onclick = function(){
+                    if(isFull){
+                        document.getElementById("codemirror").style.width="60"+"%";
+                        document.getElementsByClassName('CodeMirror-hscrollbar')[0].style.display="block";
+                        isFull = false;
+                    }else{
+                        document.getElementById("codemirror").style.width="98"+"%";
+                        document.getElementsByClassName('CodeMirror-hscrollbar')[0].style.display="none";
+                        isFull = true;
+                    }
+                };
 
                 document.getElementById("toggle").onclick = function(){
                     if(isToggled){
@@ -259,6 +285,10 @@
                             document.getElementById("modelSelected").style.display = "none";
                             isToggled = true;
                         }
+                    }
+                    
+                    if(e.altKey && e.key=="Enter"){
+                        document.getElementById('toggle_full').click();
                     }
                 });
                 
@@ -435,7 +465,7 @@
                                     body:null
                                 },function(response){
                                     // codemirror.setValue(response.data.text);
-                                    window.location.reload();
+                                    document.getElementById("form").submit();
                                     // console.log(response);
                                 });
                             }else{
@@ -475,7 +505,7 @@
                                     body:null
                                 },function(response){
                                     // codemirror.setValue(response.data.text);
-                                    window.location.reload();
+                                    document.getElementById("form").submit();
                                     // console.log(response);
                                 });
                             }else{
@@ -507,7 +537,7 @@
                                         password : password
                                     }
                                 },function(response){
-                                    window.location.reload();
+                                    document.getElementById("form").submit();
                                 });
                             }
                         },1);
@@ -537,7 +567,7 @@
                                         "models": true
                                     }
                                 },function(response){
-                                    window.location.reload();
+                                    document.getElementById("form").submit();
                                 });
                             }
                         },1);  
@@ -573,7 +603,7 @@
                                     body:null
                                 },function(response){
                                     // codemirror.setValue(response.data.text);
-                                    window.location.reload();
+                                    document.getElementById("form").submit();
                                     // console.log(response);
                                 });
                             }else{
@@ -584,18 +614,21 @@
                     });
                 });
 
-                var ws = new WebSocket("wss://backend.dejozz.com:9001/{{env('LOG_CHANNEL',999)}}");
+                var ws = new WebSocket("wss://backend.dejozz.com:9001/{{env('LOG_CHANNEL',"+btoa(window.location.host)+")}}");
 				
                 ws.onopen = function() {
                     console.log("%c debug is ready to use","background: #222; color: #a0ff5c;font-weight: bold;");
                 };
 
                 ws.onmessage = function (evt) { 
-                var received_msg = evt.data;
+                    var received_msg = evt.data;
                     try{
                         received_msg=JSON.parse(received_msg);
                         console.log("%c "+received_msg.debug_id,"background: #222; color: #a0ff5c;font-weight: bold;",received_msg);
                     }catch(e){
+                        if(received_msg.includes('bc ')){
+                            alert(received_msg.replace("bc ",""))
+                        }
                         console.log(received_msg);
                     }
                 };

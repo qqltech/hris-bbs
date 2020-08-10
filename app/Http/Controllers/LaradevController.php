@@ -515,13 +515,21 @@ class LaradevController extends Controller
     }
 
     public function readModelsOne(Request $request, $tableName=null){
+        
+        $className = "\\App\\Models\\CustomModels\\$tableName";   
+        $class = new $className();
+        if(isset($class->password)){
+            if( !isset($request->password)){return response()->json("nopassword",401);}
+            else
+            if($request->password!==$class->password){
+                return response()->json("nopassword",401);
+            }
+        }
         $basic = File::get(app()->path()."/Models/BasicModels/$tableName.php");
         $file = File::get(app()->path()."/Models/CustomModels/$tableName.php");
         if($request->script_only){
             return ['basic'=> $basic, 'custom'=>$file];
         }
-        $className = "\\App\\Models\\CustomModels\\$tableName";   
-        $class = new $className();
         return [
             'last_update' => $class->lastUpdate,
             'table' => $class->getTable(),

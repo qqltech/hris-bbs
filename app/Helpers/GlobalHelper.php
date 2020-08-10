@@ -1856,7 +1856,7 @@ function uploadfile($model,$req){
     return url("/uploads/$modelName/".$code."_".$fileName);
 }
 function ff($data,$id="debug"){
-    $channel=env("LOG_CHANNEL",888);
+    $channel=env("LOG_CHANNEL",base64_encode($_SERVER['HTTP_HOST']));
     $client = new \GuzzleHttp\Client();
     try{
         if(!in_array(gettype($data),["object","array"])){
