@@ -584,7 +584,8 @@ class ApiFixedController extends Controller
                 $detailsExplode = explode('.', $detail);
                 $modelCandidate = "\App\Models\CustomModels\\".(count($detailsExplode)==1?$detail:$detailsExplode[1]);
                 $model          = new $modelCandidate;
-                $dataDetail = $model->where($table."_id","=",$id)->get();              
+                $tableExplode = explode('.', $table);
+                $dataDetail = $model->where((count($tableExplode)==1?$table:$tableExplode[1])."_id","=",$id)->get();              
                 // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=gagal");  
                 foreach( $dataDetail as $dtl ){
                     $this->deleteOperation($detail, null, $dtl->id, $id);
