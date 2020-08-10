@@ -647,10 +647,8 @@ class ApiFixedController extends Controller
         $model->updateAfter($finalModel, $processedData, $this->requestMeta, $id);
         $this->success[] = "SUCCESS: data update in ".$model->getTable()." id: $id";
                 
-        ff($detailsArray,"arraydetail");
-        foreach( $detailsArray as $detail ){           
-            ff(array_keys($data),"data");
-            ff($detail);
+        
+        foreach( $detailsArray as $detail ){
             if( !$this->checkDetailExist($detail,array_keys($data)) ){
                 continue;
             }
