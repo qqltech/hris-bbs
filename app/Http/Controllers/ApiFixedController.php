@@ -313,7 +313,7 @@ class ApiFixedController extends Controller
                 foreach($join as $relation){
                     if(strpos($relation,$modelName)!==false){
                         $colArr = explode("=", $relation)[1];
-                        $col    = $colArr[1];
+                        $col    = $colArr;
                         $existing = $modelHeir->where($col, $this->operationId )->limit(1)->get();
                         if(count($existing)>0){
                             $this->messages[] = "USED: cannot delete id $this->operationId in [$modelName]. It is being used in child $heir";
