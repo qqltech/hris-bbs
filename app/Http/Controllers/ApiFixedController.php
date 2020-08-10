@@ -245,6 +245,10 @@ class ApiFixedController extends Controller
         return true;
     }
     private function checkDetailExist($key, $detailsArray){
+        $keyArray = explode( ".", $key);
+        if( count( $keyArray )>1 ){
+            $key = $keyArray[1];
+        }
         foreach( $detailsArray as $detail ){
             $detailStringArray = explode( ".", $detail);
             $detailString = $detail;
