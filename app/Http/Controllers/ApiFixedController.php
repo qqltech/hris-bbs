@@ -654,8 +654,12 @@ class ApiFixedController extends Controller
             if( !$this->checkDetailExist($detail,array_keys($data)) ){
                 continue;
             }
-
-            $modelCandidate = "\App\Models\CustomModels\\$detail";
+            $detailClass = $detail;
+            $detailArray = explode( ".", $detail);
+            if( count( $detailArray )>1 ){
+                $detailClass = $detailArray[1];
+            }
+            $modelCandidate = "\App\Models\CustomModels\\$detailClass";
             $modelChild = new $modelCandidate;
             
             $detailIds = [];
