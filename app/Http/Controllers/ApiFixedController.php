@@ -314,8 +314,10 @@ class ApiFixedController extends Controller
                 foreach($join as $relation){
                     if(strpos($relation,$modelName)!==false){
                         $colArr = explode("=", $relation)[1];
+                        ff(explode("=", $relation),'tes');
                         $col    = $colArr;
                         $existing = $modelHeir->where($col, $this->operationId )->limit(1)->get();
+                        ff('stop');
                         if(count($existing)>0){
                             $this->messages[] = "USED: cannot delete id $this->operationId in [$modelName]. It is being used in child $heir";
                             $this->errors[] = "FAILED: cannot delete this resource, It is still being used in another resource.";
