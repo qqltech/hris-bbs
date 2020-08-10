@@ -293,7 +293,7 @@ class ApiFixedController extends Controller
     {
         if( !in_array($this->operation,["delete"]) ){return;}
         $modelNameExplode = explode('.', $modelName);
-        $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$detail:$modelNameExplode[1]);
+        $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$modelName:$modelNameExplode[1]);
         $model          = new $modelCandidate;
         $detailsArray   = $model->details; 
         $heirs          = $model->heirs; 
