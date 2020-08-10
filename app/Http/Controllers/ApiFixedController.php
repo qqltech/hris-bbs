@@ -665,9 +665,9 @@ class ApiFixedController extends Controller
             $detailIds = [];
             $detailNew = [];
             $detailOld = [];
-            foreach($data[$detail] as $index => $valDetail){
+            foreach($data[$detailClass] as $index => $valDetail){
                 if(isset($valDetail['id']) && is_numeric($valDetail['id']) && (new $modelCandidate)->where('id',$valDetail['id'])->count()>0){
-                    $this->updateOperation($detail, $valDetail, $valDetail['id']);
+                    $this->updateOperation($detailClass, $valDetail, $valDetail['id']);
                     $detailIds[]=$valDetail['id'];
                     $detailOld [] = $valDetail;
                 }else{
@@ -691,10 +691,10 @@ class ApiFixedController extends Controller
             }
             $dataDetail = $modelChild->where($fkName,$id)->whereNotIn('id',$detailIds)->get();                
             foreach( $dataDetail as $dtl ){
-                $this->deleteOperation($detail, null, $dtl->id, $id);
+                $this->deleteOperation($detailClass, null, $dtl->id, $id);
             }
             if( count($detailNew)>0){
-                $this->createOperation($detail, $detailNew, $id, $model->getTable());
+                $this->createOperation($detailClass, $detailNew, $id, $model->getTable());
             }
             // foreach($detailOld as $oldDetail){
             //     $this->updateOperation($detail, $oldDetail, $oldDetail['id']);
