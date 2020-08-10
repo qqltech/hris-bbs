@@ -1770,7 +1770,9 @@ function _customFind($model, $params)
         $p->addJoin     = null;
         $p->join        = true;
         $p->caller      = $pureModel->getTable();
-        $data[$detail]  = $model->customGet($p);
+        $detailArray = explode('.', $detailArray);
+
+        $data[count($detailArray)==1? $detail : $detailArray[1] ]  = $model->customGet($p);
     }
     return $data;
 }
