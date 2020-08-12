@@ -1039,21 +1039,29 @@ class LaradevController extends Controller
             $tableStringClass = "\App\Models\BasicModels\\$table";
             if(class_exists( $tableStringClass )){
                 $currentModel = new $tableStringClass;
-                $aliasTable=$currentModel->getTable();
-                \DB::unprepared("DROP TABLE IF EXISTS $aliasTable");
+                $aliasTable=$currentModel->getTable();               
+                try{
+                    \DB::unprepared("DROP TABLE IF EXISTS $aliasTable");
+                }catch(\Exception $e){}
             }
             if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
                 $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
                 $tableName = explode("_timing_",$samaran)[0];
-                DB::unprepared("                    
-                    DROP TRIGGER IF EXISTS $table ON $tableName;
-                    DROP FUNCTION IF EXISTS fungsi_"."$table();
-                ");
-            }elseif(Schema::hasTable($aliasTable===null?$table:$aliasTable)){
-                Schema::dropIfExists($aliasTable===null?$table:$aliasTable);
-            }else{
-                DB::unprepared("DROP VIEW IF EXISTS $table;");
+                try{
+                    DB::unprepared("                    
+                        DROP TRIGGER IF EXISTS $table ON $tableName;
+                        DROP FUNCTION IF EXISTS fungsi_"."$table();
+                    ");
+                }catch(\Exception $e){}
             }
+            if(Schema::hasTable($aliasTable===null?$table:$aliasTable)){                
+                try{
+                    Schema::dropIfExists($aliasTable===null?$table:$aliasTable);
+                }catch(\Exception $e){}
+            }
+            try{
+                DB::unprepared("DROP VIEW IF EXISTS $table;");
+            }catch(\Exception $e){}
            
             // Schema::connection('flyingpgsql')->dropIfExists($currentModel->getTable());
             // return response()->json([Schema::hasTable($currentModel->getTable())?'ada':'tidak'],422);
