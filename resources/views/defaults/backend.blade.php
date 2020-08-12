@@ -45,17 +45,8 @@
             <input id="password" type="hidden" name="password" value="{{$data['password']}}">
         </form>
         <script>
-            if(localStorage.scrollY!==undefined){
-                window.scrollTo({
-                    top: localStorage.scrollY,
-                    left: 0,
-                    behavior: 'smooth'
-                });
-            }
             function onsubmit(){
                 localStorage.scrollY=window.scrollY;
-                alert('submit');
-                return true;
             };
 
         </script>
@@ -659,6 +650,15 @@
                 ws.onclose = function() {
                     console.log("connection is closed");
                 };
+                $(document).ready(function(){                    
+                    if(localStorage.scrollY!==undefined){
+                        window.scrollTo({
+                            top: localStorage.scrollY,
+                            left: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
             </script>
     </body>
 </html>
