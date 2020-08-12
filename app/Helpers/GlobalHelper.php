@@ -1525,20 +1525,21 @@ function _customGetData($model,$params)
         return $data;
     }
     if($params->caller){
+        $tempData=$data->toArray();
         $fixedData=[];
         $index=0;
-        foreach($data->toArray() as $i => $row){
+        foreach($tempData as $i => $row){
             $keys=array_keys($row);
             foreach($keys as $key){
                 if( count(explode(".", $key))>2 ){
                     $newKeyArray = explode(".", $key);
                     $newKey = $newKeyArray[1].".".$newKeyArray[2];
-                    $row[$i][$newKey] = $row[$i][$key];
-                    unset($row[$i][$key]);
+                    $tempData[$i][$newKey] = $tempData[$i][$key];
+                    unset($tempData[$i][$key]);
                 }
             }
         }
-        foreach($data->toArray() as $row){
+        foreach($tempData as $row){
             $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
             if( gettype($transformedData)=='boolean' ){
                 continue;
@@ -1590,7 +1591,18 @@ function _customGetData($model,$params)
     }else{
         $tempData = $data->toArray()["data"];
         $fixedData=[];
-        $index=0;
+        $index=0;        
+        foreach($tempData as $i => $row){
+            $keys=array_keys($row);
+            foreach($keys as $key){
+                if( count(explode(".", $key))>2 ){
+                    $newKeyArray = explode(".", $key);
+                    $newKey = $newKeyArray[1].".".$newKeyArray[2];
+                    $tempData[$i][$newKey] = $tempData[$i][$key];
+                    unset($tempData[$i][$key]);
+                }
+            }
+        }
         foreach($tempData as $row){
             $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
             if( gettype($transformedData)=='boolean' ){
