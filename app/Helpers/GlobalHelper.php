@@ -1527,6 +1527,17 @@ function _customGetData($model,$params)
     if($params->caller){
         $fixedData=[];
         $index=0;
+        foreach($data->toArray() as $i => $row){
+            $keys=array_keys($row);
+            foreach($keys as $key){
+                if( count(explode(".", $key))>2 ){
+                    $newKeyArray = explode(".", $key);
+                    $newKey = $newKeyArray[1].".".$newKeyArray[2];
+                    $row[$i][$newKey] = $row[$i][$key];
+                    unset($row[$i][$key]);
+                }
+            }
+        }
         foreach($data->toArray() as $row){
             $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
             if( gettype($transformedData)=='boolean' ){
