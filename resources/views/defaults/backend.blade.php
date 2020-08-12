@@ -52,10 +52,10 @@
                     behavior: 'smooth'
                 });
             }
-            document.getElementById('form').submit(function(){
-                localStorage.scrollY=window.scrollY;
-                return true;
-            })
+            // document.getElementById('form').submit(function(){
+            //     localStorage.scrollY=window.scrollY;
+            //     return true;
+            // })
         </script>
         <p><span style="padding:0 20px 5 20px;position:fixed;right:40px;top:0px;font-weight:bold;background-color:green;color:white" id="modelSelected"></span>
             <button style="position:fixed;right:0px;top:0px; background-color:red;color:white" id="toggle">Hide!</button>
