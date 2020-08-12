@@ -41,7 +41,7 @@
         </style>
     </head>
     <body>
-        <form id="form" method="POST" action="{{$data['url']}}" style="display:none" onsubmit="onsubmit()">
+        <form id="form" method="POST" action="{{$data['url']}}" style="display:none">
             <input id="password" type="hidden" name="password" value="{{$data['password']}}">
         </form>
         <script>
@@ -185,6 +185,7 @@
                                 modul:modul
                             }
                         },function(response){
+                            onsubmit();
                             document.getElementById("form").submit();
                             // console.log(response);
                         });
@@ -198,6 +199,7 @@
                             method: "get",
                             body:null
                         },function(response){
+                            onsubmit();
                             document.getElementById("form").submit();
                             // console.log(response);
                         });
@@ -211,6 +213,7 @@
                             method: "get",
                             body:null
                         },function(response){
+                            onsubmit();
                             document.getElementById("form").submit();
                             // console.log(response);
                         });
@@ -480,6 +483,7 @@
                                     body:null
                                 },function(response){
                                     // codemirror.setValue(response.data.text);
+                                    onsubmit();
                                     document.getElementById("form").submit();
                                     // console.log(response);
                                 });
@@ -520,6 +524,7 @@
                                     body:null
                                 },function(response){
                                     // codemirror.setValue(response.data.text);
+                                    onsubmit();
                                     document.getElementById("form").submit();
                                     // console.log(response);
                                 });
@@ -552,6 +557,7 @@
                                         password : password
                                     }
                                 },function(response){
+                                    onsubmit();
                                     document.getElementById("form").submit();
                                 });
                             }
@@ -582,6 +588,7 @@
                                         "models": true
                                     }
                                 },function(response){
+                                    onsubmit();
                                     document.getElementById("form").submit();
                                 });
                             }
@@ -618,6 +625,7 @@
                                     body:null
                                 },function(response){
                                     // codemirror.setValue(response.data.text);
+                                    onsubmit();
                                     document.getElementById("form").submit();
                                     // console.log(response);
                                 });
