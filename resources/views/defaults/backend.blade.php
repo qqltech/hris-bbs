@@ -650,7 +650,7 @@
                 ws.onclose = function() {
                     console.log("connection is closed");
                 };
-                $(document).ready(function(){                    
+                document.addEventListener('DOMContentLoaded', ()=>{
                     if(localStorage.scrollY!==undefined){
                         window.scrollTo({
                             top: localStorage.scrollY,
@@ -658,7 +658,7 @@
                             behavior: 'smooth'
                         });
                     }
-                });
+                }), false);
             </script>
     </body>
 </html>
