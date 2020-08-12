@@ -658,7 +658,7 @@
                             behavior: 'smooth'
                         });
                     }
-                }), false);
+                }, false);
             </script>
     </body>
 </html>
