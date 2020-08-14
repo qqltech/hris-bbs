@@ -1815,8 +1815,8 @@ function _customFind($model, $params)
         if( count(explode(".", $key))>2 ){
             $newKeyArray = explode(".", $key);
             $newKey = $newKeyArray[1].".".$newKeyArray[2];
-            $data[$i][$newKey] = $data[$i][$key];
-            unset($data[$i][$key]);
+            $data[$newKey] = $data[$key];
+            unset($data[$key]);
         }
     }
     return $data;
