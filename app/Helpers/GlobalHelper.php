@@ -1582,6 +1582,8 @@ function _customGetData($model,$params)
                 $p->addSelect   = null;
                 $p->addJoin     = null;
                 $p->join        = true;
+                $p->joinMax     = 0;
+                $p = $model->overrideGetParams($p,null);
                 $p->caller      = $pureModel->getTable();
                 $fixedData[$index][$detail]  = $model->customGet($p);
             }
