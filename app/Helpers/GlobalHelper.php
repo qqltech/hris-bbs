@@ -1583,6 +1583,7 @@ function _customGetData($model,$params)
                 $p->addJoin     = null;
                 $p->join        = true;
                 $p->joinMax     = 0;
+                $p->group_by    = null;
                 $p = $model->overrideGetParams($p,null);
                 $p->caller      = $pureModel->getTable();
                 $fixedData[$index][$detail]  = $model->customGet($p);
@@ -1795,7 +1796,8 @@ function _customFind($model, $params)
         $p->addJoin     = null;
         $p->join        = true;
         $p->joinMax     = 0;
-        $p = $model->overrideGetParams($p,null);
+        $p->group_by    = null;
+        $p = $model->overrideGetParams($p);
         $p->caller      = $pureModel->getTable();
         $detailArray = explode('.', $detail);
 
