@@ -1810,15 +1810,15 @@ function _customFind($model, $params)
         $data[count($detailArray)==1? $detail : $detailArray[1] ]  = $model->customGet($p);
     }
     
-    // $keys   =   array_keys($data);
-    // foreach($keys as $key){
-    //     if( count(explode(".", $key))>2 ){
-    //         $newKeyArray = explode(".", $key);
-    //         $newKey = $newKeyArray[1].".".$newKeyArray[2];
-    //         $data[$newKey] = $data[$key];
-    //         unset($data[$key]);
-    //     }
-    // }
+    $keys   =   array_keys($data);
+    foreach($keys as $key){
+        if( count(explode(".", $key))>2 ){
+            $newKeyArray = explode(".", $key);
+            $newKey = $newKeyArray[1].".".$newKeyArray[2];
+            $data[$newKey] = $data[$key];
+            unset($data[$key]);
+        }
+    }
     return $data;
 }
 
