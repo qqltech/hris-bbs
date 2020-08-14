@@ -95,13 +95,15 @@ function createTable(data, isReferenced=false, caller=null){
           comment = JSON.parse(data.columns[i].comment);
         }
         if(comment['src']!==undefined){
-          data.columns[i].table_reference = comment['src'].split(".")[0];
-          data.columns[i].column_reference = comment['src'].split(".")[1];
+          let srcArray = comment['src'].split(".");
+          data.columns[i].table_reference = srcArray.length==2?srcArray[0]:srcArray[0]+"."+srcArray[1];
+          data.columns[i].column_reference =  srcArray.length==2?srcArray[1]:srcArray[2];
           data.columns[i].connection = 'SRC';
         }
         if(comment['fk']!==undefined && comment['fk']!="false"){
-          data.columns[i].table_reference = comment['fk'].split(".")[0];
-          data.columns[i].column_reference = comment['fk'].split(".")[1];
+          let fkArray = comment['fk'].split(".");
+          data.columns[i].table_reference =  fkArray.length==2? fkArray[0]:fkArray[0]+"."+fkArray[1];
+          data.columns[i].column_reference =  fkArray.length==2? fkArray[1]:fkArray[2];
           data.columns[i].connection = 'FK';
         }
         if( data.columns[i].nullable===false ) {required=false;}
