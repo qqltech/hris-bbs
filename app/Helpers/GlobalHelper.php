@@ -1551,8 +1551,13 @@ function _customGetData($model,$params)
                     $fixedData[$index] = array_merge( ["meta_$akses"=>$modelExtender->$func()], $fixedData[$index]);
                 }
             }
-            foreach($pureModel->details as $detail){           
-                $modelCandidate = "\App\Models\CustomModels\\$detail";
+            foreach($pureModel->details as $detail){ 
+                $detailArray = explode(".",$detail);
+                $detailClass = $detail;
+                if( count($detailArray)>1 ){
+                    $detailClass = $detailArray[1];
+                }          
+                $modelCandidate = "\App\Models\CustomModels\\$detailClass";
                 $model      = new $modelCandidate;
                 $details    = $model->details;
                 $columns    = $model->columns;
