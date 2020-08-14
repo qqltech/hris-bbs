@@ -1591,7 +1591,8 @@ function _customGetData($model,$params)
                 $p->group_by    = null;
                 $p = $model->overrideGetParams($p,null);
                 $p->caller      = $pureModel->getTable();
-                $fixedData[$index][$detail]  = $model->customGet($p);
+                $detailArray = explode('.', $detail);
+                $fixedData[$index][ count($detailArray)==1? $detail : $detailArray[1] ]  = $model->customGet($p);
             }
             $index++;
         }
