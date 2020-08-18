@@ -290,13 +290,13 @@ class LaradevController extends Controller
                 // .json_encode($table->getComment() ));
             }
             $views = $schemaManager->listViews();
+            ff('cobasaja');
             foreach($views as $view){
                 
                 if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
                     continue;
                 }
                 $columnNames = \Schema::getColumnListing(str_replace('public.','',$view->getName()));
-                ff($columnNames, $view->getName());
                 $columns     = [];
                 foreach($columnNames as $key => $column){
                     $columns[] = [
