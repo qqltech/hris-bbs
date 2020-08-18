@@ -290,7 +290,8 @@ class LaradevController extends Controller
                 // .json_encode($table->getComment() ));
             }
             $views = $schemaManager->listViews();
-            foreach($views as $view){                
+            foreach($views as $view){
+                
                 if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
                     continue;
                 }
@@ -310,7 +311,7 @@ class LaradevController extends Controller
                     "table" => str_replace("public.","",$view->getName()),
                     "fullColumns" => $columns,
                     "config" => null,
-                    "columns"=>[],
+                    "columns"=>$columnNames,
                     "values"=>[],
                     "foreign_keys" => [],
                     "required" => "[]",
@@ -318,8 +319,7 @@ class LaradevController extends Controller
                     'triggers'=>[]
                 ];
             }
-        }catch(\Exception $e){
-            ff($e->getMessage());
+        }catch(Exception $e){
             return null;
         }
         $data = [
@@ -718,8 +718,6 @@ class LaradevController extends Controller
             // File::delete( \File::glob("$directory/$req->oldName*.*" ));
             // File::deleteDirectory( database_path("migrations/$req->oldName" ) );
             // File::delete( \File::glob( resource_path("views/generator/$req->oldName.php" )) );
-            file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=".
-            json_encode($table->columns));
             $paste = str_replace([
                 "__namespace","__class","__table","__columns",  "__lastupdate"
             ],[
