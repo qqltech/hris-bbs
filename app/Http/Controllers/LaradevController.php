@@ -155,7 +155,7 @@ class LaradevController extends Controller
     private function getMigration(){
         return File::get( base_path("templates/migration.stub") );
     }
-    private function getFullTables($toModel=false,$tableKhusus=null)
+    public function getFullTables($toModel=false,$tableKhusus=null)
     {
         try{
             $schemaManager = DB::getDoctrineSchemaManager();
