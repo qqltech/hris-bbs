@@ -310,7 +310,7 @@ class LaradevController extends Controller
                     "table" => str_replace("public.","",$view->getName()),
                     "fullColumns" => $columns,
                     "config" => null,
-                    "columns"=>$columnNames,
+                    "columns"=>[],
                     "values"=>[],
                     "foreign_keys" => [],
                     "required" => "[]",
@@ -318,7 +318,7 @@ class LaradevController extends Controller
                     'triggers'=>[]
                 ];
             }
-        }catch(Exception $e){
+        }catch(\Exception $e){
             ff($e->getMessage());
             return null;
         }
