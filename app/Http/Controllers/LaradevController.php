@@ -289,7 +289,7 @@ class LaradevController extends Controller
                 // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
                 // .json_encode($table->getComment() ));
             }
-            $views = [];
+            $views = $schemaManager->listViews();
             foreach($views as $view){                
                 if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
                     continue;
@@ -319,6 +319,7 @@ class LaradevController extends Controller
                 ];
             }
         }catch(Exception $e){
+            ff($e->getMessage());
             return null;
         }
         $data = [
