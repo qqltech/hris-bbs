@@ -295,21 +295,11 @@ class LaradevController extends Controller
                 if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
                     continue;
                 }
-                $columnNames = [];
+                $columnNames = \Schema::getColumnListing($view->getname());
                 $columns     = [];
-                $selectString = str_replace("SELECT ","",explode(" FROM",$view->getSql())[0]);
-                foreach(explode(",", $selectString) as $key => $column){
-                    $col = $column;
-                    if(strpos($col," AS ")!==false){
-                        $col = explode( "AS ",$col )[1];
-                    }
-                    if(strpos($col,".")!==false){
-                        $col = explode( ".",$col )[1];
-                    }
-                    $col = str_replace(['"'," ","\n"],["","",""],$col);
-                    $columnNames[]=$col;
+                foreach($columnNames as $key => $column){
                     $columns[] = [
-                        "name"=>$col,
+                        "name"=>$column,
                         "type"=> "string",
                         "length"=> "",
                         "default"=> "",
