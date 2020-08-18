@@ -295,7 +295,7 @@ class LaradevController extends Controller
                 if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
                     continue;
                 }
-                $columnNames = \Schema::getColumnListing($view->getname());
+                $columnNames = \Schema::getColumnListing(str_replace('public.','',$view->getName()));
                 ff($columnNames, $view->getName());
                 $columns     = [];
                 foreach($columnNames as $key => $column){
