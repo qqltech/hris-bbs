@@ -713,15 +713,14 @@ class LaradevController extends Controller
                     'casts'     => isset($cfg['casts'])?$cfg['casts']:['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']
                 ]
             ];
-            // if( $tableKhusus!==null && $table->table!==$tableKhusus ){continue;}
-            // File::put( $directory."/processlist.json", json_encode($oldValue, JSON_PRETTY_PRINT));
-            // File::delete( \File::glob("$directory/$req->oldName*.*" ));
-            // File::deleteDirectory( database_path("migrations/$req->oldName" ) );
-            // File::delete( \File::glob( resource_path("views/generator/$req->oldName.php" )) );
+            $colsArray = [];
+            foreach($table->fullColumns as $col){
+                $colsArray[] = $col['name'].":".str_replace("\\","", $col['type'] );
+            }
             $paste = str_replace([
-                "__namespace","__class","__table","__columns",  "__lastupdate"
+                "__namespace","__class","__table","__columnsFull","__columns",  "__lastupdate"
             ],[
-                $this->prefixNamespace, $className, $tableName, '["'.implode('","',$table->columns).'"]', date('d/m/Y H:i:s')
+                $this->prefixNamespace, $className, $tableName,'["'.implode('","',$colsArray).'"]', '["'.implode('","',$table->columns).'"]', date('d/m/Y H:i:s')
             ],$data);
             if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
                 $pasteCustom = str_replace([

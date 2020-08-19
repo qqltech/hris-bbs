@@ -13,6 +13,7 @@ class __class extends Model
     protected $guarded  = __config_guarded;
     protected $hidden   = __config_hidden;
     public $columns     = __columns;
+    public $columnsFull = __columnsFull;
     public $joins       = __joins;
     public $details     = __details;
     public $heirs       = __heirs;
