@@ -1761,15 +1761,13 @@ function _customFind($model, $params)
     }
     $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
     $data=$data->toArray();
-    foreach($data as $i => $row){
-        $keys=array_keys($row);
-        foreach($keys as $key){
-            if( count(explode(".", $key))>2 ){
-                $newKeyArray = explode(".", $key);
-                $newKey = $newKeyArray[1].".".$newKeyArray[2];
-                $data[$i][$newKey] = $data[$i][$key];
-                unset($data[$i][$key]);
-            }
+    $keys=array_keys($data);
+    foreach($keys as $key){
+        if( count(explode(".", $key))>2 ){
+            $newKeyArray = explode(".", $key);
+            $newKey = $newKeyArray[1].".".$newKeyArray[2];
+            $data[$newKey] = $data[$key];
+            unset($data[$key]);
         }
     }
     if(method_exists($modelExtender, "transformRowData")){
