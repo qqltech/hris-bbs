@@ -23,6 +23,15 @@
       </div>
     </div>
 <script>
+function downloadURI(uri, name) {
+  var link = document.createElement('a');
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  delete link;
+}
 var sembunyi=false;
 window.addEventListener('keydown', function(event){
     if(event.altKey===true && event.key=='Enter'){
@@ -31,6 +40,19 @@ window.addEventListener('keydown', function(event){
         // document.getElementById('konvajscontent').style.width=sembunyi?'100vh':'100%';
         sembunyi=!sembunyi;
     };
+    if(event.altKey===true && ['s','S'].includes(event.ke) ){
+      var ratio = prompt("info: 1 pxRatio = 500x500, masukkan JUDUL:ratio", "database.png:2");
+      if (ratio == null || ratio == "" || !ratio.includes(':') ) {
+      }else{
+        let ratioArray = ratio.split(':');
+        if(ratioArray.length!=2){
+          alert('format judul dan ratio salah');
+          return true;
+        }
+        let dataURL = stage.toDataURL({ pixelRatio: ratioArray[1] });
+        downloadURI(dataURL, ratioArray[0]);                              
+      }
+    }
 } );
 var json = null
 //===========================================WAJIB
