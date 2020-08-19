@@ -22,17 +22,24 @@
         </div>
       </div>
     </div>
-    <script>
-    var json = null
+<script>
+var sembunyi=false;
+window.addEventListener('keydown', function(event){
+    if(event.altKey===true && event.key=='Enter'){
+        document.getElementById('list').style.display=sembunyi?'block':'none';
+        sembunyi=!sembunyi;
+    };
+} );
+var json = null
 //===========================================WAJIB
-    var stage = new Konva.Stage({
-        container: 'container',
-        width: window.innerWidth,
-        height: window.innerHeight,
-        draggable:true
-    });
+var stage = new Konva.Stage({
+    container: 'container',
+    width: window.innerWidth,
+    height: window.innerHeight,
+    draggable:true
+});
 
-    var layer = new Konva.Layer();
+var layer = new Konva.Layer();
 //=========================================GROUPING
 
 var tableX  = 20;

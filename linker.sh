@@ -13,6 +13,8 @@ cp -R storage ../$1
 cp -R app ../$1
 rm -rf ../$1/app/Models
 ln -s `realpath app/Models` ../$1/app/Models
+rm -rf ../$1/app/Http/Controllers
+ln -s `realpath app/Http/Controllers` ../$1/app/Http/Controllers
 
 cp .env ../$1
 cp .htaccess ../$1
