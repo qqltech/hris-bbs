@@ -16,8 +16,8 @@
   <body>
     <div style="position:fixed;background-color:none;right:5px;top:5px;z-index:91;height: 100vh;overflow-y: scroll;" id="list"></div>
     <div id="container" style="cursor: default;">
-      <div class="konvajs-content" role="presentation" style="position: relative; user-select: none; width: 100vh; height: 100vh;">
-            <canvas width="100vh" height="100vh" style="padding: 0px; margin: 0px; border: 0px; background-color: transparent; position: absolute; top: 0px; left: 0px; width: 1366px; height: 667px; display: block;"></canvas>
+      <div class="konvajs-content" role="presentation" id="konvajscontent" style="position: relative; user-select: none; width: 100vh; height: 100vh;">
+            <canvas id="konvacanvas" width="100vh" height="100vh" style="padding: 0px; margin: 0px; border: 0px; background-color: transparent; position: absolute; top: 0px; left: 0px; width: 1366px; height: 667px; display: block;"></canvas>
           </div>
         </div>
       </div>
@@ -27,6 +27,8 @@ var sembunyi=false;
 window.addEventListener('keydown', function(event){
     if(event.altKey===true && event.key=='Enter'){
         document.getElementById('list').style.display=sembunyi?'block':'none';
+        document.getElementById('konvajscontent').style.width=sembunyi?'100vh':'100%';
+        document.getElementById('konvacanvas').style.width=sembunyi?'100vh':'100%';
         sembunyi=!sembunyi;
     };
 } );
