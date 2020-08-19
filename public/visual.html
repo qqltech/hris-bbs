@@ -40,7 +40,7 @@ window.addEventListener('keydown', function(event){
         // document.getElementById('konvajscontent').style.width=sembunyi?'100vh':'100%';
         sembunyi=!sembunyi;
     };
-    if(event.altKey===true && ['s','S'].includes(event.ke) ){
+    if(event.altKey===true && ['s','S'].includes(event.key) ){
       var ratio = prompt("info: 1 pxRatio = 500x500, masukkan JUDUL:ratio", "database.png:2");
       if (ratio == null || ratio == "" || !ratio.includes(':') ) {
       }else{
