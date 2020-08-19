@@ -1760,9 +1760,20 @@ function _customFind($model, $params)
         $model = $modelExtender->extendJoin($model);
     }
     $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
-    
+    $data=$data->toArray();
+    foreach($data as $i => $row){
+        $keys=array_keys($row);
+        foreach($keys as $key){
+            if( count(explode(".", $key))>2 ){
+                $newKeyArray = explode(".", $key);
+                $newKey = $newKeyArray[1].".".$newKeyArray[2];
+                $data[$i][$newKey] = $data[$i][$key];
+                unset($data[$i][$key]);
+            }
+        }
+    }
     if(method_exists($modelExtender, "transformRowData")){
-        $data = $modelExtender->transformRowData($data->toArray());
+        $data = $modelExtender->transformRowData($data);
     }
     if($params->single){
         return $data;
@@ -2134,3 +2145,23 @@ function getOutStanding($model, $row,$formula){
     }
     return mathString($formula);
 };
+function getDataType($tbl,$col){
+    $array = json_decode( \Illuminate\Support\Facades\File::get(
+         base_path("public/models.json") 
+        ),true 
+    );
+    $columns = [];
+    foreach($array as $table){
+        if($table['model']==$tbl){
+            $columns = $table['fullColumns'];
+            break;
+        }
+    }
+    foreach($columns as $column){
+        if($column['name']==$col){
+            return str_replace("\\","", strtolower($column['type']) );
+            break;
+        }
+    }
+    return null;
+}
