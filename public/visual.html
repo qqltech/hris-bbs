@@ -218,7 +218,7 @@ function createTable(data, isReferenced=false, caller=null){
             y: lastY,
             fontSize: 11,
             fontFamily: 'Calibri',
-            text: data.columns[i].type+(data.columns[i].table_reference!==undefined?"["+data.columns[i].connection+"]":""),
+            text: *(data.columns[i].type).replace('\\',"")+" "+(data.columns[i].table_reference!==undefined?"["+data.columns[i].connection+"]":""),
             color: '#01040a',
             fill: (data.columns[i].table_reference!==undefined?"orange":color),
             padding: 8,
