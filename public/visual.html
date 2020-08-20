@@ -6,23 +6,29 @@
     <title>Database Models</title>
     <style>
       body {
+        background-size: 20px 20px;
+        background-image:
+          linear-gradient(to right, rgb(204, 201, 201) 1px, transparent 1px),
+          linear-gradient(to bottom, rgb(204, 201, 201) 1px, transparent 1px);
         margin: 0;
         padding: 0;
         overflow: hidden;
-        background-color: #f0f0f0;
+        background-color: #ffffff;
       }
     </style>
   </head>
   <body>
-    <div style="position:fixed;background-color:none;right:5px;top:5px;z-index:91;height: 100vh;overflow-y: scroll;" id="list"></div>
+    <div style="position:fixed;background-color:white;opacity: 0.8;right:5px;top:5px;z-index:91;height: 100vh;overflow-y: scroll;" id="list"></div>
     <div id="container" style="cursor: default;">
       <div class="konvajs-content" role="presentation" id="konvajscontent" style="position: relative; user-select: none; width: 100vh; height: 100vh;">
-            <canvas id="konvacanvas" width="100vh" height="100vh" style="padding: 0px; margin: 0px; border: 0px; background-color: transparent; position: absolute; top: 0px; left: 0px; width: 1366px; height: 667px; display: block;"></canvas>
+            <canvas id="konvacanvas" width="100vh" height="100vh" style="padding: 0px; margin: 0px; border: 0px; background: white; position: absolute; top: 0px; left: 0px; width: 1366px; height: 667px; display: block;"></canvas>
           </div>
         </div>
       </div>
     </div>
 <script>
+var terpilih;
+var newScale=1;
 function downloadURI(uri, name) {
   var link = document.createElement('a');
   link.download = name;
@@ -33,6 +39,7 @@ function downloadURI(uri, name) {
   delete link;
 }
 var sembunyi=false;
+var gridSembunyi=false;
 window.addEventListener('keydown', function(event){
     if(event.altKey===true && event.key=='Enter'){
         document.getElementById('list').style.display=sembunyi?'block':'none';
@@ -53,6 +60,20 @@ window.addEventListener('keydown', function(event){
         downloadURI(dataURL, ratioArray[0]);                              
       }
     }
+    if(event.altKey===true && ['a','A'].includes(event.key) ){
+      document.body.style.backgroundSize=gridSembunyi?document.body.style.backgroundSize=`${20*newScale}px ${20*newScale}px`:`0px`;
+      gridSembunyi=!gridSembunyi;
+    }
+    if(event.key=='Delete'){
+      try{
+        document.getElementById(terpilih.getId()).checked=false;;
+        terpilih.destroy();
+      }catch(e){}
+      stage.find('Transformer').destroy();
+      layer.draw();
+    }
+
+    
 } );
 var json = null
 //===========================================WAJIB
@@ -62,8 +83,30 @@ var stage = new Konva.Stage({
     height: window.innerHeight,
     draggable:true
 });
-
+// stage.getContainer().style.backgroundColor = 'white';
 var layer = new Konva.Layer();
+// var gridLayer = new Konva.Layer();
+// var blockSnapSize = 10;
+// var width = window.innerWidth*10;
+// var height = window.innerHeight*10;
+// var padding = blockSnapSize;
+// for (var i = 0; i < width / padding; i++) {
+//   gridLayer.add(new Konva.Line({
+//     points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, height],
+//     stroke: '#ddd',
+//     strokeWidth: 1,
+//   }));
+// }
+
+// gridLayer.add(new Konva.Line({points: [0,0,10,10]}));
+// for (var j = 0; j < height / padding; j++) {
+//   gridLayer.add(new Konva.Line({
+//     points: [0, Math.round(j * padding), width, Math.round(j * padding)],
+//     stroke: '#ddd',
+//     strokeWidth: 0.5,
+//   }));
+// }
+// stage.add(gridLayer);
 //=========================================GROUPING
 
 var tableX  = 20;
@@ -194,7 +237,7 @@ function createTable(data, isReferenced=false, caller=null){
           // x: col1.getPosition().x+temp,
           y: lastY,
           fontSize: 11,
-          fontFamily: 'Calibri',
+          fontFamily: 'Courier New',
           text: "BigInt(PK)",
           fill: "red",
           // fill: 'black',
@@ -217,7 +260,7 @@ function createTable(data, isReferenced=false, caller=null){
             // x: col1.getPosition().x+temp,
             y: lastY,
             fontSize: 11,
-            fontFamily: 'Calibri',
+            fontFamily: 'Courier New',
             text: (data.columns[i].type).replace('\\',"")+" "+(data.columns[i].table_reference!==undefined?"["+data.columns[i].connection+"]":""),
             color: '#01040a',
             fill: (data.columns[i].table_reference!==undefined?"orange":color),
@@ -237,6 +280,7 @@ function createTable(data, isReferenced=false, caller=null){
     var headerText = new Konva.Text({
         fontSize: 11,
         // width: lebar,
+        fill:"white",
         height: headerHeight ,
         fontFamily: 'Calibri',
         text: data.table,
@@ -246,7 +290,7 @@ function createTable(data, isReferenced=false, caller=null){
         padding: 8,
         align: 'center'
     });
-    var color ="#83bede";
+    var color ="#0b79b5";
     lebar = lebar<(temp+longText+5)?(temp+longText+5):lebar;
     var headerRect = new Konva.Rect({
         stroke: '#555',
@@ -363,6 +407,7 @@ function jsonGet(json){
         if (this.readyState == 4 && this.status == 200) {
             var myArr = JSON.parse(this.responseText);
             jsonGet(myArr);
+            alert("Command:  Alt+enter,  Alt+A,  Alt+S")
         }
     };
     xmlhttp.open("GET", url, true);
@@ -389,16 +434,17 @@ function jsonGet(json){
       stage.on('wheel', e => {
         e.evt.preventDefault();
         var oldScale = stage.scaleX();
-
         var mousePointTo = {
           x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
           y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
         };
 
-        var newScale =
+        newScale =
           e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
         stage.scale({ x: newScale, y: newScale });
-
+        if(!gridSembunyi){
+          document.body.style.backgroundSize=`${20*newScale}px ${20*newScale}px`;
+        }
         var newPos = {
           x:
             -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
@@ -422,6 +468,7 @@ function jsonGet(json){
         if (!e.target.parent.hasName('table')) {
           return;
         }
+        terpilih = e.target.parent;
         stage.find('Transformer').destroy();
 
         var tr = new Konva.Transformer();

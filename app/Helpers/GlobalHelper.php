@@ -1935,7 +1935,7 @@ function ff($data,$id="debug"){
         );
     }
 }
-function reformatData($arrayData){
+function reformatData($arrayData,$model=null){
     $dataKey=["date","tgl","tanggal","_at","etd"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
@@ -1960,6 +1960,10 @@ function reformatData($arrayData){
                 $arrayData[$key] = $newData;                
             }catch(Exception $e){}
         }
+        // $datatype=getDataType($model,$key);
+        // if( strpos($datatype,'boolean')!==false && in_array(strtolower($data),["active","aktif","true","yes","ya"]) ){
+        //     $arrayData[$key] = true;
+        // }
         if( str_replace(["null","NULL"," "],["","",""],$data)==''){
             $arrayData[$key] = null;
         }
@@ -2143,21 +2147,12 @@ function getOutStanding($model, $row,$formula){
     }
     return mathString($formula);
 };
-function getDataType($tbl,$col){
-    $array = json_decode( \Illuminate\Support\Facades\File::get(
-         base_path("public/models.json") 
-        ),true 
-    );
-    $columns = [];
-    foreach($array as $table){
-        if($table['model']==$tbl){
-            $columns = $table['fullColumns'];
-            break;
-        }
-    }
+function getDataType($model,$col){
+    $columns = $model->columnsFull;
     foreach($columns as $column){
-        if($column['name']==$col){
-            return str_replace("\\","", strtolower($column['type']) );
+        $column = explode(":", $column);
+        if($column[0]==$col){
+            return $column[1];
             break;
         }
     }

@@ -715,7 +715,7 @@ class LaradevController extends Controller
             ];
             $colsArray = [];
             foreach($table->fullColumns as $col){
-                $colsArray[] = $col['name'].":".str_replace("\\","", $col['type'] );
+                $colsArray[] = $col['name'].":".str_replace("\\","", strtolower($col['type']) );
             }
             $paste = str_replace([
                 "__namespace","__class","__table","__columnsFull","__columns",  "__lastupdate"
