@@ -1483,35 +1483,18 @@ function _customGetData($model,$params)
     }
 
     if($params->search){
-        $searchfield = $params->searchfield==null?[]:explode(",", $searchfield);
-        $searchfield = array_map(function($dt){
-            if( count( explode(".", $dt) )==1 ){
-                $dt=$table.".".$dt;
-            }
-        },$searchfield);
+        $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
                 foreach($allColumns as $column){
-                    if(( strpos($column, '.id') !== false)||( strpos($column, '_id') !== false ) ){
+                    if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
                         continue;
                     }
-                    $arrayColumn = explode( ".", $column );
-                    if( count($searchfield)>0 ){
-                        if(  count ( $arrayColumn ) == 3  ){
-                            if( !in_array( $arrayColumn[1].".".$arrayColumn[2], $searchfield ) ){
-                                continue;
-                            }
-                        }else if(  count ( $arrayColumn ) == 2  ){
-                            if( !in_array( $column, $searchfield ) ){
-                                continue;
-                            }
-                        }else{
-                            if( !in_array( $column, $searchfield ) ){
-                                continue;
-                            }
-                        }
+                    $arrayColumn = explode(".",$column);
+                    if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
+                        continue;
                     }
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                 }
