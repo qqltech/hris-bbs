@@ -1493,6 +1493,7 @@ function _customGetData($model,$params)
                         continue;
                     }
                     if($searchfield!=null && !in_array(explode(".",$column)[1], explode(",", $searchfield))){
+                        ff(explode(".",$column)[1],'kluar');
                         continue;
                     }
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
