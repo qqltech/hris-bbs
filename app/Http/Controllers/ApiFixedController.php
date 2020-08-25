@@ -312,7 +312,7 @@ class ApiFixedController extends Controller
         if(!$deleteOnUse){
             foreach( $heirs as $heir ){
                 $heirExplode = explode('.', $heir);
-                $modelCandidateHeir = "\App\Models\CustomModels\\".(count($heirExplode)==1?$detail:$heirExplode[1]);
+                $modelCandidateHeir = "\App\Models\CustomModels\\".(count($heirExplode)==1?$heir:$heirExplode[1]);
                 $modelHeir          = new $modelCandidateHeir;
                 $join               = $modelHeir->joins;
                 foreach($join as $relation){
