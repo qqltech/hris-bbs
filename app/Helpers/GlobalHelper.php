@@ -1937,7 +1937,7 @@ function ff($data,$id="debug"){
     }
 }
 function reformatData($arrayData,$model=null){
-    $dataKey=["date","tgl","tanggal","_at","etd"];
+    $dataKey=["date","tgl","tanggal","_at","etd","eta"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
         if( strtolower(gettype($data))=='null'){
@@ -1972,7 +1972,7 @@ function reformatData($arrayData,$model=null){
     return $arrayData;
 }
 function reformatDataResponse($arrayData){
-    $dataKey=["date","tgl","tanggal","_at","etd"];
+    $dataKey=["date","tgl","tanggal","_at","etd","eta"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
         $isDate=false;
