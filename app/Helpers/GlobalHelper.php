@@ -1995,7 +1995,7 @@ function reformatDataResponse($arrayData){
 function getReportHeader($model,$params=[]){
     $p = (object)array_merge([
         "where_raw"=>null,
-        "order_by"=>"id",
+        "order_by"=>null,
         "order_type"=>"ASC",
         "page"=>"1",
         "order_by_raw"=>null,

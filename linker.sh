@@ -15,6 +15,8 @@ rm -rf ../$1/app/Models
 ln -s `realpath app/Models` ../$1/app/Models
 rm -rf ../$1/app/Http/Controllers
 ln -s `realpath app/Http/Controllers` ../$1/app/Http/Controllers
+rm -rf ../$1/app/Helpers
+ln -s `realpath app/Helpers` ../$1/app/Helpers
 
 cp .env ../$1
 cp .htaccess ../$1
