@@ -1508,12 +1508,12 @@ function _customGetData($model,$params)
         $model = $model->groupBy(DB::raw($params->group_by));
     }
 
-    if($params->order_by){
-        $order =  str_replace("this.","$table.",$params->order_by);
-        $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
-    }
+    
     if($params->order_by_raw){
         $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );
+    }elseif($params->order_by){
+        $order =  str_replace("this.","$table.",$params->order_by);
+        $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
