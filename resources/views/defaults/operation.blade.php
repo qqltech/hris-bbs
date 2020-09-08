@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Operation</title>
+        <title>CONFIG - Larahan</title>
         <link rel="stylesheet" href="defaults/request.css">
         <link rel="stylesheet" href="defaults/codemirror.css">
         <link rel="stylesheet" href="defaults/theme/monokai.css">
