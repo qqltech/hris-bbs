@@ -615,7 +615,7 @@ class ApiFixedController extends Controller
         $additionalData = $this->createAdditionalData($model, $data);
         $eliminatedData = $this->createEliminationData($model, $data);
         $processedData  = array_merge($eliminatedData, $additionalData);
-        $updateBeforeEvent = $model->updateBefore($model, $processedData, $this->requestMeta);
+        $updateBeforeEvent = $model->updateBefore($model, $processedData, $this->requestMeta,$id);
         if(isset($updateBeforeEvent['errors'])){
             $this->operationOK=false;
             $this->errors = $updateBeforeEvent['errors'];
