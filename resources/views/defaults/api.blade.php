@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>FRONTEND - Larahan</title>
+        <link rel="icon" href="{{url('favicon.ico')}}">
         <link rel="stylesheet" href="{{url('defaults/request2.css')}}">
         <link rel="stylesheet" href="{{url('defaults/codemirror.css')}}">
         <link rel="stylesheet" href="{{url('defaults/theme/monokai.css')}}">
