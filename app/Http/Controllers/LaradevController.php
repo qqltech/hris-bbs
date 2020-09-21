@@ -360,6 +360,9 @@ class LaradevController extends Controller
                 'MAIL_USERNAME' => 'starlight93@gmail.com',
                 'TG_TOKEN' => 'xxx',
                 'TG_CHATID' => 'xxx',
+                'LOG_CHANNEL' => '777',
+                'SINGLE_LOGIN' => 'true',
+                'FORMAT_DATE_FRONTEND' => 'd/m/Y',
                 'FIREBASE_KEY' => 'xxx'
             ];
             $env = [];
