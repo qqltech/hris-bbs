@@ -25,7 +25,7 @@ class RevokeOtherTokens
     public function handle(AccessTokenCreated $event)
     {
         if($event->userId==1){return;}
-        if( strtolower(env( "SINGLE_LOGIN", "false" ))=="false" ){
+        if( strtolower(env( "SINGLE_LOGIN", "true" ))=="false" ){
             return;
         }
         Token::where(function($query) use($event){
