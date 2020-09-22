@@ -53,6 +53,7 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
     require __DIR__.'/../routes/laradev.php';
     require __DIR__.'/../routes/operation.php';
+    require __DIR__.'/../routes/public.php';
     require __DIR__.'/../routes/docs.php';
     require __DIR__.'/../routes/custom.php';
 });
@@ -68,17 +69,24 @@ collect(scandir(__DIR__ . '/../config'))->each(function ($item) use ($app) {
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
-$app->alias('Excel', Maatwebsite\Excel\Facades\Excel::class);
 if (!class_exists('Excel')) {
     class_alias('Maatwebsite\Excel\Facades\Excel', 'Excel');
 }
-if (!class_exists('Excel')) {
+if (!class_exists('Carbon')) {
     class_alias('Carbon\Carbon', 'Carbon');
 }
 if (!class_exists('ExportExcel')) {
     class_alias('App\Models\Additionals\ExportExcel', 'ExportExcel');
 }
-
+if (!class_exists('Api')) {
+    class_alias('App\Http\Controllers\ApiFixedController', 'Api');
+}
+if (!class_exists('Mail')) {
+    class_alias('Illuminate\Support\Facades\Mail', 'Mail');
+}
+if (!class_exists('MailTemplate')) {
+    class_alias('App\Mails\SendMailable', 'MailTemplate');
+}
 \Illuminate\Http\Request::macro('hanya', function($array) {
     $diff = array_filter(array_keys($this->all()),function($dt)use($array){
         if( !in_array($dt,$array) && strpos($dt,"_d_") !==true ){

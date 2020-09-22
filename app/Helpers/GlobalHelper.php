@@ -2159,3 +2159,14 @@ function getDataType($model,$col){
     }
     return null;
 }
+function Api(){
+    return new \Api(new Illuminate\Http\Request(),true);
+}
+function SendEmail($to,$subject,$template){
+    try{
+        \Mail::to($to)->send(new \MailTemplate($subject, $template ));         
+    }catch(\Exception $e){
+        return $e->getMessage();
+    }
+    return true;
+}

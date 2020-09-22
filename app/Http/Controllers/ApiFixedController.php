@@ -37,14 +37,14 @@ class ApiFixedController extends Controller
     public function __construct(Request $request,$backdoor=false)
     {
         $this->isBackdoor = $backdoor;
+        if(config('tables')==null){
+            config(['tables'=>[]]);
+        }
         if($backdoor){
             return;
         }
         if( ! File::isDirectory(base_path('public/uploads') ) ) {
             File::makeDirectory(base_path('public/uploads') , 493, true);
-        }
-        if(config('tables')==null){
-            config(['tables'=>[]]);
         }
         $this->formatDate=env("FORMAT_DATE_FRONTEND","d/m/Y");
         $this->isMultipart = (strpos($request->header("Content-Type"),"multipart") !==FALSE)?true:false;

@@ -10,16 +10,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class SendMailable extends Mailable
 {
     use Queueable, SerializesModels;
-    public $name;
+    public $template;
+    public $subject;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($name)
+    public function __construct($subject,$template)
     {
-        $this->name = $name;
+        $this->template = $template;
+        $this->subject = $subject;
     }
 
     /**
@@ -29,6 +31,7 @@ class SendMailable extends Mailable
      */
     public function build()
     {
-        return $this->view('defaults.email');
+        return $this->view('defaults.email')
+                ->subject($this->subject);
     }
 }

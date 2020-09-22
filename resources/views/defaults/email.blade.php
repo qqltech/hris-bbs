@@ -1,3 +1,3 @@
 <div>
-    Hi, This is : {{ $name }}
+    {!! $template !!}
 </div>
