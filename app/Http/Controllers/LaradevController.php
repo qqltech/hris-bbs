@@ -341,6 +341,7 @@ class LaradevController extends Controller
                 'APP_NAME' => 'Project',
                 'APP_TIMEZONE' => 'Asia/Jakarta',
                 'LOCALE' => 'EN',
+                'QUEUE_CONNECTION' => 'database',
                 'APP_URL' => 'http://localhost',
                 'DB_CONNECTION' => 'mysql',
                 'DB_DATABASE' => 'trial2',
@@ -363,6 +364,7 @@ class LaradevController extends Controller
                 'LOG_CHANNEL' => '777',
                 'SINGLE_LOGIN' => 'true',
                 'FORMAT_DATE_FRONTEND' => 'd/m/Y',
+                'DEFAULT_ACTIVITIES' => 'false',
                 'FIREBASE_KEY' => 'xxx'
             ];
             $env = [];

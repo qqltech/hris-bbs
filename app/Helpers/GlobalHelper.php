@@ -1913,7 +1913,7 @@ function uploadfile($model,$req){
     return url("/uploads/$modelName/".$code."_".$fileName);
 }
 function ff($data,$id="debug"){
-    $channel=env("LOG_CHANNEL",base64_encode($_SERVER['HTTP_HOST']));
+    $channel=env("LOG_CHANNEL",env('APP_NAME',uniqid()));
     $client = new \GuzzleHttp\Client();
     try{
         if(!in_array(gettype($data),["object","array"])){
@@ -2169,4 +2169,27 @@ function SendEmail($to,$subject,$template){
         return $e->getMessage();
     }
     return true;
+}
+function SendEmailAsync($to,$subject,$template){
+    try{
+        \Queue::push(new App\Jobs\SendEmail([
+            "to"        => $to,
+            "subject"   => $subject,
+            "template"  => $template
+        ]));
+    }catch(\Exception $e){
+        return $e->getMessage();
+    }
+    return true;
+}
+function Async($class,$func,$args){
+    dispatch(new \App\Jobs\Background(get_class($class),$func,$args));
+}
+function getBasic($name){
+    $string = "\App\Models\BasicModels\\$name";
+    return new $string;
+}
+function getCustom($name){
+    $string = "\App\Models\CustomModels\\$name";
+    return new $string;
 }

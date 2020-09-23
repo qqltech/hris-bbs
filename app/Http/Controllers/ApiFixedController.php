@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use App\Jobs\DefaultActivities;
 // use PDF;
 use Excel;
 
@@ -17,12 +18,12 @@ class ApiFixedController extends Controller
 {
     private $requestData;
     private $requestMeta;
-    private $operation='create';
+    private $operation  ='create';
     private $user;
     private $isAuthorized   = true;
     private $messages       = [];
     private $errors       = [];
-    private $success        = [];
+    private $success       = [];
     private $parentModelName;
     private $lastParentId;
     private $lastParentName;
@@ -579,6 +580,7 @@ class ApiFixedController extends Controller
             $this->errors = $deleteBeforeEvent['errors'];
             return;
         }
+        $this->requestData = $preparedModel;
         $preparedModel->delete(); 
         $model->deleteAfter($model, $preparedModel, $this->requestMeta, $id);
         // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=$table pra");
@@ -852,6 +854,18 @@ class ApiFixedController extends Controller
                 }
 
                 DB::commit();
+                if(env('DEFAULT_ACTIVITIES',false)){
+                    \Queue::push(new DefaultActivities([
+                        "user_id"       =>  $this->user->id,
+                        "table"         =>  $this->parentModelName,
+                        "table_id"      =>  $this->operationId,
+                        "action"        =>  $this->operation,
+                        "status"        =>  "success",
+                        "value"         =>  json_encode($this->requestData),
+                        // "error"         =>  null,
+                        // "tambahan"      =>  
+                    ]));
+                }
                 return response()->json([
                     "status"    => "$this->operation data berhasil", 
                     "warning"  => $this->messages, 
@@ -862,16 +876,40 @@ class ApiFixedController extends Controller
                 ],200);
             }else{
                 DB::rollback();
+                if(env('DEFAULT_ACTIVITIES',false)){
+                    \Queue::push(new DefaultActivities([
+                        "user_id"       =>  $this->user->id,
+                        "table"         =>  $this->parentModelName,
+                        "table_id"      =>  $this->operationId,
+                        "action"        =>  $this->operation,
+                        "status"        =>  "failed",
+                        "value"         =>  json_encode($this->requestData),
+                        "error"         =>  json_encode($this->errors),
+                        // "tambahan"      =>  
+                    ]));
+                }
                 return response()->json([
                     "status"    => "$this->operation data gagal",
-                    "warning"  => $this->messages, 
-                    "success"  => $this->success, 
-                    "errors"  => $this->errors, 
-                    "request" => $this->requestData,
-                    "id"      => $this->operationId
+                    "warning"   => $this->messages, 
+                    "success"   => $this->success, 
+                    "errors"    => $this->errors, 
+                    "request"   => $this->requestData,
+                    "id"        => $this->operationId
                 ],422);
             }
         }else{
+            if(env('DEFAULT_ACTIVITIES',false)){
+                \Queue::push(new DefaultActivities([
+                    "user_id"       =>  $this->user->id,
+                    "table"         =>  $this->parentModelName,
+                    "table_id"      =>  $this->operationId,
+                    "action"        =>  $this->operation,
+                    "status"        =>  "failed",
+                    "value"         =>  json_encode($this->requestData),
+                    "error"         =>  json_encode($this->errors),
+                    // "tambahan"      =>  
+                ]));
+            }
             return response()->json([
                 "status"    => "$this->operation data failed",
                 "warning"  => $this->messages, 

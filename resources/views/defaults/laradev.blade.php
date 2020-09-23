@@ -53,6 +53,7 @@
             'APP_NAME' => 'Project',
             'APP_TIMEZONE' => 'Asia/Jakarta',
             'LOCALE' => 'EN',
+            'QUEUE_CONNECTION' => 'database',
             'APP_URL' => 'http://localhost',
             'AUTHORIZATION' => 'true',
             'BACKENDPASSWORD' => 'pulangcepat',
@@ -77,6 +78,7 @@
             'LOG_CHANNEL' => '777',
             'SINGLE_LOGIN' => 'true',
             'FORMAT_DATE_FRONTEND' => 'd/m/Y',
+            'DEFAULT_ACTIVITIES' => 'false',
             'FIREBASE_KEY' => 'xxx'
         ];
         $env = [];
