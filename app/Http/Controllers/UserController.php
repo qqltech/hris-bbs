@@ -152,7 +152,7 @@ class UserController extends Controller
         $user = User::where('remember_token', $token)->first();
         if($user){
             $user->update([
-                "verified_at"=>Carbon::now()
+                "email_verified_at"=>Carbon::now()
             ]);
             $data= "Your account($user->email) has been verifed successfully!";
             return view("defaults.email",compact('data'));
