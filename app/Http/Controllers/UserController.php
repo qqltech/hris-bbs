@@ -27,7 +27,8 @@ class UserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' =>Hash::make($request->password)
+            'password' =>Hash::make($request->password),
+            'remember_token'=>str_random(60)
         ]);
         // logTg("developer",$user->name." has registered");
         
@@ -146,5 +147,18 @@ class UserController extends Controller
         return response()->json([
             'message' => 'Successfully updated password!'
         ], 200);
+    }
+    public function verify($token){
+        $user = User::where('remember_token', $token)->first();
+        if($user){
+            $user->update([
+                "verified_at"=>Carbon::now()
+            ]);
+            $data= "Your account($user->email) has been verifed successfully!";
+            return view("defaults.email",compact('data'));
+        }else{
+            $data= "Sorry your token is invalid!";
+            return view("defaults.email",compact('data'));
+        }
     }
 }
