@@ -36,7 +36,7 @@ class UserController extends Controller
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(Request $request,$emailVerified=false)
     {
         $validator = Validator::make($request->all(), [
             'password' => 'required|string',
@@ -54,6 +54,11 @@ class UserController extends Controller
             $user = User::where('email', $request->username)->orWhere('username',$request->username)->first();
         }
         if ($user) {
+            if($emailVerified){
+                if($user->email_verified_at==null){
+                    return response()->json("Please Open your Email and Verify by Clicking the Link!",401);
+                }
+            }
             if( isset($user->status) && strtolower($user->status)!='active'){
                 return response()->json("username is inactive", 401);
             }
