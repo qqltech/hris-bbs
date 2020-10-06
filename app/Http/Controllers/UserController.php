@@ -14,7 +14,7 @@ use Stevebauman\Location\Location;
 use Exception;
 class UserController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request,$local=false)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
@@ -30,7 +30,8 @@ class UserController extends Controller
             'password' =>Hash::make($request->password)
         ]);
         // logTg("developer",$user->name." has registered");
-        return response()->json([
+        
+        return $Local?true:response()->json([
             'message' => 'Successfully created user!'
         ], 201);
     }
