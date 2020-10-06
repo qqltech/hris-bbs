@@ -122,4 +122,23 @@ class UserController extends Controller
             'message' => 'Successfully updated password!'
         ], 200);
     }
+    
+    public function changePasswordAuth(Request $request)
+    {
+        $user = User::find($request->user()->id);
+        try{
+            if (Hash::check($request->old_password, $user->password)) {
+                $user->update([
+                    'password' =>Hash::make($request->new_password)
+                ]);                
+            }else{
+                return response()->json('Mismatch Old Password!', 401);
+            }
+        }catch(Exception $e){
+            return $e->getMessage();
+        }
+        return response()->json([
+            'message' => 'Successfully updated password!'
+        ], 200);
+    }
 }
