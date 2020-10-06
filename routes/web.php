@@ -10,7 +10,7 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
 });
 $router->post('/login', "UserController@login");
 $router->post('/register', "UserController@register");
-$router->get('/verify/{token}', "UserController@verify");
+// // $router->get('/verify/{token}', "UserController@verify");
 //====================================================================================
 
 $router->get('/telegram/{command}','TelegramController@index');
