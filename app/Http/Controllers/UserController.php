@@ -154,11 +154,11 @@ class UserController extends Controller
             $user->update([
                 "email_verified_at"=>Carbon::now()
             ]);
-            $data= "Your account($user->email) has been verifed successfully!";
-            return view("defaults.email",compact('data'));
+            $template= "Your account($user->email) has been verifed successfully!";
+            return view("defaults.email",compact('template'));
         }else{
-            $data= "Sorry your token is invalid!";
-            return view("defaults.email",compact('data'));
+            $template= "Sorry your token is invalid!";
+            return view("defaults.email",compact('template'));
         }
     }
 }
