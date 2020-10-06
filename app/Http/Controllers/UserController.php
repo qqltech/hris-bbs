@@ -31,7 +31,7 @@ class UserController extends Controller
         ]);
         // logTg("developer",$user->name." has registered");
         
-        return $Local?true:response()->json([
+        return $local?true:response()->json([
             'message' => 'Successfully created user!'
         ], 201);
     }
