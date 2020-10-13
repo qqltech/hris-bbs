@@ -7,4 +7,5 @@ git push igaserver master
 git push efiserver master
 git push dejozzlarahan master
 git push pciserver master
+git push pat master
 REM git push hsiserver master
