@@ -5,11 +5,11 @@ $router->group(['prefix'=>'operation'], function () use ($router) {
 
     $router->group(['middleware'=>'auth'], function () use ($router) {
 
-        $router->get('/{modelname}', 'ApiFixedController@router');         //LIST PARENTS
+        $router->get('/{modelname}',['as'=>'read_list', 'uses'=> 'ApiFixedController@router']);         //LIST PARENTS
         $router->post('/{modelname}', 'ApiFixedController@router');        //CREATE PARENT-ALL-DETAILS
         $router->post('/{modelname}/{id}', 'ApiFixedController@router');        //CREATE PARENT-ALL-DETAILS
 
-        $router->get('/{modelname}/{id}', 'ApiFixedController@router')->name('read_by_id');    //GET SINGLE PARENT-ALL-DETAILS
+        $router->get('/{modelname}/{id}',['as'=>'read_id', 'uses'=>'ApiFixedController@router']);    //GET SINGLE PARENT-ALL-DETAILS
         $router->put('/{modelname}/{id}', 'ApiFixedController@router');    //UPDATE SINGLE PARENT-ALL-DETAILS
         $router->patch('/{modelname}/{id}', 'ApiFixedController@router');  //UPDATE SINGLE PARENT-ALL-DETAILS
         $router->delete('/{modelname}/{id}', 'ApiFixedController@router'); //DELETE SINGLE PARENT-ALL-DETAILS
