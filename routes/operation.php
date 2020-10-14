@@ -9,7 +9,7 @@ $router->group(['prefix'=>'operation'], function () use ($router) {
         $router->post('/{modelname}', 'ApiFixedController@router');        //CREATE PARENT-ALL-DETAILS
         $router->post('/{modelname}/{id}', 'ApiFixedController@router');        //CREATE PARENT-ALL-DETAILS
 
-        $router->get('/{modelname}/{id}', 'ApiFixedController@router');    //GET SINGLE PARENT-ALL-DETAILS
+        $router->get('/{modelname}/{id}', 'ApiFixedController@router')->name('read_by_id');    //GET SINGLE PARENT-ALL-DETAILS
         $router->put('/{modelname}/{id}', 'ApiFixedController@router');    //UPDATE SINGLE PARENT-ALL-DETAILS
         $router->patch('/{modelname}/{id}', 'ApiFixedController@router');  //UPDATE SINGLE PARENT-ALL-DETAILS
         $router->delete('/{modelname}/{id}', 'ApiFixedController@router'); //DELETE SINGLE PARENT-ALL-DETAILS
