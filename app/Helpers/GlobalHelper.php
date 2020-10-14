@@ -2193,3 +2193,9 @@ function getCustom($name){
     $string = "\App\Models\CustomModels\\$name";
     return new $string;
 }
+function getRoute(){
+    return app()->request->route()[1]['as'];
+}
+function isRoute($val){
+    return app()->request->route()[1]['as']==$val;
+}
