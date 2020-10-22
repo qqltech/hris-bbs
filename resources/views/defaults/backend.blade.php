@@ -218,6 +218,7 @@
                     firstLineNumber:1,
                     foldGutter: true,
                     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                    lineWrapping: true,
                     mode: "php",
                     viewportMargin: Infinity,
                     theme:"monokai",
@@ -256,6 +257,7 @@
                     codemirror.setOption("extraKeys", {
                         "Ctrl-Y": cm => CodeMirror.commands.foldAll(cm),
                         "Ctrl-I": cm => CodeMirror.commands.unfoldAll(cm),
+                        "Ctrl-Q": cm => cm.foldCode(cm.getCursor())
                     })
                     // if(localStorage.valueText!=undefined){
                     //     codemirror.setValue(localStorage.valueText);
