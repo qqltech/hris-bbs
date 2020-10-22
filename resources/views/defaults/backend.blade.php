@@ -214,10 +214,10 @@
 
                 var data = @php echo json_encode($models); @endphp;
                 var codemirror = CodeMirror.fromTextArea(document.getElementById("code"), {
-                    lineNumbers: false,
+                    lineNumbers: true,
                     firstLineNumber:1,
-                    // foldGutter: true,
-                    // gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                    foldGutter: true,
+                    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
                     mode: "php",
                     viewportMargin: Infinity,
                     theme:"monokai",
@@ -253,6 +253,10 @@
 
                     }}
                     codemirror.addKeyMap(map);
+                    codemirror.setOption("extraKeys", {
+                        "Ctrl-Y": cm => CodeMirror.commands.foldAll(cm),
+                        "Ctrl-I": cm => CodeMirror.commands.unfoldAll(cm),
+                    })
                     // if(localStorage.valueText!=undefined){
                     //     codemirror.setValue(localStorage.valueText);
                     // }

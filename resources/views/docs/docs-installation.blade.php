@@ -57,11 +57,11 @@ masuk ke direktori publicnya langsung, misal di Apache2 yakni <b>/var/www/html</
 ### One Click Installation
 - Masuklah ke direktori hasil clone repositori dengan perintah <i>Change Directory</i>
 > cd larahan
+- Pastikan koneksi internet lancar, dan tunggu sampai proses selesai
 - Bagi pengguna linux bisa menggunakan bash script di dalam direktori tersebut dengan perintah:
 > . linuxinstall.sh
 - Bagi pengguna windows bisa menggunakan bash script di dalam direktori tersebut dengan perintah:
 > wininstall.bat
-Pastikan koneksi internet lancar, dan tunggu sampai proses selesai
 
 
 ### Post Installation
