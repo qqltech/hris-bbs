@@ -1597,6 +1597,11 @@ function _customGetData($model,$params)
             }
             $index++;
         }
+        $func="transformArrayData";
+        if( method_exists( $modelExtender, $func )  ){
+            $newFixedData = $modelExtender->$func( $fixedData );
+            $fixedData = gettype($newFixedData)=='array' ? $newFixedData : $fixedData;
+        }
         $data   = $fixedData;
     }else{
         $tempData = $data->toArray()["data"];
@@ -1626,6 +1631,11 @@ function _customGetData($model,$params)
                 }
             }
             $index++;
+        }
+        $func="transformArrayData";
+        if( method_exists( $modelExtender, $func )  ){
+            $newFixedData = $modelExtender->$func( $fixedData );
+            $fixedData = gettype($newFixedData)=='array' ? $newFixedData : $fixedData;
         }
         $data = array_merge([
             "data"=>$fixedData],[
