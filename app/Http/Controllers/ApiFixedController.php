@@ -726,6 +726,20 @@ class ApiFixedController extends Controller
         //         $this->createOperation($key, $value, $id, $model->getTable());
         //     }
         // }
+        
+        if($this->isBackdoor){
+            
+            if(method_exists($model, "createAfterTransaction")){
+                $newData = $this->readOperation( $modelName, (object)[], $id )['data'];
+                $newfunction = "createAfterTransaction";
+                $model->$newfunction( 
+                    $newData,
+                    $data, 
+                    $this->requestData,
+                    $this->requestMeta
+                );
+            }
+        }
         $model = null;  
     }
     public function router(Request $request, $modelname, $id=null)
