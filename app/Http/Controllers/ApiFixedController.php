@@ -41,12 +41,6 @@ class ApiFixedController extends Controller
         if(config('tables')==null){
             config(['tables'=>[]]);
         }
-        if($backdoor){
-            return;
-        }
-        if( ! File::isDirectory(base_path('public/uploads') ) ) {
-            File::makeDirectory(base_path('public/uploads') , 493, true);
-        }
         $this->formatDate=env("FORMAT_DATE_FRONTEND","d/m/Y");
         $this->isMultipart = (strpos($request->header("Content-Type"),"multipart") !==FALSE)?true:false;
         $this->originalRequest = $request->capture();
@@ -57,6 +51,14 @@ class ApiFixedController extends Controller
             config(['requestHeader'=>$this->requestMeta->header()]);
             config(['requestMethod'=>$this->requestMeta->method()]);
             config(['requestOrigin'=>$this->requestMeta->path()]);
+        }
+        $this->parentModelName=$request->route("modelname");
+        $this->operationId=($request->route("id")!=null&&$request->route("id")!="")?$request->route("id"):null;
+        if($backdoor){
+            return;
+        }
+        if( ! File::isDirectory(base_path('public/uploads') ) ) {
+            File::makeDirectory(base_path('public/uploads') , 493, true);
         }
         if($this->isMultipart){
             $this->serializeMultipartData();
@@ -80,8 +82,6 @@ class ApiFixedController extends Controller
                 $this->operation = "read";
                 break;
         }
-        $this->parentModelName=$request->route("modelname");
-        $this->operationId=($request->route("id")!=null&&$request->route("id")!="")?$request->route("id"):null;
         if(!$this->is_model_exist( $this->parentModelName )){return;};
         if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}
         if(!$this->is_operation_authorized($this->parentModelName )){return;};
@@ -505,6 +505,19 @@ class ApiFixedController extends Controller
                     }
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
+            }
+        }
+        if($this->isBackdoor && $parentId==null){
+            
+            if(method_exists($model, "createAfterTransaction")){
+                $newData = $this->readOperation( $modelName, (object)[], $finalModel->id )['data'];
+                $newfunction = "createAfterTransaction";
+                $model->$newfunction( 
+                    $newData,
+                    [], 
+                    $this->requestData,
+                    $this->requestMeta
+                );
             }
         }
         $model = null;   
