@@ -734,7 +734,7 @@ class ApiFixedController extends Controller
                 $newfunction = "createAfterTransaction";
                 $model->$newfunction( 
                     $newData,
-                    $data, 
+                    $newData, 
                     $this->requestData,
                     $this->requestMeta
                 );
