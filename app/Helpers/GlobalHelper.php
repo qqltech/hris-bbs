@@ -1959,7 +1959,7 @@ function reformatData($arrayData,$model=null){
         }
         $isDate=false;
         foreach($dataKey as $dateString){
-            if(strpos(strtolower($key),$dateString)!==false && count(explode("/",$data))>2){
+            if(strpos(strtolower($key),$dateString)!==false && strpos($data,"/")!==false && count(explode("/",$data))>2){
                 $isDate=true;
                 break;
             }

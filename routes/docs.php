@@ -12,6 +12,12 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         }
         return view("defaults.api",compact('models'));
     });
+    $router->get('/simulation', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        return view("defaults.simulation");
+    });
     $router->get('/backend', function(Request $req){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);
