@@ -680,16 +680,6 @@ class ApiFixedController extends Controller
             $detailIds = [];
             $detailNew = [];
             $detailOld = [];
-            foreach($data[$detailClass] as $index => $valDetail){
-                if(isset($valDetail['id']) && is_numeric($valDetail['id']) && (new $modelCandidate)->where('id',$valDetail['id'])->count()>0){
-                    $this->updateOperation($detailClass, $valDetail, $valDetail['id']);
-                    $detailIds[]=$valDetail['id'];
-                    $detailOld [] = $valDetail;
-                }else{
-                    $detailNew [] = $valDetail;
-                }
-            };
-            
             $columns    = $modelChild->columns;
             $fkName     = $model->getTable();
             if(!in_array($fkName."_id",$columns)){
@@ -704,6 +694,16 @@ class ApiFixedController extends Controller
             }else{
                 $fkName.="_id";
             }
+            foreach($data[$detailClass] as $index => $valDetail){
+                if(isset($valDetail['id']) && is_numeric($valDetail['id']) && (new $modelCandidate)->where($fkName,$id)->where('id',$valDetail['id'])->count()>0){
+                    $this->updateOperation($detailClass, $valDetail, $valDetail['id']);
+                    $detailIds[]=$valDetail['id'];
+                    $detailOld [] = $valDetail;
+                }else{
+                    $detailNew [] = $valDetail;
+                }
+            };
+            
             $dataDetail = $modelChild->where($fkName,$id)->whereNotIn('id',$detailIds)->get();                
             foreach( $dataDetail as $dtl ){
                 $this->deleteOperation($detailClass, null, $dtl->id, $id);
