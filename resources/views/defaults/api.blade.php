@@ -92,17 +92,28 @@
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
                         var newData = {
-                            columns : arrayData.columns,
-                            parameters      :{
+                            url: "/operation/"+arrayData.model,
+                            method: "GET",
+                            headers: {
+                                "authorization": "BearerToken",
+                                "Cache-Control": "no-cache"
+                            },
+                            parameters      : {
                                 selectfield : "column1,column2,column3,dst",
                                 where       : "column1='kata' AND column2=999",
                                 orderby     : "id",
-                                orderbype   : "ASC",
-                                search      : "string",
+                                ordertype   : "ASC",
+                                orderbyraw  : "id ASC,col2 DESC",
+                                search      : "stringpotongankata",
                                 searchfield : "column_tercari1,column_tercari2,dst",
                                 paginate    : "100",
-                                join        : true                                
-                            }
+                                join        : true,
+                                joinmax     : 0,
+                                addselect   : "column1,column2,column3,dst",
+                                group_by    : "column1,column2,column3,dst",
+                            },
+                            basic_response  : arrayData.columns,
+                            real_response  : "silahkan dicoba di operation"
                         };
                         codemirror.setValue(JSON.stringify(newData,null,"\t"));
                         document.getElementById("modelSelected").innerText=arrayData.model+"[GET]";
@@ -122,15 +133,50 @@
                         let fullColumns = arrayData.fullColumns;
                         var newForm = {};
                         for(let i=0; i<fullColumns.length;i++){
-                            if( arrayData.config.createable.includes(fullColumns[i].name) ){
+                            if( arrayData.config.createable.includes(fullColumns[i].name) && !(fullColumns[i].comment).includes('fk') ){
                                 var susunan = "";
-                                susunan += fullColumns[i].nullable?"{required}-[":"{kosongan}-[";
+                                susunan += fullColumns[i].nullable?"{required}-[":"{optional}-[";
                                 susunan += (fullColumns[i].type).replace("\\","")+"]" ;
                                 susunan += fullColumns[i].comment==""?"-<data:input>":"-<data:"+fullColumns[i].comment+">" ;
                                 newForm[fullColumns[i].name] = susunan;
                             }
                         }
-                        codemirror.setValue(JSON.stringify(newForm,null,"\t\t"));
+                        
+                        (arrayData.details).forEach(dt=>{
+                            let arrayDataDetail = data.find(dtl=>{
+                                return dtl.model == dt;
+                            });
+                            let fullColumnsDetail = arrayDataDetail.fullColumns;
+                            let detailsPayload = {};
+                            for(let i=0; i<fullColumnsDetail.length;i++){
+                                if( arrayDataDetail.config.createable.includes(fullColumnsDetail[i].name) && !(fullColumnsDetail[i].comment).includes('fk') ){
+                                    var susunan = "";
+                                    susunan += fullColumnsDetail[i].nullable?"{required}-[":"{optional}-[";
+                                    susunan += (fullColumnsDetail[i].type).replace("\\","")+"]" ;
+                                    susunan += fullColumnsDetail[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetail[i].comment+">" ;
+                                    detailsPayload[fullColumnsDetail[i].name] = susunan;
+                                }
+                                (arrayDataDetail.details).forEach(subdt=>{
+                                    let arrayDataDetailDetail = data.find(subdtl=>{
+                                        return subdtl.model == subdt;
+                                    });
+                                    let fullColumnsDetailHeirs = arrayDataDetailDetail.fullColumns;
+                                    let detailsPayloadHeirs = {};
+                                    for(let i=0; i<fullColumnsDetailHeirs.length;i++){
+                                        if( arrayDataDetailDetail.config.createable.includes(fullColumnsDetailHeirs[i].name) && !(fullColumnsDetailHeirs[i].comment).includes('fk') ){
+                                            var susunan = "";
+                                            susunan += fullColumnsDetailHeirs[i].nullable?"{required}-[":"{optional}-[";
+                                            susunan += (fullColumnsDetailHeirs[i].type).replace("\\","")+"]" ;
+                                            susunan += fullColumnsDetailHeirs[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">" ;
+                                            detailsPayloadHeirs[fullColumnsDetailHeirs[i].name] = susunan;
+                                        }
+                                        detailsPayload[subdt] = [detailsPayloadHeirs];
+                                    }
+                                });
+                                newForm[dt] = [detailsPayload];
+                            }
+                        });
+                        codemirror.setValue(JSON.stringify(newForm,null,"\t"));
                         document.getElementById("modelSelected").innerText=arrayData.model+"[CREATE]";
                         document.getElementById("codemirror").style.display = "block";
                         document.getElementById("modelSelected").style.display = "block";
@@ -143,21 +189,56 @@
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
                         var newData = {
-                            payloadFields : arrayData.config.updateable
+                            payloadFields : arrayData.config.createable,
                         };
                         let fullColumns = arrayData.fullColumns;
                         var newForm = {};
                         for(let i=0; i<fullColumns.length;i++){
-                            if( arrayData.config.updateable.includes(fullColumns[i].name) ){
+                            if( arrayData.config.createable.includes(fullColumns[i].name) ){
                                 var susunan = "";
-                                susunan += fullColumns[i].nullable?"{required}-[":"{kosongan}-[";
+                                susunan += fullColumns[i].nullable?"{required}-[":"{optional}-[";
                                 susunan += (fullColumns[i].type).replace("\\","")+"]" ;
-                                susunan += fullColumns[i].comment==""?"-<data:input>":("-<data:"+JSON.parse(fullColumns[i].comment).src)+">" ;
+                                susunan += fullColumns[i].comment==""?"-<data:input>":"-<data:"+fullColumns[i].comment+">" ;
                                 newForm[fullColumns[i].name] = susunan;
                             }
                         }
-                        codemirror.setValue(JSON.stringify(newForm,null,"\t\t"));
-                        document.getElementById("modelSelected").innerText=arrayData.model+"[UPDATE]";
+                        
+                        (arrayData.details).forEach(dt=>{
+                            let arrayDataDetail = data.find(dtl=>{
+                                return dtl.model == dt;
+                            });
+                            let fullColumnsDetail = arrayDataDetail.fullColumns;
+                            let detailsPayload = {};
+                            for(let i=0; i<fullColumnsDetail.length;i++){
+                                if( arrayDataDetail.config.createable.includes(fullColumnsDetail[i].name)  ){
+                                    var susunan = "";
+                                    susunan += fullColumnsDetail[i].nullable?"{required}-[":"{optional}-[";
+                                    susunan += (fullColumnsDetail[i].type).replace("\\","")+"]" ;
+                                    susunan += fullColumnsDetail[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetail[i].comment+">" ;
+                                    detailsPayload[fullColumnsDetail[i].name] = susunan;
+                                }
+                                (arrayDataDetail.details).forEach(subdt=>{
+                                    let arrayDataDetailDetail = data.find(subdtl=>{
+                                        return subdtl.model == subdt;
+                                    });
+                                    let fullColumnsDetailHeirs = arrayDataDetailDetail.fullColumns;
+                                    let detailsPayloadHeirs = {};
+                                    for(let i=0; i<fullColumnsDetailHeirs.length;i++){
+                                        if( arrayDataDetailDetail.config.createable.includes(fullColumnsDetailHeirs[i].name) ){
+                                            var susunan = "";
+                                            susunan += fullColumnsDetailHeirs[i].nullable?"{required}-[":"{optional}-[";
+                                            susunan += (fullColumnsDetailHeirs[i].type).replace("\\","")+"]" ;
+                                            susunan += fullColumnsDetailHeirs[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">" ;
+                                            detailsPayloadHeirs[fullColumnsDetailHeirs[i].name] = susunan;
+                                        }
+                                        detailsPayload[subdt] = [detailsPayloadHeirs];
+                                    }
+                                });
+                                newForm[dt] = [detailsPayload];
+                            }
+                        });
+                        codemirror.setValue(JSON.stringify(newForm,null,"\t"));
+                        document.getElementById("modelSelected").innerText=arrayData.model+"[CREATE]";
                         document.getElementById("codemirror").style.display = "block";
                         document.getElementById("modelSelected").style.display = "block";
                     });

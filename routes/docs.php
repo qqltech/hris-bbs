@@ -6,7 +6,11 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
             return response()->json("SERVER WAS CLOSED",404);
         }
         try{
+            function querySort ($x, $y) {
+                return strcasecmp($x->model, $y->model);
+            }
             $models = json_decode(file_get_contents("models.json"));
+            usort($models, 'querySort');
         }catch(Exception $e){
             return $e->getMessage();
         }

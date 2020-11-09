@@ -566,7 +566,7 @@ class ApiFixedController extends Controller
             $p->paginate    = isset($data->paginate) ? $data->paginate:25;
             $p->page        = isset($data->page) ? $data->page:1;
             $p->group_by    = isset($data->group_by) ? $data->group_by:null;
-            $p->joinMax      = isset($data->joinMax) ? $data->joinMax:0;
+            $p->joinMax      = isset($data->joinMax) ? $data->joinmax:0;
             $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->caller      = null;
             $overrideParams = $model->overrideGetParams($p);

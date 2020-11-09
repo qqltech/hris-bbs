@@ -679,8 +679,8 @@ class LaradevController extends Controller
         }
         $dataForJSON = [];
         $tableKhusus = $tableName;
-        foreach($schema['tables'] as $table)
-        {            
+        foreach($schema['tables'] as $key => $table)
+        {
             // file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='.json_encode( $table ));
             $table = (object)$table;
             $tableName = $table->table;
@@ -700,8 +700,7 @@ class LaradevController extends Controller
                 }
             }
             $cfg['required'] = isset( $cfg['required'] )? array_merge( $cfg['required'], array_filter( $table->required,function($arr)use($cfg){ if(!in_array($arr,$cfg['required'])){return $arr;} } ) ):$table->required;
-            
-            $dataForJSON[] = [
+            $dataForJSONArray = [
                 "model" => $tableName,
                 "fullColumns" =>$table->fullColumns,
                 "columns" => $table->columns,
@@ -788,6 +787,10 @@ class LaradevController extends Controller
             $paste = str_replace("__details", count($details)==0?"[]":'["'.implode('","',$details).'"]' ,$paste);
             $paste = str_replace("__hasManyThrough","",$paste);
             $paste = str_replace("__hasMany","",$paste);
+            $dataForJSON[] = array_merge($dataForJSONArray,[
+                "details"=>$details,
+                "heirs"=>$heirs
+            ]);
             if(in_array($tableName, array_keys($schema['children']) )){
                 foreach($schema['children'][$tableName] as $fk){
                     $fk=(object)$fk;
