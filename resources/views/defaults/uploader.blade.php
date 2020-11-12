@@ -3,11 +3,18 @@
     <title> UPLOADER </title>
     <link rel="icon" href="{{url('favicon.ico')}}">
     <script src="{{url('defaults/vue.min.js')}}"></script>
+    <script src="https://unpkg.com/vue-select@3.0.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css">
 @verbatim
 </head>
 <body>
 <div class="container">
     <div id="app">
+        <v-select 
+            placeholder="Pilih table yang akan diupload"
+            :options="['table1','table2','table3', 'table4']" style="margin-left: auto;margin-right: auto;width:40%;margin-bottom:5px;">
+        </v-select>
+        
         <div style="padding-left:23%;">
             <textarea style="width:70%;font-size:10px;resize: none;height:25%" v-model="excelValue" placeholder="paste excel here" @input="processExcel"></textarea>
         </div>
@@ -31,6 +38,7 @@
 @endverbatim
 
 <script>
+Vue.component('v-select', VueSelect.VueSelect);
 var app = new Vue({
     el: '#app',
     watch: {},
