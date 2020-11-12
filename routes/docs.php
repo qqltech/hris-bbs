@@ -22,6 +22,29 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         }
         return view("defaults.simulation");
     });
+    $router->get('/uploader', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        return view('defaults.unauthorized')->with('data',[
+            'page'=>'halaman uploader',
+            'url'=>url("docs/uploader")
+        ]);
+    });
+    $router->post('/uploader', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
+            return view('defaults.unauthorized')->with('data',[
+                'page'=>'halaman uploader',
+                'url'=>url("docs/uploader"),
+                'salah'=>true
+            ]);
+        }else{
+            return view("defaults.uploader");
+        }
+    });
     $router->get('/backend', function(Request $req){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);

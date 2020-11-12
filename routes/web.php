@@ -32,6 +32,7 @@ $router->get('/', function () use ($router) {
             "operation" => url("/operation"),
             "simulation" => url("/docs/simulation"),
             "documentation" => url("/docs/documentation"),
+            "uploader" => url("/docs/uploader"),
         ]
     ]);
 });

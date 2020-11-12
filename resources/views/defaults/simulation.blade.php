@@ -3,6 +3,7 @@
     <title> SIMULATION </title>
     <link rel="icon" href="{{url('favicon.ico')}}">
     <script src="{{url('defaults/vue.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url('defaults/tailwind.min.css')}}">
 @verbatim
 </head>
 <body>
