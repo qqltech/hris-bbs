@@ -55,7 +55,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in bodyArray">
-                    <td v-for="(itemChild, indexChild) in item" style="border: 1px solid black;">
+                    <td v-for="(itemChild, indexChild) in item" style="border: 1px solid black;" :key="key">
                         <input type='text' dalue="itemChild" v-model="bodyArray[index][indexChild]" @input="bodyJson[index][headers[indexChild]]=bodyArray[index][indexChild]">
                     </td>
                 </tr>
@@ -72,6 +72,7 @@ var app = new Vue({
     el: '#app',
     watch: {},
     data: {
+        key:0,
         port: '8080',
         excelValue:"",
         headers : [],
@@ -135,10 +136,20 @@ var app = new Vue({
                 // })
                 console.log(response.data)
                 me.bodyArray = response.data;
-                // me.bodyJson = response.data.data;
+                let newBodyJson = [];
+                me.bodyArray.forEach(dt=>{
+                    let newData = {};
+                    dt.forEach( (dtCol,i) =>{
+                        newData[ me.headers[i] ] = dtCol;
+                    })
+                    newBodyJson.push(newData);
+                });
+                me.key++;
+                me.bodyJson = newBodyJson;
             })
         },
         query(i){
+            // console.log(this.bodyArray)
             let val = this.headersQuery[i];
             let valOriginal = val;
             let value =val;
