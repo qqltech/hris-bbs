@@ -2209,3 +2209,12 @@ function getRoute(){
 function isRoute($val){
     return app()->request->route()[1]['as']==$val;
 }
+
+function getRawData($query){
+    try{        	
+        $res = (array)\DB::select("$query limit 1")[0];
+        return array_values($res)[0];
+    }catch(\Exception $e){
+        return null;
+    }
+}
