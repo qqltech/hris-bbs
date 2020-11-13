@@ -26,11 +26,19 @@
         <div style="padding-left:23%;">
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                 style="margin-left: auto;margin-right: auto;margin-top:5px;">
-                Test!
+                Lengkapi!
+            </button>
+            <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
+                style="margin-left: auto;margin-right: auto;margin-top:5px;">
+                Test Upload!
             </button>
             <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full"
                 style="margin-left: auto;margin-right: auto;margin-top:5px;">
-                Up!
+                Final Upload!
+            </button>
+            <button class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full"
+                style="margin-left: auto;margin-right: auto;margin-top:5px;">
+                Copy to Clipboard!
             </button>
         </div>
         <table class="table-auto" style="border: 0.2px solid black;margin-top:10px;" >
