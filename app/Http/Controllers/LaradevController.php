@@ -1269,4 +1269,23 @@ class LaradevController extends Controller
         
         return response()->json("pembuatan file migration OK");
     }
+
+    public function uploadLengkapi(Request $request){
+        $table = $request->table;
+        $data = $request->data;
+        $dataArray = [];
+        foreach($data as $index => $dt){
+            foreach($dt as $indexCol => $col){
+                if( strpos( strtolower($col),"select ")!==false ){
+                    $data[$index][$indexCol] = getRawData( $col );
+                }
+                // $newArray = [];
+                // foreach ($data[$index] as $item) {
+                //     $newArray[] = $item;
+                // }
+                // $dataArray[] = $newArray;
+            }
+        }
+        return $data;
+    }
 }

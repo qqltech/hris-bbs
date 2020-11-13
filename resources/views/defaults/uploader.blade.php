@@ -6,6 +6,7 @@
     <script src="https://unpkg.com/vue-select@3.0.0"></script>
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css">
     <link rel="stylesheet" href="{{url('defaults/tailwind.min.css')}}">
+    <script src="{{url('defaults/axios.min.js')}}"></script>
 @verbatim
 </head>
 <body>
@@ -25,7 +26,7 @@
         </div>
         <div style="padding-left:23%;">
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-                style="margin-left: auto;margin-right: auto;margin-top:5px;">
+                style="margin-left: auto;margin-right: auto;margin-top:5px;" @click="apiLengkapi">
                 Lengkapi!
             </button>
             <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
@@ -37,7 +38,7 @@
                 Final Upload!
             </button>
             <button class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full"
-                style="margin-left: auto;margin-right: auto;margin-top:5px;">
+                style="margin-left: auto;margin-right: auto;margin-top:5px;" @click="copyToClipboard">
                 Copy to Clipboard!
             </button>
         </div>
@@ -83,6 +84,12 @@ var app = new Vue({
         tablesComplete:[],
         selectedTable:null
     },
+    computed:{
+        // bodyArr:function(){
+        //     let data = me.bodyJson;
+        //     let newArray = 
+        // }
+    },
     created(){           
         var me = this; 
         var xmlhttp = new XMLHttpRequest();
@@ -97,6 +104,40 @@ var app = new Vue({
         xmlhttp.send();
     },
     methods: {
+        copyToClipboard(){
+            let str = "";
+            str+=this.headers.join("\t");
+            str+="\n";
+            this.bodyArray.forEach(dt=>{
+                str+=dt.join("\t");
+                str+="\n";
+            })
+            const el = document.createElement('textarea');
+            el.value = str;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        },
+        apiLengkapi(){
+            let me = this;
+            me.submitApi({
+                url  : "{{url('laradev/uploadlengkapi')}}",
+                data : {
+                    data:me.bodyArray,
+                    table:me.selectedTable.model 
+                }
+            },function(response){
+                // let bodyArrayNew = [];
+                // response=response.data;
+                // response.forEach(dt=>{
+                //     bodyArrayNew.push(Object.values(dt));
+                // })
+                console.log(response.data)
+                me.bodyArray = response.data;
+                // me.bodyJson = response.data.data;
+            })
+        },
         query(i){
             let val = this.headersQuery[i];
             let valOriginal = val;
@@ -180,6 +221,27 @@ var app = new Vue({
                 this.headersQuery.push("");
             })
             this.bodyJson = body;
+        },
+        // var url = "{{url('laradev/migrations')}}";
+        submitApi(data,callback=function(response){}){
+            var $options   =
+            {
+                url         : data.url,
+                credentials : true,
+                method      : 'POST',
+                data        : data.data,
+                headers     : {
+                    laradev:"quantumleap150671"
+                }
+            }
+            axios($options).then(response => {
+                console.log(response)
+                callback(response);
+            }).catch(error => {
+                
+            }).then(function () {
+                //GAGAL BERHASIL SELALU DILAKSANAKAN
+            });  ;
         }
     },
 })

@@ -39,6 +39,8 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
 
         $router->get('/migrate/{table}', 'LaradevController@doMigrate');
         $router->get('/refreshalias/{table}', 'LaradevController@refreshAlias');
+
+        $router->post("/uploadlengkapi","LaradevController@uploadLengkapi");
     });
 
     // $router->get('/', function(Request $req){
