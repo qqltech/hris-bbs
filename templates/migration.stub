@@ -5,9 +5,13 @@ use Illuminate\Support\Facades\Schema;
 
 class __class__ extends Migration
 {
+    public function __construct()
+    { config(['database.connections.flyingpgsql'=>array_merge(config('database.connections.pgsql'),
+            ['schema'=>'public'])]);
+    }
     public function up()
     {
-        Schema::create('__table__', function (Blueprint $table) {
+        Schema::connection('flyingpgsql')->create('__table__', function (Blueprint $table) {
             $table->bigIncrements('id');
 
             $table->string('samplecolumn',100)->nullable();
@@ -16,7 +20,7 @@ class __class__ extends Migration
             $table->dateTime('updated_at')->nullable();
         });
 
-        table_config('__table__', [
+        table_config('public.__table__', [
             // pilihan isian: 'all', 'none', ['kolom'], except key pakai tanda !(not) misal: '!required'
             "hidden"        => "none", //kolom disembunyikan ketika GET
             "guarded"       => ["id"], //kolom dilarang diCREATE
@@ -39,12 +43,12 @@ class __class__ extends Migration
             "writers"     =>[]
         ]);
         //SEEDING 1 data
-        \DB::table("__table__")->insert([
+        \DB::table("public.__table__")->insert([
             "samplecolumn"=>"contohdata"
         ]);
     }
     public function down()
     {
-        Schema::dropIfExists('__table__');
+        Schema::connection('flyingpgsql')->dropIfExists('__table__');
     }
 }

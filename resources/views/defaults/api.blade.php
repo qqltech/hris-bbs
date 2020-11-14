@@ -25,9 +25,15 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Authorization</td>
-                        <td colspan="2" align="center"><button href="javascript:void(0)">LOGIN</button></td>
-                        <td colspan="2" align="center"><button href="javascript:void(0)">GET ME</button></td>
+                        <td>
+                            Authorization
+                        </td>
+                        <td colspan="2" align="center">
+                            <button id="login" href="javascript:void(0)">LOGIN</button>
+                        </td>
+                        <td colspan="2" align="center">
+                            <button href="javascript:void(0)">GET ME</button>
+                        </td>
                     </tr>
                     @foreach($models as $key => $model)                        
                         <tr>
@@ -35,7 +41,7 @@
                             <td><button class="read" href="javascript:void(0)" style="font-size:10px" index={{$key}}>READ</button></td>
                             <td><button class="create" href="javascript:void(0)" style="font-size:10px" index={{$key}}>CREATE</button></td>
                             <td><button class="update" href="javascript:void(0)" style="font-size:10px" index={{$key}}>UPDATE</button></td>
-                            <td><button class="delete" href="javascript:void(0)" style="font-size:10px" index={{$key}}>DELETE</button></td>
+                            <td><button class="notice" href="javascript:void(0)" style="font-size:10px" index={{$key}}>NOTICE</button></td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -63,6 +69,27 @@
             <script src="{{url('defaults/addon/lint/javascript-lint.js')}}"></script>
             <script src="{{url('defaults/addon/lint/css-lint.js')}}"></script>
             <script>
+            function submitApi(data,callback=function(response){},error=function(error){}){
+                let me = this;
+                var $options   =
+                {
+                    url         : data.url,
+                    credentials : true,
+                    method      : 'POST',
+                    data        : data.data,
+                    headers     : {
+                        laradev:"frontend-only",
+                        "Content-Type" :"Application/json"
+                    }
+                }
+                axios($options).then(response => {
+                    callback(response);
+                }).catch(errors => {
+                    error(errors.response.data);
+                }).then(function () {
+                    
+                });  ;
+            }
                 var data = @php echo json_encode($models); @endphp;
                 var codemirror = CodeMirror.fromTextArea(document.getElementById("code"), {
                     lineNumbers: false,
@@ -87,6 +114,29 @@
                         isToggled = true;
                     }
                 };
+                var buttonLogin = document.getElementById('login');
+                buttonLogin.addEventListener('click',function(){
+                    codemirror.setValue("");
+                    var newData = {
+                        url: "/login",
+                        method: "POST",
+                        headers: {
+                            "authorization": "BearerToken",
+                            "Cache-Control": "no-cache"
+                        },
+                        body      : {
+                            "email":"email",
+                            "password":"password"
+                        }
+                    };
+                    
+                    codemirror.setOption('mode','javascript');
+                    codemirror.setOption('theme','monokai');
+                    codemirror.setValue(JSON.stringify(newData,null,"\t"));
+                    document.getElementById("modelSelected").innerText="LOGIN [POST]";
+                    document.getElementById("codemirror").style.display = "block";
+                    document.getElementById("modelSelected").style.display = "block";
+                });
                 var classname = document.getElementsByClassName("read");
                 Array.from(classname).forEach(function(element) {
                     element.addEventListener("click",function(){
@@ -117,6 +167,9 @@
                             basic_response  : arrayData.columns,
                             real_response  : "silahkan dicoba di operation"
                         };
+                        
+                        codemirror.setOption('mode','javascript');
+                        codemirror.setOption('theme','monokai');
                         codemirror.setValue(JSON.stringify(newData,null,"\t"));
                         document.getElementById("modelSelected").innerText=arrayData.model+"[GET]";
                         document.getElementById("codemirror").style.display = "block";
@@ -178,6 +231,9 @@
                                 newForm[dt] = [detailsPayload];
                             }
                         });
+                        
+                        codemirror.setOption('mode','javascript');
+                        codemirror.setOption('theme','monokai');
                         codemirror.setValue(JSON.stringify(newForm,null,"\t"));
                         document.getElementById("modelSelected").innerText=arrayData.model+"[CREATE]";
                         document.getElementById("codemirror").style.display = "block";
@@ -239,22 +295,38 @@
                                 newForm[dt] = [detailsPayload];
                             }
                         });
+                        
+                        codemirror.setOption('mode','javascript');
+                        codemirror.setOption('theme','monokai');
                         codemirror.setValue(JSON.stringify(newForm,null,"\t"));
                         document.getElementById("modelSelected").innerText=arrayData.model+"[CREATE]";
                         document.getElementById("codemirror").style.display = "block";
                         document.getElementById("modelSelected").style.display = "block";
                     });
                 });
-                var classname = document.getElementsByClassName("delete");
+                var classname = document.getElementsByClassName("notice");
                 Array.from(classname).forEach(function(element) {
                     element.addEventListener("click",function(){
                         codemirror.setValue("");
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
-                        document.getElementById("modelSelected").innerText=arrayData.model+"[DELETE]";
-                        document.getElementById("codemirror").style.display = "block";
-                        document.getElementById("modelSelected").style.display = "block";
-                    });
+                        let model = arrayData.model;                        
+                        submitApi({
+                            url  : "{{url('laradev/getnotice')}}",
+                            data : {
+                                data:model
+                            }
+                        },function(response){
+                            codemirror.setOption('mode','reStructuredText')
+                            codemirror.setOption('theme','chrome');
+                            document.getElementById("modelSelected").innerText=model+" [NOTICE]";
+                            document.getElementById("codemirror").style.display = "block";
+                            document.getElementById("modelSelected").style.display = "block";
+                            codemirror.setValue( (response.data).replace("\t","") );
+                        },function(errors){
+                            console.log(errors)
+                        });
+                    })
                 });
             </script>
     </body>

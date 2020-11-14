@@ -44,13 +44,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->post("/uploadtest","LaradevController@uploadTest");
     });
 
-    // $router->get('/', function(Request $req){
-    //     if(!isset($req->kode) || $req->kode!=env("BACKENDPASSWORD","pulangcepat")){
-    //         return response()->json("Unauthorized",401);
-    //     }
-    //     return view("defaults.laradev");
-    // });
-    
+    $router->post("/getnotice","LaradevController@getNotice");
     $router->get('/', function(Request $req){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);

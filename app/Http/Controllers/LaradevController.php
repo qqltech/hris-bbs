@@ -1269,7 +1269,10 @@ class LaradevController extends Controller
         
         return response()->json("pembuatan file migration OK");
     }
-
+    public function getNotice(Request $req){
+        $model = getCustom($req->data);
+        return method_exists( $model, "frontendNotice" )?$model->frontendNotice():"tidak ada catatan";
+    }
     public function uploadLengkapi(Request $request){
         $table = $request->table;
         $data = $request->data;

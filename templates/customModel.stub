@@ -155,8 +155,23 @@ class __class extends __basicClass
 //========================================================================CUSTOM FUNCTION BEBAS TOTAL FUNGSINYA DIPREFIX "custom_"
     public function custom_getdraftid($request)
     {
-        $data = $this->count()+1;
-      	$char=strlen($data);
-        return "DRAFT".str_repeat("0",7-$char).$data;
+        
+        $karakterSeq = 4;
+        $namakolom = "no_transaction";
+        $prefix = "BB".date('Ymd');
+        $data = $this->latest('id')->first();
+      	if($data){
+          $count = substr($data->$namakolom, -($karakterSeq)) + 1;        
+        }else{
+        	$count=1;
+        }
+        $no = $prefix . str_repeat("0", $karakterSeq - strlen($count)) . $count;
+      	return response()->json($no);
     }
+/*    public function frontendNotice(){
+    	return implode("\n",[
+        	"1. Catatan 1 field abc tidak boleh lagi",
+          	"2. Field tanggal dengan format yyyy-mm-dd",          	
+        ]);
+    }*/
 }
