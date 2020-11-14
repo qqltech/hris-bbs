@@ -1279,13 +1279,45 @@ class LaradevController extends Controller
                 if( strpos( strtolower($col),"select ")!==false ){
                     $data[$index][$indexCol] = getRawData( $col );
                 }
-                // $newArray = [];
-                // foreach ($data[$index] as $item) {
-                //     $newArray[] = $item;
-                // }
-                // $dataArray[] = $newArray;
             }
         }
         return $data;
+    }
+    public function uploadTest(Request $request){
+        $table = $request->table;
+        $data = $request->data;
+        $final=$request->final;
+        $columns = $request->columns;
+        $dataNew = array_map(function($dt)use($columns){
+            $dataTemp = array_only($dt,$columns); 
+            foreach($dataTemp as $i => $tmp){
+                if($tmp==""||strtolower($tmp)=="null"||$tmp==null){
+                    unset($dataTemp[$i]);
+                }
+            }
+            return $dataTemp;
+        },$data);
+        DB::beginTransaction();
+        $indexOpt = 1;
+        try{
+            foreach($dataNew as $index => $dt){
+                DB::table($table)->insert($dt);
+                $indexOpt++;
+            }
+        }catch(\Exception $e){
+            DB::rollback();
+            return response()->json([
+                'index'=>$indexOpt,
+                'error'=>$e->getMessage()
+            ],422);
+        }
+        if($final===true){
+            DB::commit();
+            return 'inserting ok';
+        }else{
+            DB::rollback();
+            return 'testing ok';
+
+        }
     }
 }

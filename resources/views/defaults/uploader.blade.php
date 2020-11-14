@@ -5,73 +5,109 @@
     <script src="{{url('defaults/vue.min.js')}}"></script>
     <script src="https://unpkg.com/vue-select@3.0.0"></script>
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css">
-    <link rel="stylesheet" href="{{url('defaults/tailwind.min.css')}}">
+    <link rel="stylesheet" href="{{url('defaults/uploader-style.css')}}">
     <script src="{{url('defaults/axios.min.js')}}"></script>
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="{{url('defaults/vue-clipboard.min.js')}}"></script>
+
+    <!-- Load the following for BootstrapVueIcons support -->
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
 @verbatim
 </head>
 <body>
-<div class="container">
+<div>
     <div id="app">
-        <v-select 
-            placeholder="Pilih table yang akan diupload"
-            :options="tablesComplete" 
-            label="model"
-            v-model="selectedTable"
-            @input="tableSelected"
-            style="margin-left: auto;margin-right: auto;width:40%;margin-bottom:5px;">
-        </v-select>
-        
-        <div style="padding-left:23%;">
-            <textarea :disabled="selectedTable===null" class='bg-blue-100' style="width:70%;font-size:10px;resize: none;height:25%" v-model="excelValue" placeholder="paste excel here" @input="processExcel"></textarea>
+        <b-modal v-model="showModal" size="xl" title="tekan ALT+A untuk memunculkan menu ini" hide-footer>
+            <div>
+                <v-select 
+                    placeholder="Pilih table yang akan diupload"
+                    :options="tablesComplete" 
+                    label="model"
+                    v-model="selectedTable"
+                    @input="tableSelected"
+                    style="margin-left: auto;margin-right: auto;width:60%;margin-bottom:5px;">
+                </v-select>
+                
+                <div class="text-center">
+                    <textarea :disabled="selectedTable===null" rows="8"  class='form-input' style="width:80%;font-size:11px;resize: true;" v-model="excelValue" placeholder="paste excel here" @input="processExcel"></textarea>
+                </div>
+                <div class="text-center">
+                    <b-overlay
+                    :show="isLoading"
+                    rounded
+                    opacity="0.6"
+                    spinner-small
+                    spinner-variant="primary"
+                    class="d-inline-block"
+                    >
+                        <button class="bg-info"
+                            style="margin-left: auto;margin-right: auto;margin-top:5px;" @click="apiLengkapi" :disabled="isLoading">
+                            Lengkapi (Alt+Q)
+                        </button>
+                    </b-overlay>
+                    <button class="bg-warning"
+                        style="margin-left: auto;margin-right: auto;margin-top:5px;" :disabled="isLoading" @click="apiUploadTest">
+                        Test Upload! (Alt+T)
+                    </button>
+                    <button class="bg-success"
+                        style="margin-left: auto;margin-right: auto;margin-top:5px;" :disabled="isLoading" @click="apiUploadReal">
+                        Final Upload (Ctrl+S)!
+                    </button>
+                    <span
+                        style="margin-left: auto;margin-right: auto;margin-top:5px;" disabled>
+                        Copy to Excel! (Alt+C)
+                    </span>
+                </div>
+            </div>
+        </b-modal>
+        <div>
+            <b-overlay :show="isLoading" rounded="sm">
+                <table class="table-auto" style="border: 0.2px solid black;margin-top:10px;padding-right:5px;font-size:11px;" >
+                    <thead>
+                    <th style="width:3.5em;position:fixed;left:0px;">
+                    </th>
+                    <th v-for="(item, index) in headersQuery" style="border: 1px solid black;" class="bg-dark">
+                            <input class='form-input' type='text' placeholder='queryAll' v-model="headersQuery[index]" @input="query(index)">
+                    </th>
+                    </thead>
+                    <thead>
+                    <th style="width:3.5em;position:fixed;left:0px;">
+                    </th>
+                    <th v-for="(item, index) in headers" style="border: 1px solid black;" :class="headersRequired.includes(item)?'bg-danger':(headersOriginal.includes(item)?'bg-success':'')">
+                        {{item}}
+                    </th>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in bodyArray">
+                            <td style="width:5em;">
+                                {{index+1}}
+                            </td>
+                            <td v-for="(itemChild, indexChild) in item" style="border: 1px solid black;" :key="key">
+                                <input class='form-input' type='text' dalue="itemChild" v-model="bodyArray[index][indexChild]" @input="bodyJson[index][headers[indexChild]]=bodyArray[index][indexChild]">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </b-overlay>
         </div>
-        <div style="padding-left:23%;">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-                style="margin-left: auto;margin-right: auto;margin-top:5px;" @click="apiLengkapi">
-                Lengkapi!
-            </button>
-            <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
-                style="margin-left: auto;margin-right: auto;margin-top:5px;">
-                Test Upload!
-            </button>
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full"
-                style="margin-left: auto;margin-right: auto;margin-top:5px;">
-                Final Upload!
-            </button>
-            <button class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full"
-                style="margin-left: auto;margin-right: auto;margin-top:5px;" @click="copyToClipboard">
-                Copy to Clipboard!
-            </button>
-        </div>
-        <table class="table-auto" style="border: 0.2px solid black;margin-top:10px;" >
-            <thead>
-            <th v-for="(item, index) in headersQuery" style="border: 1px solid black;" class="bg-purple-300">
-                    <input type='text' placeholder='queryAll' v-model="headersQuery[index]" @input="query(index)">
-            </th>
-            </thead>
-            <thead>
-            <th v-for="(item, index) in headers" style="border: 1px solid black;" :class="headersRequired.includes(item)?'bg-pink-200':(headersOriginal.includes(item)?'bg-green-200':'')">
-                {{item}}
-            </th>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in bodyArray">
-                    <td v-for="(itemChild, indexChild) in item" style="border: 1px solid black;" :key="key">
-                        <input type='text' dalue="itemChild" v-model="bodyArray[index][indexChild]" @input="bodyJson[index][headers[indexChild]]=bodyArray[index][indexChild]">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        
+        <button href="#" class="float" @click="showModal=true;" v-if="!showModal">
+            +
+        </button>
     </div>
 </div>
 @endverbatim
 
 <script>
 Vue.component('v-select', VueSelect.VueSelect);
+Vue.use(VueClipboard)
 var app = new Vue({
     el: '#app',
     watch: {},
     data: {
+        showModal:true,
+        isLoading:false,
         key:0,
         port: '8080',
         excelValue:"",
@@ -91,8 +127,32 @@ var app = new Vue({
         //     let newArray = 
         // }
     },
-    created(){           
-        var me = this; 
+    created(){       
+        let me = this;
+        window.addEventListener("keydown", e => {
+            if(e.altKey && e.code=='KeyA'){
+                me.showModal=true;
+                e.preventDefault();
+                return false;
+            }else if(e.altKey && e.code=='KeyC'){
+                me.copyToClipboard();
+                e.preventDefault();
+                return false;
+            }else if(e.altKey && e.code=='KeyQ'){
+                me.apiLengkapi();
+                e.preventDefault();
+                return false;
+            }else if(e.altKey && e.code=='KeyT'){
+                me.apiUploadTest();
+                e.preventDefault();
+                return false;
+            }else if(e.ctrlKey && e.code=='KeyS'){
+                me.apiUploadReal();
+                e.preventDefault();
+                return false;
+            }
+            
+        });    
         var xmlhttp = new XMLHttpRequest();
         var url = "{{url('models.json')}}";
         xmlhttp.onreadystatechange = function() {
@@ -103,22 +163,33 @@ var app = new Vue({
         };
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
+
     },
     methods: {
         copyToClipboard(){
             let str = "";
             str+=this.headers.join("\t");
             str+="\n";
+            console.log(this.headers,this.bodyArray,)
             this.bodyArray.forEach(dt=>{
                 str+=dt.join("\t");
                 str+="\n";
+                console.log(dt)
             })
-            const el = document.createElement('textarea');
-            el.value = str;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
+            let container = this.$refs.container
+            this.$copyText(str, container)
+            // const el = document.createElement('textarea');
+            // el.value = str;
+            // document.body.appendChild(el);
+            // el.select();
+            // document.execCommand('copy');
+            // document.body.removeChild(el);
+            this.$bvToast.toast('Ready to Paste to Excel', {
+                title: 'Copy OK',
+                toaster:'b-toaster-bottom-center',
+                variant: 'warning',
+                solid: true
+            })
         },
         apiLengkapi(){
             let me = this;
@@ -129,12 +200,6 @@ var app = new Vue({
                     table:me.selectedTable.model 
                 }
             },function(response){
-                // let bodyArrayNew = [];
-                // response=response.data;
-                // response.forEach(dt=>{
-                //     bodyArrayNew.push(Object.values(dt));
-                // })
-                console.log(response.data)
                 me.bodyArray = response.data;
                 let newBodyJson = [];
                 me.bodyArray.forEach(dt=>{
@@ -148,17 +213,57 @@ var app = new Vue({
                 me.bodyJson = newBodyJson;
             })
         },
+        apiUploadReal(){
+            var konfirmasi = confirm('Data Akan Benar-Benar di Upload?');
+            if(konfirmasi){
+                this.apiUploadTest(true);
+            }
+        },
+        apiUploadTest(final=false){
+            let me = this;
+            me.submitApi({
+                url  : "{{url('laradev/uploadtest')}}",
+                data : {
+                    data:me.bodyJson,
+                    table:me.selectedTable.model,
+                    columns:me.selectedTable.columns,
+                    final:final
+                }
+            },function(response){
+                me.$bvToast.toast( final?"INSERT SUKSES!":"TESTING SUKSES SILAHKAN FINAL UPLOAD!" , {
+                    'auto-hide-delay':15000,
+                    title: final?"INSERT SUKSES!":"TESTING SUKSES",
+                    toaster:'b-toaster-top-full',
+                    variant: final?'success':'info',
+                    solid: true
+                })
+            },function(response){
+                me.$bvToast.toast(response.error, {
+                    'no-auto-hide':true,
+                    'auto-hide-delay':15000,
+                    title: `Baris ${response.index}`,
+                    toaster:'b-toaster-top-full',
+                    variant: 'danger',
+                    solid: true
+                })
+
+            })
+        },
         query(i){
             // console.log(this.bodyArray)
             let val = this.headersQuery[i];
             let valOriginal = val;
             let value =val;
+            let increment = 0;
             for(let index in this.bodyArray){
                 if(valOriginal.includes("<") && valOriginal.includes(">")){
                     value = valOriginal;
                     for(let indexJson in this.bodyJson[index]){
                         let reg = `<${indexJson}>`;
                         value = value.replace(new RegExp(reg,'g'),this.bodyJson[index][indexJson]);
+                    }
+                    if(valOriginal.includes("<_seq>")){
+                        value = value.replace(new RegExp("<_seq>",'g'),++increment);
                     }
                 }
                 this.bodyArray[index][i] = value;
@@ -176,7 +281,8 @@ var app = new Vue({
             this.headersQuery=[];
             this.headers.forEach(dt=>{
                 this.headersQuery.push("");
-            })
+            });
+            this.processExcel();
         },
         processExcel(){
             let me = this;
@@ -234,7 +340,8 @@ var app = new Vue({
             this.bodyJson = body;
         },
         // var url = "{{url('laradev/migrations')}}";
-        submitApi(data,callback=function(response){}){
+        submitApi(data,callback=function(response){},error=function(error){}){
+            let me = this;
             var $options   =
             {
                 url         : data.url,
@@ -245,13 +352,14 @@ var app = new Vue({
                     laradev:"quantumleap150671"
                 }
             }
+            me.isLoading=true;
             axios($options).then(response => {
-                console.log(response)
                 callback(response);
-            }).catch(error => {
-                
+            }).catch(errors => {
+                console.log(errors.response.data)
+                error(errors.response.data);
             }).then(function () {
-                //GAGAL BERHASIL SELALU DILAKSANAKAN
+                me.isLoading=false;
             });  ;
         }
     },

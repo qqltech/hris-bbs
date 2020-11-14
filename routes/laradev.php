@@ -41,6 +41,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->get('/refreshalias/{table}', 'LaradevController@refreshAlias');
 
         $router->post("/uploadlengkapi","LaradevController@uploadLengkapi");
+        $router->post("/uploadtest","LaradevController@uploadTest");
     });
 
     // $router->get('/', function(Request $req){
