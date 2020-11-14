@@ -28,11 +28,12 @@ $router->get('/', function () use ($router) {
             "config" => url("/laradev"),
             "frontend" => url("/docs/frontend"),
             "backend" => url("/docs/backend"),
-            "visual" => url("/visual.html"),
+            "visualisasi DB" => url("/visual.html"),
             "operation" => url("/operation"),
             "simulation" => url("/docs/simulation"),
             "documentation" => url("/docs/documentation"),
             "uploader" => url("/docs/uploader"),
+            'contact' => "https://wa.me/6289684328441?text="
         ]
     ]);
 });

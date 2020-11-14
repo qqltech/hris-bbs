@@ -8,12 +8,14 @@
         <link rel="stylesheet" href="{{url('defaults/addon/lint/lint.css')}}">
     </head>
     <body>
-        <p><span style="padding:5 20px 5 20px;position:fixed;right:1%;top:10px;font-weight:bold;background-color:green;color:white" id="modelSelected"></span>
+        <p><span style="padding:5 5px 5 5px;position:fixed;right:1%;top:0px;font-weight:bold;background-color:green;color:white" id="modelSelected"></span>
             
         </p>
         <div id="codemirror">
             <textarea id="code"></textarea>
-            <p><button style="position:fixed;right:400px;bottom:35px; background-color:red;color:white" id="toggle">Hide!</button><a href="javascript:void(0)" class="button" id="run" style="margin-left:75% !important">Run on Console!</a></p>
+            <p><button style="position:fixed;right:10px;bottom:40px; background-color:red;color:white" id="toggle">Hide!</button>
+            <!-- <a href="javascript:void(0)" class="button" id="run" style="margin-left:75% !important">Run on Console!</a> -->
+            </p>
         </div>
         <div>
             <table border="1">
