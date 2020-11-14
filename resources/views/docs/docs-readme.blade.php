@@ -21,5 +21,8 @@ Hanya kepingin tidak memegang laptop setelah jam 5 sore. Camkan itu!
 Ayo Cangkruk Kawan! His social-media accounts:
 
 - Anak Bangun Tidur [Facebook](https://web.facebook.com/firmansyah.fajar)
+- Contact1 [Whatsapp](https://wa.me/6289684328441?text=)
+- Contact2 [Telegram](https://t.me/firmansyah2018)
+- Contact2 [Instagram](https://www.instagram.com/firmansyah_2017/)
 
 ![logo](https://scontent.fsub5-1.fna.fbcdn.net/v/t1.0-9/10178022_10200794555745725_3345129989677326181_n.jpg?_nc_cat=107&ccb=2&_nc_sid=174925&_nc_ohc=lvpbk1g7BCwAX9EjvnR&_nc_ht=scontent.fsub5-1.fna&oh=41e1967b8cfcf030ed56445850cceb01&oe=5FD3F3DB ':size=220x200')
