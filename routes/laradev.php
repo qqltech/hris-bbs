@@ -42,6 +42,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
 
         $router->post("/uploadlengkapi","LaradevController@uploadLengkapi");
         $router->post("/uploadtest","LaradevController@uploadTest");
+        $router->post("/uploadwithcreate","LaradevController@uploadWithCreate");
     });
 
     $router->post("/getnotice","LaradevController@getNotice");

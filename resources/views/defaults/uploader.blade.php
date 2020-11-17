@@ -55,6 +55,11 @@
                         style="margin-left: auto;margin-right: auto;margin-top:5px;" :disabled="isLoading" @click="apiUploadReal">
                         Final Upload (Ctrl+S)!
                     </button>
+                    <button class="bg-success"
+                        style="margin-left: auto;margin-right: auto;margin-top:5px;" :disabled="isLoading" @click="apiUploadWithCreate">
+                        Upload ke table Uploaders(Alt+P)!
+                    </button>
+                    
                     <span
                         style="margin-left: auto;margin-right: auto;margin-top:5px;" disabled>
                         Copy to Excel! (Alt+C)
@@ -69,7 +74,7 @@
                     <th style="width:3.5em;position:fixed;left:0px;">
                     </th>
                     <th v-for="(item, index) in headersQuery" style="border: 1px solid black;" class="bg-dark">
-                            <input class='form-input' type='text' placeholder='queryAll' v-model="headersQuery[index]" @input="query(index)">
+                        <input class='form-input' type='text' placeholder='queryAll' v-model="headersQuery[index]" @input="query(index)">
                     </th>
                     </thead>
                     <thead>
@@ -80,12 +85,22 @@
                     </th>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, index) in bodyArray">
+                        <tr v-for="(item, index) in bodyArray" v-if="index <= 99">
                             <td style="width:5em;">
                                 {{index+1}}
                             </td>
                             <td v-for="(itemChild, indexChild) in item" style="border: 1px solid black;" :key="key">
-                                <input class='form-input' type='text' dalue="itemChild" v-model="bodyArray[index][indexChild]" @input="bodyJson[index][headers[indexChild]]=bodyArray[index][indexChild]">
+                                {{itemChild}}
+                                <!-- <input class='form-input' type='text' dalue="itemChild" v-model="bodyArray[index][indexChild]" @input="bodyJson[index][headers[indexChild]]=bodyArray[index][indexChild]"> -->
+                            </td>
+                        </tr>
+                        <tr style="margin-top:10px;">
+                            <td style="width:5em;">
+                                ...{{bodyArray.length-1}}
+                            </td>
+                            <td v-for="(itemChild, indexChild) in bodyArray[bodyArray.length-1]" style="border: 1px solid black;" :key="key">
+                                {{itemChild}}
+                                <!-- <input class='form-input' type='text' dalue="itemChild" v-model="bodyArray[index][indexChild]" @input="bodyJson[index][headers[indexChild]]=bodyArray[index][indexChild]"> -->
                             </td>
                         </tr>
                     </tbody>
@@ -150,6 +165,10 @@ var app = new Vue({
                 me.apiUploadReal();
                 e.preventDefault();
                 return false;
+            }else if(e.altKey && e.code=='KeyP'){
+                me.apiUploadWithCreate();
+                e.preventDefault();
+                return false;
             }
             
         });    
@@ -170,11 +189,9 @@ var app = new Vue({
             let str = "";
             str+=this.headers.join("\t");
             str+="\n";
-            console.log(this.headers,this.bodyArray,)
             this.bodyArray.forEach(dt=>{
                 str+=dt.join("\t");
                 str+="\n";
-                console.log(dt)
             })
             let container = this.$refs.container
             this.$copyText(str, container)
@@ -189,6 +206,32 @@ var app = new Vue({
                 toaster:'b-toaster-bottom-center',
                 variant: 'warning',
                 solid: true
+            })
+        },
+        apiUploadWithCreate(){
+            let me = this;
+            me.submitApi({
+                url  : "{{url('laradev/uploadwithcreate')}}",
+                data : {
+                    data:me.bodyJson,
+                    table:me.selectedTable.model 
+                }
+            },function(response){
+                me.$bvToast.toast( response.data, {
+                    'auto-hide-delay':15000,
+                    title: "INSERT SUKSES",
+                    toaster:'b-toaster-top-full',
+                    variant: 'success',
+                    solid: true
+                })
+            },function(response){
+                me.$bvToast.toast( "INSERT GAGAL!", {
+                    'auto-hide-delay':15000,
+                    title: "INSERT GAGAL",
+                    toaster:'b-toaster-top-full',
+                    variant: 'danger',
+                    solid: true
+                })
             })
         },
         apiLengkapi(){

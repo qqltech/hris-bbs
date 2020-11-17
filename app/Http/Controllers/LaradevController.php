@@ -1286,6 +1286,31 @@ class LaradevController extends Controller
         }
         return $data;
     }
+    public function uploadWithCreate(Request $req){
+        $data = $req->data; 
+        DB::beginTransaction();   
+        try{  
+            Schema::dropIfExists('uploaders');
+            Schema::create('uploaders',function (Blueprint $table)use($data) {
+                $table->bigIncrements('_id');
+                foreach( array_keys( end($data) ) as $key ){
+                    $table->text($key)->nullable();
+                }
+            });
+            $insertData = collect($data)->chunk(500);
+            foreach($insertData as $chunkedData){
+                \DB::table('uploaders')->insert($chunkedData->toArray());
+            }
+        }catch(\Exception $e){
+            DB::rollback();
+            return response()->json([
+                'index'=>'entahlah',
+                'error'=>$e->getMessage()
+            ],422);
+        }
+        DB::commit();
+        return count($data)." rows inserted successfully in table uploaders, OLAH SENDIRI!!!";
+    }
     public function uploadTest(Request $request){
         $table = $request->table;
         $data = $request->data;
