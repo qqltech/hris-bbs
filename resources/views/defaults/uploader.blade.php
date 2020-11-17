@@ -94,7 +94,7 @@
                                 <!-- <input class='form-input' type='text' dalue="itemChild" v-model="bodyArray[index][indexChild]" @input="bodyJson[index][headers[indexChild]]=bodyArray[index][indexChild]"> -->
                             </td>
                         </tr>
-                        <tr style="margin-top:10px;">
+                        <tr style="margin-top:10px;" v-if="bodyArray.length>98">
                             <td style="width:5em;">
                                 ...{{bodyArray.length-1}}
                             </td>
