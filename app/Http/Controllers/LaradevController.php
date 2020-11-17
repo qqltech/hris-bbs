@@ -1287,6 +1287,7 @@ class LaradevController extends Controller
         return $data;
     }
     public function uploadWithCreate(Request $req){
+        DB::disableQueryLog();
         $data = $req->data; 
         DB::beginTransaction();   
         try{  
@@ -1312,6 +1313,7 @@ class LaradevController extends Controller
         return count($data)." rows inserted successfully in table uploaders, OLAH SENDIRI!!!";
     }
     public function uploadTest(Request $request){
+        DB::disableQueryLog();
         $table = $request->table;
         $data = $request->data;
         $final=$request->final;

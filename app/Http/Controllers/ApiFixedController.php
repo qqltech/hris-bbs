@@ -37,6 +37,7 @@ class ApiFixedController extends Controller
 
     public function __construct(Request $request,$backdoor=false)
     {
+        DB::disableQueryLog();
         $this->isBackdoor = $backdoor;
         if(config('tables')==null){
             config(['tables'=>[]]);
