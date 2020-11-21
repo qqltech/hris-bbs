@@ -1922,15 +1922,18 @@ function uploadfile($model,$req){
     );
     return url("/uploads/$modelName/".$code."_".$fileName);
 }
-function ff($data,$id="debug"){
+function ff($data,$id=""){
     $channel=env("LOG_CHANNEL",env('APP_NAME',uniqid()));
     $client = new \GuzzleHttp\Client();
     try{
         if(!in_array(gettype($data),["object","array"])){
             $data = [$data];
         }
+        $dtrace = (object)debug_backtrace(1,true)[0];
+      	// ff($dtrace['class'],$dtrace['function']);
         $data = is_object($data)?array($data):$data;
-        $data = array_merge($data,["debug_id"=>$id]);        
+        $filename = explode("\\",$dtrace->file);
+        $data = array_merge($data,[ "debug_id"=>$id." [".str_replace(".php","",end($filename))."-$dtrace->line]"]);        
         $client->post(
             "https://backend.dejozz.com/chatbot/public/websocket-send/$channel",
             [
