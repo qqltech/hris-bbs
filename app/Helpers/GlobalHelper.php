@@ -2273,7 +2273,7 @@ function renderXLS( $config,$arrayData,$pageConfig=["break"=>false,"sheetname"=>
                     'break'=>@$pageConfig['break'],
                     'data'=>$arrayData,
                     'title'=>@$pageConfig['title'],
-                    'sheetname'=>@$pageConfig['sheetname'],
+                    'sheetname'=>'name',
                     'title'=>@$pageConfig['title'],
                     'size'=>@$pageConfig['size'],
                     'orientation'=>@$pageConfig['orientation']
