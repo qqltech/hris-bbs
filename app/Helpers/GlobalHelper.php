@@ -2228,19 +2228,20 @@ function renderpdf( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"doc
         $response = $client->post(
             env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_htmlpdf.php"),
             [
-                'form_params' => [
-                'type'=>$type,
-                'config'=>$config,
-                'break'=>@$pageConfig['break'],
-                'data'=>$arrayData,
-                'title'=>@$pageConfig['title'],
-                // 'sheetname'=>@$pageConfig['sheetname'],
-                'preview'=>@$pageConfig['preview'],
-                'size'=>@$pageConfig['size'],
-                'orientation'=>@$pageConfig['orientation']
+                'json' => [
+                    'type'=>$type,
+                    'config'=>$config,
+                    'break'=>@$pageConfig['break'],
+                    'data'=>$arrayData,
+                    'title'=>@$pageConfig['title'],
+                    // 'sheetname'=>@$pageConfig['sheetname'],
+                    'preview'=>@$pageConfig['preview'],
+                    'size'=>@$pageConfig['size'],
+                    'orientation'=>@$pageConfig['orientation']
                 ],
                 'headers' => [
-                    'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998'
+                    'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998',
+                    'Accept' => 'application/json',
                 ]
             ],
         );
