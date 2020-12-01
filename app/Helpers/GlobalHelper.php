@@ -2286,7 +2286,6 @@ function renderXLS( $config,$arrayData,$pageConfig=["break"=>false,"sheetname"=>
     }catch(\Exception $e){
         return $e->getMessage()." ".$e->getLine();
     }
-    return response($response->getBody());
     return response($response->getBody())
     ->withHeaders([
         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
