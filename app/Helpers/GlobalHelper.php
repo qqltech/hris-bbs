@@ -2231,13 +2231,13 @@ function renderpdf( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"doc
                 'form_params' => [
                 'type'=>$type,
                 'config'=>$config,
-                'break'=>$pageConfig['break'],
+                'break'=>@$pageConfig['break'],
                 'data'=>$arrayData,
-                'title'=>$pageConfig['title'],
-                // 'sheetname'=>$pageConfig['sheetname'],
-                'preview'=>$pageConfig['preview'],
-                'size'=>$pageConfig['size'],
-                'orientation'=>$pageConfig['orientation']
+                'title'=>@$pageConfig['title'],
+                // 'sheetname'=>@$pageConfig['sheetname'],
+                'preview'=>@$pageConfig['preview'],
+                'size'=>@$pageConfig['size'],
+                'orientation'=>@$pageConfig['orientation']
                 ],
                 'headers' => [
                     'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998'
