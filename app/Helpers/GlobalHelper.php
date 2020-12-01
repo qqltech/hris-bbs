@@ -1910,7 +1910,7 @@ function uploadfile($model,$req){
     $modelArray = explode("\\",get_class($model));
     $modelName = end($modelArray);
     $validator = Validator::make($req->all(), [
-        'file' => 'max:25000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,jpeg,png,bmp,mp4,mp3,mpg,mpeg,mkv,3gp'
+        'file' => 'max:25000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,jpeg,png,bmp,mp4,mp3,mpg,mpeg,mkv,3gp,ods'
     ]);
     if ( $validator->fails()) {
         return $validator->errors()->all();
