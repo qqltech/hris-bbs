@@ -2268,7 +2268,7 @@ function renderXLS( $config,$arrayData,$pageConfig=["break"=>false,"sheetname"=>
         $response = $client->post(
             env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_xlsx.php"),
             [
-                'form_params' => [
+                'json' => [
                     'config'=>$config,
                     'break'=>@$pageConfig['break'],
                     'data'=>$arrayData,
@@ -2279,7 +2279,8 @@ function renderXLS( $config,$arrayData,$pageConfig=["break"=>false,"sheetname"=>
                     'orientation'=>@$pageConfig['orientation']
                 ],
                 'headers' => [
-                    'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998'
+                    'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998',
+                    'Accept' => 'application/json',
                 ]
             ],
         );
