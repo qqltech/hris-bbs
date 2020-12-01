@@ -2221,3 +2221,78 @@ function getRawData($query){
         return null;
     }
 }
+
+function renderpdf( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"documentpdf","size"=>"A4","orientation"=>"P","preview"=>false],$type="pdf" ){
+    $client = new \GuzzleHttp\Client();
+    try{    
+        $response = $client->post(
+            env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_htmlpdf.php"),
+            [
+                'form_params' => [
+                'type'=>$type,
+                'config'=>$config,
+                'break'=>$pageConfig['break'],
+                'data'=>$arrayData,
+                'title'=>$pageConfig['title'],
+                // 'sheetname'=>$pageConfig['sheetname'],
+                'preview'=>$pageConfig['preview'],
+                'size'=>$pageConfig['size'],
+                'orientation'=>$pageConfig['orientation']
+                ],
+                'headers' => [
+                    'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998'
+                ]
+            ],
+        );
+    }catch(\Exception $e){
+        return $e->getMessage()." ".$e->getLine();
+    }
+    return response($response->getBody())
+    ->withHeaders([
+        'Content-Type' => $type=='html'?'text/html':'application/pdf',//'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',//'text/html',//'application/pdf',
+        'Pragma' => 'public',
+        'Content-Disposition' => "inline; filename=".$pageConfig['title'].".pdf",//"attachment;filename=$judulsaja.xlsx",//'inline; filename="coba.pdf"'', // 
+        'Cache-Control'=>'private, must-revalidate, post-check=0, pre-check=0, max-age=1',
+        'Last-Modified'=>gmdate('D, d M Y H:i:s').' GMT',
+        'Expires'=>'Mon, 26 Jul 1997 05:00:00 GMT'
+    ]);
+}
+
+function renderHTML( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"documenthtml","size"=>"A4","orientation"=>"P","preview"=>false] ){
+   return renderPDF( $config,$arrayData,$pageConfig,"html" );
+}
+function renderXLS( $config,$arrayData,$pageConfig=["break"=>false,"sheetname"=>"header","title"=>"documentOffice2007","size"=>"A4","orientation"=>"P"] ){
+    $client = new \GuzzleHttp\Client();
+    // if(strtolower())
+    try{    
+        $response = $client->post(
+            env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_xlsx.php"),
+            [
+                'form_params' => [
+                    'config'=>$config,
+                    'break'=>@$pageConfig['break'],
+                    'data'=>$arrayData,
+                    'title'=>@$pageConfig['title'],
+                    'sheetname'=>@$pageConfig['sheetname'],
+                    'title'=>@$pageConfig['title'],
+                    'size'=>@$pageConfig['size'],
+                    'orientation'=>@$pageConfig['orientation']
+                ],
+                'headers' => [
+                    'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998'
+                ]
+            ],
+        );
+    }catch(\Exception $e){
+        return $e->getMessage()." ".$e->getLine();
+    }
+    return response($response->getBody())
+    ->withHeaders([
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Pragma' => 'public',
+        'Content-Disposition' => "attachment;filename=".$pageConfig['title'].".xlsx",
+        'Cache-Control'=>'private, must-revalidate, post-check=0, pre-check=0, max-age=1',
+        'Last-Modified'=>gmdate('D, d M Y H:i:s').' GMT',
+        'Expires'=>'Mon, 26 Jul 1997 05:00:00 GMT'
+    ]);
+}
