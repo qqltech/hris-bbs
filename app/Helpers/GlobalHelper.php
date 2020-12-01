@@ -2223,6 +2223,7 @@ function getRawData($query){
 }
 
 function renderpdf( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"documentpdf","size"=>"A4","orientation"=>"P","preview"=>false],$type="pdf" ){
+    return $pageConfig;
     $client = new \GuzzleHttp\Client();
     try{    
         $response = $client->post(
