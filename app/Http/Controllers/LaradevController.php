@@ -1371,7 +1371,9 @@ class LaradevController extends Controller
             File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             if( ! File::exists("$realpath/.git") ){
                 $commit = "first time";
-                $a = passthru("cd $realpath;pwd;git init .;git remote add origin $giturl;git remote -v;");//cd $realpath;git init .; pwd; git remote add origin $giturl");
+                passthru("cd $realpath;pwd;git init .;git remote add origin $giturl;git remote -v;");//cd $realpath;git init .; pwd; git remote add origin $giturl");
+                sleep(2);
+                passthru("cd $realpath;git remote add origin $giturl;git remote -v;");
                 return $a;
             }
             return 'a';
