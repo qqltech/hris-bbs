@@ -1364,7 +1364,7 @@ class LaradevController extends Controller
     public function git_push($filename, $commit = 'new'){
         try{
             // $giturl = env("GIT_ENABLE");
-            $userInfo = new \Jenssegers\Agent\Agent();
+            $agent = new \Jenssegers\Agent\Agent();
             $giturl = env("GIT_URL");
             $realpath = base_path();
             if( ! File::exists("$realpath/.git") ){
