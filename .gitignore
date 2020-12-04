@@ -11,8 +11,4 @@ Homestead.yaml
 /app/Models/CustomModels
 /app/Models/BasicModels
 /app/Models/SuperModels
-customscript.sh
-customscript.bat
-custommigrate.sh
-custommigrate.bat
 *.bat
