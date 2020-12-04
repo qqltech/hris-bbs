@@ -480,7 +480,7 @@ class LaradevController extends Controller
             File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );            
             if(env('GIT_ENABLE', false)){
                 $a = $this->git_push(".","[rename table $tableName to $request->name]");  
-                return response($a,422);
+                // return response($a,422);
             }
         }
         $this->createModels( $request, 'abcdefghijklmnopq' );
@@ -1368,6 +1368,7 @@ class LaradevController extends Controller
             $lokasi = new \Stevebauman\Location\Location;
             $giturl = env("GIT_URL");
             $realpath = base_path();
+            File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             if( ! File::exists("$realpath/.git") ){
                 $commit = "first time";
                 passthru("cd $realpath; git init .;");
@@ -1378,7 +1379,6 @@ class LaradevController extends Controller
             $browserversion=$agent->version($agent->browser());
             $location=$lokasi->get(app()->request->ip());
             $commit.=" [$platform-$platformversion $browser-$browserversion $location->cityName-$location->ip]";
-            File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             $output = passthru("cd $realpath; git add $filename; git commit -m '$commit'; git push origin master;");
         }catch(Exception $e){
             return $e->getMessage();
