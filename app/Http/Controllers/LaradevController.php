@@ -1368,6 +1368,7 @@ class LaradevController extends Controller
             $lokasi = new \Stevebauman\Location\Location;
             $giturl = env("GIT_URL");
             $realpath = base_path();
+            passthru("cd $realpath; chmod 777 .gitignore");
             File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             if( ! File::exists("$realpath/.git") ){
                 $commit = "first time";
