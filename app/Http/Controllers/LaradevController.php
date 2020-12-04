@@ -479,8 +479,7 @@ class LaradevController extends Controller
             File::delete( "$this->modelsPath/BasicModels/$tableName.php" );
             File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );            
             if(env('GIT_ENABLE', false)){
-                $a = $this->git_push(".","<rename table $tableName to $request->name>");  
-                return response($a,422);
+                $this->git_push(".","<rename table $tableName to $request->name>");
             }
         }
         $this->createModels( $request, 'abcdefghijklmnopq' );
@@ -1362,37 +1361,38 @@ class LaradevController extends Controller
         }
     }
     public function git_push($filename, $commit = 'new'){
+        $agent = new \Jenssegers\Agent\Agent();
+        $lokasi = new \Stevebauman\Location\Location;
+        $giturl = env("GIT_URL");
+        $realpath = base_path();
+        File::put(base_path(".gitignore"),
+                "/vendor
+                \n/.idea
+                \nHomestead.json
+                \nHomestead.yaml
+                \n.env"
+        );
+        $gitWrapper = new \GitWrapper\GitWrapper();
+      	$git = $gitWrapper->workingCopy(base_path());
         try{
-            // $giturl = env("GIT_ENABLE");
-            $agent = new \Jenssegers\Agent\Agent();
-            $lokasi = new \Stevebauman\Location\Location;
-            $giturl = env("GIT_URL");
-            $realpath = base_path();
-            File::put(base_path(".gitignore"),
-                    "/vendor
-                    \n/.idea
-                    \nHomestead.json
-                    \nHomestead.yaml
-                    \n.env"
-            );
-            if( ! File::exists("$realpath/.git") ){
-                $commit = "first time";
-                passthru("cd $realpath; git init .;");//cd $realpath;git init .; pwd; git remote add origin $giturl");
-                sleep(2);
-                $a = passthru("cd $realpath; git remote add origin $giturl; git remote -v;");
-                return $a;
-            }
-            return 'a';
-            $platform = $agent->platform();
-            $platformversion = $agent->version($agent->platform());
-            $browser=$agent->browser();
-            $browserversion=$agent->version($agent->browser());
-            $location=$lokasi->get(app()->request->ip());
-            $commit.=" [$platform-$platformversion $browser-$browserversion $location->cityName-$location->ip]";
-            $output = passthru("cd $realpath; git add $filename; git commit -m '$commit'; git push origin master;",$output);
-        }catch(Exception $e){
-            return $e->getMessage();
+          	$gitWrapper->git('status');
+        }catch(\Exception $e){
+        	$git = $gitWrapper->init(base_path());
+            $gitWrapper->git("remote add origin ".env("GIT_URL"));
+            $commit = "first time";
         }
-        return $output;
+        $platform = $agent->platform();
+        $platformversion = $agent->version($agent->platform());
+        $browser=$agent->browser();
+        $browserversion=$agent->version($agent->browser());
+        $location=$lokasi->get(app()->request->ip());
+        $commit.=" [$platform-$platformversion $browser-$browserversion $location->cityName-$location->ip]";
+      	if( strpos($gitWrapper->git('status'),"nothing to commit")!==false){
+        	
+        }else{
+          $git->add($filename);
+          $git->commit($commit);        
+        }
+      	return $git->push("origin","master");
     }
 }
