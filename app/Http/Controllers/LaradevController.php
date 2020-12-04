@@ -558,7 +558,7 @@ class LaradevController extends Controller
         if($return===0){
             $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
             if(env('GIT_ENABLE', false)){ 
-                $this->git_push(".","<SAVE MODEL $table>");       
+                $this->git_push(".","<SAVE MODEL $tableName>");       
             }
             return "update Model OK";
         }else{
