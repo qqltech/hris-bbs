@@ -367,6 +367,7 @@ class LaradevController extends Controller
                 'DEFAULT_ACTIVITIES' => 'false',
                 'FIREBASE_KEY' => 'xxx',
                 'GIT_ENABLE'=>'false',
+                'GIT_PUSH_START'=>'16:00',
                 'GIT_URL'=>'https://larahan:larahansuperuser2019@gitlab.com/exampleproject',            
             ];
             $env = [];
@@ -556,6 +557,9 @@ class LaradevController extends Controller
         File::delete($tempFile);
         if($return===0){
             $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
+            if(env('GIT_ENABLE', false)){ 
+                $this->git_push(".","<SAVE MODEL $table>");       
+            }
             return "update Model OK";
         }else{
             return response()->json($output,422);
@@ -1411,6 +1415,12 @@ class LaradevController extends Controller
           $git->add($filename);
           $git->commit($commit);        
         }
-      	return $git->push("origin","master");
+        $time = explode(":", env('GIT_PUSH_START', "15:00") );
+        $hour = $time[0];
+        $mins = $time[1];
+        if( (date("H")*60+date("i")) >= ($hour*60+$mins) ){
+            return $git->push("origin","master");
+        }
+        return 'ok';
     }
 }

@@ -81,6 +81,7 @@
             'DEFAULT_ACTIVITIES' => 'false',
             'FIREBASE_KEY' => 'xxx',
             'GIT_ENABLE'=>'false',
+            'GIT_PUSH_START'=>'16:00',
             'GIT_URL'=>'https://larahan:larahansuperuser2019@gitlab.com/exampleproject',  
         ];
         $env = [];
