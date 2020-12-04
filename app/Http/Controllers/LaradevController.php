@@ -1109,12 +1109,12 @@ class LaradevController extends Controller
         Schema::enableForeignKeyConstraints();
         if($req->alter){
             if(env('GIT_ENABLE', false)){ 
-                $this->git_push(".","<ALTER $tableName>");       
+                $this->git_push(".","<ALTER $table>");       
             }
             return "database alter ok, $table model altered successfully";
         }else{
             if(env('GIT_ENABLE', false)){ 
-                $this->git_push(".","<MIGRATE $tableName>");       
+                $this->git_push(".","<MIGRATE $table>");       
             }
             return "database migration ok, $table model recreated successfully";
         }
@@ -1166,14 +1166,14 @@ class LaradevController extends Controller
             return response()->json($e->getMessage(),400);
         }
         if(env('GIT_ENABLE', false)){ 
-            $this->git_push(".","<DROP $tableName>");       
+            $this->git_push(".","<DROP $table>");       
         }
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
     }
     public function editAlter(Request $req, $table=null){
         $file = File::put( base_path('database/migrations/alters')."/0_0_0_0_"."$table.php" , $req->text); 
         if(env('GIT_ENABLE', false)){ 
-            $this->git_push(".","<SAVE ALTER $tableName>");       
+            $this->git_push(".","<SAVE ALTER $table>");       
         }
         return "update Alter OK";
     }
@@ -1210,7 +1210,7 @@ class LaradevController extends Controller
             }
             $file = File::put( base_path('database/migrations/projects')."/0_0_0_0_"."$table.php" , $req->text); 
             if(env('GIT_ENABLE', false)){ 
-                $this->git_push(".","<SAVE MIGRATION $tableName>");       
+                $this->git_push(".","<SAVE MIGRATION $table>");       
             }
             return "update Migrations OK [".count($data)."]";
         }
