@@ -5,7 +5,8 @@ if [ -d .git ]; then
     git commit -m '[Fajar Maintain Kode]'
     git push origin master
     echo 'git push dijalankan'
-else
+fi
+# else
 #   git add .
 #   git commit -m '[Fajar Maintain Kode]'
-fi;
+# fi;
