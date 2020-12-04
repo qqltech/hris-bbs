@@ -7,6 +7,4 @@ if [ -d .git ]; then
 # fi
 else
     git init;
-    git add .;
-    git commit -m '[Fajar Maintain Kode]';
 fi;
