@@ -1369,7 +1369,7 @@ class LaradevController extends Controller
             return ". $realpath/git.sh '$giturl' $filename '$commit'";
             $output = passthru(". $realpath/git.sh '$giturl' $filename '$commit'");
         }catch(Exception $e){
-            return response()->json(["error"=>$e->getMessage()],422);
+            return $e->getMessage();
         }
         return $output;
     }
