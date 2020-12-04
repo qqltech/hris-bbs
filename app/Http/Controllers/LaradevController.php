@@ -1365,7 +1365,7 @@ class LaradevController extends Controller
         try{
             // $giturl = env("GIT_ENABLE");
             $agent = new \Jenssegers\Agent\Agent();
-            $lokasi = new \Stevebauman\Location\Location();
+            $lokasi = new \Stevebauman\Location\Location;
             $giturl = env("GIT_URL");
             $realpath = base_path();
             if( ! File::exists("$realpath/.git") ){
