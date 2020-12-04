@@ -483,6 +483,9 @@ class LaradevController extends Controller
             }
         }
         $this->createModels( $request, 'abcdefghijklmnopq' );
+        if(env('GIT_ENABLE', false)){
+            $this->git_push(".","<rename table $tableName to $request->name>");
+        }
         return "rename table OK";
     }
     public function deleteTables(Request $request, $tableName){
@@ -1367,6 +1370,9 @@ class LaradevController extends Controller
         $realpath = base_path();
         File::put(base_path(".gitignore"),
                 "/vendor
+                \n/public/uploads
+                \n/public/models.json
+                \n*.bat
                 \n/.idea
                 \nHomestead.json
                 \nHomestead.yaml
