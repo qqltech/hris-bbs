@@ -477,14 +477,11 @@ class LaradevController extends Controller
 
             File::delete( "$this->modelsPath/CustomModels/$tableName.php" );
             File::delete( "$this->modelsPath/BasicModels/$tableName.php" );
-            File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );            
-            if(env('GIT_ENABLE', false)){
-                $this->git_push(".","<rename table $tableName to $request->name>");
-            }
+            File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );
         }
         $this->createModels( $request, 'abcdefghijklmnopq' );
         if(env('GIT_ENABLE', false)){
-            $this->git_push(".","<rename table $tableName to $request->name>");
+            $this->git_push(".","<RENAME $tableName -> $request->name>");
         }
         return "rename table OK";
     }
@@ -496,7 +493,7 @@ class LaradevController extends Controller
             File::delete( $customModel );
             File::delete( $basicModel );
             if(env('GIT_ENABLE', false)){ 
-                $this->git_push(".","[delete table $tableName]");       
+                $this->git_push(".","<DROP $tableName>");       
             }
         }
         return "delete table OK";
@@ -1111,8 +1108,14 @@ class LaradevController extends Controller
         }
         Schema::enableForeignKeyConstraints();
         if($req->alter){
+            if(env('GIT_ENABLE', false)){ 
+                $this->git_push(".","<ALTER $tableName>");       
+            }
             return "database alter ok, $table model altered successfully";
         }else{
+            if(env('GIT_ENABLE', false)){ 
+                $this->git_push(".","<MIGRATE $tableName>");       
+            }
             return "database migration ok, $table model recreated successfully";
         }
     }
@@ -1162,10 +1165,16 @@ class LaradevController extends Controller
         }catch(Exception $e){
             return response()->json($e->getMessage(),400);
         }
+        if(env('GIT_ENABLE', false)){ 
+            $this->git_push(".","<DROP $tableName>");       
+        }
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
     }
     public function editAlter(Request $req, $table=null){
         $file = File::put( base_path('database/migrations/alters')."/0_0_0_0_"."$table.php" , $req->text); 
+        if(env('GIT_ENABLE', false)){ 
+            $this->git_push(".","<SAVE ALTER $tableName>");       
+        }
         return "update Alter OK";
     }
     public function refreshAlias(Request $req,$table){
@@ -1200,6 +1209,9 @@ class LaradevController extends Controller
                 return response()->json("maaf nama model $table tidak ada", 400);
             }
             $file = File::put( base_path('database/migrations/projects')."/0_0_0_0_"."$table.php" , $req->text); 
+            if(env('GIT_ENABLE', false)){ 
+                $this->git_push(".","<SAVE MIGRATION $tableName>");       
+            }
             return "update Migrations OK [".count($data)."]";
         }
         $data = $this->getDirContents( base_path('database/migrations/projects') );
