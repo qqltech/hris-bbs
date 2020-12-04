@@ -6,6 +6,7 @@ if [ -d .git ]; then
     echo 'git push dijalankan'
 # fi
 else
-  git add .
-  git commit -m '[Fajar Maintain Kode]'
+    git init
+    git add .
+    git commit -m '[Fajar Maintain Kode]'
 fi;
