@@ -1368,7 +1368,6 @@ class LaradevController extends Controller
             $lokasi = new \Stevebauman\Location\Location;
             $giturl = env("GIT_URL");
             $realpath = base_path();
-            passthru("cd $realpath; chmod 777 .gitignore");
             File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             if( ! File::exists("$realpath/.git") ){
                 $commit = "first time";
@@ -1380,7 +1379,7 @@ class LaradevController extends Controller
             $browserversion=$agent->version($agent->browser());
             $location=$lokasi->get(app()->request->ip());
             $commit.=" [$platform-$platformversion $browser-$browserversion $location->cityName-$location->ip]";
-            $output = passthru("cd $realpath; git add $filename; git commit -m '$commit'; git push origin master;");
+            $output = passthru("cd $realpath; git add $filename; git commit -m '$commit'; git push origin master;",$output);
         }catch(Exception $e){
             return $e->getMessage();
         }
