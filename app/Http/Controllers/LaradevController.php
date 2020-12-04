@@ -1364,12 +1364,21 @@ class LaradevController extends Controller
     public function git_push($filename, $commit = 'new'){
         try{
             // $giturl = env("GIT_ENABLE");
+            $userInfo = new \Jenssegers\Agent\Agent();
             $giturl = env("GIT_URL");
             $realpath = base_path();
             if( ! File::exists("$realpath/.git") ){
+                $commit = "first time";
                 passthru("cd $realpath; git init .;");
             }
-            $output = passthru("cd $realpath; git add $filename; git commit -m $commit; git push origin master;");
+            $platform = $agent->platform();
+            $platformversion = $agent->version($agent->platform());
+            $browser=$agent->browser();
+            $browserversion=$agent->version($agent->browser());
+            $location=(new Location)->get(app()->request->ip());
+            $commit.=" [$platform-$platformversion $browser-$browserversion $location-".app()->request->ip();
+            File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
+            $output = passthru("cd $realpath; git add $filename; git commit -m '$commit'; git push origin master;");
         }catch(Exception $e){
             return $e->getMessage();
         }
