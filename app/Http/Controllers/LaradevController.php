@@ -1367,7 +1367,7 @@ class LaradevController extends Controller
             $giturl = env("GIT_URL");
             $realpath = base_path();
             // return ". $realpath/git.sh '$giturl' $filename '$commit'";
-            $output = passthru(". $realpath/git.sh '$giturl' $filename '$commit'");
+            $output = passthru(". $realpath/git.sh 'g' $filename '$commit'");
         }catch(Exception $e){
             return $e->getMessage();
         }
