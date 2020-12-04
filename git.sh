@@ -1,5 +1,5 @@
 echo "$(cat gitignore.txt)" > .gitignore
-echo "masuk $1 $2 $3";
+echo "masuk awal $# $1 $2 $3";
 if [ -d .git ]; then
   echo "masuk $1 $2 $3";
 else
