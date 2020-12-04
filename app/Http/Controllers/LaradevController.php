@@ -1379,8 +1379,8 @@ class LaradevController extends Controller
                 $commit = "first time";
                 passthru("cd $realpath; git init .;");//cd $realpath;git init .; pwd; git remote add origin $giturl");
                 sleep(2);
-                $a = passthru("cd $realpath;git remote add origin $giturl;");
-                return $giturl;
+                $a = passthru("cd $realpath; git remote add origin $giturl; git remote -v;");
+                return $a;
             }
             return 'a';
             $platform = $agent->platform();
