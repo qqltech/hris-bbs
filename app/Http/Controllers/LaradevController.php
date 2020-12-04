@@ -1370,9 +1370,9 @@ class LaradevController extends Controller
             $realpath = base_path();
             File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             if( ! File::exists("$realpath/.git") ){
-                return 'ab';
                 $commit = "first time";
-                $a = passthru("cd $realpath; git init .; git remote add origin $giturl");
+                $a = passthru("cd $realpath;git init .; echo ok; git remote add origin $giturl");
+                return 'abc';
             }
             return 'a';
             $platform = $agent->platform();
