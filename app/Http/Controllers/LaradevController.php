@@ -479,7 +479,7 @@ class LaradevController extends Controller
             File::delete( "$this->modelsPath/BasicModels/$tableName.php" );
             File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );            
             if(env('GIT_ENABLE', false)){
-                $a = $this->git_push(".","[rename table $tableName to $request->name]");  
+                $a = $this->git_push(".","<rename table $tableName to $request->name>");  
                 return response($a,422);
             }
         }
@@ -1371,8 +1371,9 @@ class LaradevController extends Controller
             File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             if( ! File::exists("$realpath/.git") ){
                 $commit = "first time";
-                passthru("cd $realpath; git init .; git remote add origin $giturl");
+                $a = passthru("cd $realpath; git init .; git remote add origin $giturl");
             }
+            return $a;
             $platform = $agent->platform();
             $platformversion = $agent->version($agent->platform());
             $browser=$agent->browser();
