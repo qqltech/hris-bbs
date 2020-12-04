@@ -4,7 +4,6 @@ if [ -d .git ]; then
 else
   git init .
   git remote add origin $1
-  git remote -v
 fi;
 git add $2
 git commit -m $3

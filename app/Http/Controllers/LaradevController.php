@@ -365,7 +365,9 @@ class LaradevController extends Controller
                 'SINGLE_LOGIN' => 'true',
                 'FORMAT_DATE_FRONTEND' => 'd/m/Y',
                 'DEFAULT_ACTIVITIES' => 'false',
-                'FIREBASE_KEY' => 'xxx'
+                'FIREBASE_KEY' => 'xxx',
+                'GIT_ENABLE'=>'false',
+                'GIT_URL'=>'https://larahan:larahansuperuser2019@gitlab.com/exampleproject',            
             ];
             $env = [];
             foreach ($data as $key => $value) {
@@ -475,7 +477,10 @@ class LaradevController extends Controller
 
             File::delete( "$this->modelsPath/CustomModels/$tableName.php" );
             File::delete( "$this->modelsPath/BasicModels/$tableName.php" );
-            File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );
+            File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );            
+            if(env('GIT_ENABLE', false)){ 
+                $this->git_push(".","[rename table $tableName to $request->name]");  
+            }
         }
         $this->createModels( $request, 'abcdefghijklmnopq' );
         return "rename table OK";
@@ -483,8 +488,13 @@ class LaradevController extends Controller
     public function deleteTables(Request $request, $tableName){
         Schema::dropIfExists($tableName);
         if($request->models){
-            File::delete( "$this->modelsPath/CustomModels/$tableName.php" );
-            File::delete( "$this->modelsPath/BasicModels/$tableName.php" );
+            $customModel = "$this->modelsPath/CustomModels/$tableName.php";
+            $basicModel = "$this->modelsPath/BasicModels/$tableName.php";
+            File::delete( $customModel );
+            File::delete( $basicModel );
+            if(env('GIT_ENABLE', false)){ 
+                $this->git_push(".","[delete table $tableName]");       
+            }
         }
         return "delete table OK";
     }
@@ -1349,5 +1359,17 @@ class LaradevController extends Controller
             return 'testing ok';
 
         }
+    }
+    public function git_push($filename, $commit = 'new'){
+        try{
+            // $giturl = env("GIT_ENABLE");
+            $giturl = env("GIT_URL");
+            $realpath = base_path();
+            $data   = json_encode($req->all());
+            $output = passthru(". $realpath/git.sh $giturl $filename $commit");
+        }catch(Exception $e){
+            return response()->json(["error"=>$e->getMessage()],422);
+        }
+        return $output;
     }
 }

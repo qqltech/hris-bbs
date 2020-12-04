@@ -79,7 +79,9 @@
             'SINGLE_LOGIN' => 'true',
             'FORMAT_DATE_FRONTEND' => 'd/m/Y',
             'DEFAULT_ACTIVITIES' => 'false',
-            'FIREBASE_KEY' => 'xxx'
+            'FIREBASE_KEY' => 'xxx',
+            'GIT_ENABLE'=>'false',
+            'GIT_URL'=>'https://larahan:larahansuperuser2019@gitlab.com/exampleproject',  
         ];
         $env = [];
         foreach ($data as $key => $value) {
