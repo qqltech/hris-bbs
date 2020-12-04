@@ -1,6 +1,5 @@
 echo "$(cat gitignore.txt)" > .gitignore
 if [ -d .git ]; then
-    echo git dir ok;
 else
   git init .
   git remote add origin $1
