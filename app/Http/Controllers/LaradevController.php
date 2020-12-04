@@ -1367,9 +1367,9 @@ class LaradevController extends Controller
             $giturl = env("GIT_URL");
             $realpath = base_path();
             if( ! File::exists("$realpath/.git") ){
-                return passthru('cd $realpath; echo "$(cat gitignore.txt)"');
-                passthru("cd $realpath; git add $filename;");
+                return passthru("cd $realpath; git init .; git add $filename;");
             }
+
             // return ". $realpath/git.sh '$giturl' $filename '$commit'";
             $output = passthru("cd $realpath; git add $filename; git commit -m $commit; git push origin master;");
         }catch(Exception $e){
