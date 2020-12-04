@@ -478,7 +478,7 @@ class LaradevController extends Controller
             File::delete( "$this->modelsPath/CustomModels/$tableName.php" );
             File::delete( "$this->modelsPath/BasicModels/$tableName.php" );
             File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );            
-            if(env('GIT_ENABLE', false)){ 
+            if(env('GIT_ENABLE', false)){
                 $a = $this->git_push(".","[rename table $tableName to $request->name]");  
                 return response($a,422);
             }
@@ -1366,6 +1366,7 @@ class LaradevController extends Controller
             // $giturl = env("GIT_ENABLE");
             $giturl = env("GIT_URL");
             $realpath = base_path();
+            return ". $realpath/git.sh '$giturl' $filename '$commit'";
             $output = passthru(". $realpath/git.sh '$giturl' $filename '$commit'");
         }catch(Exception $e){
             return response()->json(["error"=>$e->getMessage()],422);
