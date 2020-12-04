@@ -1375,7 +1375,7 @@ class LaradevController extends Controller
             $platformversion = $agent->version($agent->platform());
             $browser=$agent->browser();
             $browserversion=$agent->version($agent->browser());
-            $location=(new Location)->get(app()->request->ip());
+            $location=(new \Stevebauman\Location\Location())->get(app()->request->ip());
             $commit.=" [$platform-$platformversion $browser-$browserversion $location-".app()->request->ip();
             File::put(base_path(".gitignore"),File::get(base_path("gitignore.txt")) );
             $output = passthru("cd $realpath; git add $filename; git commit -m '$commit'; git push origin master;");
