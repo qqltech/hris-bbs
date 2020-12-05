@@ -1407,8 +1407,9 @@ class LaradevController extends Controller
         $platformversion = $agent->version($agent->platform());
         $browser=$agent->browser();
         $browserversion=$agent->version($agent->browser());
-        $location=$lokasi->get(app()->request->ip());
-        $commit.=" [$platform-$platformversion $browser-$browserversion $location->cityName-$location->ip]";
+        $ip = app()->request->ip();
+        $location=$lokasi->get($ip);
+        $commit.=" [$platform-$platformversion $browser-$browserversion IP:$ip]";
       	if( strpos($gitWrapper->git('status'),"nothing to commit")!==false){
         	
         }else{
