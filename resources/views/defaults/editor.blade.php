@@ -48,10 +48,6 @@
         .ace-monokai .ace_identifier {
             color: #A6E22E;
         }
-        .b-sidebar{
-            width:27% !important;
-            padding-left:10px !important;
-        }
         .text-sangat-white{
             color:#ffffff
         }
@@ -120,10 +116,10 @@
 <div id="app" >
     <split-pane @resize="resize" :min-percent='0' :default-percent="$store.state.sidebarLeft" split="vertical">
       <template ref="leftPanel" slot="paneL">
-        <div style="z-index:1;min-width:300px;" class="text-white col-md-12 col-sm-12 col-xs-12">
+        <div style="z-index:1;min-width:280px;" class="text-white col-md-12 col-sm-12 col-xs-12">
                 <b-row class="mt-md-2">
                     <b-col md="6" class="ml-md-2 mr-md-0" style="padding-right:1px;">
-                        <b-form-input size="sm" placeholder='search' @input="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
+                        <b-form-input size="sm" placeholder='search' v-model="searchData" @input="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
                     </b-col>
                     <b-col style="padding-left:0px;">
                         <b-btn title="add new" class="bg-dark-monokai" size="sm" style="margin-top:2px;margin-right:0px;" @click="add_new">
@@ -644,7 +640,7 @@ vm = new Vue({
         {
             state: {
                 sidebar: false,
-                sidebarLeft:30,
+                sidebarLeft:25,
                 activeEditorIndex:0,
                 activeEditorTitle:"-",
                 activeEditors:[{
@@ -681,7 +677,7 @@ vm = new Vue({
                 addActiveEditors(state,objVal){
                     let ketemu = state.activeEditors.findIndex(dt=>{ return dt.title==objVal.title&&dt.jenis==objVal.jenis;} );
                     if(ketemu>-1){
-                        console.log(ketemu)
+                        state.activeEditors[ketemu]=objVal.value;
                         state.activeEditorIndex = ketemu;
                         return;
                     }
@@ -697,7 +693,6 @@ vm = new Vue({
             },
             actions: {
                 saveOnline ({ commit, state }, editor) {
-                    console.log(state.activeEditors)
                     window.aku=editor;
                     console.log(editor)
                 },
@@ -730,7 +725,7 @@ vm = new Vue({
                     }).then(response => {
                         state.modelList = response.data;
                     }).catch(error => {
-                        console.log(response)
+                        console.log(error)
                     }).then(function () {
                         loader.hide();
                     });  ;
@@ -741,7 +736,7 @@ vm = new Vue({
     components:{ 'vue-ace-editor': VueAceEditor },
     data:{
         editorcontent: 'tes',
-        // treeData: treeData,
+        searchData:""
         //  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
     },
     created(){
@@ -753,6 +748,11 @@ vm = new Vue({
             let models=this.$store.state.modelList.models;
             // console.log(models)
             for(let i in models){
+                if(this.searchData!="" && this.searchData!==null){
+                    if(!(models[i].file).includes(this.searchData)){
+                        continue;
+                    }
+                }
                 let name = 'migration';
                 let icon = 'table';
                 let children = [
@@ -790,41 +790,61 @@ vm = new Vue({
             }
         },
         search(e){
-            console.log(e)
+            // console.log(e)
         },
         resize(a){
             this.$store.commit('sidebarLeftChange',a);
         },
         addFile: function(item,e) {
             let itemLengkap = this.treeData.find(dt=>dt.name==item.src);
-            let icon,action;
+            let icon,action,endpoint;
+            let me = this;
             if(item.name=='Migration'){
-                icon='lightning'; action='migrate';
+                icon='lightning'; action='migrate'; endpoint="/migrations/"+item.src;
             }else if(item.name=='Alter'){
-                icon='shuffle'; action='alter';
+                icon='shuffle'; action='alter';endpoint="/alter/"+item.src;
             }else if( (item.name).toLowerCase().includes('custom')){
-                icon='file-code';action="";
+                icon='file-code';action="";endpoint="/models/"+item.src;
             }else if((item.name).toLowerCase().includes('basic')){
-                icon='file-check';action="";
+                icon='file-check';action="";endpoint="/models/"+item.src;
             }else{
                 icon='list-check';action="";
             }
-            this.$store.commit('addActiveEditors',{
-                    title:itemLengkap.name,
-                    jenis:item.name,
-                    value:"kosong",
-                    icon: icon,
-                    readOnly:(item.name).toLowerCase().includes('basic'),
-                    action:action,
-                    mode:'php',
-                    theme: 'monokai',
-                    fontSize: 12,
-                    fontFamily: 'monospace',
-                    highlightActiveLine: true,
-                    enableBasicAutocompletion:true,
-                    maxLines:parseInt(window.innerHeight/15.2),
-                    minLines:parseInt(window.innerHeight/15.2+15)
-            })
+            let loader = Vue.$loading.show({
+                color: 'grey',loader: 'dots',
+            },{
+                
+            });
+            axios({
+                url         : "{{url('laradev')}}"+endpoint,
+                credentials : true,
+                // method      : data.method,
+                // data        : data.body,
+                headers     : {
+                    laradev:"quantumleap150671"
+                }
+            }).then(response => {           
+                me.$store.commit('addActiveEditors',{
+                        title:itemLengkap.name,
+                        jenis:item.name,
+                        value:item.name.includes('Model')?response.data.text:response.data,
+                        icon: icon,
+                        readOnly:(item.name).toLowerCase().includes('basic'),
+                        action:action,
+                        mode:'php',
+                        theme: 'monokai',
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                        highlightActiveLine: true,
+                        enableBasicAutocompletion:true,
+                        maxLines:parseInt(window.innerHeight/15.2),
+                        minLines:parseInt(window.innerHeight/15.2+15)
+                })
+            }).catch(error => {
+                console.log(error)
+            }).then(function () {
+                loader.hide();
+            });
         },
         openFile: function(item) {
             console.log(item)
