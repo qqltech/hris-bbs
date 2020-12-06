@@ -643,22 +643,7 @@ vm = new Vue({
                 sidebarLeft:25,
                 activeEditorIndex:0,
                 activeEditorTitle:"-",
-                activeEditors:[{
-                        action:'migrate',
-                        mode:'php',
-                        title:"New File",
-                        value:'',
-                        theme: 'monokai',
-                        fontSize: 12,
-                        fontFamily: 'monospace',
-                        highlightActiveLine: true,
-                        
-                        // highlightGutterLine: true,
-                        // emableLiveAutocompletion:true,
-                        enableBasicAutocompletion:true,
-                        maxLines:parseInt(window.innerHeight/15.2),
-                        minLines:parseInt(window.innerHeight/15.2+25)
-                }],
+                activeEditors:[],
                 modelList:[]
             },
             mutations: {
@@ -675,10 +660,11 @@ vm = new Vue({
                     state.sidebarLeft=val;
                 },
                 addActiveEditors(state,objVal){
-                    let ketemu = state.activeEditors.findIndex(dt=>{ return dt.title==objVal.title&&dt.jenis==objVal.jenis;} );
+                    let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
                     if(ketemu>-1){
                         state.activeEditors[ketemu].value=objVal.value;
                         state.activeEditorIndex = ketemu;
+                        state.activeEditorTitle=state.activeEditors[ketemu].jenis+'-'+state.activeEditors[ketemu].title;
                         return;
                     }
                     state.activeEditors.push(objVal);
