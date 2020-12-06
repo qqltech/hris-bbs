@@ -531,6 +531,12 @@ class LaradevController extends Controller
                 return response()->json("nopassword",401);
             }
         }
+        if($request->basic){
+            return File::get(app()->path()."/Models/BasicModels/$tableName.php");
+        }
+        if($request->custom){
+            return File::get(app()->path()."/Models/CustomModels/$tableName.php");
+        }
         $basic = File::get(app()->path()."/Models/BasicModels/$tableName.php");
         $file = File::get(app()->path()."/Models/CustomModels/$tableName.php");
         if($request->script_only){

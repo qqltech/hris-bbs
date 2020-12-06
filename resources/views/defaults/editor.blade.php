@@ -804,9 +804,9 @@ vm = new Vue({
             }else if(item.name=='Alter'){
                 icon='shuffle'; action='alter';endpoint="/alter/"+item.src;
             }else if( (item.name).toLowerCase().includes('custom')){
-                icon='file-code';action="";endpoint="/models/"+item.src;
+                icon='file-code';action="";endpoint="/models/"+item.src+"?custom=true";
             }else if((item.name).toLowerCase().includes('basic')){
-                icon='file-check';action="";endpoint="/models/"+item.src;
+                icon='file-check';action="";endpoint="/models/"+item.src+"?basic=true";
             }else{
                 icon='list-check';action="";
             }
@@ -827,7 +827,7 @@ vm = new Vue({
                 me.$store.commit('addActiveEditors',{
                         title:itemLengkap.name,
                         jenis:item.name,
-                        value:item.name.includes('Model')?response.data.text:response.data,
+                        value:response.data,
                         icon: icon,
                         readOnly:(item.name).toLowerCase().includes('basic'),
                         action:action,
