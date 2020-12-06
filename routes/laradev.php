@@ -18,7 +18,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->delete('/tables/{tableName}', 'LaradevController@deleteTables');
         $router->post('/migrate', 'LaradevController@migrateDefault');
 
-        $router->get('/models', 'LaradevController@readModels');
+        $router->get('/models', 'LaradevController@readMigrations');
         $router->get('/models/{tableName}', 'LaradevController@readModelsOne');
         $router->post('/models', 'LaradevController@createModels');
         $router->post('/models/{tableName}', 'LaradevController@createModels');
