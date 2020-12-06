@@ -147,7 +147,7 @@
       </template>
       <template slot="paneR">
         <div>
-            <b-tabs active-nav-item-class="font-weight-bold monokai-active-tab"
+            <b-tabs active-nav-item-class="font-weight-bold monokai-active-tab" no-fade small
                     content-class="mt-0" style="width:100%;" nav-class='monokai-inactive-tab' @input="changeTab">
                 <b-tab  v-for="(item,index) in $store.state.activeEditors" :active="index==$store.state.activeEditorIndex">
                     <template #title style="font-size:9px;">
