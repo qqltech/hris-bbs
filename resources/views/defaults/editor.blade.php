@@ -677,7 +677,7 @@ vm = new Vue({
                 addActiveEditors(state,objVal){
                     let ketemu = state.activeEditors.findIndex(dt=>{ return dt.title==objVal.title&&dt.jenis==objVal.jenis;} );
                     if(ketemu>-1){
-                        state.activeEditors[ketemu]=objVal.value;
+                        state.activeEditors[ketemu].value=objVal.value;
                         state.activeEditorIndex = ketemu;
                         return;
                     }
