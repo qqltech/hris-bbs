@@ -129,13 +129,23 @@ class ApiFixedController extends Controller
     {
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
         $model = new $modelCandidate;
-        $function = $this->operation."RoleCheck";
-        if(method_exists($model, $function)){
-            if(!$model->$function()){
+
+        if( method_exists($model, "getRoles" ) ){
+            if( !$model->getRoles($this->originalRequest) ){
                 $this->messages[] ="[UNAUTHORIZED]operasi $this->operation di [$modelName] dilarang!";
                 $this->isAuthorized=false;
                 return false;
             }
+        }else{
+            $function = $this->operation."RoleCheck";
+            if(method_exists($model, $function)){
+                if(!$model->$function()){
+                    $this->messages[] ="[UNAUTHORIZED]operasi $this->operation di [$modelName] dilarang!";
+                    $this->isAuthorized=false;
+                    return false;
+                }
+            }
+
         }
         $model = null;
         return true;
