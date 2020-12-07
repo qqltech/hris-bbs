@@ -30,8 +30,15 @@
                         user-select: none; /* Non-prefixed version, currently
                                             supported by Chrome, Edge, Opera and Firefox */
             }
+        .ace-monokai .ace_string {
+            /* color: #f5e658 !important; */
+        }
         .ace_prompt_container {
             z-index:999999999 !important;
+        }
+        .ace-monokai .ace_entity.ace_name.ace_tag, .ace-monokai .ace_keyword, .ace-monokai .ace_meta.ace_tag, .ace-monokai .ace_storage {
+            color: #F92672;
+            font-weight: bold;
         }
         .ace-monokai .ace_storage {
             color: #66D9EF !important;
@@ -162,12 +169,14 @@
                             &nbsp;&nbsp;x&nbsp;&nbsp;
                         </b-btn>
                     </template>
-                    <div style="overflow: auto;height:100%;">
-                        <vue-ace-editor 
-                            v-model:value ="item.value" 
-                            v-bind:options="item" 
-                            :id="'editor_'+index">
-                        </vue-ace-editor>      
+                    <div style="max-height:94%">
+                        <div style="overflow: auto;height:94%;">
+                            <vue-ace-editor 
+                                v-model:value ="item.value" 
+                                v-bind:options="item" 
+                                :id="'editor_'+index">
+                            </vue-ace-editor>      
+                        </div>
                     </div>
                     <b-btn pill 
                         @click="$store.dispatch(item.action, item)"
@@ -819,12 +828,12 @@ vm = new Vue({
                         action:action,
                         mode:'php',
                         theme: 'monokai',
-                        fontSize: 12,
-                        fontFamily: 'monospace',
+                        fontSize: 11,
+                        fontFamily: 'Consolas',
                         highlightActiveLine: true,
                         enableBasicAutocompletion:true,
-                        maxLines:parseInt(window.innerHeight/15.2),
-                        minLines:parseInt(window.innerHeight/15.2+15)
+                        maxLines: Infinity,//parseInt(window.innerHeight/13.9),
+                        minLines:parseInt(window.innerHeight/13.9+25)
                 })
             }).catch(error => {
                 console.log(error)
