@@ -6,7 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.min.js" integrity="sha512-8qx1DL/2Wsrrij2TWX5UzvEaYOFVndR7BogdpOyF4ocMfnfkw28qt8ULkXD9Tef0bLvh3TpnSAljDC7uyniEuQ==" crossorigin="anonymous"></script>
     <!-- <script src="https://ace.c9.io/lib/ace/keyboard/vscode.js"></script> -->
 
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="{{url('defaults/vue.min.js')}}"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-loading-overlay@3"></script>
     <link href="https://cdn.jsdelivr.net/npm/vue-loading-overlay@3/dist/vue-loading.css" rel="stylesheet">
@@ -21,6 +21,9 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-splitpane@1.0.6/dist/vue-split-pane.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
     <style>
+        .ace-monokai .ace_marker-layer .ace_active-line {
+            background: #49483E;
+        }
         .no-select {
             -webkit-touch-callout: none; /* iOS Safari */
                 -webkit-user-select: none; /* Safari */
@@ -33,12 +36,18 @@
         .ace-monokai .ace_string {
             /* color: #f5e658 !important; */
         }
+        .ace-monokai .ace_gutter {
+            
+            background: #27282236 !important;
+            /* background: #1e1f1c !important; */
+            color: #8F908A;
+        }
         .ace_prompt_container {
             z-index:999999999 !important;
         }
         .ace-monokai .ace_entity.ace_name.ace_tag, .ace-monokai .ace_keyword, .ace-monokai .ace_meta.ace_tag, .ace-monokai .ace_storage {
             color: #F92672;
-            font-weight: bold;
+            /* font-weight: bold; */
         }
         .ace-monokai .ace_storage {
             color: #66D9EF !important;
@@ -46,8 +55,8 @@
         .ace-monokai .ace_support.ace_function {
             color: #66ffef;
         }
-        .ace_support .ace_php_tag{            
-            color: #66D9EF !important;
+        .ace_php_tag{            
+            color: #F92672 !important;
         }
         .ace-monokai .ace_variable {
             color: #ffffff;
@@ -68,6 +77,7 @@
         }
         .ace-monokai{
             background-color:#272822 !important;
+            /* background-color:#27282236 !important; */
         }
         .monokai-inactive-tab{
             background-color:#34352f !important;
@@ -128,9 +138,14 @@
                     <b-col md="6" class="ml-md-2 mr-md-0" style="padding-right:1px;">
                         <b-form-input size="sm" placeholder='search' v-model="searchData" @input="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
                     </b-col>
-                    <b-col style="padding-left:0px;">
+                    <b-col style="padding-left:0px;padding-right:0px;margin-right:0px;flex-grow: 0 !important;">
                         <b-btn title="add new" class="bg-dark-monokai" size="sm" style="margin-top:2px;margin-right:0px;" @click="add_new">
                             <b-icon icon="plus-square"></b-icon>
+                        </b-btn>
+                    </b-col>
+                    <b-col style="padding-left:0px;">
+                        <b-btn title="reload models" class="bg-dark-monokai" size="sm" style="margin-top:2px;margin-right:0px;" @click="reload_models">
+                            <b-icon icon="arrow-clockwise"></b-icon>
                         </b-btn>
                     </b-col>
                 </b-row>
@@ -179,17 +194,38 @@
                         </div>
                     </div>
                     <b-btn pill 
+                        :disabled="$store.state.migrating"
                         @click="$store.dispatch(item.action, item)"
                         :class="item.action=='alter'?'bg-warning':'bg-danger'" 
-                        style="z-index:999999;position:fixed;right:13px;bottom:30px;" 
+                        style="z-index:999999;position:fixed;right:18px;bottom:30px;" 
                         v-if="item.action" :title="item.action" size="sm">
-                        <b-icon icon="lightning-fill" ></b-icon>
+                        <b-icon icon="lightning-fill" v-if="!$store.state.migrating"></b-icon>
+                        <b-spinner small type="grow" v-if="$store.state.migrating"></b-spinner><span v-if="$store.state.migrating">Altering/Migrating...</span>
+                            
                     </b-btn>
+
+                    <b-spinner small type="grow"></b-spinner>
+                        Loading...
+                    </b-button>
                 </b-tab>
             </b-tabs>
         </div>
       </template>
     </split-pane>
+    <!-- <b-overlay :show="$store.state.prompt" no-wrap style="z-index: 999999">
+        <template #overlay>          
+          <div
+            tabindex="-1"
+            role="dialog"
+            aria-modal="false"
+          >
+            <p><strong :class="$store.state.prompt_type">{{$store.state.prompt_text}}</strong></p>
+            <div class="d-flex">
+              <b-button variant="outline-success" @click="$store.state.prompt=!$store.state.prompt">OK</b-button>
+            </div>
+          </div>
+        </template>
+      </b-overlay> -->
 </div>
 @endverbatim
 <script>
@@ -228,7 +264,6 @@ Vue.component("tree-item", {
     }
 });
 const VueAceEditor = {
-    //  simplified model handling using `value` prop and `input` event for $emit 
     props:['value','id','options'],
     template:`
         <div :id="id ? id: $options._componentTag +'-'+ _uid" 
@@ -643,9 +678,32 @@ const VueAceEditor = {
 
 Vue.component('split-pane', SplitPane.SplitPane);
 Vue.component('v-select', VueSelect.VueSelect);
+var mixin = {
+  data: function () {
+    return {     
+    }
+  },
+  methods:{
+      saveOnlineMixin(data){
+
+      }
+  }
+}
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+  }
+})
 vm = new Vue({
     el: '#app',
-    'store': new Vuex.Store(
+    mixins: [mixin],
+    store: new Vuex.Store(
         {
             state: {
                 sidebar: false,
@@ -653,14 +711,22 @@ vm = new Vue({
                 activeEditorIndex:0,
                 activeEditorTitle:"-",
                 activeEditors:[],
-                modelList:[]
+                modelList:[],
+                prompt:false,
+                prompt_type:"text-danger",
+                prompt_text:"errors",   
+                migrating:false
             },
             mutations: {
                 changeTab(state,index){
-                    if(state.activeEditorIndex==index){return;}
-                    state.activeEditorIndex=index;
-                    let item = state.activeEditors.find((dt,i)=>i==index);
-                    state.activeEditorTitle=item.jenis+'-'+item.title;
+                    if(state.activeEditorIndex==index){
+                        return;
+                    }
+                    try{
+                        state.activeEditorIndex=index;
+                        let item = state.activeEditors[index];
+                        state.activeEditorTitle=item.jenis+'-'+item.title;
+                    }catch(e){}
                 },
                 sidebarChange (state,val) {
                     state.sidebar=val;
@@ -671,9 +737,9 @@ vm = new Vue({
                 addActiveEditors(state,objVal){
                     let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
                     if(ketemu>-1){
-                        state.activeEditors[ketemu].value=objVal.value;
+                        // state.activeEditors[ketemu].value=objVal.value;
                         state.activeEditorIndex = ketemu;
-                        state.activeEditorTitle=state.activeEditors[ketemu].jenis+'-'+state.activeEditors[ketemu].title;
+                        state.activeEditorTitle = state.activeEditors[ketemu].jenis+'-'+state.activeEditors[ketemu].title;
                         return;
                     }
                     state.activeEditors.push(objVal);
@@ -683,32 +749,162 @@ vm = new Vue({
                     let confirm = window.confirm(`Close [${dt.item.jenis}] ${dt.item.title}?`);
                     if(confirm){
                         state.activeEditors = state.activeEditors.filter((data,i)=>{ return i!=dt.index;});
+                        state.activeEditorTitle = state.activeEditors[0].jenis+'-'+state.activeEditors[0].title;
                     }
                 }
             },
             actions: {
                 saveOnline ({ commit, state }, editor) {
-                    window.aku=editor;
-                    console.log(editor)
+                    let activeEditor = state.activeEditors[state.activeEditorIndex];
+                    if((activeEditor.jenis).toLowerCase().includes("basic")){
+                        Toast.fire({
+                            icon: 'warning',
+                            title: 'Never Saved basic model!'
+                        })
+                        return false;
+                    }
+                    let errors = editor.getSession().getAnnotations();
+                    for(let i in errors){
+                        if(errors[i].type=='error'){
+                            Swal.fire({
+                                title: `Line ${errors[i].row+1}!`,
+                                text: errors[i].text,
+                                icon: 'error',
+                                confirmButtonText: 'Ok!'
+                            })
+                            return;
+                        }
+                    }
+                    
+                    let operation = "model";
+                    if((activeEditor.jenis).toLowerCase().includes("alter")){
+                        operation = "alter";
+                    }else if((activeEditor.jenis).toLowerCase().includes("model")){
+                        operation = "models";
+                    }else if((activeEditor.jenis).toLowerCase().includes("migration")){
+                        operation = "migrations";
+                    }
+                    
+                    axios({
+                        url         : `{{url('laradev')}}/${operation}/${activeEditor.title}`,
+                        method      : 'put',
+                        credentials : true,
+                        data        : {
+                            text:editor.getSession().getValue()
+                        },
+                        headers     : {
+                            laradev:"quantumleap150671"
+                        }
+                    }).then(response => {
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Saved Successfully'
+                        })
+                    }).catch(error => {
+                        window.console.clear();
+                        Swal.fire({
+                            title: `Failed!`,
+                            text: 'Check Your Console',
+                            icon: 'error',
+                            confirmButtonText: 'Ok!'
+                        })
+                        console.log(error.response.data)
+                    }).then(function () {
+                    });
+                    
                 },
-                alter({commit,state}, item){
-                    let confirm = window.confirm(`ALTER ${item.title} ?`);
+                async alter({commit,state}, item){
+                    const { value: confirm } = await Swal.fire({
+                        title: 'Penting',
+                        input: 'checkbox',
+                        inputValue: 0,
+                        inputPlaceholder:
+                            `Saya bertanggung jawab atas ${item.title}!`,
+                        confirmButtonText:
+                            'Force Migrate&nbsp;<i class="fa fa-check"></i>',
+                        inputValidator: (result) => {
+                            return !result && 'OK anda belum yakin'
+                        }
+                    });
                     if(confirm){
-                        state.activeEditors = state.activeEditors.filter((dt,i)=>i!=index);
+                        state.migrating = true;
+                        axios({
+                            url         : `{{url('laradev/alter')}}/${item.title}`,
+                            method      : 'get',
+                            credentials : true,
+                            body        : null,
+                            headers     : {
+                                laradev:"quantumleap150671"
+                            }
+                        }).then(response => {
+                            Toast.fire({
+                                icon: 'info',
+                                title: `${item.title} has been altered Successfully`
+                            })
+                        }).catch(error => {
+                            window.console.clear();
+                            Swal.fire({
+                                title: `Failed!`,
+                                text: 'Check Your Console',
+                                icon: 'error',
+                                confirmButtonText: 'Ok!'
+                            })
+                            console.log(error.response.data)
+                        }).then(function () {
+                            state.migrating = false;
+                        });
                     }
                 },
-                migrate({commit,state}, item){
-                    let confirm = window.confirm(`WARNING!! Migrate ${item.title}?`);
+                async migrate({commit,state}, item){
+                    const { value: confirm } = await Swal.fire({
+                        title: 'Penting',
+                        input: 'checkbox',
+                        inputValue: 0,
+                        inputPlaceholder:
+                            `Saya bertanggung jawab atas ${item.title}!`,
+                        confirmButtonText:
+                            'Force Migrate&nbsp;<i class="fa fa-check"></i>',
+                        inputValidator: (result) => {
+                            return !result && 'OK anda belum yakin'
+                        }
+                    });
                     if(confirm){
-                        state.activeEditors = state.activeEditors.filter((dt,i)=>i!=index);
+                        state.migrating = true;
+                        axios({
+                            url         : `{{url('laradev/migrate')}}/${item.title}`,
+                            method      : 'get',
+                            credentials : true,
+                            body        : null,
+                            headers     : {
+                                laradev:"quantumleap150671"
+                            }
+                        }).then(response => {
+                            Toast.fire({
+                                icon: 'info',
+                                title: `${item.title} has been migrated Successfully`
+                            })
+                        }).catch(error => {
+                            window.console.clear();
+                            Swal.fire({
+                                title: `Failed!`,
+                                text: 'Check Your Console',
+                                icon: 'error',
+                                confirmButtonText: 'Ok!'
+                            })
+                            console.log(error.response.data)
+                        }).then(function () {
+                            state.migrating = false;
+                        });
                     }
                 },
                 getModels({commit,state}){
-                    let loader = Vue.$loading.show({
-                        color: 'grey',loader: 'dots',
-                    },{
+                    // let loader = Vue.$loading.show({
+                    //     color: 'grey',loader: 'dots',
+                    // },{
                         
-                    });
+                    // });
+                    let oldList = state.modelList;
+                    state.modelList=[];
                     axios({
                         url         : "{{url('laradev/models')}}",
                         credentials : true,
@@ -720,10 +916,18 @@ vm = new Vue({
                     }).then(response => {
                         state.modelList = response.data;
                     }).catch(error => {
-                        console.log(error)
+                        window.console.clear();
+                        Swal.fire({
+                            title: `Failed to Load Models!`,
+                            text: 'Check Your Console',
+                            icon: 'error',
+                            confirmButtonText: 'Ok!'
+                        })
+                        console.log(error.response.data)
+                        state.modelList = oldList;
                     }).then(function () {
-                        loader.hide();
-                    });  ;
+                        // loader.hide();
+                    });;
                 }
             }
         }
@@ -756,12 +960,15 @@ vm = new Vue({
                     { name: "Basic Model",icon:"check2-square",src:(models[i].file).split(".")[0] },
                     { name: "Custom Model",icon:"code-square",src:(models[i].file).split(".")[0] }
                 ];
-                if((models[i].file).includes("_after_")){
+                if((models[i].file).includes("_after_") || (models[i].file).includes("_before_")){
                     name='trigger'; icon = 'lightning-fill';
-                    children.splice(1,1)
+                    children =[{ name: 'Migration', icon:"lightning-fill",src:(models[i].file).split(".")[0] }];
                 }else if(models[i].view){
                     children.splice(1,1)
                     name='view'; icon = 'eye-fill';
+                }else if(models[i].alias){
+                    children.splice(1,1)
+                    name='alias'; icon = 'stickies';
                 }
 
                 treeData.push({
@@ -778,11 +985,41 @@ vm = new Vue({
             this.$store.commit('changeTab',index);
         },
         add_new(){
+            let me = this;
             var modul = prompt("Nama Migration (standard : (3)modul_(3)submodul_processname):", "");
             if (modul == null || modul == "") {
             } else {
-                
+                axios({
+                    url         : `{{url('laradev/migrations')}}`,
+                    method      : 'post',
+                    credentials : true,
+                    data        : {
+                        modul:modul
+                    },
+                    headers     : {
+                        laradev:"quantumleap150671"
+                    }
+                }).then(response => {
+                    Toast.fire({
+                        icon: 'info',
+                        title: `${modul} has been created Successfully`
+                    });
+                    me.$store.dispatch('getModels');
+                }).catch(error => {
+                    window.console.clear();
+                    Swal.fire({
+                        title: `Failed!`,
+                        text: 'Check Your Console',
+                        icon: 'error',
+                        confirmButtonText: 'Ok!'
+                    })
+                    console.log(error.response.data)
+                }).then(function () {
+                });
             }
+        },
+        reload_models(){
+            this.$store.dispatch('getModels');
         },
         search(e){
             // console.log(e)
@@ -805,6 +1042,17 @@ vm = new Vue({
             }else{
                 icon='list-check';action="";
             }
+            
+            let ketemu = this.$store.state.activeEditors.findIndex(dt=>{ 
+                return (dt.title==itemLengkap.name&&dt.jenis==item.name);
+            } );
+            if(ketemu>-1){      
+                me.$store.commit('addActiveEditors',{
+                    title:itemLengkap.name,
+                    jenis:item.name
+                })
+                return;
+            }
             let loader = Vue.$loading.show({
                 color: 'grey',loader: 'dots',
             },{
@@ -820,20 +1068,20 @@ vm = new Vue({
                 }
             }).then(response => {           
                 me.$store.commit('addActiveEditors',{
-                        title:itemLengkap.name,
-                        jenis:item.name,
-                        value:response.data,
-                        icon: icon,
-                        readOnly:(item.name).toLowerCase().includes('basic'),
-                        action:action,
-                        mode:'php',
-                        theme: 'monokai',
-                        fontSize: 11,
-                        fontFamily: 'Consolas',
-                        highlightActiveLine: true,
-                        enableBasicAutocompletion:true,
-                        maxLines: Infinity,//parseInt(window.innerHeight/13.9),
-                        minLines:parseInt(window.innerHeight/13.9+25)
+                    title:itemLengkap.name,
+                    jenis:item.name,
+                    value:response.data,
+                    icon: icon,
+                    readOnly:(item.name).toLowerCase().includes('basic'),
+                    action:action,
+                    mode:'php',
+                    theme: (item.name).toLowerCase().includes('basic')?'chrome':'monokai',
+                    fontSize: 11,
+                    fontFamily: 'Consolas',
+                    highlightActiveLine: true,
+                    enableBasicAutocompletion:true,
+                    maxLines: Infinity,//parseInt(window.innerHeight/13.9),
+                    minLines:parseInt(window.innerHeight/13.9+25)
                 })
             }).catch(error => {
                 console.log(error)
@@ -854,6 +1102,37 @@ vm = new Vue({
         }
     }
 });
+var ws = new WebSocket("wss://backend.dejozz.com:9001/{{env('LOG_CHANNEL',"+btoa(window.location.host)+")}}");
+				
+ws.onopen = function() {
+    console.log("%c debug is ready to use","background: #222; color: #a0ff5c;font-weight: bold;");
+};
+
+ws.onmessage = function (evt) { 
+    var received_msg = evt.data;
+    try{
+        received_msg=JSON.parse(received_msg);
+        console.log("%c "+received_msg.debug_id,"background: #222; color: #a0ff5c;font-weight: bold;",received_msg);
+    }catch(e){
+        if(received_msg.includes('bc ')){
+            alert(received_msg.replace("bc ",""))
+        }
+        console.log(received_msg);
+    }
+};
+
+ws.onclose = function() {
+    console.log("connection is closed");
+};
+document.addEventListener('DOMContentLoaded', ()=>{
+    if(localStorage.scrollY!==undefined){
+        window.scrollTo({
+            top: localStorage.scrollY,
+            left: 0,
+            behavior: 'smooth'
+        });
+    }
+}, false);
 </script>
 </body>
 </html>

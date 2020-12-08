@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,30 +22,23 @@ class __class__ extends Migration
         });
 
         table_config('public.__table__', [
-            // pilihan isian: 'all', 'none', ['kolom'], except key pakai tanda !(not) misal: '!required'
             "hidden"        => "none", //kolom disembunyikan ketika GET
-            "guarded"       => ["id"], //kolom dilarang diCREATE
-            "required"      => [], //kolom wajib ada saat CREATE
-            "!createable"   => ["id","created_at","updated_at"], //kolom yang bisa diCREATE mirip fillable tapi bukan fillable
-            "!updateable"   => ["id","created_at","updated_at"], //kolom yang bisa diUPDATE
-            "searchable"    => "all", //kolom yang bisa di BULK-WHERE LIKE
-            "deleteable"    => "true", //row apakah bisa di DELETE
-            "deleteOnUse"   => "false", //row apakah bisa di DELETE
-            "extendable"    => "false", //table apakah bisa otomatis nambah kolom saat kolom tidak ada saat CREATE
-            "casts"     => [ // cek https://laravel.com/docs/6.x/eloquent-mutators#attribute-casting
+            "guarded"       => ["id"],
+            "required"      => [],
+            "!createable"   => ["id","created_at","updated_at"],
+            "!updateable"   => ["id","created_at","updated_at"],
+            "searchable"    => "all",
+            "deleteable"    => "true",
+            "deleteOnUse"   => "false",
+            "extendable"    => "false",
+            "casts"     => [
                 'created_at' => 'datetime:d-m-Y',
                 'updated_at' => 'datetime:d-m-Y'
             ],
-            "autocreate"    => [ //default VALUE saat CREATE data
-            ],
-            "autoupdate"    => [ //default VALUE saat UPDATE data
-            ],
+            "autocreate"    => [],
+            "autoupdate"    => [],
             "readers"     =>[],
             "writers"     =>[]
-        ]);
-        //SEEDING 1 data
-        \DB::table("public.__table__")->insert([
-            "samplecolumn"=>"contohdata"
         ]);
     }
     public function down()

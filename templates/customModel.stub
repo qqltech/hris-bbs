@@ -18,7 +18,7 @@ class __class extends __basicClass
     public $createAdditionalData = __autocreate;
     public $updateAdditionalData = __autoupdate;
     public $user;
-//====================================================================USER ROLE LOGIC
+
     public function createRoleCheck()
     {
         return true;
@@ -35,10 +35,9 @@ class __class extends __basicClass
     {
         return true;
     }
-//======================================================================CREATE EVENT LOGIC
+
     public function createBefore($model, $arrayData, $metaData, $id=null)
     {
-        //$arrayData["no_draft"] = $this->custom_getdraftid(null);
         $newModel = $model;
         $newArrayData  = array_merge($arrayData,[]);
         return [
@@ -51,7 +50,6 @@ class __class extends __basicClass
     {        
 
     }
-//======================================================================UPDATE EVENT LOGIC
 
     public function updateBefore($model, $arrayData, $metaData, $id=null)
     {
@@ -66,7 +64,7 @@ class __class extends __basicClass
     public function updateAfter($model, $arrayData, $metaData, $id=null){
 
     }
-//======================================================================DELETE EVENT LOGIC
+
     public function deleteBefore($model, $arrayData, $metaData, $id=null)
     {
         $newModel = $model;
@@ -78,84 +76,74 @@ class __class extends __basicClass
     {
         
     }    
-//======================================================================READ EVENT & OVERRIDE PARAMETER GET DATA JIKA PERLU
+    public function createAfterTransaction($newdata, $olddata, $data, $meta)
+    {
+        //do here
+    }
+    public function updateAfterTransaction($newdata, $olddata, $data, $meta)
+    {
+        //do here
+    }
     public function overrideGetParams($params, $id=null)
     {
         /*if( $params->where_raw != '' && $params->where_raw != null ){
         	$params->where_raw = $params->where_raw." AND ";
         }*/
         if($id){
-            $params->selectfield = $params->selectfield; //"id,kolom1,kolom2"
-            $params->join        = $params->join;        //true(default)/false {TABLE AUTO JOIN DENGAN INDUK}
-            $params->single      = $params->single;      //true/false(default) {AMBIL CHILDREN ATAU SINGLE}
+            $params->selectfield = $params->selectfield;
+            $params->join        = $params->join;
+            $params->single      = $params->single;
             $params->addSelect   = null;
             $params->addJoin     = null;
-          	$params->joinMax 	 = $params->joinMax; //default 0
+          	$params->joinMax 	 = $params->joinMax;
         }else{
-            $params->where_raw   = $params->where_raw;      //raw WHERE
-            $params->order_by    = $params->order_by;       //nama_kolom
-            $params->order_type  = $params->order_type;     //ASC/DESC
-            $params->order_by_raw= $params->order_by_raw;   //nama_kolom1,nama_kolom2 ASC/DESC
-            $params->search      = $params->search;         //string kata
-            $params->searchfield = $params->searchfield;    //kolom1,kolom2 yang akan dimatching dengan where like
-            $params->selectfield = $params->selectfield;    //id,kolom1,kolom2,kolom3
-            $params->paginate    = $params->paginate;       //integer angka default 25
-            $params->join        = $params->join;           //true(default)/false {ROW AUTO JOIN DENGAN INDUK}
+            $params->where_raw   = $params->where_raw;
+            $params->order_by    = $params->order_by;
+            $params->order_type  = $params->order_type;
+            $params->order_by_raw= $params->order_by_raw;
+            $params->search      = $params->search;
+            $params->searchfield = $params->searchfield;
+            $params->selectfield = $params->selectfield;
+            $params->paginate    = $params->paginate;
+            $params->join        = $params->join;
             $params->addSelect   = null;
             $params->addJoin     = null;
-          	$params->joinMax 	 = $params->joinMax; //default 0
-            $params->group_by    = $params->group_by; //pastikan selectnya sama dg yg digroupby
+          	$params->joinMax 	 = $params->joinMax;
+            $params->group_by    = $params->group_by;
         }
         return $params;
     }
-//======================================================================READ EVENT & TRANSFORM DATA PER ROW
+
     public function transformRowData($row)
     {
         return array_merge($row,[]);
     }
-//======================================================================SINGLE UPLOAD LANGSUNG RESPONSE
+
     public function custom_fileupload($request)
     {
         if(!$request->hasFile("file")){return response()->json("file harus ada",400);}
         $response = uploadfile($this,$request);
         return response()->json(is_array($response)?implode("\n",$response):$response,is_array($response)?400:200);
     }
-//======================================================================IMPORT EXCEL
+
     public function custom_importexcel($request)
     {
         if(!$request->hasFile("file")){return response()->json("file harus ada",400);}
         return _uploadexcel($this, $request);
     }
-//=======================================================================EXPORT EXCEL 
+
   	public function custom_exportexcel($request)
     {
       	$query = \DB::table($this->getTable())->get();
       	if( count($query)==0 ){
         	return "data kosong";
         }else{
-    		return \Excel::download(new \ExportExcel($query), \Carbon\Carbon::now()->format('d-m-Y')."_".$this->getTable().'.xlsx');    
+    		return \Excel::download(new \ExportExcel($query), \Carbon::now()->format('d-m-Y')."_".$this->getTable().'.xlsx');    
         }
     }
-//==========================================================================
 
-/*    public function metaFields($fields)
-    {
-        return [
-            "nama_field"=>"readonly"
-        ];
-    }*/
-/*    public function metaScript()
-    {
-        return js("alert('dari backend saat edit')");
-    }*/
-/*    public function custom_initialize()
-    {
-        return js("alert('dari backend saat create')");
-    }*/
-//========================================================================CUSTOM FUNCTION BEBAS TOTAL FUNGSINYA DIPREFIX "custom_"
     public function custom_getdraftid($request)
     {
-        
         $karakterSeq = 4;
         $namakolom = "no_transaction";
         $prefix = "BB".date('Ymd');
@@ -168,7 +156,23 @@ class __class extends __basicClass
         $no = $prefix . str_repeat("0", $karakterSeq - strlen($count)) . $count;
       	return response()->json($no);
     }
-/*    public function frontendNotice(){
+
+    /*public function metaFields($fields)
+    {
+        return [
+            "nama_field"=>"readonly"
+        ];
+    }
+    public function metaScript()
+    {
+        return js("alert('dari backend saat edit')");
+    }
+    public function custom_initialize()
+    {
+        return js("alert('dari backend saat create')");
+    }*/
+
+    /*public function frontendNotice(){
     	return implode("\n",[
         	"1. Catatan 1 field abc tidak boleh lagi",
           	"2. Field tanggal dengan format yyyy-mm-dd",          	
