@@ -950,7 +950,7 @@ vm = new Vue({
             // console.log(models)
             for(let i in models){
                 if(this.searchData!="" && this.searchData!==null){
-                    if(!(models[i].file).includes(this.searchData)){
+                    if(!( (models[i].file).toLowerCase() ).includes( (this.searchData).toLowerCase() )){
                         continue;
                     }
                 }
