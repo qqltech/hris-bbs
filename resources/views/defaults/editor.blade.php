@@ -994,7 +994,7 @@ vm = new Vue({
                 axios({
                     url         : `{{url('laradev/migrations')}}`,
                     method      : 'post',
-                    credentials : true,p
+                    credentials : true,
                     data        : {
                         modul:modul
                     },
