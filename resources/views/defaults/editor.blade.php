@@ -185,6 +185,7 @@
                     <div style="max-height:94%">
                         <div style="overflow: auto;height:94%;">
                             <vue-ace-editor 
+                                v-model.lazy:value="item.value"
                                 v-bind:options="item" 
                                 :id="'editor_'+index">
                             </vue-ace-editor>      
