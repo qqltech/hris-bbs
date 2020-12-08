@@ -823,7 +823,7 @@ vm = new Vue({
                         inputPlaceholder:
                             `Saya bertanggung jawab atas ${item.title}!`,
                         confirmButtonText:
-                            'Force Migrate&nbsp;<i class="fa fa-check"></i>',
+                            'ALTER &nbsp;<i class="fa fa-check"></i>',
                         inputValidator: (result) => {
                             return !result && 'OK anda belum yakin'
                         }
