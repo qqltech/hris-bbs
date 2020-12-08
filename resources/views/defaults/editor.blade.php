@@ -748,9 +748,11 @@ vm = new Vue({
                 removeActiveEditors(state,dt){
                     let confirm = window.confirm(`Close [${dt.item.jenis}] ${dt.item.title}?`);
                     if(confirm){
-                        state.activeEditors = state.activeEditors.filter((data,i)=>{ return i!=dt.index;});
-                        state.activeEditorTitle = state.activeEditors[0].jenis+'-'+state.activeEditors[0].title;
-                    }
+                        try{
+                            state.activeEditors = state.activeEditors.filter((data,i)=>{ return i!=dt.index;});
+                            state.activeEditorTitle = state.activeEditors[0].jenis+'-'+state.activeEditors[0].title;
+                        }catch(e){}
+                        }
                 }
             },
             actions: {
@@ -992,7 +994,7 @@ vm = new Vue({
                 axios({
                     url         : `{{url('laradev/migrations')}}`,
                     method      : 'post',
-                    credentials : true,
+                    credentials : true,p
                     data        : {
                         modul:modul
                     },
