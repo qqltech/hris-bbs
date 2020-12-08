@@ -4,17 +4,13 @@
     <link rel="icon" href="{{url('favicon.ico')}}">
     <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.min.js" integrity="sha512-8qx1DL/2Wsrrij2TWX5UzvEaYOFVndR7BogdpOyF4ocMfnfkw28qt8ULkXD9Tef0bLvh3TpnSAljDC7uyniEuQ==" crossorigin="anonymous"></script>
-    <!-- <script src="https://ace.c9.io/lib/ace/keyboard/vscode.js"></script> -->
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="{{url('defaults/vue.min.js')}}"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-loading-overlay@3"></script>
     <link href="https://cdn.jsdelivr.net/npm/vue-loading-overlay@3/dist/vue-loading.css" rel="stylesheet">
-    <script src="https://unpkg.com/vue-select@3.0.0"></script>
-    <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css">
+    <!-- <script src="https://unpkg.com/vue-select@3.0.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css"> -->
     <script src="{{url('defaults/axios.min.js')}}"></script>
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs/editor/editor.main.min.css" integrity="sha512-9uX8QlyL0SosYXO3oNqyiXdnmhtWk22wutqEzGR53Bezc+yqYVvFukBAOW97fPx/3Dxdul77zW27GwHRzdYfMg==" crossorigin="anonymous" /> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs/editor/editor.main.js" integrity="sha512-wT1GtkfpGl0hLM5MbJIobnwU89WdvSFTKM90FgguAHyTR763v6i5zRgVyCUBiohRyLvv0+KBRc+iOpwgXLZabQ==" crossorigin="anonymous"></script>
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
@@ -22,7 +18,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
     <style>
         .ace-monokai .ace_marker-layer .ace_active-line {
-            background: #49483E;
+            /* background: #49483E; */
+        }
+        .ace-monokai .ace_marker-layer .ace_selected-word {
+            background: #6e6c5c !important;
         }
         .no-select {
             -webkit-touch-callout: none; /* iOS Safari */
@@ -93,7 +92,6 @@
             z-index:99;   
         }
     </style>
-    <!-- Load the following for BootstrapVueIcons support -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     @verbatim
     <script type="text/x-template" id="item-template">
@@ -129,11 +127,11 @@
     </script>
     
 </head>
-<body class="bg-dark-monokai" style="overflow:hidden;">
+<body class="bg-dark-monokai" style="overflow-y:hidden;scrollbar-width: none;">
 <div id="app" >
     <split-pane @resize="resize" :min-percent='0' :default-percent="$store.state.sidebarLeft" split="vertical">
       <template ref="leftPanel" slot="paneL">
-        <div style="z-index:1;min-width:280px;" class="text-white col-md-12 col-sm-12 col-xs-12">
+        <div style="z-index:1;min-width:250px;" class="text-white col-md-12 col-sm-12 col-xs-12">
                 <b-row class="mt-md-2">
                     <b-col md="6" class="ml-md-2 mr-md-0" style="padding-right:1px;">
                         <b-form-input size="sm" placeholder='search' v-model="searchData" @input="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
@@ -187,7 +185,6 @@
                     <div style="max-height:94%">
                         <div style="overflow: auto;height:94%;">
                             <vue-ace-editor 
-                                v-model:value ="item.value" 
                                 v-bind:options="item" 
                                 :id="'editor_'+index">
                             </vue-ace-editor>      
@@ -266,33 +263,26 @@ Vue.component("tree-item", {
 const VueAceEditor = {
     props:['value','id','options'],
     template:`
-        <div :id="id ? id: $options._componentTag +'-'+ _uid" 
+        <textarea :id="id ? id: $options._componentTag +'-'+ _uid" 
              :class="$options._componentTag">
             <slot></slot>
-        </div>
+        </textarea>
     `,
-
     watch:{
-        value() { 
-            //  two way binding – emit changes to parent
+        value() {
             this.$emit('input', this.value);
-            
-            //  update value on external model changes
             if(this.oldValue !== this.value){ 
                 this.editor.setValue(this.value, 1); 
             }
         }
     },
-   
     mounted(){
         //  editor
         this.editor = window.ace.edit(this.$el.id);
         let me = this;
-        // let myeditor = this.editor;
-        //  deprecation fix
-        this.editor.$blockScrolling = Infinity;        
 
-        //  ignore doctype warnings
+        //  deprecation fix
+        this.editor.$blockScrolling = Infinity;
         const session = this.editor.getSession();
         session.on("changeAnnotation", () => {
             const a = session.getAnnotations();
@@ -300,43 +290,31 @@ const VueAceEditor = {
             if(a.length > b.length) session.setAnnotations(b);
         });
 
-        //  editor options 
         //  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
         this.options = this.options || {};
-        
-        //  opinionated option defaults
         this.options.maxLines = this.options.maxLines || Infinity;
         this.options.printMargin = this.options.printMargin || false;      
         this.options.highlightActiveLine = this.options.highlightActiveLine || false;
 
-        //  hide cursor 
         if(this.options.cursor === 'none' || this.options.cursor === false){
             this.editor.renderer.$cursorLayer.element.style.display = 'none';
             delete this.options.cursor; 
         }
 
-        //  add missing mode and theme paths 
-        if(this.options.mode && this.options.mode.indexOf('ace/mode/')===-1) {
+        // if(this.options.mode && this.options.mode.indexOf('ace/mode/')===-1) {
             this.options.mode = `ace/mode/${this.options.mode}`;
-        }
-        if(this.options.theme && this.options.theme.indexOf('ace/theme/')===-1) {
+        // }
+        // if(this.options.theme && this.options.theme.indexOf('ace/theme/')===-1) {
             this.options.theme = `ace/theme/${this.options.theme}`;
-        }
-        this.editor.setOptions(this.options);
-        
-        
-        //  set model value 
-        //  if no model value found – use slot content
+        // }
+        this.editor.setOptions(this.options);        
         if(!this.value || this.value === ''){
             this.$emit('input', this.editor.getValue());
         } else {
             this.editor.setValue(this.value, -1);
-        }        
-        //  editor value changes   
+        }
         this.editor.on('change', () => {
-            //  oldValue set to prevent internal updates
              this.value = this.oldValue = this.editor.getValue();
-            //  console.log(this.editor.getValue().split("\n").length)
         });
         me.editor.commands.addCommands([{
                 name: "fullScreen2",
@@ -672,12 +650,13 @@ const VueAceEditor = {
         });
 
     },
-    methods:{ editor(){ return this.editor } }
+    methods:{ 
+        editor(){ return this.editor } }
 };
 
 
 Vue.component('split-pane', SplitPane.SplitPane);
-Vue.component('v-select', VueSelect.VueSelect);
+// Vue.component('v-select', VueSelect.VueSelect);
 var mixin = {
   data: function () {
     return {     
@@ -1082,7 +1061,7 @@ vm = new Vue({
                     fontFamily: 'Consolas',
                     highlightActiveLine: true,
                     enableBasicAutocompletion:true,
-                    maxLines: Infinity,//parseInt(window.innerHeight/13.9),
+                    maxLines:Infinity,//parseInt(window.innerHeight/13.9),
                     minLines:parseInt(window.innerHeight/13.9+25)
                 })
             }).catch(error => {
