@@ -831,7 +831,7 @@ vm = new Vue({
                     if(confirm){
                         state.migrating = true;
                         axios({
-                            url         : `{{url('laradev/alter')}}/${item.title}`,
+                            url         : `{{url('laradev/migrate')}}/${item.title}?alter=true`,
                             method      : 'get',
                             credentials : true,
                             body        : null,
