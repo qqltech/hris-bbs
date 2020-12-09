@@ -904,14 +904,22 @@ class ApiFixedController extends Controller
                         // "tambahan"      =>  
                     ]));
                 }
-                return response()->json([
+                $responses = [
+                    "operation" => $this->operation,
                     "status"    => "$this->operation data berhasil", 
                     "warning"  => $this->messages, 
                     "success"  => $this->success, 
                     "errors"  => $this->errors,
                     "request" => $this->requestData,
-                    "id"        => $this->operationId
-                ],200);
+                    "id"      => $this->operationId
+                ];
+                if(method_exists($model, "transformResponse")){
+                    $newResponses = $model->transformResponse($responses);
+                    if( gettype($newResponses)=='array' ){
+                        $responses=$newResponses;
+                    }
+                }
+                return response()->json($responses,200);
             }else{
                 DB::rollback();
                 if(env('DEFAULT_ACTIVITIES',false)){
