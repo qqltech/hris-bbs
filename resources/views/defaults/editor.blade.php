@@ -183,13 +183,11 @@
                         </b-btn>
                     </template>
                     <div style="max-height:94%">
-                        <div style="overflow: auto;height:94%;">
                             <vue-ace-editor 
                                 v-model.lazy:value="item.value"
                                 v-bind:options="item" 
                                 :id="'editor_'+index">
-                            </vue-ace-editor>      
-                        </div>
+                            </vue-ace-editor>
                     </div>
                     <b-btn pill 
                         :disabled="$store.state.migrating"
@@ -1062,8 +1060,8 @@ vm = new Vue({
                     fontFamily: 'Consolas',
                     highlightActiveLine: true,
                     enableBasicAutocompletion:true,
-                    maxLines:Infinity,//parseInt(window.innerHeight/13.9),
-                    minLines:parseInt(window.innerHeight/13.9+25)
+                    maxLines:parseInt(window.innerHeight/13.9),
+                    minLines:parseInt(window.innerHeight/13.9)
                 })
             }).catch(error => {
                 console.log(error)
