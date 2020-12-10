@@ -199,10 +199,6 @@
                         <b-spinner small type="grow" v-if="$store.state.migrating"></b-spinner><span v-if="$store.state.migrating">Altering/Migrating...</span>
                             
                     </b-btn>
-
-                    <b-spinner small type="grow"></b-spinner>
-                        Loading...
-                    </b-button>
                 </b-tab>
             </b-tabs>
         </div>
@@ -915,11 +911,14 @@ vm = new Vue({
     components:{ 'vue-ace-editor': VueAceEditor },
     data:{
         editorcontent: 'tes',
-        searchData:""
+        searchData:"",
+        connection:null,
+        channel:"{{env('LOG_CHANNEL',"+btoa(window.location.host)+")}}"
         //  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
     },
     created(){
         this.$store.dispatch('getModels');
+        this.connect();
     },
     computed:{
         treeData:function(){
@@ -961,6 +960,43 @@ vm = new Vue({
         }
     },
     methods: {
+        connect(){
+            let me = this;
+            Toast.fire({
+                icon: 'warning',
+                title: `Debugger is trying to connect to channel [${me.channel}]...`
+            });
+            this.connection = new WebSocket("wss://backend.dejozz.com:9001/"+me.channel);
+            this.connection.onopen = function() {
+                console.log("%c debug is ready to use","background: #222; color: #a0ff5c;font-weight: bold;");
+                Toast.fire({
+                    icon: 'success',
+                    title: `Debug is Ready`
+                });
+            };
+            this.connection.onmessage = function (evt) { 
+                var received_msg = evt.data;
+                try{
+                    received_msg=JSON.parse(received_msg);
+                    console.log("%c "+received_msg.debug_id,"background: #222; color: #a0ff5c;font-weight: bold;",received_msg);
+                }catch(e){
+                    if(received_msg.includes('bc ')){
+                        alert(received_msg.replace("bc ",""))
+                    }
+                    console.log(received_msg);
+                }
+            };        
+            this.connection.onclose = function() {
+                console.log("connection is closed, trying to reconnect...");
+                setTimeout(function() {
+                    Toast.fire({
+                        icon: 'error',
+                        title: `Debug is Closed, reconnecting...`
+                    });
+                    me.connect();
+                }, 2000);
+            };
+        },
         changeTab(index){
             this.$store.commit('changeTab',index);
         },
@@ -1082,37 +1118,15 @@ vm = new Vue({
         }
     }
 });
-var ws = new WebSocket("wss://backend.dejozz.com:9001/{{env('LOG_CHANNEL',"+btoa(window.location.host)+")}}");
-				
-ws.onopen = function() {
-    console.log("%c debug is ready to use","background: #222; color: #a0ff5c;font-weight: bold;");
-};
-
-ws.onmessage = function (evt) { 
-    var received_msg = evt.data;
-    try{
-        received_msg=JSON.parse(received_msg);
-        console.log("%c "+received_msg.debug_id,"background: #222; color: #a0ff5c;font-weight: bold;",received_msg);
-    }catch(e){
-        if(received_msg.includes('bc ')){
-            alert(received_msg.replace("bc ",""))
-        }
-        console.log(received_msg);
-    }
-};
-
-ws.onclose = function() {
-    console.log("connection is closed");
-};
-document.addEventListener('DOMContentLoaded', ()=>{
-    if(localStorage.scrollY!==undefined){
-        window.scrollTo({
-            top: localStorage.scrollY,
-            left: 0,
-            behavior: 'smooth'
-        });
-    }
-}, false);
+// document.addEventListener('DOMContentLoaded', ()=>{
+//     if(localStorage.scrollY!==undefined){
+//         window.scrollTo({
+//             top: localStorage.scrollY,
+//             left: 0,
+//             behavior: 'smooth'
+//         });
+//     }
+// }, false);
 </script>
 </body>
 </html>
