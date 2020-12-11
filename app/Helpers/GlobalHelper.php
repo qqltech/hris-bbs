@@ -2222,23 +2222,21 @@ function getRawData($query){
     }
 }
 
-function renderpdf( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"documentpdf","size"=>"A4","orientation"=>"P","preview"=>false],$type="pdf" ){
-    $client = new \GuzzleHttp\Client();
+function renderpdf( $config,$arrayData,$pageConfig=[],$type="pdf" ){
+    $client = new \GuzzleHttp\Client();    
+    $pageConfig = array_merge(["break"=>false,"title"=>"documentpdf","fontsize"=>12,"size"=>"A4","orientation"=>"P","preview"=>false],
+    $pageConfig);
+    $payLoad = [
+        'config'=>$config,
+        'data'=>$arrayData,
+        'type'=>$type
+    ];
+    $payLoad = array_merge($payLoad,$pageConfig);
     try{    
         $response = $client->post(
             env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_htmlpdf.php"),
             [
-                'json' => [
-                    'type'=>$type,
-                    'config'=>$config,
-                    'break'=>@$pageConfig['break'],
-                    'data'=>$arrayData,
-                    'title'=>@$pageConfig['title'],
-                    // 'sheetname'=>@$pageConfig['sheetname'],
-                    'preview'=>@$pageConfig['preview'],
-                    'size'=>@$pageConfig['size'],
-                    'orientation'=>@$pageConfig['orientation']
-                ],
+                'json' => $payLoad,
                 'headers' => [
                     'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998',
                     'Accept' => 'application/json',
@@ -2262,23 +2260,20 @@ function renderpdf( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"doc
 function renderHTML( $config,$arrayData,$pageConfig=["break"=>false,"title"=>"documenthtml","size"=>"A4","orientation"=>"P","preview"=>false] ){
    return renderPDF( $config,$arrayData,$pageConfig,"html" );
 }
-function renderXLS( $config,$arrayData,$pageConfig=["break"=>false,"sheetname"=>"header","title"=>"documentOffice2007","size"=>"A4","orientation"=>"P"] ){
+function renderXLS( $config,$arrayData,$pageConfig=[] ){
     $client = new \GuzzleHttp\Client();
-    // if(strtolower())
     try{    
+        $pageConfig = array_merge(["break"=>false,"fontsize"=>11,"sheetname"=>"header","title"=>"documentOffice2007","size"=>"A4","orientation"=>"P"],
+                        $pageConfig);
+        $payLoad = [
+            'config'=>$config,
+            'data'=>$arrayData,
+        ];
+        $payLoad = array_merge($payLoad,$pageConfig);
         $response = $client->post(
             env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_xlsx.php"),
             [
-                'json' => [
-                    'config'=>$config,
-                    'break'=>@$pageConfig['break'],
-                    'data'=>$arrayData,
-                    'title'=>@$pageConfig['title'],
-                    'sheetname'=>@$pageConfig['sheetname'],
-                    'title'=>@$pageConfig['title'],
-                    'size'=>@$pageConfig['size'],
-                    'orientation'=>@$pageConfig['orientation']
-                ],
+                'json' => $payLoad,
                 'headers' => [
                     'Authorization' => 'Bearer 57aa62501a7fe0d3b71de5712cdb1998',
                     'Accept' => 'application/json',
