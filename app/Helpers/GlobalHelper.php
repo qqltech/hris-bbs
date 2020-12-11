@@ -1481,7 +1481,7 @@ function _customGetData($model,$params)
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
-    ff($model->toSql(),'sql');
+    
     if($params->search){
         $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
@@ -1517,6 +1517,7 @@ function _customGetData($model,$params)
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
+    ff($final->toSql(),'sql');
     if(!$params->caller){
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
