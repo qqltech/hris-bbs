@@ -1429,8 +1429,7 @@ function _customGetData($model,$params)
                 $parentName = $parent.(string)$kembar[$parent];
             }
             foreach($parentClass->columns as $column){
-                // $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
-                $colTemp        = '"'.$parentName.".".$column.'"';
+                $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
             }
