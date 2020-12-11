@@ -1493,9 +1493,9 @@ function _customGetData($model,$params)
                         continue;
                     }
                     $arrayColumn = explode(".",$column);
-                    if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
-                        continue;
-                    }
+                    // if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
+                    //     continue;
+                    // }
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                 }
         });
@@ -1517,7 +1517,6 @@ function _customGetData($model,$params)
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
-    ff($final->toSql(),'sql');
     if(!$params->caller){
        $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
