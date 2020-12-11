@@ -1415,7 +1415,7 @@ function _customGetData($model,$params)
             }
             $parentName = $fullParent;
             if($kembar[$parent]>1){
-                $parentName = "$fullParent ".$parent.(string)$kembar[$parent];
+                $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
                 // $onParent = str_replace($parent,"tes".$parent.(string)$kembar[$parent],$onParent); //OLD CODE
                 $onParentArray=explode(".",$onParent);
                 if( count( $onParentArray )>2 ){
@@ -1429,7 +1429,8 @@ function _customGetData($model,$params)
                 $parentName = $parent.(string)$kembar[$parent];
             }
             foreach($parentClass->columns as $column){
-                $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                // $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                $colTemp        = '"'.$parentName.".".$column.'"';
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
             }
