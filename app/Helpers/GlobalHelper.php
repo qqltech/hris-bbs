@@ -1415,7 +1415,7 @@ function _customGetData($model,$params)
             }
             $parentName = $fullParent;
             if($kembar[$parent]>1){
-                $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
+                $parentName = "$fullParent ".$parent.(string)$kembar[$parent];
                 // $onParent = str_replace($parent,"tes".$parent.(string)$kembar[$parent],$onParent); //OLD CODE
                 $onParentArray=explode(".",$onParent);
                 if( count( $onParentArray )>2 ){
@@ -1493,9 +1493,9 @@ function _customGetData($model,$params)
                         continue;
                     }
                     $arrayColumn = explode(".",$column);
-                    // if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
-                    //     continue;
-                    // }
+                    if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
+                        continue;
+                    }
                     $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                 }
         });
