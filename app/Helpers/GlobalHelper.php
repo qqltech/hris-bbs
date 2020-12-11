@@ -1481,25 +1481,25 @@ function _customGetData($model,$params)
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
-
-    // if($params->search){
-    //     $searchfield = $params->searchfield;
-    //     $string  = strtolower($params->search);
-    //     $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
-    //     $model = $model->where(
-    //         function ($query)use($allColumns,$string,$additionalString, $searchfield) {
-    //             foreach($allColumns as $column){
-    //                 if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
-    //                     continue;
-    //                 }
-    //                 $arrayColumn = explode(".",$column);
-    //                 if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
-    //                     continue;
-    //                 }
-    //                 $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
-    //             }
-    //     });
-    // }
+    ff($model->toSql(),'sql');
+    if($params->search){
+        $searchfield = $params->searchfield;
+        $string  = strtolower($params->search);
+        $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
+        $model = $model->where(
+            function ($query)use($allColumns,$string,$additionalString, $searchfield) {
+                foreach($allColumns as $column){
+                    if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
+                        continue;
+                    }
+                    $arrayColumn = explode(".",$column);
+                    if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
+                        continue;
+                    }
+                    $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
+                }
+        });
+    }
     if($params->where_raw){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
