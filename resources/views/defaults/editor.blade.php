@@ -104,7 +104,7 @@
                     onMouseOut="this.style.backgroundColor='#1e1f1c'"
                     onMouseOver="this.style.backgroundColor='#7388e6'" 
                     class='no-select'>
-                    <b-icon :icon="item.icon" style="margin-right:5px;"></b-icon>{{ item.name }}
+                    <b-icon :icon="item.icon" style="margin-right:5px;"></b-icon><span :style="item.migrated?'':'text-decoration: line-through red;'">{{ item.name }}</span> 
                     <b-icon size="sm" icon="pencil-square" style="margin-left:5px;" v-if="$store.state.activeEditorTitle==(item.name+'-'+item.src)"></b-icon>
                     <b-spinner variant="danger" type="grow" small label="Active" style="max-width:10px;max-height:10px;" v-if="$store.state.activeEditorTitle==(item.name+'-'+item.src)"></b-spinner>
                 </span>
@@ -192,12 +192,21 @@
                     <b-btn pill 
                         :disabled="$store.state.migrating"
                         @click="$store.dispatch(item.action, item)"
-                        :class="item.action=='alter'?'bg-warning':'bg-danger'" 
+                        :class="item.action=='alter'?'bg-warning':(!item.migrated?'bg-success':'bg-danger')" 
                         style="z-index:999999;position:fixed;right:18px;bottom:30px;" 
                         v-if="item.action" :title="item.action" size="sm">
-                        <b-icon icon="lightning-fill" v-if="!$store.state.migrating"></b-icon>
+                        <b-icon :icon="!item.migrated?'arrow-up-circle':'lightning-fill'" v-if="!$store.state.migrating"></b-icon>
                         <b-spinner small type="grow" v-if="$store.state.migrating"></b-spinner><span v-if="$store.state.migrating">Altering/Migrating...</span>
                             
+                    </b-btn>
+                    <b-btn pill
+                        v-if="item.action=='migrate' && item.migrated"
+                        :disabled="$store.state.migrating"
+                        @click="$store.dispatch('down', item)"
+                        class="bg-default" 
+                        style="z-index:999999;position:fixed;right:55px;bottom:30px;" 
+                        title="Down" size="sm">
+                        <b-icon icon="arrow-down-circle" v-if="!$store.state.migrating"></b-icon>                            
                     </b-btn>
                 </b-tab>
             </b-tabs>
@@ -719,6 +728,13 @@ vm = new Vue({
                     state.activeEditors.push(objVal);
                     state.activeEditorIndex = state.activeEditors.length-1;
                 },
+                updateActiveEditors(state,objVal){
+                    let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
+                    if(ketemu>-1){
+                        Object.assign(state.activeEditors[ketemu],objVal);
+                        return;
+                    }
+                },
                 removeActiveEditors(state,dt){
                     let confirm = window.confirm(`Close [${dt.item.jenis}] ${dt.item.title}?`);
                     if(confirm){
@@ -727,6 +743,13 @@ vm = new Vue({
                             state.activeEditorTitle = state.activeEditors[0].jenis+'-'+state.activeEditors[0].title;
                         }catch(e){}
                         }
+                },
+                removeActiveEditorsAll(state,title){
+                    try{
+                        state.activeEditors = state.activeEditors.filter((data)=>{ return data.title!=title;});
+                        state.activeEditorTitle = state.activeEditors[0].jenis+'-'+state.activeEditors[0].title;
+                    }catch(e){}
+                    }
                 }
             },
             actions: {
@@ -859,6 +882,63 @@ vm = new Vue({
                                 icon: 'info',
                                 title: `${item.title} has been migrated Successfully`
                             })
+                            commit('updateActiveEditors',{
+                                title:item.title,
+                                jenis:item.jenis,
+                                migrated:true
+                            });
+                            Object.assign(state.modelList.models.find(dt=>dt.file == item.title+".php"),{
+                                table   : true, model:true
+                            });
+                        }).catch(error => {
+                            window.console.clear();
+                            Swal.fire({
+                                title: `Failed!`,
+                                text: 'Check Your Console',
+                                icon: 'error',
+                                confirmButtonText: 'Ok!'
+                            })
+                            console.log(error.response.data)
+                        }).then(function () {
+                            state.migrating = false;
+                        });
+                    }
+                },
+                async down({commit,state}, item){
+                    let me = this;
+                    const { value: confirm } = await Swal.fire({
+                        title: 'Penting',
+                        input: 'checkbox',
+                        inputValue: 0,
+                        inputPlaceholder:
+                            `Saya bertanggung jawab atas ${item.title}!`,
+                        confirmButtonText:
+                            'Force Drop&nbsp;<i class="fa fa-check"></i>',
+                        inputValidator: (result) => {
+                            return !result && 'OK anda belum yakin'
+                        }
+                    });
+                    if(confirm){
+                        state.migrating = true;
+                        axios({
+                            url         : `{{url('laradev/migrate')}}/${item.title}?down=true`,
+                            method      : 'get',
+                            credentials : true,
+                            body        : null,
+                            headers     : {
+                                laradev:"quantumleap150671"
+                            }
+                        }).then(response => {
+                            Toast.fire({
+                                icon: 'info',
+                                title: `${item.title} has been dropped Successfully`
+                            });
+                            commit('updateActiveEditors',{
+                                title:item.title,
+                                jenis:item.jenis,
+                                migrated:false
+                            });
+                            state.modelList.models.find(dt=>dt.file == item.title+".php").table=false;
                         }).catch(error => {
                             window.console.clear();
                             Swal.fire({
@@ -934,26 +1014,34 @@ vm = new Vue({
                 let name = 'migration';
                 let icon = 'table';
                 let children = [
-                    { name: 'Migration', icon:"card-checklist",src:(models[i].file).split(".")[0] },
-                    { name: "Alter",icon:"bookmark-plus",src:(models[i].file).split(".")[0] },
-                    { name: "Basic Model",icon:"check2-square",src:(models[i].file).split(".")[0] },
-                    { name: "Custom Model",icon:"code-square",src:(models[i].file).split(".")[0] }
+                    { migrated:true,name: 'Migration', icon:"card-checklist",src:(models[i].file).split(".")[0] },
+                    { migrated:true,name: "Alter",icon:"bookmark-plus",src:(models[i].file).split(".")[0] },
+                    { migrated:true,name: "Basic Model",icon:"check2-square",src:(models[i].file).split(".")[0] },
+                    { migrated:true,name: "Custom Model",icon:"code-square",src:(models[i].file).split(".")[0] }
                 ];
                 if((models[i].file).includes("_after_") || (models[i].file).includes("_before_")){
                     name='trigger'; icon = 'lightning-fill';
-                    children =[{ name: 'Migration', icon:"lightning-fill",src:(models[i].file).split(".")[0] }];
+                    children =[{ migrated:true,name: 'Migration', icon:"lightning-fill",src:(models[i].file).split(".")[0] }];
                 }else if(models[i].view){
                     children.splice(1,1)
                     name='view'; icon = 'eye-fill';
                 }else if(models[i].alias){
-                    children.splice(1,1)
+                    children.splice(0,2)
                     name='alias'; icon = 'stickies';
                 }
-
+                if(!models[i].model){
+                    children = children.filter(dt=>{
+                        return !dt.name.includes("Model") && !dt.name.includes("Alter")
+                    })
+                }
+                children.push({
+                    migrated:true,name: "Delete",icon:"trash",src:(models[i].file).split(".")[0]
+                })
                 treeData.push({
                     name: (models[i].file).split(".")[0],
                     icon: icon,
-                    children: children
+                    children: children,
+                    migrated:models[i].table||models[i].alias
                 });
             }
             return treeData;
@@ -1045,8 +1133,43 @@ vm = new Vue({
         },
         addFile: function(item,e) {
             let itemLengkap = this.treeData.find(dt=>dt.name==item.src);
-            let icon,action,endpoint;
-            let me = this;
+            let icon,action,endpoint,me=this;
+            if(item.name=='Delete'){
+                var password = prompt(`[${itemLengkap.name}] Migration, Model, Table akan hilang!, password:`, "");
+                if (password == null || password == "") {
+                    return;
+                } else {
+                    axios({
+                        url         : "{{url('laradev/trio')}}/"+itemLengkap.name,
+                        method      : 'post',
+                        credentials : true,
+                        data        : {
+                            password: password
+                        },
+                        headers     : {
+                            laradev:"quantumleap150671"
+                        }
+                    }).then(response => {
+                        Toast.fire({
+                            icon: 'info',
+                            title: `${itemLengkap.name} has been deleted Successfully`
+                        });
+                        me.$store.dispatch('getModels');
+                        me.$store.commit('removeActiveEditorsAll',itemLengkap.name);
+                    }).catch(error => {
+                        window.console.clear();
+                        Swal.fire({
+                            title: `Failed!`,
+                            text: error.response.status==401?"Password Salah!":'Check Your Console',
+                            icon: 'error',
+                            confirmButtonText: 'Ok!'
+                        })
+                    }).then(function () {
+                        return;
+                    });
+                }
+                return;
+            }
             if(item.name=='Migration'){
                 icon='lightning'; action='migrate'; endpoint="/migrations/"+item.src;
             }else if(item.name=='Alter'){
@@ -1090,6 +1213,7 @@ vm = new Vue({
                     icon: icon,
                     readOnly:(item.name).toLowerCase().includes('basic'),
                     action:action,
+                    migrated:itemLengkap.migrated,
                     mode:'php',
                     theme: (item.name).toLowerCase().includes('basic')?'chrome':'monokai',
                     fontSize: 11,
