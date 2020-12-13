@@ -110,7 +110,7 @@
                 </span>
             </span>
         </div>
-        <ul v-show="isOpen||$store.state.activeEditorTitle==(item.name+'-'+item.src)" v-if="isFolder" style="list-style: none;padding-left:15px;">
+        <ul v-show="isOpen||(!toggled && $store.state.activeEditors.find(dt=>dt.title==item.src))" v-if="isFolder" style="list-style: none;padding-left:15px;">
           <tree-item
             style="cursor:pointer;"
             class="item"
@@ -236,22 +236,24 @@ Vue.component('loading', VueLoading)
 Vue.component("tree-item", {
     template: "#item-template",
     props: {
-        item: Object
+        item: Object,
     },
     data: function() {
         return {
-        isOpen: false
+            isOpen: false,
+            toggled:false
         };
     },
     computed: {
         isFolder: function() {
-        return this.item.children && this.item.children.length;
+            return this.item.children && this.item.children.length;
         }
     },
     methods: {
         toggle: function() {
             if (this.isFolder) {
                 this.isOpen = !this.isOpen;
+                this.toggled=true;
             }else{
                 this.$emit("open-file", this.item);
             }
