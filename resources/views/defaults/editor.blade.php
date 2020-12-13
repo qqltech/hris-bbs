@@ -110,7 +110,7 @@
                 </span>
             </span>
         </div>
-        <ul v-show="isOpen||($store.state.activeEditorTitle).split('-')[1]==(item.src)" v-if="isFolder" style="list-style: none;padding-left:15px;">
+        <ul v-show="isOpen||$store.state.activeEditorTitle==(item.name+'-'+item.src)" v-if="isFolder" style="list-style: none;padding-left:15px;">
           <tree-item
             style="cursor:pointer;"
             class="item"
@@ -749,7 +749,6 @@ vm = new Vue({
                         state.activeEditors = state.activeEditors.filter((data)=>{ return data.title!=title;});
                         state.activeEditorTitle = state.activeEditors[0].jenis+'-'+state.activeEditors[0].title;
                     }catch(e){}
-                    }
                 }
             },
             actions: {
@@ -1041,7 +1040,8 @@ vm = new Vue({
                     name: (models[i].file).split(".")[0],
                     icon: icon,
                     children: children,
-                    migrated:models[i].table||models[i].alias
+                    migrated:models[i].table||models[i].alias,
+                    src:(models[i].file).split(".")[0]
                 });
             }
             return treeData;
