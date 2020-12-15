@@ -134,7 +134,7 @@
         <div style="z-index:1;min-width:250px;" class="text-white col-md-12 col-sm-12 col-xs-12">
                 <b-row class="mt-md-2">
                     <b-col md="6" class="ml-md-2 mr-md-0" style="padding-right:1px;">
-                        <b-form-input size="sm" placeholder='search' v-model="searchData" @input="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
+                        <b-form-input size="sm" placeholder='search' v-model.lazy="searchData" @input="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
                     </b-col>
                     <b-col style="padding-left:0px;padding-right:0px;margin-right:0px;flex-grow: 0 !important;">
                         <b-btn title="add new" class="bg-dark-monokai" size="sm" style="margin-top:2px;margin-right:0px;" @click="add_new">
@@ -168,10 +168,19 @@
       <template slot="paneR">
         <div>
             <b-tabs active-nav-item-class="font-weight-bold monokai-active-tab" no-fade small
-                    content-class="mt-0" style="width:100%;" nav-class='monokai-inactive-tab' @input="changeTab">
-                <b-tab  v-for="(item,index) in $store.state.activeEditors" :active="index==$store.state.activeEditorIndex">
+                    content-class="mt-0" style="width:100%;" nav-class='monokai-inactive-tab' @input="changeTab" @changed="changedArrayTab">
+                <b-tab  v-for="(item,index) in $store.state.activeEditors" :ref="item.jenis+'-'+item.title">
                     <template #title style="font-size:9px;">
-                        <!-- <b-spinner type="grow" small label="Active" v-if="index==$store.state.activeEditorIndex"></b-spinner> -->
+                        <span class="dot" style="height: 19px;width: 19px;background-color: #bbb;border-radius: 50%;display: inline-block;"
+                        v-if="$store.state.activeEditorTitle==item.jenis+'-'+item.title"
+                        ></span>
+                        <!-- <b-spinner 
+                            style="max-height:10px;max-width:10px;"
+                            type="grow" 
+                            small 
+                            label="Active" 
+                            v-if="$store.state.activeEditorTitle==item.jenis+'-'+item.title">
+                        </b-spinner> -->
                         <b-icon size="sm" :icon="item.icon" style="max-height:15px;"></b-icon>
                         <small style="font-size:12px;color:#ccccc7 !important;" :title="item.jenis">{{item.title}} 
                             <!-- <span style='font-size:10px;'>{{item.jenis}}</span> -->
@@ -704,13 +713,13 @@ vm = new Vue({
             },
             mutations: {
                 changeTab(state,index){
-                    if(state.activeEditorIndex==index){
-                        return;
-                    }
+                    // if(state.activeEditorIndex==index){
+                    //     return;
+                    // }
                     try{
-                        state.activeEditorIndex=index;
+                        // state.activeEditorIndex=index;
                         let item = state.activeEditors[index];
-                        console.log(item.jenis+'-'+item.title)
+                        // console.log(item.jenis+'-'+item.title)
                         state.activeEditorTitle=item.jenis+'-'+item.title;
                     }catch(e){}
                 },
@@ -725,13 +734,13 @@ vm = new Vue({
                     if(objVal['value']===undefined){
                         let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
                         // state.activeEditors[ketemu].value=objVal.value;
-                        state.activeEditorIndex = ketemu;
+                        // state.activeEditorIndex = ketemu;
                         state.activeEditorTitle = state.activeEditors[ketemu].jenis+'-'+state.activeEditors[ketemu].title;
                         return;
                     }
 
                     state.activeEditors.push(objVal);
-                    state.activeEditorIndex = state.activeEditors.length;
+                    state.activeEditorTitle = objVal.jenis+'-'+objVal.title;
                 },
                 updateActiveEditors(state,objVal){
                     let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
@@ -1093,6 +1102,11 @@ vm = new Vue({
         changeTab(index){
             this.$store.commit('changeTab',index);
         },
+        changedArrayTab(now,prev){
+            if(now.length>prev.length){
+                now[now.length-1].activate()
+            }
+        },
         add_new(){
             let me = this;
             var modul = prompt("Nama Migration (standard : (3)modul_(3)submodul_processname):", "");
@@ -1194,6 +1208,7 @@ vm = new Vue({
                     title:itemLengkap.name,
                     jenis:item.name
                 })
+                me.$refs[ me.$store.state.activeEditorTitle][0].activate()
                 return;
             }
             let loader = Vue.$loading.show({
