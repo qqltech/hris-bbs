@@ -710,6 +710,7 @@ vm = new Vue({
                     try{
                         state.activeEditorIndex=index;
                         let item = state.activeEditors[index];
+                        console.log(item.jenis+'-'+item.title)
                         state.activeEditorTitle=item.jenis+'-'+item.title;
                     }catch(e){}
                 },
@@ -720,15 +721,17 @@ vm = new Vue({
                     state.sidebarLeft=val;
                 },
                 addActiveEditors(state,objVal){
-                    let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
-                    if(ketemu>-1){
+                    // console.log(objVal)
+                    if(objVal['value']===undefined){
+                        let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
                         // state.activeEditors[ketemu].value=objVal.value;
                         state.activeEditorIndex = ketemu;
                         state.activeEditorTitle = state.activeEditors[ketemu].jenis+'-'+state.activeEditors[ketemu].title;
                         return;
                     }
+
                     state.activeEditors.push(objVal);
-                    state.activeEditorIndex = state.activeEditors.length-1;
+                    state.activeEditorIndex = state.activeEditors.length;
                 },
                 updateActiveEditors(state,objVal){
                     let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
@@ -1183,11 +1186,10 @@ vm = new Vue({
             }else{
                 icon='list-check';action="";
             }
-            
-            let ketemu = this.$store.state.activeEditors.findIndex(dt=>{ 
+            let ketemu = this.$store.state.activeEditors.find(dt=>{ 
                 return (dt.title==itemLengkap.name&&dt.jenis==item.name);
             } );
-            if(ketemu>-1){      
+            if(ketemu){      
                 me.$store.commit('addActiveEditors',{
                     title:itemLengkap.name,
                     jenis:item.name
