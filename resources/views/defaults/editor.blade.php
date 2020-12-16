@@ -767,7 +767,9 @@ vm = new Vue({
             },
             actions: {
                 saveOnline ({ commit, state }, editor) {
-                    let activeEditor = state.activeEditors[state.activeEditorIndex];
+                    let activeEditor = state.activeEditors.find(dt=>{
+                        state.activeEditorTitle == dt.jenis+'-'+dt.title;
+                    });
                     if((activeEditor.jenis).toLowerCase().includes("basic")){
                         Toast.fire({
                             icon: 'warning',
