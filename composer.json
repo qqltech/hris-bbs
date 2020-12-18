@@ -34,7 +34,6 @@
             "database/factories"
         ],
         "psr-4": {
-            "App\\": "app/",
             "App\\Models\\BasicModels\\": "app/Models/BasicModels/"
         },
         "files": [
