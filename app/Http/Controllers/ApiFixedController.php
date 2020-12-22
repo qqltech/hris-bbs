@@ -441,7 +441,7 @@ class ApiFixedController extends Controller
                     return;
                 }
                 $finalData  = $createBeforeEvent["data"];
-                
+                ff($this->getParentClass($model)->get()->toArray(),'test');
                 $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
                 $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
