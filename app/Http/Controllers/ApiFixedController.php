@@ -283,7 +283,7 @@ class ApiFixedController extends Controller
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 foreach( $isiData as $key => $value ){
-                    if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){                
+                    if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){
                         $this->is_model_exist($key);
                         $this->is_operation_authorized($key );
                         $this->is_data_required($key, $value);
@@ -294,7 +294,7 @@ class ApiFixedController extends Controller
             }
         }else{
             foreach( $data as $key => $value ){
-                if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){                
+                if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){
                     $this->is_model_exist($key);
                     $this->is_operation_authorized($key );
                     $this->is_data_required($key, $value);
@@ -307,7 +307,7 @@ class ApiFixedController extends Controller
     }
     private function is_model_deletable($modelName, $data)
     {
-        if( !in_array($this->operation,["delete"]) ){return;}
+        if( !in_array($this->operation,["delete"]) ){return true;}
         $modelNameExplode = explode('.', $modelName);
         $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$modelName:$modelNameExplode[1]);
         $model          = new $modelCandidate;
