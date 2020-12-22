@@ -21,6 +21,7 @@ class __class extends Model
     public $detailsHeirs= __detailsHeirs;
     public $unique      = __config_unique;
     public $required    = __config_required;
+    protected $fillable = __config_createable;
     public $createable  = __config_createable;
     public $updateable  = __config_updateable;
     public $searchable  = __config_searchable;

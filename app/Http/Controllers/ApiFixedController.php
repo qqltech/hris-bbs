@@ -441,9 +441,8 @@ class ApiFixedController extends Controller
                     return;
                 }
                 $finalData  = $createBeforeEvent["data"];
-                $basicModel = $this->getParentClass($model);
-                $basicModel->fillable($basicModel->createable);
-                $finalModel = $basicModel->create(reformatData($finalData));
+                
+                $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
                 $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
@@ -503,9 +502,8 @@ class ApiFixedController extends Controller
                     }
                 }
             }
-            $basicModel = $this->getParentClass($model);
-            $basicModel->fillable($basicModel->createable);
-            $finalModel = $basicModel->create(reformatData($finalData));
+            
+            $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
             $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
