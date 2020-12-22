@@ -442,7 +442,7 @@ class ApiFixedController extends Controller
                 }
                 $finalData  = $createBeforeEvent["data"];
                 
-                $finalModel = (getBasic($modelName))->create(reformatData($finalData));
+                $finalModel = (getBasic($modelName)->create(reformatData($finalData));
                 $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
@@ -503,7 +503,7 @@ class ApiFixedController extends Controller
                 }
             }
             
-            $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
+            $finalModel = (getBasic($modelName)->create(reformatData($finalData));
             $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
