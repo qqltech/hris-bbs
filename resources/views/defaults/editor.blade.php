@@ -742,6 +742,7 @@ vm = new Vue({
                     state.activeEditors.push(objVal);
                     setTimeout(function() {                        
                         state.activeEditorTitle = objVal.jenis+'-'+objVal.title;
+                        vm.$refs[ state.activeEditorTitle][0].activate()
                     }, 1000);
                 },
                 updateActiveEditors(state,objVal){
