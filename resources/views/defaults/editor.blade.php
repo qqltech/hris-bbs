@@ -743,7 +743,7 @@ vm = new Vue({
                     setTimeout(function() {                        
                         state.activeEditorTitle = objVal.jenis+'-'+objVal.title;
                         vm.$refs[ state.activeEditorTitle][0].activate()
-                    }, 1000);
+                    }, 300);
                 },
                 updateActiveEditors(state,objVal){
                     let ketemu = state.activeEditors.findIndex(dt=>{ return (dt.title==objVal.title&&dt.jenis==objVal.jenis);} );
