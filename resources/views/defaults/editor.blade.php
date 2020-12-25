@@ -172,7 +172,7 @@
                     content-class="mt-0" style="width:100%;" nav-class='monokai-inactive-tab' @input="changeTab" @changed="changedArrayTab">
                 <b-tab  v-for="(item,index) in $store.state.activeEditors" :ref="item.jenis+'-'+item.title">
                     <template #title style="font-size:9px;">
-                        <span class="dot" style="height: 9px;width: 9px;background-color: #bbb;border-radius: 50%;display: inline-block;"
+                        <span class="dot" style="height: 9px;width: 9px;background-color: #dc3545;border-radius: 50%;display: inline-block;"
                         v-if="$store.state.activeEditorTitle==item.jenis+'-'+item.title"
                         ></span>
                         <!-- <b-spinner 
