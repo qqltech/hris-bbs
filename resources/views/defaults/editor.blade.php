@@ -106,7 +106,8 @@
                     class='no-select'>
                     <b-icon :icon="item.icon" style="margin-right:5px;"></b-icon><span :style="item.migrated?'':'text-decoration: line-through red;'">{{ item.name }}</span> 
                     <b-icon size="sm" icon="pencil-square" style="margin-left:5px;" v-if="$store.state.activeEditorTitle==(item.name+'-'+item.src)"></b-icon>
-                    <b-spinner variant="danger" type="grow" small label="Active" style="max-width:10px;max-height:10px;" v-if="$store.state.activeEditorTitle==(item.name+'-'+item.src)"></b-spinner>
+                    <b-spinner variant="danger" type="grow" small label="Active" style="max-width:10px;max-height:10px;" v-if="!isChrome&&$store.state.activeEditorTitle==(item.name+'-'+item.src)"></b-spinner>
+                    <span style="width:10px;height:10px;background-color: #dc3545;border-radius: 50%;display: inline-block;" v-if="isChrome&&$store.state.activeEditorTitle==(item.name+'-'+item.src)"></span>
                 </span>
             </span>
         </div>
@@ -250,13 +251,17 @@ Vue.component("tree-item", {
     data: function() {
         return {
             isOpen: false,
-            toggled:false
+            toggled:false,
+            isChrome:false
         };
     },
     computed: {
         isFolder: function() {
             return this.item.children && this.item.children.length;
         }
+    },
+    created(){        
+        this.isChrome = window.chrome!==undefined;
     },
     methods: {
         toggle: function() {
@@ -1011,10 +1016,12 @@ vm = new Vue({
         editorcontent: 'tes',
         searchData:"",
         connection:null,
+        isChrome:false,
         channel:"{{env('LOG_CHANNEL',"+btoa(window.location.host)+")}}"
         //  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
     },
     created(){
+        this.isChrome = window.chrome!==undefined;
         this.$store.dispatch('getModels');
         this.connect();
     },
