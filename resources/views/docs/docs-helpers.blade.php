@@ -1,0 +1,135 @@
+## Global Helper
+
+- Download Hasil Query sebagai file xlsx
+```php
+\Excel::download(new \ExportExcel($queryBuilderGet), \Carbon::now()->format('d-m-Y')."_nama_file.xlsx");
+```
+
+- Casting tanggal sekarang ke format string diinginkan
+```php
+\Carbon::now()->format('d-m-Y');
+```
+
+## Custom Models
+
+- Mendapatkan ```Class``` Model Basic
+```php
+getBasic('nama_model');
+```
+
+- Mendapatkan ```Class``` Model Custom
+```php
+getCustom('nama_model');
+```
+
+- Mendapatkan tipe data dari column di model tertentu
+```php
+getDataType('nama_model','nama_kolom');
+```
+
+## Custom API - CRUD
+
+- API:: READ List atau READ by ID dengan mengisikan variable ```$primary_id``` dengan angka integer dari Primary Id row. Hasil ada di index ```$dataAll['data']```, sisanya pagination, dll.
+Untuk ```$params``` bisa diberi inisiasi array empty yakni ```[]```
+```php
+$dataAll = Api()->readOperation('nama_model',$params=[
+        "where_raw" =>null,
+        "order_by"  =>'updated_at',
+        "order_type"=>'DESC',
+        "order_by_raw"  =>null,
+        "search"    =>null,
+        "searchfield"   =>null,
+        "selectfield"   =>null,
+        "paginate"  =>25,
+        "page"      =>1,
+        "join"      =>true,
+        "joinMax"   =>0,
+        "addSelect" =>null,
+        "addJoin"   =>null,
+        "group_by"  =>null
+    ],$primary_id=null);
+$data = $dataAll['data'];
+```
+
+- API:: CREATE create data baik single row, maupun cascade detail-subdetail
+```php
+$data = [
+    'nama'=>'fajar firmansyah',
+    'nomor'=>1001,
+    'details_hobi'[
+        [
+            'hobi' => 'Makan'
+        ],
+        [
+            'hobi' => 'Tidur'
+        ]
+    ]
+];
+Api()->createOperation( "nama_model", $data, null, null);
+```
+
+- API:: UPDATE update data baik single row, maupun cascade detail-subdetail dengan ```$primary_id``` integer
+```php
+$data = [
+    'nama'=>'fajar firmansyah',
+    'nomor'=>1001,
+    'details_hobi'[
+        [
+            'hobi' => 'Makan'
+        ],
+        [
+            'hobi' => 'Tidur'
+        ]
+    ]
+];
+Api()->updateOperation( "nama_model", $data, $primary_id, null);
+```
+
+- API:: DELETE remove data baik single row, maupun cascade detail-subdetail dengan ```$primary_id``` integer
+```php
+Api()->deleteOperation( "nama_model", null, $primary_id, null);
+```
+
+## Emails
+
+- Send Email pengiriman email secara synchronous
+```php 
+SendEmail("email@domain.com","Subject Anda","<a href='#'>Contoh Link</a>");
+```
+
+## Debugging
+
+- Console Debugging, pengiriman hasil debug ke console browser (Javascript) secara websocket realtime pengganti ```dd``` punya laravel
+```php 
+ff($any_data,"your_title");
+```
+
+- Mendapatkan jenis route yang diakses user apakah ```'read_list'``` atau ```'read_id'```
+```php
+getRoute(); //atau
+$hasilBool = isRoute('read_list'); //true atau false
+```
+
+## Reports
+
+- Reporting HTML, PDF, & XLSX, belajar template bisa ke [link](https://dejozz.com/report.html)
+```php
+$template = "string dari disain excel, bisa dari hasil yg telah disimpan di database";
+$data = [
+    "from" => "01/12/2020",
+    "to" => "01/12/2020",
+    "Type Laporan" => "Tahunan",
+    "data" => [ //bisa dari query
+        ['netto'=>2000,'rugi'=>0,'untung'=>3000,'minggu-ke'=>1],
+        ['netto'=>4000,'rugi'=>2,'untung'=>5000,'minggu-ke'=>2]
+    ]
+];
+$type = "html";
+if( strpos(strtolower($type),"htm")!==false ){
+    return renderHTML($template,$data,["break"=>false,"title"=>"Laporan", "orientation"=>"L","size"=>"A4","fontsize"=>10]);
+}elseif( strpos(strtolower($type),"pdf")!==false ){
+    return renderPDF($template,$data,["break"=>false,"title"=>"Laporan", "orientation"=>"L","fontsize"=>10]); 
+}else{
+    return renderXLS($template,$data,["break"=>false,"sheetname"=>"minggu-ke","title"=>"Laporan", "orientation"=>"L","fontsize"=>10]);
+}
+```

@@ -24,6 +24,11 @@
         },
       loadNavbar: true,
       mergeNavbar: true,
+      copyCode: {
+        buttonText : 'Copy',
+        errorText  : 'Error',
+        successText: 'Silahkan dipaste! Dasar Tukang Copas!'
+      }
       },
     }
   </script>
@@ -34,6 +39,8 @@
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <script src="//unpkg.com/mermaid/dist/mermaid.js"></script>
   <script src="//unpkg.com/docsify-mermaid@latest/dist/docsify-mermaid.js">
+  <script src="https://unpkg.com/docsify-copy-code@2"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-php.min.js"></script>
   <script>mermaid.initialize({ startOnLoad: true });</script>
 </body>
 </html>
