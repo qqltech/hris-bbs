@@ -38,8 +38,8 @@ public function custom_namafungsi($request){
 }
 ```
 Cara mengakses:
-> Menggunakan method <b style='color:green;'>[GET]</b> ```{{url('/operation/{model}/namafungsi')}}```<br>
-> Menggunakan method <b style='color:green;'>[POST]</b> ```{{url('/operation/{model}/namafungsi')}}```
+><b style='color:green;'>[GET]</b> ```{{url('/operation/{model}/namafungsi')}}```<br>
+><b style='color:green;'>[POST]</b> ```{{url('/operation/{model}/namafungsi')}}```
 
 ### Public Function
 Baris Kode Public Function ( bisa diakses oleh klien tanpa otorisasi/auth ) di custom model manapun. Format nama fungsi: public_<b>namafungsi</b>
@@ -49,5 +49,5 @@ public function public_namafungsi($request){
 }
 ```
 Cara mengakses:
-> Menggunakan method <b style='color:green;'>[GET]</b> ```{{url('/public/{model}/namafungsi')}}```<br>
-> Menggunakan method <b style='color:green;'>[POST]</b> ```{{url('/public/{model}/namafungsi')}}```
+><b style='color:green;'>[GET]</b> ```{{url('/public/{model}/namafungsi')}}```<br>
+><b style='color:green;'>[POST]</b> ```{{url('/public/{model}/namafungsi')}}```

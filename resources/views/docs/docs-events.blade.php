@@ -52,7 +52,8 @@ public function deleteBefore($model, $arrayData, $metaData, $id=null)
 {
     $newModel = $model;
     return [
-        "model" => $newModel
+        "model" => $newModel,
+        // 'errors' => ['error1','error2'] //untuk menggagalkan delete data
     ];
 }
 ```

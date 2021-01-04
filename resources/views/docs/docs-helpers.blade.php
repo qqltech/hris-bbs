@@ -1,4 +1,15 @@
 ## Global Helper
+- Simple Try Catch dengan DB transaction
+```php
+DB::beginTransaction();
+try{
+    //do something
+catch(Exception $e){
+    $error  = $e->getMessage()."-".$e.getLine()."-".$e->getFile();
+    DB::rollback();
+}
+DB::commit();
+```
 
 - Download Hasil Query sebagai file xlsx
 ```php
@@ -33,21 +44,21 @@ getDataType('nama_model','nama_kolom');
 Untuk ```$params``` bisa diberi inisiasi array empty yakni ```[]```
 ```php
 $dataAll = Api()->readOperation('nama_model',$params=[
-        "where_raw" =>null,
-        "order_by"  =>'updated_at',
-        "order_type"=>'DESC',
-        "order_by_raw"  =>null,
-        "search"    =>null,
-        "searchfield"   =>null,
-        "selectfield"   =>null,
-        "paginate"  =>25,
-        "page"      =>1,
-        "join"      =>true,
-        "joinMax"   =>0,
-        "addSelect" =>null,
-        "addJoin"   =>null,
-        "group_by"  =>null
-    ],$primary_id=null);
+        "where_raw"     =>  null,
+        "order_by"      =>  'updated_at',
+        "order_type"    =>  'DESC',
+        "order_by_raw"  =>  null,
+        "search"        =>  null,
+        "searchfield"   =>  null,
+        "selectfield"   =>  null,
+        "paginate"      =>  25,
+        "page"          =>  1,
+        "join"          =>  true,
+        "joinMax"       =>  0,
+        "addSelect"     =>  null,
+        "addJoin"       =>  null,
+        "group_by"      =>  null
+    ],$primary_id = null);
 $data = $dataAll['data'];
 ```
 
@@ -119,15 +130,15 @@ $data = [
     "from" => "01/12/2020",
     "to" => "01/12/2020",
     "Type Laporan" => "Tahunan",
-    "data" => [ //bisa dari query
+    "data" => [ //bisa didapatkan dari hasil DB query,Model Get, atau Array Data
         ['netto'=>2000,'rugi'=>0,'untung'=>3000,'minggu-ke'=>1],
         ['netto'=>4000,'rugi'=>2,'untung'=>5000,'minggu-ke'=>2]
     ]
 ];
-$type = "html";
-if( strpos(strtolower($type),"htm")!==false ){
+$output = "html"; //contoh jika ingin outputnya html, sisanya: pdf dan xlsx
+if( strpos(strtolower($output),"htm")!==false ){
     return renderHTML($template,$data,["break"=>false,"title"=>"Laporan", "orientation"=>"L","size"=>"A4","fontsize"=>10]);
-}elseif( strpos(strtolower($type),"pdf")!==false ){
+}elseif( strpos(strtolower($output),"pdf")!==false ){
     return renderPDF($template,$data,["break"=>false,"title"=>"Laporan", "orientation"=>"L","fontsize"=>10]); 
 }else{
     return renderXLS($template,$data,["break"=>false,"sheetname"=>"minggu-ke","title"=>"Laporan", "orientation"=>"L","fontsize"=>10]);

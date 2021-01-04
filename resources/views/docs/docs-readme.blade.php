@@ -25,4 +25,4 @@ Ayo Cangkruk Kawan! His social-media accounts:
 - Contact2 [Telegram](https://t.me/firmansyah2018)
 - Contact2 [Instagram](https://www.instagram.com/firmansyah_2017/)
 
-![logo](https://scontent.fsub5-1.fna.fbcdn.net/v/t1.0-9/10178022_10200794555745725_3345129989677326181_n.jpg?_nc_cat=107&ccb=2&_nc_sid=174925&_nc_ohc=lvpbk1g7BCwAX9EjvnR&_nc_ht=scontent.fsub5-1.fna&oh=41e1967b8cfcf030ed56445850cceb01&oe=5FD3F3DB ':size=220x200')
+![logo](https://scontent.fsub9-1.fna.fbcdn.net/v/t1.0-0/c62.0.206.206a/p206x206/107574300_10214375784067945_1752569351938394089_o.jpg?_nc_cat=111&ccb=2&_nc_sid=da31f3&_nc_eui2=AeGUJHtzDJWY5T9yYKouFwHy1p7GK16v6dbWnsYrXq_p1vrUdXgupraSj0U0F37Uaoo&_nc_ohc=99sC_3b9QjsAX9QYZXj&_nc_ht=scontent.fsub9-1.fna&tp=27&oh=3e4739df7a85812bc057f05e42c5a660&oe=60171144)
