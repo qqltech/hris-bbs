@@ -4,7 +4,7 @@
 DB::beginTransaction();
 try{
     //do something
-catch(Exception $e){
+}catch(Exception $e){
     $error  = $e->getMessage()."-".$e.getLine()."-".$e->getFile();
     DB::rollback();
 }

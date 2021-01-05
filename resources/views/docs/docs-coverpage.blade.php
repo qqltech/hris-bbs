@@ -8,5 +8,5 @@
 - Sak Karepmu, bebas
 - Sak sirmu, los dol
 
-[Halaman Awal]({{url('/')}})
 [Get Started](/readme?id=catatan-rilis)
+[Halaman Awal]({{url('/docs/frontend')}})
