@@ -1,14 +1,15 @@
 ## Global Helper
 - Simple Try Catch dengan DB transaction
 ```php
-DB::beginTransaction();
+\DB::beginTransaction();
 try{
     //do something
 }catch(Exception $e){
     $error  = $e->getMessage()."-".$e.getLine()."-".$e->getFile();
-    DB::rollback();
+    trigger_error($error);
+    \DB::rollback();
 }
-DB::commit();
+\DB::commit();
 ```
 
 - Download Hasil Query sebagai file xlsx
@@ -16,9 +17,12 @@ DB::commit();
 \Excel::download(new \ExportExcel($queryBuilderGet), \Carbon::now()->format('d-m-Y')."_nama_file.xlsx");
 ```
 
-- Casting tanggal sekarang ke format string diinginkan
+- Casting tanggal dan waktu [Carbon Source](https://carbon.nesbot.com/)
 ```php
-\Carbon::now()->format('d-m-Y');
+$dateToString = \Carbon::now()->format('d-m-Y');
+$dateFromString = \Carbon::createFromFormat('d/m/Y', '23/12/2023');
+$tomorrow = \Carbon::now()->addDay();
+$lastWeek = \Carbon::now()->subWeek();
 ```
 
 ## Custom Models
