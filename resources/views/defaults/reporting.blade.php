@@ -33,8 +33,8 @@
         </div>
         <div>
             <table style="width:100%;border-collapse: collapse;" cellspacing="0">
-                <tr v-for="(tr,i) in arrayexcelRead" key="i">
-                    <td v-for="(td,j) in tr" key="j" :colspan="getColspan(i,j)" :rowspan="getRowspan(i,j)"  v-if="td!=''" :style="getStyle(td)">
+                <tr v-for="(tr,i) in arrayexcelRead" :key="i">
+                    <td v-for="(td,j) in tr" :key="j" :colspan="getColspan(i,j)" :rowspan="getRowspan(i,j)"  v-if="td!=''" :style="getStyle(td)">
                         {{getData(i,td)}}
                     </td>
                 </tr>
