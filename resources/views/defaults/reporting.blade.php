@@ -70,7 +70,7 @@ var app = new Vue({
                 return dt.length>1
                 return dt.length==this.maxCol
             });
-            return newData;
+            return newData??[];
         }
     },
     created(){ 
