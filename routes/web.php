@@ -23,15 +23,16 @@ $router->get('/', function () use ($router) {
     if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
         return response()->json("SERVER WAS CLOSED",404);
     }
-    return response()->json(["info"=>"welcome to LARAHAN fast Api LaravelLumen-based!",
+    return response()->json(["info"=>"welcome to LARAHAN fast Api Laravel Lumen-based!",
         "data"=>[
+            "documentation" => url("/docs/documentation"),
+            "operation" => url("/operation"),
             "config" => url("/laradev"),
             "frontend" => url("/docs/frontend"),
             "backend" => url("/docs/backend"),
             "visualisasi DB" => url("/visual.html"),
-            "operation" => url("/operation"),
             "simulation" => url("/docs/simulation"),
-            "documentation" => url("/docs/documentation"),
+            "report templating" => url("/docs/reporting"),
             "uploader" => url("/docs/uploader")
         ]
     ]);

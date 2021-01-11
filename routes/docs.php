@@ -68,6 +68,38 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
             return view("defaults.editor");
         }
     });
+    $router->get('/reporting', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        return view('defaults.unauthorized')->with('data',[
+            'page'=>'halaman report template',
+            'url'=>url("docs/reporting")
+        ]);
+    });
+    $router->post('/reporting', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        $tables = array_filter(DB::connection()->getDoctrineSchemaManager()->listTableNames(),function($tb){
+            return strpos($tb,"report_template")!==false;
+        });
+        if(count($tables)==0){
+            return "table _report_template does not exist";
+        }
+        
+        if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
+            return view('defaults.unauthorized')->with('data',[
+                'page'=>'halaman report template',
+                'url'=>url("docs/reporting"),
+                'salah'=>true
+            ]);
+        }else{
+            $table = array_values($tables)[0]; 
+            $list = DB::table($table)->select('name','template','id')->get();
+            return view("defaults.reporting",compact('list','table'));
+        }
+    });
     $router->get('/backend', function(Request $req){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);

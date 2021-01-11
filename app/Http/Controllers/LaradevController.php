@@ -1430,4 +1430,21 @@ class LaradevController extends Controller
         }
         return 'ok';
     }
+    public function uploadTemplate(Request $request){
+        $id = $request->id;
+        if($id!==null){
+            DB::table($request->table)->where('id',$id)->update([
+                'template' => $request->template,
+                'updated_at' => \Carbon::now()
+            ]);
+        }else{
+            DB::table($request->table)->insert([
+                'name' => $request->name,
+                'template' => $request->template,
+                'updated_at' => \Carbon::now(),
+                'created_at' => \Carbon::now()
+            ]);
+        }
+        return DB::table($request->table)->select('name','template','id')->get();;
+    }
 }

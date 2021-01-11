@@ -26,7 +26,6 @@ $lastWeek = \Carbon::now()->subWeek();
 ```
 
 ## Custom Models
-
 - Mendapatkan ```Class``` Model Basic
 ```php
 getBasic('nama_model');
