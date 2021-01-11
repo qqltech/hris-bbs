@@ -33,7 +33,7 @@
         </div>
         <div>
             <table style="width:100%;border-collapse: collapse;" cellspacing="0">
-                <tr v-for="(tr,i) in arrayexcel" key="i">
+                <tr v-for="(tr,i) in arrayexcelRead" key="i">
                     <td v-for="(td,j) in tr" key="j" :colspan="getColspan(i,j)" :rowspan="getRowspan(i,j)"  v-if="td!=''" :style="getStyle(td)">
                         {{getData(i,td)}}
                     </td>
@@ -62,8 +62,16 @@ var app = new Vue({
         startBody:1,
         action:"http://localhost/larahan/public/ace/coba",
         actionFixed:"",
+        maxCol:0
     },
     computed:{
+        arrayexcelRead:function(){
+            let newData = (this.arrayexcel).filter(dt=>{
+                return dt.length>1
+                return dt.length==this.maxCol
+            });
+            return newData;
+        }
     },
     created(){ 
                 this.dataexcel = `PT Makmur Indonesia::trb						
@@ -109,6 +117,9 @@ _number::cb	$data.no_rekening	$data.nama_rekening	$data.saldo_awal::.r	$data.deb
             });
         },
         selectChange(val){
+            if(val===null){
+                this.dataexcel = null;this.paste();return;
+            }
             if(val.name!='Create New'){
                 this.templateNameNew=null;
             }
@@ -132,6 +143,9 @@ _number::cb	$data.no_rekening	$data.nama_rekening	$data.saldo_awal::.r	$data.deb
             this.arrayexcel=[];
             for(let i in data){
                 let tds = data[i].split("\t");
+                if( tds.length>this.maxCol ){
+                    this.maxCol=tds.length;
+                }
                 this.arrayexcel.push(tds);
                 if(tds[0].includes("::")){
                     let format = tds[0].split("::");
