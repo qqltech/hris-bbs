@@ -117,6 +117,7 @@ _number::cb	$data.no_rekening	$data.nama_rekening	$data.saldo_awal::.r	$data.deb
             });
         },
         selectChange(val){
+            this.dataexcel = "";
             if(val===null){
                 this.dataexcel = null;this.paste();return;
             }
