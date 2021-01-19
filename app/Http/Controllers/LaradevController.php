@@ -568,7 +568,7 @@ class LaradevController extends Controller
             }
             return "update Model OK";
         }else{
-            return response()->json($output,422);
+            return response()->json($return,422);
         };
     }
     public function getPhysicalForeignKeys(){
