@@ -554,7 +554,9 @@ class LaradevController extends Controller
         $tempFile=app()->path()."/Models/CustomModels/$tableName"."_temp.php";
         File::put($tempFile,$request->text);
         try{
-            $result = exec("php -l $tempFile", $output, $return);
+            $output=null;
+            $return=null;
+            exec("php -l $tempFile", $output, $return);
         }catch(\Exception $e){
             File::delete($tempFile);            
             $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
@@ -568,7 +570,7 @@ class LaradevController extends Controller
             }
             return "update Model OK";
         }else{
-            return response()->json($return,422);
+            return response()->json($output,422);
         };
     }
     public function getPhysicalForeignKeys(){
