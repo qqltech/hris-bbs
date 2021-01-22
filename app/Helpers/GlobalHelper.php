@@ -1491,6 +1491,7 @@ function _customGetData($model,$params)
                 if($searchfield!=null){
                     $searchfieldArray = explode(",", strtolower($searchfield) );
                     foreach($searchfieldArray as $fieldSearching){
+                        $fieldSearching = str_replace( "this.","$table.", $fieldSearching );
                         if(in_array($fieldSearching,$allColumns)){
                             $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%$string%'"));
                         }
