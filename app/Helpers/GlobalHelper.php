@@ -1488,17 +1488,35 @@ function _customGetData($model,$params)
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield) {
-                foreach($allColumns as $column){
-                    if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
-                        continue;
+                if($searchfield!=null){
+                    $searchfieldArray = explode(",", strtolower($searchfield) );
+                    foreach($searchfieldArray as $fieldSearching){
+                        if(in_array($fieldSearching,$allColumns)){
+                            $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%$string%'"));
+                        }
                     }
-                    $arrayColumn = explode(".",$column);
-                    if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
-                        continue;
+                }else{
+                    foreach($allColumns as $column){
+                        if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
+                            continue;
+                        }
+                        $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                     }
-                    $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
                 }
         });
+        // $model = $model->where(
+        //     function ($query)use($allColumns,$string,$additionalString, $searchfield) {
+        //         foreach($allColumns as $column){
+        //             if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
+        //                 continue;
+        //             }
+        //             $arrayColumn = explode(".",$column);
+        //             if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
+        //                 continue;
+        //             }
+        //             $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
+        //         }
+        // });
     }
     if($params->where_raw){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
