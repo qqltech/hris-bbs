@@ -1495,6 +1495,12 @@ function _customGetData($model,$params)
                         if(in_array($fieldSearching,$allColumns)){
                             $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%$string%'"));
                         }
+                        $found = null;
+                        foreach($allColumns as $col){
+                            if(strpos($col, $fieldSearching)){
+                                $query->orWhereRaw(DB::raw("LOWER($col$additionalString) LIKE '%$string%'"));
+                            }
+                        }
                     }
                 }else{
                     foreach($allColumns as $column){
