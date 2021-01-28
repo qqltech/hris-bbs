@@ -35,8 +35,12 @@ class __class__ extends Migration
                 'created_at' => 'datetime:d-m-Y',
                 'updated_at' => 'datetime:d-m-Y'
             ],
-            "autocreate"    => [],
-            "autoupdate"    => [],
+            "autocreate"  =>[
+                //"creator_id"=>"auth:id"
+            ],
+            "autoupdate"  =>[
+                //"editor_id"=>"auth:id"
+            ],
             "readers"     =>[],
             "writers"     =>[]
         ]);
