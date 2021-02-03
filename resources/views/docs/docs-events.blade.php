@@ -27,8 +27,8 @@ public function createOperation( $request )
         return [
             "status"    => "failed",
             "warning"  => $e->getMessage(),
-            "errors"  => [e->getMessage()]
-        ]
+            "errors"  => [$e->getMessage()]
+        ];
     }
     return true;
 }
@@ -70,9 +70,9 @@ public function updateOperation( $request, $id )
         return [
             "status"    => "failed",
             "warning"  => $e->getMessage(),
-            "errors"  => [e->getMessage()],
+            "errors"  => [$e->getMessage()],
             "id"      => $id
-        ]
+        ];
     }
     return true;
 }
