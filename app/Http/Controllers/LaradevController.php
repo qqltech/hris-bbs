@@ -1040,6 +1040,9 @@ class LaradevController extends Controller
             return File::get( $alterFile );
         }
     }
+    public function readLog(Request $req, $table=null){
+        return getLog($table.".json");
+    }
     public function doMigrate(Request $req, $table=null){
         
         Schema::disableForeignKeyConstraints();

@@ -27,6 +27,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
 
         
         $router->get('/migrations', 'LaradevController@readMigrations');
+        $router->get('/logs/{table}', 'LaradevController@readLog');
         $router->get('/alter/{table}', 'LaradevController@readAlter');
         $router->put('/alter/{table}', 'LaradevController@editAlter');
         $router->get('/migrations/{table}', 'LaradevController@readMigrations');

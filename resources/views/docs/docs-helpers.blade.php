@@ -12,6 +12,12 @@ try{
 \DB::commit();
 ```
 
+- Get Payload Request->all() versi lumen berbentuk object
+```php
+$payloadAll = req(); //object 
+$username   = req('username'); //single key
+```
+
 - Download Hasil Query sebagai file xlsx
 ```php
 \Excel::download(new \ExportExcel($queryBuilderGet), \Carbon::now()->format('d-m-Y')."_nama_file.xlsx");
@@ -24,6 +30,7 @@ $dateFromString = \Carbon::createFromFormat('d/m/Y', '23/12/2023');
 $tomorrow = \Carbon::now()->addDay();
 $lastWeek = \Carbon::now()->subWeek();
 ```
+
 
 ## Custom Models
 - Mendapatkan ```Class``` Model Basic
@@ -112,6 +119,22 @@ SendEmail("email@domain.com","Subject Anda","<a href='#'>Contoh Link</a>");
 ```
 
 ## Debugging
+
+- Menyimpan Array ke JSON File sebagai {appRoot}/logs/{namamodel}.json bisa berguna untuk ditampilkan di panel backend editor di bagian Log
+```php 
+$arrayData = req(); //contoh: logging request data dengan helper req()
+setLog($arrayData);
+```
+
+- Memanggil Hasil Simpanan Log {appRoot}/logs/{namamodel}.json
+```php 
+$debugLog = getLog();
+```
+
+- Menghapus File Log {appRoot}/logs/{namamodel}.json
+```php 
+removeLog();
+```
 
 - Console Debugging, pengiriman hasil debug ke console browser (Javascript) secara websocket realtime pengganti ```dd``` punya laravel
 ```php 

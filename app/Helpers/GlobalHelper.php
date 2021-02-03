@@ -11,6 +11,7 @@ use Illuminate\Support\HigherOrderTapProxy;
 use Dotenv\Environment\Adapter\PutenvAdapter;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
+use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 if (! function_exists('append_config')) {
     /**
@@ -2318,4 +2319,61 @@ function renderXLS( $config,$arrayData,$pageConfig=[] ){
         'Last-Modified'=>gmdate('D, d M Y H:i:s').' GMT',
         'Expires'=>'Mon, 26 Jul 1997 05:00:00 GMT'
     ]);
+}
+
+function setLog($data){
+    umask(0000);
+    $dtrace = (object)debug_backtrace(1,true)[0];
+    $filenameArr = explode(php_uname('s')=='Linux'?"/":"\\",$dtrace->file);
+    $filename = str_replace(".php",".json",end($filenameArr));
+    $path = base_path("logs");
+    if( ! File::exists($path) ){
+        File::makeDirectory( $path, 493, true);
+    }
+    $agent = new \Jenssegers\Agent\Agent;
+    $data = is_array($data) ? $data:(array)$data;
+    $data['___client_timestamp'] = \Carbon::now();
+    $data['___client_address'] = app()->request->ip();
+    $data['___client_browser'] = $agent->browser();
+    $data['___client_platform'] = $agent->platform();
+    return File::put("$path/$filename",json_encode($data));
+}
+function getLog($filename=null,$string=false){
+    if($filename===null){
+        $dtrace = (object)debug_backtrace(1,true)[0];
+        $filenameArr = explode(php_uname('s')=='Linux'?"/":"\\",$dtrace->file);
+        $filename = str_replace(".php",".json",end($filenameArr));
+    }
+    $path = base_path("logs/$filename");
+    if( ! File::exists($path) ){
+        return null;
+    }
+    if($string){
+        return File::get($path);
+    }
+    return json_decode(File::get($path),true);
+}
+function removeLog($filename=null){
+    if($filename===null){
+        $dtrace = (object)debug_backtrace(1,true)[0];
+        $filenameArr = explode(php_uname('s')=='Linux'?"/":"\\",$dtrace->file);
+        $filename = str_replace(".php",".json",end($filenameArr));
+    }
+    $path = base_path("logs/$filename");
+    if( ! File::exists($path) ){        
+        return false;
+    }
+    return File::delete("$path");
+}
+
+function req($key=null){
+    if(app()->request->method()=="GET" ){
+        $data = (object)app()->request->all();
+    }else{
+        $data = json_decode(file_get_contents('php://input'));
+    }
+    if($key!==null){
+        return $data->$key;
+    }
+    return $data;
 }

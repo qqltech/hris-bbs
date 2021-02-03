@@ -204,7 +204,7 @@
                         @click="$store.dispatch(item.action, item)"
                         :class="item.action=='alter'?'bg-warning':(!item.migrated?'bg-success':'bg-danger')" 
                         style="z-index:999999;position:fixed;right:18px;bottom:30px;" 
-                        v-if="item.action" :title="item.action" size="sm">
+                        v-if="item.action&&item.action!='log'" :title="item.action" size="sm">
                         <b-icon :icon="!item.migrated?'arrow-up-circle':'lightning-fill'" v-if="!$store.state.migrating"></b-icon>
                         <b-spinner small type="grow" v-if="$store.state.migrating"></b-spinner><span v-if="$store.state.migrating">Altering/Migrating...</span>
                             
@@ -217,6 +217,14 @@
                         style="z-index:999999;position:fixed;right:55px;bottom:30px;" 
                         title="Down" size="sm">
                         <b-icon icon="arrow-down-circle" v-if="!$store.state.migrating"></b-icon>                            
+                    </b-btn>
+                    <b-btn pill
+                        v-if="['log',''].includes(item.action)"
+                        @click="$store.dispatch('reload', item)"
+                        class="bg-default" 
+                        style="z-index:999999;position:fixed;right:5px;bottom:30px;" 
+                        title="Reload" size="sm">
+                        <b-icon icon="arrow-clockwise" v-if="!$store.state.migrating"></b-icon>                            
                     </b-btn>
                 </b-tab>
             </b-tabs>
@@ -976,6 +984,56 @@ vm = new Vue({
                         });
                     }
                 },
+                async reload({commit,state}, item){
+                    const { value: confirm } = await Swal.fire({
+                        title: `Reload Model ${item.title}?`,
+                        text: "Semua Perubahan diReload Ulang dari Server",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Reload!'
+                    });
+                    if(!confirm){ return; }
+                    let url = "{{url('laradev')}}";
+                    if(item.jenis=='Log'){
+                        url=url+"/logs/"+item.title;
+                    }else if( (item.jenis).toLowerCase().includes('custom')){
+                        url=url+"/models/"+item.title+"?custom=true";
+                    }else if((item.jenis).toLowerCase().includes('basic')){
+                        url=url+"/models/"+item.title+"?basic=true";
+                    }
+                    axios({
+                        url         : url,
+                        method      : 'GET',
+                        credentials : true,
+                        body        : null,
+                        headers     : {
+                            laradev:"quantumleap150671"
+                        }
+                    }).then(response => {
+                        Toast.fire({
+                            icon: 'info',
+                            title: `${item.title} model has been reloaded sucessfully`
+                        });
+                        commit('updateActiveEditors',{
+                            title:item.title,
+                            jenis:item.jenis,
+                            value:item.jenis=='Log'?JSON.stringify(response.data, null, 2):response.data
+                        });
+                    }).catch(error => {
+                        window.console.clear();
+                        Swal.fire({
+                            title: `Failed!`,
+                            text: 'Check Your Console',
+                            icon: 'error',
+                            confirmButtonText: 'Ok!'
+                        })
+                        console.log(error.response.data)
+                    }).then(function () {
+                        
+                    });
+                },
                 getModels({commit,state}){
                     // let loader = Vue.$loading.show({
                     //     color: 'grey',loader: 'dots',
@@ -1038,15 +1096,17 @@ vm = new Vue({
                 }
                 let name = 'migration';
                 let icon = 'table';
+                const filename = (models[i].file).split(".")[0];
                 let children = [
-                    { migrated:true,name: 'Migration', icon:"card-checklist",src:(models[i].file).split(".")[0] },
-                    { migrated:true,name: "Alter",icon:"bookmark-plus",src:(models[i].file).split(".")[0] },
-                    { migrated:true,name: "Basic Model",icon:"check2-square",src:(models[i].file).split(".")[0] },
-                    { migrated:true,name: "Custom Model",icon:"code-square",src:(models[i].file).split(".")[0] }
+                    { migrated:true,name: 'Migration', icon:"card-checklist",src:filename },
+                    { migrated:true,name: "Alter",icon:"bookmark-plus",src:filename },
+                    { migrated:true,name: "Basic Model",icon:"check2-square",src:filename },
+                    { migrated:true,name: "Custom Model",icon:"code-square",src:filename },
+                    { migrated:true,name: "Log", icon:"search", src:filename}
                 ];
                 if((models[i].file).includes("_after_") || (models[i].file).includes("_before_")){
                     name='trigger'; icon = 'lightning-fill';
-                    children =[{ migrated:true,name: 'Migration', icon:"lightning-fill",src:(models[i].file).split(".")[0] }];
+                    children =[{ migrated:true,name: 'Migration', icon:"lightning-fill",src:filename }];
                 }else if(models[i].view){
                     children.splice(1,1)
                     name='view'; icon = 'eye-fill';
@@ -1060,14 +1120,14 @@ vm = new Vue({
                     })
                 }
                 children.push({
-                    migrated:true,name: "Delete",icon:"trash",src:(models[i].file).split(".")[0]
+                    migrated:true,name: "Delete",icon:"trash",src:filename
                 })
                 treeData.push({
-                    name: (models[i].file).split(".")[0],
+                    name: filename,
                     icon: icon,
                     children: children,
                     migrated:models[i].table||models[i].alias,
-                    src:(models[i].file).split(".")[0]
+                    src:filename
                 });
             }
             return treeData;
@@ -1203,6 +1263,8 @@ vm = new Vue({
             }
             if(item.name=='Migration'){
                 icon='lightning'; action='migrate'; endpoint="/migrations/"+item.src;
+            }else if(item.name=='Log'){
+                icon='search'; action='log';endpoint="/logs/"+item.src;
             }else if(item.name=='Alter'){
                 icon='shuffle'; action='alter';endpoint="/alter/"+item.src;
             }else if( (item.name).toLowerCase().includes('custom')){
@@ -1236,19 +1298,19 @@ vm = new Vue({
                 headers     : {
                     laradev:"quantumleap150671"
                 }
-            }).then(response => {           
+            }).then(response => {
                 me.$store.commit('addActiveEditors',{
                     title:itemLengkap.name,
                     jenis:item.name,
-                    value:response.data,
+                    value:item.name=='Log'?JSON.stringify(response.data, null, 2):response.data,
                     icon: icon,
-                    readOnly:(item.name).toLowerCase().includes('basic'),
+                    readOnly:(item.name).toLowerCase().includes('basic')||item.name=='Log',
                     action:action,
                     migrated:itemLengkap.migrated,
-                    mode:'php',
-                    theme: (item.name).toLowerCase().includes('basic')?'chrome':'monokai',
+                    mode:item.name=='Log'?'json':'php',
+                    theme: (item.name).toLowerCase().includes('basic')||item.name=='Log'?'chrome':'monokai',
                     fontSize: 11,
-                    fontFamily: 'Consolas',
+                    fontFamily: item.name=='Log'?'Monospace':'Consolas',
                     highlightActiveLine: true,
                     enableBasicAutocompletion:true,
                     maxLines:parseInt(window.innerHeight/13.9),

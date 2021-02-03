@@ -11,4 +11,5 @@ Homestead.yaml
 /app/Models/CustomModels
 /app/Models/BasicModels
 /app/Models/SuperModels
+/logs
 *.bat
