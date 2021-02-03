@@ -781,16 +781,27 @@ class ApiFixedController extends Controller
                     $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
                 }
                 $function = $this->operation."Operation";
-                $this->$function($this->parentModelName,$this->requestData, $id);
-                if(!$this->operationOK){
-                    return response()->json([
-                        "status"    => "$this->operation data failed",
-                        "warning"  => $this->messages, 
-                        "success"  => $this->success, 
-                        "errors"  => $this->errors, 
-                        "request" => $this->requestData,
-                        "id"      => $this->operationId
-                    ],400);
+                if( method_exists($model, $function) ){
+                    if( $this->operation=='create' ){
+                        $overrideOperation = $model->$function( $this->originalRequest );
+                    }elseif( $this->operation=='update' ){
+                        $overrideOperation = $model->$function( $this->originalRequest, $id );
+                    }
+                    if(is_array($overrideOperation)){
+                        return response()->json($overrideOperation,400);
+                    }
+                }else{
+                    $this->$function($this->parentModelName,$this->requestData, $id);
+                    if(!$this->operationOK){
+                        return response()->json([
+                            "status"    => "$this->operation data failed",
+                            "warning"  => $this->messages, 
+                            "success"  => $this->success, 
+                            "errors"  => $this->errors, 
+                            "request" => $this->requestData,
+                            "id"      => $this->operationId
+                        ],400);
+                    }
                 }
             }catch(Exception $e){
                 DB::rollback();

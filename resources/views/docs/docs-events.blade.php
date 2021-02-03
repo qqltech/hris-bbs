@@ -13,6 +13,27 @@ public function createBefore($model, $arrayData, $metaData, $id=null)
 }
 ```
 
+## Create Function Overriding 
+- Fungsi ini dijalankan ketika sebuah model ```create``` data, Fungsi ini akan meng-override default fungsi create yang ada di Controller Api, 
+Anda harusnya jarang sekali menggunakan ini di Custom Model anda.
+```php
+public function createOperation( $request )
+{
+    try{
+        $parentClassName = "\\".get_parent_class($this);
+        $parentClass =  new $parentClassName;
+        $result = $parentClass->create( reformatData($request->only( $parentClass->createable ) ) );
+    }catch(\Exception $e){
+        return [
+            "status"    => "failed",
+            "warning"  => $e->getMessage(),
+            "errors"  => [e->getMessage()]
+        ]
+    }
+    return true;
+}
+```
+
 ## Create After
 - Fungsi ini dijalankan ketika sebuah model <b>TELAH</b> digunakan untuk ```create``` data
 ```php
@@ -34,6 +55,26 @@ public function updateBefore($model, $arrayData, $metaData, $id=null)
         "data"   => $newArrayData,
         // 'errors' => ['error1','error2'] //untuk menggagalkan update data
     ];
+}
+```
+
+## Update Function Overriding 
+- Fungsi ini dijalankan ketika sebuah model ```update``` data, Fungsi ini akan meng-override default fungsi update yang ada di Controller Api, 
+Anda harusnya jarang sekali menggunakan ini di Custom Model anda.
+```php
+public function updateOperation( $request, $id )
+{
+    try{
+        $this->find($id)->update($request->only($this->updateable));
+    }catch(\Exception $e){
+        return [
+            "status"    => "failed",
+            "warning"  => $e->getMessage(),
+            "errors"  => [e->getMessage()],
+            "id"      => $id
+        ]
+    }
+    return true;
 }
 ```
 
