@@ -1,0 +1,29 @@
+before_script:
+  - echo "Before script"
+  - cd /opt/others/www/larahan_bitlab #your project path
+building:
+  stage: build
+  script:
+    - git reset --hard
+    - git pull origin develop
+    - composer install
+    - cp .env.example .env
+    - php artisan key:generate
+    - php artisan migrate --seed
+    - php artisan cache:clear
+    - php artisan config:clear
+    - php artisan storage:link
+    - sudo chown -R deployer:www-data /opt/others/www/larahan_bitlab/
+    - find /opt/others/www/larahan_bitlab -type f -exec chmod 664 {} \;
+    - find /opt/others/www/larahan_bitlab -type d -exec chmod 775 {} \;
+    - chgrp -R www-data storage bootstrap/cache
+    - chmod -R ug+rwx storage bootstrap/cache
+testing:
+  stage: test
+  script:
+    - php ./vendor/bin/phpunit
+deploying:
+  stage: deploy
+  script:
+    - echo "Deployed"
+    - php artisan queue:restart #if you use queue

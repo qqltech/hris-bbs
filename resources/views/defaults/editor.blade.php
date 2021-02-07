@@ -986,7 +986,7 @@ vm = new Vue({
                 },
                 async reload({commit,state}, item){
                     const { value: confirm } = await Swal.fire({
-                        title: `Reload Model ${item.title}?`,
+                        title: `Reload Model?`,
                         text: "Semua Perubahan diReload Ulang dari Server",
                         icon: 'warning',
                         showCancelButton: true,
