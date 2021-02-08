@@ -10,7 +10,7 @@ before_script:
   # - chmod 644 ~/.ssh/known_hosts
   - uname
   - whoami
-  - pwd
+  # - pwd
   - cd /opt/others/www/larahan_gitlab #your project p ath
 building:
   stage: build
