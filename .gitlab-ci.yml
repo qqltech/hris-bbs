@@ -6,6 +6,8 @@ before_script:
 building:
   stage: build
   script:
+    - git reset --hard
+    - git pull origin master
     - composer install
     - mkdir database/migrations/projects
     - mkdir database/migrations/alters
@@ -38,4 +40,4 @@ deploying:
   stage: deploy
   script:
     - echo "Deployed"
-    - php artisan queue:restart #if you use queue
+    # - php artisan queue:restart #if you use queue
