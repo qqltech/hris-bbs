@@ -7,7 +7,7 @@ building:
   stage: build
   script:
     # - git pull origin master
-    - ls -al
+    - ls -al 
     - composer install
     - mkdir database/migrations/projects
     - mkdir database/migrations/alters
