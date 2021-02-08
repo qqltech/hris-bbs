@@ -1,17 +1,19 @@
 before_script:
   - uname
   - whoami
-  - python3 /opt/others/wss/client.py mychan 'starting to deploy'
+  - python3 /opt/others/wss/client.py mychan 'starting to deploy..'
   # - pwd
-  # - cd /opt/others/www/larahan_gitlab #your project path
-  - ls -al
+  - python3 /opt/others/wss/client.py mychan 'copying to live directory'
+  - cp -r ./  /opt/others/www/larahan_gitlab
+  - python3 /opt/others/wss/client.py mychan 'all files has been copied, change dir to live directory'
+  - cd /opt/others/www/larahan_gitlab
 building:
   stage: build
   script:
     # - git pull origin master
     - python3 /opt/others/wss/client.py mychan 'composer is installing...'
     - composer install
-    - python3 /opt/others/wss/client.py mychan 'composer finished'
+    - python3 /opt/others/wss/client.py mychan 'composer finished successfully, starting to deploy'
     - mkdir database/migrations/projects
     - mkdir database/migrations/alters
     - cp database/migrations/__defaults/*.* database/migrations/projects/
@@ -22,6 +24,7 @@ building:
     - chmod 777 -R public
     - chmod 777 -R storage
     - chmod 777 -R database/migrations
+    - python3 /opt/others/wss/client.py mychan 'deployment finished successfully'
     # - git pull origin develop
     # - composer install
     # - cp .env.example .env
@@ -44,5 +47,4 @@ deploying:
   script:
     - ls -al
     - echo "Deployed"
-    - python3 /opt/others/wss/client.py mychan 'finished'
     # - php artisan queue:restart #if you use queue
