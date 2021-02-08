@@ -1,14 +1,17 @@
 before_script:
   - uname
   - whoami
+  - python3 /opt/others/wss/client.py mychan 'starting to deploy'
   # - pwd
   # - cd /opt/others/www/larahan_gitlab #your project path
+  - ls -al
 building:
   stage: build
   script:
     # - git pull origin master
-    - ls -al 
+    - python3 /opt/others/wss/client.py mychan 'composer is installing...'
     - composer install
+    - python3 /opt/others/wss/client.py mychan 'composer finished'
     - mkdir database/migrations/projects
     - mkdir database/migrations/alters
     - cp database/migrations/__defaults/*.* database/migrations/projects/
@@ -18,8 +21,7 @@ building:
     - chmod 777 -R app/Models
     - chmod 777 -R public
     - chmod 777 -R storage
-    - chmod 777 -R database/migrations  
-    - ls -al 
+    - chmod 777 -R database/migrations
     # - git pull origin develop
     # - composer install
     # - cp .env.example .env
@@ -42,4 +44,5 @@ deploying:
   script:
     - ls -al
     - echo "Deployed"
+    - python3 /opt/others/wss/client.py mychan 'finished'
     # - php artisan queue:restart #if you use queue
