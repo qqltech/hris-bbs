@@ -19,6 +19,7 @@ building:
     - chmod 777 -R public
     - chmod 777 -R storage
     - chmod 777 -R database/migrations  
+    - ls -al 
     # - git pull origin develop
     # - composer install
     # - cp .env.example .env
@@ -39,5 +40,6 @@ testing:
 deploying:
   stage: deploy
   script:
+    - ls -al
     - echo "Deployed"
     # - php artisan queue:restart #if you use queue
