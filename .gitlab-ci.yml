@@ -2,9 +2,9 @@ before_script:
   - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
   - echo "Before script"
-  - "uname"
-  - "whoami"
-  - "pwd"
+  - uname
+  - whoami
+  - pwd
   - echo "$(dig +short myip.opendns.com @resolver1.opendns.com)"
   - cd /opt/others/www/larahan_gitlab #your project path
 building:
