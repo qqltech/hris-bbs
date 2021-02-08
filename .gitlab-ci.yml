@@ -6,7 +6,7 @@ before_script:
   - whoami
   - pwd
   - echo "$(dig +short myip.opendns.com @resolver1.opendns.com)"
-  - cd /opt/others/www/larahan_gitlab #your project path
+  - cd /opt/others/www/larahan_gitlab #your project p ath
 building:
   stage: build
   script:
