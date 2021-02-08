@@ -16,7 +16,7 @@ building:
     - cp database/migrations/__defaults/*.* database/migrations/projects/
     - cp .env-example .env
     - chmod 777 .gitignore
-    - chmod 777 .env
+    - chmod 777 .env 
     - chmod 777 -R app/Models
     - chmod 777 -R public
     - chmod 777 -R storage
