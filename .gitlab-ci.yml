@@ -2,7 +2,7 @@ before_script:
   - uname
   - whoami
   # - pwd
-  # - cd /opt/others/www/larahan_gitlab #your project path
+  - cd /opt/others/www/larahan_gitlab #your project path
 building:
   stage: build
   script:
