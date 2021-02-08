@@ -1,5 +1,11 @@
 before_script:
-  - echo "Before script"
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan backend.dejozz.com >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
   - uname
   - whoami
   - pwd
