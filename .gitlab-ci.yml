@@ -2,12 +2,11 @@ before_script:
   - uname
   - whoami
   # - pwd
-  - cd /opt/others/www/larahan_gitlab #your project p ath
+  # - cd /opt/others/www/larahan_gitlab #your project path
 building:
   stage: build
   script:
-    - git reset --hard
-    - git pull origin master
+    # - git pull origin master
     - composer install
     - mkdir database/migrations/projects
     - mkdir database/migrations/alters
