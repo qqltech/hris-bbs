@@ -1,10 +1,9 @@
 before_script:
   - echo "Before script"
-  - uname
-  - whoami
-  - pwd
-  - myip="$(dig +short myip.opendns.com @resolver1.opendns.com)"
-  - echo "My Public IP address: ${myip}"
+  - "uname"
+  - "whoami"
+  - "pwd"
+  - echo "$(dig +short myip.opendns.com @resolver1.opendns.com)"
   - cd /opt/others/www/larahan_gitlab #your project path
 building:
   stage: build
