@@ -1,6 +1,4 @@
 before_script:
-  - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/known_hosts
-  - chmod 644 ~/.ssh/known_hosts
   - echo "Before script"
   - uname
   - whoami
