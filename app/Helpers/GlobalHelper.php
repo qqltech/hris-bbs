@@ -2373,7 +2373,7 @@ function req($key=null){
         $data = json_decode(file_get_contents('php://input'));
     }
     if($key!==null){
-        return $data->$key;
+        return isset($data->$key)? $data->$key : null;
     }
     return $data;
 }
