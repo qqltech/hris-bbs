@@ -157,21 +157,6 @@ class __class extends __basicClass
       	return response()->json($no);
     }
 
-    /*public function metaFields($fields)
-    {
-        return [
-            "nama_field"=>"readonly"
-        ];
-    }
-    public function metaScript()
-    {
-        return js("alert('dari backend saat edit')");
-    }
-    public function custom_initialize()
-    {
-        return js("alert('dari backend saat create')");
-    }*/
-
     /*public function frontendNotice(){
     	return implode("\n",[
         	"1. Catatan 1 field abc tidak boleh lagi",
