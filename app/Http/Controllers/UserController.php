@@ -40,8 +40,7 @@ class UserController extends Controller
     public function login(Request $request,$email_verified=false)
     {
         $validator = Validator::make($request->all(), [
-            'password' => 'required|string',
-            // 'remember_me' => 'boolean'
+            'password' => 'required|string'
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(),401);
