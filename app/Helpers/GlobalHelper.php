@@ -2377,3 +2377,7 @@ function req($key=null){
     }
     return $data;
 }
+function isJson(...$args) {
+    json_decode(...$args);
+    return (json_last_error()===JSON_ERROR_NONE);
+}

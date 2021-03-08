@@ -52,37 +52,25 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $e)
     {
-        $e = $exception;
-        // if (!$request->ajax()) {
-            return parent::render($request, $e);
-        // }
-        if ($e instanceof HttpResponseException) {
-            return $e->getResponse();
-        } elseif ($e instanceof ValidationException && $e->getResponse()) {
-            return $e->getResponse();
-        } elseif ($e instanceof MethodNotAllowedHttpException) {
-            $response_code = Response::HTTP_METHOD_NOT_ALLOWED;
-            $e = new MethodNotAllowedHttpException([], 'Metode request tidak diperbolehkan.', $e);
-        } elseif ($e instanceof ModelNotFoundException) {
-            $response_code = Response::HTTP_NOT_FOUND;
-            $e = new NotFoundHttpException('Data tidak ditemukan.', $e);
-        } elseif ($e instanceof NotFoundHttpException) {
-            $response_code = Response::HTTP_NOT_FOUND;
-            $e = new NotFoundHttpException('Endpoint service tidak ditemukan.', $e);
-        } elseif ($e instanceof AuthorizationException) {
-            $response_code = Response::HTTP_UNAUTHORIZED;
-            $e = new AuthorizationException('Anda tidak diperbolehkan mengakses endpoint service ini.', $response_code);
-        } else {
-            $response_code = Response::HTTP_INTERNAL_SERVER_ERROR;
-            $e = new HttpException($response_code, 'Terjadi kesalahan di sistem internal, hubungi administrator.');
-        }
-
-        logTg("developer", (\Auth::check()?\Auth::user()->name:"Guest")."'s Error: ".(!in_array($exception->getMessage(),["",null])?$exception->getMessage():$e->getMessage()));
+        \DB::rollback();
+        $rendered = parent::render($request, $e);
+        $msg = $this->getFixedMessage($e);
         return response()->json([
-            'response_code' => $response_code,
-            'response_message' => !in_array($exception->getMessage(),["",null])?$exception->getMessage():$e->getMessage()
-        ], $response_code);
+            'code' => $rendered->getStatusCode(),
+            'message' => $msg,
+        ], $rendered->getStatusCode());
+    }
+    private function getFixedMessage($e){
+        if( isJson($e->getMessage()) ){
+            return json_decode( $e->getMessage() );
+        }
+        $fileName = explode( (str_contains($e->getFile(), "\\")?"\\":"/"), $e->getFile());
+        $stringMsg = $e->getMessage();
+        $stringMsg = $stringMsg === null || $stringMsg == ""? "Maybe Server Error" : $stringMsg;
+        // $stringMsg = !str_contains( $stringMsg, "SQLSTATE" ) && ( env("APP_DEBUG",false) || !empty( app()->request->header("Debugger") )) ? $stringMsg : "Maybe Server Error";
+        $msg = $stringMsg.(env("APP_DEBUG",false)?" => file: ".str_replace(".php","",end($fileName))." line: ".$e->getLine():"");
+        return $msg;
     }
 }
