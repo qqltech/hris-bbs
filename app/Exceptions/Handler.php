@@ -51,10 +51,12 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public function render($request, Throwable $e)
+    public function render($request, Exception $e)
     {
+
         \DB::rollback();
         $rendered = parent::render($request, $e);
+        return $rendered;
         $msg = $this->getFixedMessage($e);
         $response = [
             'code' => $rendered->getStatusCode()
