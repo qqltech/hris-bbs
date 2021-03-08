@@ -66,7 +66,7 @@ class Handler extends ExceptionHandler
         if( isJson($e->getMessage()) ){
             return json_decode( $e->getMessage() );
         }
-        $fileName = explode( (str_contains($e->getFile(), "\\")?"\\":"/"), $e->getFile());
+        $fileName = explode( (strpos($e->getFile(), "\\")!==false?"\\":"/"), $e->getFile());
         $stringMsg = $e->getMessage();
         $stringMsg = $stringMsg === null || $stringMsg == ""? "Maybe Server Error" : $stringMsg;
         // $stringMsg = !str_contains( $stringMsg, "SQLSTATE" ) && ( env("APP_DEBUG",false) || !empty( app()->request->header("Debugger") )) ? $stringMsg : "Maybe Server Error";
