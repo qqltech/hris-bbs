@@ -1,10 +1,10 @@
 <?php 
     return [
-        'bot_token' => '849705214:AAGSHiXgw5Xex2cdK-0xcYLbZE8z2KUIzNE',
+        'bot_token' => 'yourbottoken',
         'developer'     => [
-            'chat_id'   => '402325749'
+            'chat_id'   => 'yourchatid'
         ],
         'laradev'     => [
-            'chat_id'   => '402325749'
+            'chat_id'   => 'yourchatid'
         ]
     ];

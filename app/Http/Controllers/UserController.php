@@ -30,7 +30,6 @@ class UserController extends Controller
             'password' =>Hash::make($request->password),
             'remember_token'=>str_random(60)
         ]);
-        // logTg("developer",$user->name." has registered");
         
         return $local?true:response()->json([
             'message' => 'Successfully created user!'
@@ -64,8 +63,6 @@ class UserController extends Controller
             }
             if (Hash::check($request->password, $user->password)) {
                 $tokenResult = $user->createToken($request->email);
-                // $token = $tokenResult->token;
-                // logTg("developer",$user->name." has logged in");
                 
                 $agent = new Agent();
                 $user->platform = $agent->platform();
