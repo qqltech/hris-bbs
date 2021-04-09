@@ -720,7 +720,10 @@ class ApiFixedController extends Controller
                 $this->deleteOperation($detailClass, null, $dtl->id, $id);
             }
             if( count($detailNew)>0){
-                $this->createOperation($detailClass, $detailNew, $id, $model->getTable());
+
+                if(!$this->is_data_required($detailClass, $detailNew)){return;};
+                if(!$this->is_data_valid($detailClass, $detailNew)){return;};
+                $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
             }
             // foreach($detailOld as $oldDetail){
             //     $this->updateOperation($detail, $oldDetail, $oldDetail['id']);
