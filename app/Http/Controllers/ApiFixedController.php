@@ -723,6 +723,7 @@ class ApiFixedController extends Controller
 
                 if(!$this->is_data_required($detailClass, $detailNew)){return;};
                 if(!$this->is_data_valid($detailClass, $detailNew)){return;};
+                ff('terpanggil add to list');
                 $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
             }
             // foreach($detailOld as $oldDetail){
