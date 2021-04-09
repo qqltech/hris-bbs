@@ -721,7 +721,9 @@ class ApiFixedController extends Controller
             }
             if( count($detailNew)>0){
                 foreach($detailNew as $dtNew){
+                    ff($dtNew,'test');
                     if(!$this->is_data_required($detailClass, $dtNew)){ 
+                        ff('required tak lolos');
                         abort(422,json_encode([
                             "status"    => "$this->operation data failed",
                             "warning"  => $this->messages, 
@@ -732,6 +734,7 @@ class ApiFixedController extends Controller
                         ]));
                     };
                     if(!$this->is_data_valid($detailClass, $dtNew)){ 
+                        ff('required tak lolos');
                         abort(422,json_encode([
                             "status"    => "$this->operation data failed",
                             "warning"  => $this->messages, 
