@@ -721,9 +721,26 @@ class ApiFixedController extends Controller
             }
             if( count($detailNew)>0){
 
-                if(!$this->is_data_required($detailClass, $detailNew)){return;};
-                if(!$this->is_data_valid($detailClass, $detailNew)){return;};
-                ff('terpanggil add to list');
+                if(!$this->is_data_required($detailClass, $detailNew)){ 
+                    abort(422,json_encode([
+                        "status"    => "$this->operation data failed",
+                        "warning"  => $this->messages, 
+                        "success"  => $this->success, 
+                        "errors"  => $this->errors, 
+                        "request" => $this->requestData,
+                        "id"      => $this->operationId
+                    ]));
+                };
+                if(!$this->is_data_valid($detailClass, $detailNew)){ 
+                    abort(422,json_encode([
+                        "status"    => "$this->operation data failed",
+                        "warning"  => $this->messages, 
+                        "success"  => $this->success, 
+                        "errors"  => $this->errors, 
+                        "request" => $this->requestData,
+                        "id"      => $this->operationId
+                    ]));
+                };
                 $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
             }
             // foreach($detailOld as $oldDetail){
