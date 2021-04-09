@@ -150,9 +150,12 @@ class ApiFixedController extends Controller
         $model = null;
         return true;
     }
-    private function is_data_required($modelName, $data)
+    private function is_data_required($modelName, $data, $operation=null)
     {
-        if( !in_array($this->operation,["create"]) ){return true;}
+        if($operation==null){
+            $operation = $this->operation;
+        }
+        if( !in_array($operation,["create"]) ){return true;}
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
         $model = new $modelCandidate;
         $arrayRequired = $model->required;
@@ -190,9 +193,12 @@ class ApiFixedController extends Controller
         $model = null;
         return true;
     }
-    private function is_data_valid($modelName, $data)
+    private function is_data_valid($modelName, $data, $operation=null)
     {
-        if( !in_array($this->operation,["create","update"]) ){return true;}
+        if($operation==null){
+            $operation = $this->operation;
+        }
+        if( !in_array($operation,["create","update"]) ){return true;}
         $modelCandidate     = "\App\Models\CustomModels\\$modelName";
         $model              = new $modelCandidate;
         $operationValidator = $this->operation."Validator";
@@ -720,31 +726,26 @@ class ApiFixedController extends Controller
                 $this->deleteOperation($detailClass, null, $dtl->id, $id);
             }
             if( count($detailNew)>0){
-                foreach($detailNew as $dtNew){
-                    ff($dtNew,'test');
-                    if(!$this->is_data_required($detailClass, $dtNew)){ 
-                        ff('required tak lolos');
-                        abort(422,json_encode([
-                            "status"    => "$this->operation data failed",
-                            "warning"  => $this->messages, 
-                            "success"  => $this->success, 
-                            "errors"  => $this->errors, 
-                            "request" => $this->requestData,
-                            "id"      => $this->operationId
-                        ]));
-                    };
-                    if(!$this->is_data_valid($detailClass, $dtNew)){ 
-                        ff('required tak lolos');
-                        abort(422,json_encode([
-                            "status"    => "$this->operation data failed",
-                            "warning"  => $this->messages, 
-                            "success"  => $this->success, 
-                            "errors"  => $this->errors, 
-                            "request" => $this->requestData,
-                            "id"      => $this->operationId
-                        ]));
-                    };
-                }
+                if(!$this->is_data_required($detailClass, $detailNew,"create")){ 
+                    abort(422,json_encode([
+                        "status"    => "$this->operation data failed",
+                        "warning"  => $this->messages, 
+                        "success"  => $this->success, 
+                        "errors"  => $this->errors, 
+                        "request" => $this->requestData,
+                        "id"      => $this->operationId
+                    ]));
+                };
+                if(!$this->is_data_valid($detailClass, $detailNew,"create")){ 
+                    abort(422,json_encode([
+                        "status"    => "$this->operation data failed",
+                        "warning"  => $this->messages, 
+                        "success"  => $this->success, 
+                        "errors"  => $this->errors, 
+                        "request" => $this->requestData,
+                        "id"      => $this->operationId
+                    ]));
+                };
                 
                 $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
             }
