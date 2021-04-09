@@ -727,9 +727,11 @@ class ApiFixedController extends Controller
             }
             if( count($detailNew)>0){
                 if(!$this->is_data_required($detailClass, $detailNew,"create")){ 
+                    $this->operationOK=false;
                     return;
                 };
                 if(!$this->is_data_valid($detailClass, $detailNew,"create")){ 
+                    $this->operationOK=false;
                     return;
                 };
                 
