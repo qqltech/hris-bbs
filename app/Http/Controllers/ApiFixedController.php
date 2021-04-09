@@ -720,28 +720,29 @@ class ApiFixedController extends Controller
                 $this->deleteOperation($detailClass, null, $dtl->id, $id);
             }
             if( count($detailNew)>0){
+                foreach($detailNew as $dtNew){
+                    if(!$this->is_data_required($detailClass, $dtNew)){ 
+                        abort(422,json_encode([
+                            "status"    => "$this->operation data failed",
+                            "warning"  => $this->messages, 
+                            "success"  => $this->success, 
+                            "errors"  => $this->errors, 
+                            "request" => $this->requestData,
+                            "id"      => $this->operationId
+                        ]));
+                    };
+                    if(!$this->is_data_valid($detailClass, $dtNew)){ 
+                        abort(422,json_encode([
+                            "status"    => "$this->operation data failed",
+                            "warning"  => $this->messages, 
+                            "success"  => $this->success, 
+                            "errors"  => $this->errors, 
+                            "request" => $this->requestData,
+                            "id"      => $this->operationId
+                        ]));
+                    };
+                }
                 
-                if(!$this->is_data_required($detailClass, $detailNew)){ 
-                    abort(422,json_encode([
-                        "status"    => "$this->operation data failed",
-                        "warning"  => $this->messages, 
-                        "success"  => $this->success, 
-                        "errors"  => $this->errors, 
-                        "request" => $this->requestData,
-                        "id"      => $this->operationId
-                    ]));
-                };
-                if(!$this->is_data_valid($detailClass, $detailNew)){ 
-                    abort(422,json_encode([
-                        "status"    => "$this->operation data failed",
-                        "warning"  => $this->messages, 
-                        "success"  => $this->success, 
-                        "errors"  => $this->errors, 
-                        "request" => $this->requestData,
-                        "id"      => $this->operationId
-                    ]));
-                };
-                ff($detailNew, $detailClass);
                 $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
             }
             // foreach($detailOld as $oldDetail){
