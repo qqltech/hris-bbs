@@ -169,7 +169,7 @@ class ApiFixedController extends Controller
                 });
                 if(count($notPresent)>0){
                     foreach($notPresent as $field){
-                        $this->errors[] = "[REQUIRED]The $field field is required in your Detail.[$modelName] index [$i]";
+                        $this->errors[] = "[REQUIRED]The $field field is required, check your Detail.[$modelName] index [$i]";
                     }
                     $this->isAuthorized=false;
                     return false;
