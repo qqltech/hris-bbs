@@ -720,7 +720,7 @@ class ApiFixedController extends Controller
                 $this->deleteOperation($detailClass, null, $dtl->id, $id);
             }
             if( count($detailNew)>0){
-
+                
                 if(!$this->is_data_required($detailClass, $detailNew)){ 
                     abort(422,json_encode([
                         "status"    => "$this->operation data failed",
@@ -741,6 +741,7 @@ class ApiFixedController extends Controller
                         "id"      => $this->operationId
                     ]));
                 };
+                ff($detailNew, $detailClass);
                 $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
             }
             // foreach($detailOld as $oldDetail){
