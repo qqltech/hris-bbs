@@ -727,24 +727,10 @@ class ApiFixedController extends Controller
             }
             if( count($detailNew)>0){
                 if(!$this->is_data_required($detailClass, $detailNew,"create")){ 
-                    abort(422,json_encode([
-                        "status"    => "$this->operation data failed",
-                        "warning"  => $this->messages, 
-                        "success"  => $this->success, 
-                        "errors"  => $this->errors, 
-                        "request" => $this->requestData,
-                        "id"      => $this->operationId
-                    ]));
+                    return;
                 };
                 if(!$this->is_data_valid($detailClass, $detailNew,"create")){ 
-                    abort(422,json_encode([
-                        "status"    => "$this->operation data failed",
-                        "warning"  => $this->messages, 
-                        "success"  => $this->success, 
-                        "errors"  => $this->errors, 
-                        "request" => $this->requestData,
-                        "id"      => $this->operationId
-                    ]));
+                    return;
                 };
                 
                 $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
