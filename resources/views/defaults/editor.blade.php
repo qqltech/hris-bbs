@@ -823,7 +823,7 @@ vm = new Vue({
                             text:editor.getSession().getValue()
                         },
                         headers     : {
-                            laradev:"quantumleap150671"
+                            laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                         }
                     }).then(response => {
                         Toast.fire({
@@ -864,7 +864,7 @@ vm = new Vue({
                             credentials : true,
                             body        : null,
                             headers     : {
-                                laradev:"quantumleap150671"
+                                laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                             }
                         }).then(response => {
                             Toast.fire({
@@ -906,7 +906,7 @@ vm = new Vue({
                             credentials : true,
                             body        : null,
                             headers     : {
-                                laradev:"quantumleap150671"
+                                laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                             }
                         }).then(response => {
                             Toast.fire({
@@ -957,7 +957,7 @@ vm = new Vue({
                             credentials : true,
                             body        : null,
                             headers     : {
-                                laradev:"quantumleap150671"
+                                laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                             }
                         }).then(response => {
                             Toast.fire({
@@ -1009,7 +1009,7 @@ vm = new Vue({
                         credentials : true,
                         body        : null,
                         headers     : {
-                            laradev:"quantumleap150671"
+                            laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                         }
                     }).then(response => {
                         Toast.fire({
@@ -1048,7 +1048,7 @@ vm = new Vue({
                         // method      : data.method,
                         // data        : data.body,
                         headers     : {
-                            laradev:"quantumleap150671"
+                            laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                         }
                     }).then(response => {
                         state.modelList = response.data;
@@ -1193,7 +1193,7 @@ vm = new Vue({
                         modul:modul
                     },
                     headers     : {
-                        laradev:"quantumleap150671"
+                        laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                     }
                 }).then(response => {
                     Toast.fire({
@@ -1245,7 +1245,7 @@ vm = new Vue({
                             password: password
                         },
                         headers     : {
-                            laradev:"quantumleap150671"
+                            laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                         }
                     }).then(response => {
                         Toast.fire({
@@ -1303,7 +1303,7 @@ vm = new Vue({
                 // method      : data.method,
                 // data        : data.body,
                 headers     : {
-                    laradev:"quantumleap150671"
+                    laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                 }
             }).then(response => {
                 me.$store.commit('addActiveEditors',{
