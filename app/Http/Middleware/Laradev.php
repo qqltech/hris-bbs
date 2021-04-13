@@ -8,7 +8,7 @@ class Laradev
 {
     public function handle($request, Closure $next)
     {
-        if ( $request->header('laradev')==null || $request->header('laradev')!='quantumleap150671') {
+        if ( $request->header('laradev')==null || $request->header('laradev')!=env("LARADEVPASSWORD","bismillah") ) {
             return response()->json(['status'=>'unauthorized'], 401);
         }
         return $next($request);

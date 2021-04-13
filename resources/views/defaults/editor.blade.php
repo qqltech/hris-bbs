@@ -135,7 +135,7 @@
         <div style="z-index:1;min-width:250px;" class="text-white col-md-12 col-sm-12 col-xs-12">
                 <b-row class="mt-md-2">
                     <b-col md="6" class="ml-md-2 mr-md-0" style="padding-right:1px;">
-                        <b-form-input size="sm" placeholder='search' v-model.lazy="searchData" @input="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
+                        <b-form-input size="sm" autocomplete="off" placeholder='search' v-model.lazy="searchDataTemp" @keyup="searchCheck" @change="search" style="background-color: #34352f !important;color:white !important;"></b-form-input>
                     </b-col>
                     <b-col style="padding-left:0px;padding-right:0px;margin-right:0px;flex-grow: 0 !important;">
                         <b-btn title="add new" class="bg-dark-monokai" size="sm" style="margin-top:2px;margin-right:0px;" @click="add_new">
@@ -1073,6 +1073,7 @@ vm = new Vue({
     data:{
         editorcontent: 'tes',
         searchData:"",
+        searchDataTemp:"",
         connection:null,
         isChrome:false,
         channel:"{{env('LOG_CHANNEL',"+btoa(window.location.host)+")}}"
@@ -1217,7 +1218,13 @@ vm = new Vue({
             this.$store.dispatch('getModels');
         },
         search(e){
-            // console.log(e)
+            this.searchData=e
+        },
+        searchCheck(e){
+            if(e.key=='Escape'){
+                this.searchData = null
+                this.searchDataTemp = null
+            }
         },
         resize(a){
             this.$store.commit('sidebarLeftChange',a);

@@ -211,16 +211,27 @@ class LaradevController extends Controller
         }
         return response()->json("Database ".$dbname." is already created before,migrate = $migrate");
     }
-    private function getBasicModel(){
+    private function getBasicModel()
+    {
         return File::get( base_path("templates/basicModel.stub") );
     }
-    private function getCustomModel(){
+    private function getCustomModel()
+    {
         return File::get( base_path("templates/customModel.stub") );
     }
-    private function getMigration(){
+    private function getMigration()
+    {
         $template = "migration";
         if(\Schema::getConnection()->getDriverName()!='pgsql'){
             $template = "migrationMysql";
+        }
+        return File::get( base_path("templates/$template.stub") );
+    }
+    private function getMigrationAlter()
+    {
+        $template = "migrationAlter";
+        if(\Schema::getConnection()->getDriverName()!='pgsql'){
+            $template = "migrationAlterMysql";
         }
         return File::get( base_path("templates/$template.stub") );
     }
@@ -1138,7 +1149,7 @@ class LaradevController extends Controller
             }else{
                 $alterFile = str_replace(  "/projects/","/alters/",array_values($data)[0]);
             }
-            if(!File::exists( $alterFile ) ){
+            if(!File::exists( $alterFile ) && 1==2 ){
                 $realmigration = File::get( array_values($data)[0] );
                 $realmigration = explode("public function down",$realmigration)[0];
                 $realmigration = str_replace(["});","]);","Schema::create"],["==;//","..;//","Schema::table"],$realmigration);
@@ -1146,6 +1157,14 @@ class LaradevController extends Controller
                 $realmigration = str_replace(["==;//","..;//","Schema::create"],["});//","]);//","Schema::table"],$realmigration);
                 $realmigration = str_replace(["->create("],["->table("],$realmigration);
                 return $realmigration."\n}";
+            }
+            if(!File::exists( $alterFile )){
+                $migrationAlterFile = $this->getMigrationAlter();
+                return str_replace( [
+                    "__class__","__table__",
+                ],[
+                    $table,$table
+                ], $migrationAlterFile );
             }
             return File::get( $alterFile );
         }

@@ -62,7 +62,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);
         }
-        if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
+        if(!isset($req->password) || $req->password!=env("CONFIGPASSWORD","pulangcepat")){
             return view('defaults.unauthorized')->with('data',[
                 'page'=>'halaman config',
                 'url'=>url("/laradev"),
