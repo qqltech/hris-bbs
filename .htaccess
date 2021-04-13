@@ -2,8 +2,8 @@
     RewriteEngine on
     RewriteCond %{REQUEST_URI} !^public
     RewriteRule ^(.*)$ public [L]
-
-
+    
+</IfModule>
 <Limit GET POST PUT DELETE HEAD OPTIONS>
     Order allow,deny
     Allow from all
@@ -12,4 +12,3 @@
     Order deny,allow
     Deny from all
 </LimitExcept>
-</IfModule>
