@@ -1797,6 +1797,16 @@ function _customFind($model, $params)
         $model = $modelExtender->extendJoin($model);
     }
     $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
+    if( !$data ){
+        abort(404,json_encode([
+            "status"    => "read data gagal",
+            "warning"   => [], 
+            "success"   => [], 
+            "errors"    => ["[NOT FOUND]ID $params->id in model [$table] does not exist"], 
+            "request"   => [],
+            "id"        => $params->id
+        ]));
+    }
     $data=$data->toArray();
     $keys=array_keys($data);
     foreach($keys as $key){

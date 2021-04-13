@@ -42,7 +42,80 @@ class LaradevController extends Controller
             File::makeDirectory( base_path("database/migrations/alters"), 493, true);
         }
     }
+    public function laravelValidationMapper( $table, $columns )
+    {
+        $allRules = [];
+        foreach($columns as $key => $col){
+            if( $col['primary'] ){
+                continue;
+            }
+            $rules = [];
+            if( !$col[ "nullable" ] ){
+                // $rules[] = "required";
+                // $rules[] = "min:1";
+            }
+            // if( $col[ "unique" ] ){
+                // $rules[] = "unique:$table";
+            // }
+            if( $col[ "length" ]!==null ){
+                $rules[] = "max:".$col[ "length" ];
+            }
+            if( $col[ "comment" ]!==null ){
+                $comment = json_decode( $col[ "comment" ] );
+                if( isset( $comment->fk ) ){
+                    $rules[] = "prohibited";
+                }
+            }
+            $rules[] = $this->laravelValidationDataType($col['type']);
+            $rules[] = "filled";
+            
+            $allRules[ $col['name'] ] = $rules;
+        }
+        return $allRules;
+        // integer : *int
+        // boolean
+        // numeric : float,double,decimal
+        // string:text
+        // json
+        // date
+        // date_format:Y-m-d H:i:s :datetime
 
+        // unique:table
+        // required
+    }
+    public function laravelValidationDataType( $type )
+    {
+        $type = strtolower( $type );
+        if( strpos($type,"int") ){
+            return "integer";
+        }elseif( in_array($type,[
+                "float","double","decimal"
+            ]) ){
+            return "numeric";
+        }elseif( in_array($type,[
+                "text","string"
+            ]) ){
+            return "string";
+        }elseif( in_array($type,[
+                "boolean"
+            ]) ){
+            return "boolean";
+        }elseif( in_array($type,[
+                "date"
+            ]) ){
+            return "date";
+        }elseif( in_array($type,[
+                "datetime"
+            ]) ){
+            return "date_format:Y-m-d H:i:s";
+        }elseif( in_array($type,[
+                "json"
+            ]) ){
+            return "json";
+        }else{
+            return "string";
+        }
+    }
     private function getConnection($conn)
     {
         $conn = (object)$conn;
@@ -82,14 +155,6 @@ class LaradevController extends Controller
         $dbname = "";
         try {
             if($connection!=null){
-                // $connection = [
-                //     'driver'=>'mysql',
-                //     'host'=>'localhost',
-                //     'port'=>'3306',
-                //     'username'=>'root',
-                //     'password'=>'root',
-                //     'database'=>'db'
-                // ];
                 $dbname = $connection['database'];
                 $conn = $this->getConnection($connection);
                 $conn=$conn->getDoctrineSchemaManager();
@@ -153,7 +218,11 @@ class LaradevController extends Controller
         return File::get( base_path("templates/customModel.stub") );
     }
     private function getMigration(){
-        return File::get( base_path("templates/migration.stub") );
+        $template = "migration";
+        if(\Schema::getConnection()->getDriverName()!='pgsql'){
+            $template = "migrationMysql";
+        }
+        return File::get( base_path("templates/$template.stub") );
     }
     private function getFullTables($toModel=false,$tableKhusus=null)
     {
@@ -186,6 +255,20 @@ class LaradevController extends Controller
                 }
                 $columns = [];
                 $columnNames = [];
+                $_uniques = [];
+                $_indexes = [];
+                $_primary = null;
+                foreach($indexes as $index){
+                    if($index->isPrimary()){
+                        $_primary = $index->getColumns()[0];
+                    }
+                    if($index->isUnique()){
+                        $_uniques=array_merge($_uniques, $index->getColumns());
+                    }
+                    $_indexes = [
+                        $index->getName()=>$index->getColumns()
+                    ];
+                }
                 foreach ($table->getColumns() as $column) {
                     foreach($indexes as $key=>$index){
                         if(in_array($column->getName(), $index->getColumns()) && !$index->isPrimary() && $index->isUnique()){
@@ -193,12 +276,19 @@ class LaradevController extends Controller
                         }
                     }
                     $columnNames[] = $column->getName();
+
                     $columns[] = [
                         "name"=>$column->getName(),
-                        "type"=> "".$column->getType(),
-                        "length"=> "".$column->getLength(),
-                        "default"=> "".$column->getDefault(),
-                        "comment"=> "".$column->getComment(),
+                        "type"=> $column->getType()->getName(),
+                        "length"=> $column->getLength(),
+                        "unsigned"=> $column->getUnsigned(),
+                        "precision"=> $column->getPrecision(),
+                        "scale"=> $column->getScale(),
+                        "fixed"=> $column->getFixed(),
+                        "default"=> $column->getDefault(),
+                        "comment"=> $column->getComment()===null?"":$column->getComment(),
+                        "unique"=> in_array($column->getName(),$_uniques),
+                        "primary"=>$column->getName()===$_primary,
                         "nullable"=> $column->getNotnull()
                     ];
                     
@@ -284,7 +374,8 @@ class LaradevController extends Controller
                     "foreign_keys" => $foreignKeys,
                     "required" => $required,
                     "uniques" => $unique,
-                    'triggers'=>\App\Helpers\DBS::getTriggers($table->getName())
+                    'triggers'=>\App\Helpers\DBS::getTriggers($table->getName()),
+                    'validations'=>$this->laravelValidationMapper($table->getName(),$fullColumns)
                 ];
                 // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
                 // .json_encode($table->getComment() ));
@@ -316,7 +407,8 @@ class LaradevController extends Controller
                     "foreign_keys" => [],
                     "required" => "[]",
                     "uniques" => [],
-                    'triggers'=>[]
+                    'triggers'=>[],
+                    'validations'=>[]
                 ];
             }
         }catch(Exception $e){
@@ -551,20 +643,36 @@ class LaradevController extends Controller
     }
 
     public function updateModelsOne(Request $request, $tableName=null){
-        $tempFile=app()->path()."/Models/CustomModels/$tableName"."_temp.php";
-        File::put($tempFile,$request->text);
-        try{
-            $output=null;
-            $return=null;
-            exec("php -l $tempFile", $output, $return);
-        }catch(\Exception $e){
-            File::delete($tempFile);            
-            $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
-            return "update Model OK but check by your self okay?";
+        $disabled = explode(',', str_replace(" ","",ini_get('disable_functions')) );
+        $canExec =  !in_array('exec', $disabled);
+        $return = 0;
+        if ( $canExec ){
+            $tempFile=app()->path()."/Models/CustomModels/$tableName"."_temp.php";
+            File::put($tempFile,$request->text);
+            try{
+                $output=null;
+                $return=null;
+                exec("php -l $tempFile", $output, $return);
+            }catch(\Exception $e){
+                File::delete($tempFile);
+                $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
+                return "update Model OK but check by your self okay?";
+            }
+            ff("lolos checked");
+            File::delete($tempFile);
+        }else{
+            $oldFile = File::get(app()->path()."/Models/CustomModels/$tableName.php");
+            File::put( app()->path()."/Models/CustomModels/$tableName.php", $request->text );
+            $className = "\\App\\Models\\CustomModels\\$tableName";
+            try{
+                $testedClass = new $className();
+            }catch(\Throwable $e){
+                File::put(app()->path()."/Models/CustomModels/$tableName.php", $oldFile );
+                return response()->json('Error: '.$e->getMessage(),422);
+            }
         }
-        File::delete($tempFile);
         if($return===0){
-            $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
+            $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text );
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<SAVE MODEL $tableName>");       
             }
@@ -834,7 +942,7 @@ class LaradevController extends Controller
             $paste = str_replace([
                 "__config_guarded", "__config_hidden","__config_required","__config_createable",
                 "__config_updateable","__config_searchable","__config_deleteable","__config_extendable",
-                "__config_cascade","__config_deleteOnUse","__config_casts", "__config_unique"
+                "__config_cascade","__config_deleteOnUse","__config_casts", "__config_unique","__config_validations"
             ], [
                 isset($cfg['guarded'])? (!is_array($cfg['guarded'])? "'".$cfg['guarded']."'":'["'.implode('","',$cfg['guarded']).'"]'):"['id']", 
                 isset($cfg['hidden'])? (!is_array($cfg['hidden'])? "'".$cfg['hidden']."'":'["'.implode('","',$cfg['hidden']).'"]'):"[]", 
@@ -847,7 +955,8 @@ class LaradevController extends Controller
                 isset($cfg['cascade'])?$cfg['cascade']:"true",
                 isset($cfg['deleteOnUse'])?$cfg['deleteOnUse']:"false",
                 isset($cfg['casts'])?str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($cfg['casts'], JSON_PRETTY_PRINT)):"['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']",
-                str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->uniques, JSON_PRETTY_PRINT))
+                str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->uniques, JSON_PRETTY_PRINT)),
+                str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->validations, JSON_PRETTY_PRINT)),
             ],$paste);
             $customfunction="";//__customfunction__
             if(isset($cfg['autocreate'])){
@@ -1035,6 +1144,7 @@ class LaradevController extends Controller
                 $realmigration = str_replace(["});","]);","Schema::create"],["==;//","..;//","Schema::table"],$realmigration);
                 $realmigration = str_replace([");"],[")->change();"],$realmigration);
                 $realmigration = str_replace(["==;//","..;//","Schema::create"],["});//","]);//","Schema::table"],$realmigration);
+                $realmigration = str_replace(["->create("],["->table("],$realmigration);
                 return $realmigration."\n}";
             }
             return File::get( $alterFile );
@@ -1097,29 +1207,20 @@ class LaradevController extends Controller
             if($req->alter){
                 $dir = "alters";
             }
-            $file = base_path( "database/migrations/$dir")."/0_0_0_0_"."$table.php";
-            // if( strpos($table,"default_")!==FALSE || strpos($table,"oauth_")!==FALSE ){
-            //     $file = base_path( 'database/migrations/__defaults')."/0000_00_00_000000_$table.php";
-            // }
-            File::put(base_path('database/migrations')."/0_0_0_0_"."$table.php",File::get( $file ));
+            $file = "database/migrations/$dir/0_0_0_0_"."$table.php";
+            // File::put(base_path('database/migrations')."/0_0_0_0_"."$table.php",File::get( $file )); OLD
             $exitCode = Artisan::call('migrate:refresh', [
+                '--path' => $file,
                 '--force' => true,
             ]);
-            // $req->rewrite_custom = $req->rewrite_custom;
             $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
-            File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php");
-            // if($table=="default_users"){
-            //     $hasher = app()->make('hash');
-            //     User::create([
-            //         'name' => "trial",'email' => "trial@trial.trial", 'username'=>"trial",'password' => $hasher->make("trial")
-            //     ]);
-            // }
+            // File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php"); OLD
         }catch(Exception $e){
             File::delete(glob(base_path('database/migrations')."/*.*"));
             if( File::exists( base_path('database/migrations')."/0_0_0_0_"."$table.php" ) ){
                 File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php");
             }
-            return response()->json(["error"=>$e->getMessage()], 422);
+            return response()->json(["error"=>$e->getMessage(),base_path()], 422);
         }
         Schema::enableForeignKeyConstraints();
         if($req->alter){
@@ -1305,7 +1406,7 @@ class LaradevController extends Controller
             "__class__","__table__",
         ],[
             str_replace("_","",$modul),$modul
-        ],File::get( base_path("templates/migration.stub") ) ));
+        ], $this->getMigration() ));
         
         return response()->json("pembuatan file migration OK");
     }

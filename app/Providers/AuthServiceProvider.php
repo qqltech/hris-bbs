@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Carbon;
 
-use Nomadnt\LumenPassport\Passport;
+use Starlight93\Oauth2\Passport;
+
 class AuthServiceProvider extends ServiceProvider
 {
     

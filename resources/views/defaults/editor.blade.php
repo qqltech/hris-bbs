@@ -834,7 +834,7 @@ vm = new Vue({
                         window.console.clear();
                         Swal.fire({
                             title: `Failed!`,
-                            text: 'Check Your Console',
+                            text: error.response.data,
                             icon: 'error',
                             confirmButtonText: 'Ok!'
                         })
@@ -1317,7 +1317,14 @@ vm = new Vue({
                     minLines:parseInt(window.innerHeight/13.9)
                 })
             }).catch(error => {
-                console.log(error)
+                try{
+                    Swal.fire({
+                        title: `File Error!`,
+                        text: error.response.data.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok!'
+                    })
+                }catch(e){console.log(e)}
             }).then(function () {
                 loader.hide();
             });

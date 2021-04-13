@@ -27,25 +27,26 @@ $app->singleton(
 
 $app->middleware([
     // App\Http\Middleware\ExampleMiddleware::class
-    \Barryvdh\Cors\HandleCors::class,
+    \Fruitcake\Cors\HandleCors::class,
 ]);
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
-    'throttle' => Nomadnt\LumenPassport\Middleware\ThrottleRequests::class,
-    'cors' => \Barryvdh\Cors\HandleCors::class,
+    'throttle' => Starlight93\Oauth2\Middleware\ThrottleRequests::class,
+    'cors' => \Fruitcake\Cors\HandleCors::class,
     'laradev' => App\Http\Middleware\Laradev::class,
 ]);
 
 $app->register(App\Providers\AppServiceProvider::class); //DEFAULT
 $app->register(Stevebauman\Location\LocationServiceProvider::class);
-$app->register(Barryvdh\Cors\ServiceProvider::class);
+$app->register(Fruitcake\Cors\CorsServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class); //DEFAULT
-$app->register(Nomadnt\LumenPassport\PassportServiceProvider::class);
+$app->register(Starlight93\Oauth2\PassportServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',

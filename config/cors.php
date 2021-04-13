@@ -1,9 +1,10 @@
 <?php 
 return [
-   'supportsCredentials' => false,
-   'allowedOrigins' => ['*'],
-   'allowedHeaders' => ['*'],
-   'allowedMethods' => ['*'], // ex: ['GET', 'POST', 'PUT',  'DELETE']
-   'exposedHeaders' => [],
-   'maxAge' => 0,
+   'supports_credentials' => false,
+   'allowed_origins' => ['*'],
+   'allowed_headers' => ['*'],
+   'allowed_methods' => ['*'], // ex: ['GET', 'POST', 'PUT',  'DELETE']
+   'exposed_headers' => [],
+   'max_age' => 0,
+   'allowed_origins_patterns'=>[]
 ];

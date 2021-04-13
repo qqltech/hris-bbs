@@ -87,6 +87,7 @@ class ApiFixedController extends Controller
         if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}
         if(!$this->is_operation_authorized($this->parentModelName )){return;};
         if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
+        if(!$this->is_data_valid_type($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_not_unique($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_model_deletable($this->parentModelName, $this->requestData)){return;};
@@ -226,6 +227,38 @@ class ApiFixedController extends Controller
         }
         return true;
     }
+    private function is_data_valid_type($modelName, $data, $operation=null)
+    {
+        if($operation==null){
+            $operation = $this->operation;
+        }
+        if( !in_array($operation,["create","update"]) ){return true;}
+        $modelCandidate     = "\App\Models\CustomModels\\$modelName";
+        $model              = new $modelCandidate;
+        $arrayValidation    = $model->defaultValidation;        
+        if(isset($data[0]) && is_array($data[0])){
+            foreach ($data as $i => $isiData){
+                $validator = Validator::make($isiData, $arrayValidation);
+                if ( $validator->fails()) {
+                    foreach($validator->errors()->all() as $error){
+                        $this->errors[] = "[INVALID]".$error."[$modelName] index[$i]";
+                    }
+                    $this->isAuthorized=false;
+                    return false;
+                }
+            }
+        }else{
+            $validator = Validator::make($data, $arrayValidation);
+            if ( $validator->fails()) {
+                foreach($validator->errors()->all() as $error){
+                    $this->errors[] = "[INVALID]".$error."[$modelName]";
+                }
+                $this->isAuthorized=false;
+                return false;
+            }
+        }
+        return true;
+    }
     private function is_data_not_unique($modelName, $data)
     {
         if( !in_array($this->operation,["create","update"]) ){return true;}
@@ -293,6 +326,7 @@ class ApiFixedController extends Controller
                         $this->is_model_exist($key);
                         $this->is_operation_authorized($key );
                         $this->is_data_required($key, $value);
+                        $this->is_data_valid_type($key,$value);
                         $this->is_data_valid($key,$value);
                         $this->is_detail_valid($key,$value);
                     }
@@ -304,6 +338,7 @@ class ApiFixedController extends Controller
                     $this->is_model_exist($key);
                     $this->is_operation_authorized($key );
                     $this->is_data_required($key, $value);
+                    $this->is_data_valid_type($key,$value);
                     $this->is_data_valid($key,$value);
                     $this->is_detail_valid($key,$value);
                 }
@@ -713,8 +748,16 @@ class ApiFixedController extends Controller
             }
             foreach($data[$detailClass] as $index => $valDetail){
                 if(isset($valDetail['id']) && is_numeric($valDetail['id']) && (new $modelCandidate)->where($fkName,$id)->where('id',$valDetail['id'])->count()>0){
+                    if(!$this->is_data_valid_type($detailClass,$valDetail)){ 
+                        $this->operationOK=false;
+                        return;
+                    };
+                    if(!$this->is_data_valid($detailClass,$valDetail)){ 
+                        $this->operationOK=false;
+                        return;
+                    };
                     $this->updateOperation($detailClass, $valDetail, $valDetail['id']);
-                    $detailIds[]=$valDetail['id'];
+                    $detailIds [] = $valDetail['id'];
                     $detailOld [] = $valDetail;
                 }else{
                     $detailNew [] = $valDetail;
@@ -727,6 +770,10 @@ class ApiFixedController extends Controller
             }
             if( count($detailNew)>0){
                 if(!$this->is_data_required($detailClass, $detailNew,"create")){ 
+                    $this->operationOK=false;
+                    return;
+                };
+                if(!$this->is_data_valid_type($detailClass, $detailNew,"create")){ 
                     $this->operationOK=false;
                     return;
                 };

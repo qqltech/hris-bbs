@@ -6,13 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 class __class__ extends Migration
 {
-    public function __construct()
-    { config(['database.connections.flyingpgsql'=>array_merge(config('database.connections.pgsql'),
-            ['schema'=>'public'])]);
-    }
     public function up()
     {
-        Schema::connection('flyingpgsql')->create('__table__', function (Blueprint $table) {
+        Schema::create('__table__', function (Blueprint $table) {
             $table->id()->from(1);
 
             $table->string('samplecolumn',100)->nullable();
@@ -20,8 +16,8 @@ class __class__ extends Migration
             $table->timestamps();
         });
 
-        table_config('public.__table__', [
-            "hidden"        => "none", //kolom disembunyikan ketika GET
+        table_config('__table__', [
+            "hidden"        => "none",
             "guarded"       => ["id"],
             "required"      => [],
             "!createable"   => ["id","created_at","updated_at"],
@@ -46,6 +42,6 @@ class __class__ extends Migration
     }
     public function down()
     {
-        Schema::connection('flyingpgsql')->dropIfExists('__table__');
+        Schema::dropIfExists('__table__');
     }
 }
