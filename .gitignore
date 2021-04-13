@@ -13,3 +13,5 @@ Homestead.yaml
 /app/Models/SuperModels
 /logs
 *.bat
+*.tar.gz
+*_log
