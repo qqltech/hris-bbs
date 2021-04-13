@@ -19,12 +19,12 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
     
-    <Limit GET POST PUT DELETE HEAD OPTIONS>
-        Order allow,deny
-        Allow from all
-    </Limit>
-    <LimitExcept GET POST PUT DELETE HEAD OPTIONS>
-        Order deny,allow
-        Deny from all
-    </LimitExcept>
 </IfModule>
+<Limit GET POST PUT DELETE HEAD OPTIONS>
+    Order allow,deny
+    Allow from all
+</Limit>
+<LimitExcept GET POST PUT DELETE HEAD OPTIONS>
+    Order deny,allow
+    Deny from all
+</LimitExcept>
