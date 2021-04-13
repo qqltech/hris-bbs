@@ -24,7 +24,7 @@
     "url"       : "/laradev/environment",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -41,7 +41,7 @@
     "url"       : "/laradev/environment",
     "method"    : "PUT",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : 
@@ -56,7 +56,9 @@
             'QUEUE_CONNECTION' => 'database',
             'APP_URL' => 'http://localhost',
             'AUTHORIZATION' => 'true',
-            'BACKENDPASSWORD' => 'pulangcepat',
+            'BACKENDPASSWORD' =>'bismillah',
+            'CONFIGPASSWORD' =>'bismillah',
+            'LARADEVPASSWORD' =>'bismillah',
             'SERVERSTATUS' => 'OPEN',
             'DB_CONNECTION' => 'mysql',
             'DB_DATABASE' => 'trial2',
@@ -102,7 +104,7 @@
     "url"       : "/laradev/databases",
     "method"    : "POST",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -124,7 +126,7 @@
     "url"       : "/laradev/databases",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -146,7 +148,7 @@
     "url"       : "/laradev/databases/nama_database",
     "method"    : "DELETE",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {}
@@ -162,7 +164,7 @@
     "url"       : "/laradev/tables",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -180,7 +182,7 @@
     "url"       : "/laradev/tables/default_users",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -197,7 +199,7 @@
     "url"       : "/laradev/tables/mytable",
     "method"    : "PUT",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -216,7 +218,7 @@
     "url"       : "/laradev/tables",
     "method"    : "POST",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -251,7 +253,7 @@
     "url"       : "/laradev/tables/mytable",
     "method"    : "DELETE",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -269,7 +271,7 @@
     "url"       : "/laradev/tables/mytable/trigger",
     "method"    : "PUT",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -289,7 +291,7 @@
     "url"       : "/laradev/tables/mytable/trigger",
     "method"    : "DELETE",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -309,7 +311,7 @@
     "url"       : "/laradev/migrate",
     "method"    : "POST",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -329,7 +331,7 @@
     "url"       : "/laradev/models",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -346,7 +348,7 @@
     "url"       : "/laradev/models/default_users",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -364,7 +366,7 @@
     "url"       : "/laradev/models",
     "method"    : "POST",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -383,7 +385,7 @@
     "url"       : "/laradev/models/default_users",
     "method"    : "PUT",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -401,7 +403,7 @@
     "url"       : "/laradev/models/default_users",
     "method"    : "POST",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -419,7 +421,7 @@
     "url"       : "/laradev/migrations/migration_name",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -436,7 +438,7 @@
     "url"       : "/laradev/migrations",
     "method"    : "POST",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -454,7 +456,7 @@
     "url"       : "/laradev/migrate/table",
     "method"    : "GET",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
@@ -472,7 +474,7 @@
     "url"       : "/laradev/mail",
     "method"    : "POST",
     "headers"   :{
-        "laradev"   : "quantumleap15067",
+        "laradev"   : "bismillah",
         "Cache-Control" : "no-cache"
     },
     "body"  : {
