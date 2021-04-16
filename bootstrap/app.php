@@ -47,6 +47,7 @@ $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->register(\KitLoong\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',

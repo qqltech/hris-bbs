@@ -124,7 +124,7 @@
                         method      : data.method,
                         data        : data.body,
                         headers     : {
-                            laradev:"quantumleap150671"
+                            laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                         }
                     }
                     if(data.method.toLowerCase() == "get"){

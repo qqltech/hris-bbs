@@ -1001,7 +1001,7 @@ vm = new Vue({
                     }else if( (item.jenis).toLowerCase().includes('custom')){
                         url=url+"/models/"+item.title+"?custom=true";
                     }else if((item.jenis).toLowerCase().includes('basic')){
-                        url=url+"/models/"+item.title+"?basic=true";
+                        url=url+"/models/"+item.title+"?basic=true&reload=true";
                     }
                     axios({
                         url         : url,

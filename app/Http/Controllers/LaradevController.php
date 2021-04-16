@@ -57,7 +57,7 @@ class LaradevController extends Controller
             // if( $col[ "unique" ] ){
                 // $rules[] = "unique:$table";
             // }
-            if( $col[ "length" ]!==null ){
+            if( $col[ "length" ]!==null && $col["length"]>0 ){
                 $rules[] = "max:".$col[ "length" ];
             }
             if( $col[ "comment" ]!==null ){
@@ -505,7 +505,8 @@ class LaradevController extends Controller
         DB::getDoctrineSchemaManager()->dropDatabase($databaseName);
         return "delete database OK";
     }
-    public function readTables(Request $request,$table=null){
+    public function readTables(Request $request,$table=null)
+    {
         if($table){
             return $this->getFullTable($table);
         }
@@ -522,7 +523,8 @@ class LaradevController extends Controller
         return $tableNames;
     }
 
-    public function createTables(Request $request){
+    public function createTables(Request $request)
+    {
         $cols = $request->columns;
         $tableName = $request->table;
         Schema::dropIfExists($tableName);
@@ -542,7 +544,8 @@ class LaradevController extends Controller
         });
         return "create table OK";
     }
-    public function renameTables(Request $request, $tableName){
+    public function renameTables(Request $request, $tableName)
+    {
         $data = $this->getDirFullContents( base_path('database/migrations') );
         $request->name = str_replace(" ","_", $request->name);
         $data = array_filter($data,function($file)use ($tableName){
@@ -589,7 +592,8 @@ class LaradevController extends Controller
         }
         return "rename table OK";
     }
-    public function deleteTables(Request $request, $tableName){
+    public function deleteTables(Request $request, $tableName)
+    {
         Schema::dropIfExists($tableName);
         if($request->models){
             $customModel = "$this->modelsPath/CustomModels/$tableName.php";
@@ -634,7 +638,10 @@ class LaradevController extends Controller
                 return response()->json("nopassword",401);
             }
         }
-        if($request->basic){
+        if($request->basic){            
+            if( $request->reload ){
+                $this->createModels($request, $tableName);
+            }            
             return File::get(app()->path()."/Models/BasicModels/$tableName.php");
         }
         if($request->custom){
@@ -1075,7 +1082,8 @@ class LaradevController extends Controller
         return $results;
     }
 
-    public function readMigrations(Request $req, $table=null){
+    public function readMigrations(Request $req, $table=null)
+    {
         if($table!=null){
             $data = $this->getDirFullContents( base_path('database/migrations/projects') );
             $data = array_filter($data,function($file)use ($table){
@@ -1116,11 +1124,13 @@ class LaradevController extends Controller
                 $arrayViews[]=$viewName;
             }
             $models = [];
-            
+
+            $addedTables = [];
             foreach($data as $file){
                 if($file==""){continue;};
                 $stringClass = str_replace([".php","create_","_table"],["","",""], $file);
                 $modelCandidate = "\App\Models\BasicModels\\$stringClass";
+                $addedTables[] = $stringClass;
                 $models[] =[
                     "file" => $file,
                     "model"=> class_exists( $modelCandidate )?true:false,
@@ -1129,11 +1139,45 @@ class LaradevController extends Controller
                     "view" => in_array($stringClass, $arrayViews)?true:false,
                 ];
             }
+            $noMigrationTables = array_filter( $arrayTables, function( $tb ) use( $addedTables ){
+                return !in_array( $tb, $addedTables );
+            });
+            
+            foreach($noMigrationTables as $tb){
+                $this->createModels( $req, $tb );
+                $hasil = Artisan::call('migrate:generate', [
+                    '--path'    => database_path("migrations/projects"),
+                    '--tables'  => $tb,
+                    '--no-interaction'   => true,
+                ]);
+                $migrationFiles = array_filter(File::glob(database_path('migrations/projects/*.*')),function($dt)use($tb){
+                    $regex = "/(\d+)_(\d+)_(\d+)_(\d+)_create_$tb".'_table.php/';
+                    return preg_match($regex,basename($dt));
+                });
+                $migrationText = "";
+                
+                if( count( $migrationFiles )> 0 ){
+                    $migrationText = File::get( array_values($migrationFiles)[0]);
+                    // \Storage::disk("base")->move("database/migrations/projects/".basename(array_values($migrationFiles)[0]), "database/migrations/projects/0_0_0_0_"."$tb.php");
+                    File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$tb.php", $migrationText );
+                    
+                    File::delete(array_values($migrationFiles)[0]);
+                }
+                $modelCandidate = "\App\Models\BasicModels\\$tb";
+                $models[] =[
+                    "file" => $tb,
+                    "model"=> class_exists( $modelCandidate )?true:false,
+                    "table"=> in_array($tb, $arrayTables)?true:false,
+                    "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false,
+                    "view" => in_array($tb, $arrayViews)?true:false
+                ];
+            }
             return ["models"=>$models,"realfk"=>$fk];
         }
     }
 
-    public function readAlter(Request $req, $table=null){
+    public function readAlter(Request $req, $table=null)
+    {
         if($table!=null){
             $data = $this->getDirFullContents( base_path('database/migrations/projects') );
             $data = array_filter($data,function($file)use ($table){
@@ -1332,7 +1376,8 @@ class LaradevController extends Controller
         }
         return "update Basic Model Alias from $parent OK";
     }
-    public function editMigrations(Request $req, $table=null){
+    public function editMigrations(Request $req, $table=null)
+    {
         if($table!=null){
             $data = $this->getDirFullContents( base_path('database/migrations/projects') );
             $data = array_filter($data,function($file)use ($table){
@@ -1446,7 +1491,8 @@ class LaradevController extends Controller
         }
         return $data;
     }
-    public function uploadWithCreate(Request $req){
+    public function uploadWithCreate(Request $req)
+    {
         DB::disableQueryLog();
         $data = $req->data; 
         DB::beginTransaction();   
