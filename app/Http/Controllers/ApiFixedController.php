@@ -206,6 +206,7 @@ class ApiFixedController extends Controller
         $arrayValidation    = $model->$operationValidator;        
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
+                $isiData = reformatData($isiData);
                 $validator = Validator::make($isiData, $arrayValidation);
                 if ( $validator->fails()) {
                     foreach($validator->errors()->all() as $error){
@@ -216,6 +217,7 @@ class ApiFixedController extends Controller
                 }
             }
         }else{
+            $data = reformatData($data);
             $validator = Validator::make($data, $arrayValidation);
             if ( $validator->fails()) {
                 foreach($validator->errors()->all() as $error){
@@ -619,6 +621,7 @@ class ApiFixedController extends Controller
             $p->page        = isset($data->page) ? $data->page:1;
             $p->group_by    = isset($data->group_by) ? $data->group_by:null;
             $p->joinMax      = isset($data->joinMax) ? $data->joinmax:0;
+            $p->notIn      = isset($data->notin) ? $data->notin:null;
             $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->caller      = null;
             $overrideParams = $model->overrideGetParams($p);

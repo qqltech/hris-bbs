@@ -1529,6 +1529,11 @@ function _customGetData($model,$params)
     if($params->where_raw){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
+    if(isset($params->notIn) && $params->notIn!==null && strpos($params->notIn,":")!==false ){
+        $columnNotIn = explode(":", $params->notIn)[0];
+        $idNotIn = explode(",", explode(":", $params->notIn)[1]);
+        $model = $model->whereNotIn(str_replace("this.","$table.", $columnNotIn), $idNotIn );
+    }
     
     if(isset($params->group_by) && $params->group_by!=null){
         $model = $model->groupBy(DB::raw($params->group_by));

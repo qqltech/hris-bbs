@@ -108,6 +108,7 @@ class __class extends __basicClass
             $params->join        = $params->join;
             $params->addSelect   = null;
             $params->addJoin     = null;
+            $params->notIn       = @$params->notIn;
           	$params->joinMax 	 = $params->joinMax;
             $params->group_by    = $params->group_by;
         }
