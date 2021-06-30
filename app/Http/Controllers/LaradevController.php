@@ -386,7 +386,8 @@ class LaradevController extends Controller
                     "required" => $required,
                     "uniques" => $unique,
                     'triggers'=>\App\Helpers\DBS::getTriggers($table->getName()),
-                    'validations'=>$this->laravelValidationMapper($table->getName(),$fullColumns)
+                    'validations'=>$this->laravelValidationMapper($table->getName(),$fullColumns),
+                    'is_view'=>false
                 ];
                 // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
                 // .json_encode($table->getComment() ));
@@ -419,7 +420,8 @@ class LaradevController extends Controller
                     "required" => "[]",
                     "uniques" => [],
                     'triggers'=>[],
-                    'validations'=>[]
+                    'validations'=>[],
+                    'is_view'=>true
                 ];
             }
         }catch(Exception $e){
@@ -852,6 +854,7 @@ class LaradevController extends Controller
                 "model" => $tableName,
                 "fullColumns" =>$table->fullColumns,
                 "columns" => $table->columns,
+                "is_view"=>$table->is_view,
                 "config" =>[
                     'guarded'   => isset($cfg['guarded'])?$cfg['guarded']:['id'], 
                     'hidden'    => isset($cfg['hidden'])?$cfg['hidden']:[], 
@@ -1475,7 +1478,11 @@ class LaradevController extends Controller
         return response()->json("pembuatan file migration OK");
     }
     public function getNotice(Request $req){
-        $model = getCustom($req->data);
+        $model = $req->data;
+        if(strpos($model,".")!==false){
+            $model = explode(".",$req->data)[1];
+        }
+        $model = getCustom($model);
         return method_exists( $model, "frontendNotice" )?$model->frontendNotice():"tidak ada catatan";
     }
     public function uploadLengkapi(Request $request){
@@ -1486,6 +1493,9 @@ class LaradevController extends Controller
             foreach($dt as $indexCol => $col){
                 if( strpos( strtolower($col),"select ")!==false ){
                     $data[$index][$indexCol] = getRawData( $col );
+                }elseif( strpos( strtolower($col),"bcrypt::")!==false ){
+                    $hasher = app()->make('hash');
+                    $data[$index][$indexCol] = $hasher->make( str_replace(['bcrypt::'], [''], $col) );
                 }
             }
         }
@@ -1497,8 +1507,8 @@ class LaradevController extends Controller
         $data = $req->data; 
         DB::beginTransaction();   
         try{  
-            Schema::dropIfExists('uploaders');
-            Schema::create('uploaders',function (Blueprint $table)use($data) {
+            Schema::dropIfExists('temp_uploaders');
+            Schema::create('temp_uploaders',function (Blueprint $table)use($data) {
                 $table->bigIncrements('_id');
                 foreach( array_keys( end($data) ) as $key ){
                     $table->text($key)->nullable();
@@ -1506,7 +1516,7 @@ class LaradevController extends Controller
             });
             $insertData = collect($data)->chunk(500);
             foreach($insertData as $chunkedData){
-                \DB::table('uploaders')->insert($chunkedData->toArray());
+                \DB::table('temp_uploaders')->insert($chunkedData->toArray());
             }
         }catch(\Exception $e){
             DB::rollback();

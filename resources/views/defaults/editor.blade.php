@@ -11,7 +11,7 @@
     <!-- <script src="https://unpkg.com/vue-select@3.0.0"></script>
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css"> -->
     <script src="{{url('defaults/axios.min.js')}}"></script>
-    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-splitpane@1.0.6/dist/vue-split-pane.min.js"></script>

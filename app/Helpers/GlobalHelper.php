@@ -1452,11 +1452,13 @@ function _customGetData($model,$params)
     }
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
-        $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
+        $addSelect = str_replace("this.","$table.",strtolower($params->addSelect));
+        $fieldSelected = array_merge( $fieldSelected, explode(",",$addSelect));
     }
     
     if( isset($params->addJoin) && $params->addJoin!=null ){
-        $joins = explode( ",", $params->addJoin );
+        $joiningString = str_replace("this.","$table.",strtolower($params->addJoin));
+        $joins = explode( ",", $joiningString );
         foreach($joins as $join){
             if(strpos( $join, " and ")!==FALSE){
                 $join = explode(" and ",$join);
@@ -1464,14 +1466,25 @@ function _customGetData($model,$params)
                 $model = $model->leftJoin($joinedTable, function($q)use($join){
                     foreach($join as $statement){
                         $statement = str_replace(" ","",$statement);
-                        $parent = explode(".",$statement)[0];
+                        $explodes = explode(".",$statement);
+                        if( count($explodes)>2 ){
+                            $parent = "{$explodes[0]}.{$explodes[1]}";
+                        }else{
+                            $parent = $explodes[0];
+                        }                        
                         $onParent = explode("=",$statement)[0];
                         $onMe = explode("=",$statement)[1];
                         $q->on($onParent,"=",$onMe);
                     }
                 });
             }else{
-                $parent = explode(".",$join)[0];
+                $candParent = explode("=",$join)[0];
+                $explodes = explode(".",$candParent);
+                if( count($explodes)>2 ){
+                    $parent = $explodes[0].".".$explodes[1];
+                }else{
+                    $parent = $explodes[0];
+                }
                 $onParent = explode("=",$join)[0];
                 $onMe = explode("=",$join)[1];
                 $model = $model->leftJoin($parent,$onParent,"=",$onMe);
@@ -1488,11 +1501,14 @@ function _customGetData($model,$params)
         $string  = strtolower($params->search);
         $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
         $model = $model->where(
-            function ($query)use($allColumns,$string,$additionalString, $searchfield) {
+            function ($query)use($allColumns,$string,$additionalString, $searchfield,$table) {
                 if($searchfield!=null){
                     $searchfieldArray = explode(",", strtolower($searchfield) );
                     foreach($searchfieldArray as $fieldSearching){
-                        // $fieldSearching = str_replace( "this.","$table.", $fieldSearching );
+                        if(strpos($fieldSearching,".")===false){
+                            $fieldSearching = "this.$fieldSearching";
+                        }
+                        $fieldSearching = str_replace( "this.","$table.", $fieldSearching );
                         if(in_array($fieldSearching,$allColumns)){
                             $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%$string%'"));
                         }
@@ -1543,7 +1559,16 @@ function _customGetData($model,$params)
     if($params->order_by_raw){
         $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );
     }elseif($params->order_by){
-        $order =  str_replace("this.","$table.",$params->order_by);
+        $order =  str_replace("this.","$table.", $params->order_by);
+        if( method_exists( $modelExtender, 'aliases') ){
+            $aliases = $modelExtender->aliases();
+            if(is_array($aliases)){
+                $key = array_search( $order,$aliases ) ;
+                if( $key ){
+                    $order = $key;
+                }
+            }
+        }
         $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
@@ -1771,11 +1796,13 @@ function _customFind($model, $params)
     }
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
-        $fieldSelected = array_merge( $fieldSelected, explode(",",$params->addSelect));
+        $addSelect = str_replace("this.","$table.",strtolower($params->addSelect));
+        $fieldSelected = array_merge( $fieldSelected, explode(",",$addSelect));
     }
     
     if( isset($params->addJoin) && $params->addJoin!=null ){
-        $joins = explode( ",", $params->addJoin );
+        $joiningString = str_replace("this.","$table.",strtolower($params->addJoin));
+        $joins = explode( ",", $joiningString );
         foreach($joins as $join){
             if(strpos( $join, " and ")!==FALSE){
                 $join = explode(" and ",$join);
@@ -1783,14 +1810,25 @@ function _customFind($model, $params)
                 $model = $model->leftJoin($joinedTable, function($q)use($join){
                     foreach($join as $statement){
                         $statement = str_replace(" ","",$statement);
-                        $parent = explode(".",$statement)[0];
+                        $explodes = explode(".",$statement);
+                        if( count($explodes)>2 ){
+                            $parent = "{$explodes[0]}.{$explodes[1]}";
+                        }else{
+                            $parent = $explodes[0];
+                        }
                         $onParent = explode("=",$statement)[0];
                         $onMe = explode("=",$statement)[1];
                         $q->on($onParent,"=",$onMe);
                     }
                 });
             }else{
-                $parent = explode(".",$join)[0];
+                $candParent = explode("=",$join)[0];
+                $explodes = explode(".",$candParent);
+                if( count($explodes)>2 ){
+                    $parent = $explodes[0].".".$explodes[1];
+                }else{
+                    $parent = $explodes[0];
+                }
                 $onParent = explode("=",$join)[0];
                 $onMe = explode("=",$join)[1];
                 $model = $model->leftJoin($parent,$onParent,"=",$onMe);
@@ -1822,6 +1860,7 @@ function _customFind($model, $params)
             unset($data[$key]);
         }
     }
+    $data = reformatDataResponse($data);
     if(method_exists($modelExtender, "transformRowData")){
         $data = $modelExtender->transformRowData($data);
     }

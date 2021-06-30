@@ -205,7 +205,6 @@ function createTable(data, isReferenced=false, caller=null){
                 : data.table+"_"+data.columns[i].name
         });
         if(data.columns[i].table_reference!==undefined){
-            console.log(`${data.table}.${data.columns[i].name} refer ke ${data.columns[i].table_reference}`);
             // referencings.push({table_reference:data.columns[i].table_reference, column_reference:data.columns[i].column_reference,table_caller:data.table, id:data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name});
             belongs.push( { color:"#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}) ,
                 id: data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name, parent: data.columns[i].table_reference, position:i+1, 
@@ -334,21 +333,6 @@ function createTable(data, isReferenced=false, caller=null){
     stage.draw();
 
     tableX = tableX + stage.find(".bodyTable")[ stage.find(".bodyTable").length-1 ].width()+80;
-    // console.log(referencings);
-    // for(let i=0; i<referencings.length;i++){      
-    //   for(let j=0; j<otherTables.length;j++){
-    //     if(referencings[i].table_reference == otherTables[j].table){
-        // createTable( {
-        //         "table": "coba",
-        //         "type": "master",
-        //         "columns": [
-        //         ]
-        //     }, true, referencings[i] );
-        // break;
-        // }
-    //   }
-    // }
-    // referencings=[];
 }
 
 stage.add(layer);

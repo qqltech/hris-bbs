@@ -7,19 +7,24 @@
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css">
     <link rel="stylesheet" href="{{url('defaults/uploader-style.css')}}">
     <script src="{{url('defaults/axios.min.js')}}"></script>
-    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="{{url('defaults/vue-clipboard.min.js')}}"></script>
 
     <!-- Load the following for BootstrapVueIcons support -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+    <style>
+        .b-toast{
+            z-index:999999 !important;
+        }
+    </style>
 @verbatim
 </head>
 <body>
 <div>
     <div id="app">
-        <b-modal v-model="showModal" size="xl" title="tekan ALT+A untuk memunculkan menu ini" hide-footer>
+        <b-modal v-model="showModal" size="xl" :title="'tekan ALT+A untuk memunculkan menu ini'+(selectedTable&&selectedTable.is_view?' [CUSTOM UPLOAD]':'')" hide-footer>
             <div>
                 <v-select 
                     placeholder="Pilih table yang akan diupload"
@@ -264,8 +269,12 @@ var app = new Vue({
         },
         apiUploadTest(final=false){
             let me = this;
+            var url = "{{url('laradev/uploadtest')}}";
+            if(me.selectedTable.is_view){
+                url = "{{url('public/')}}/"+me.selectedTable.model+"/upload"
+            }
             me.submitApi({
-                url  : "{{url('laradev/uploadtest')}}",
+                url  : url,
                 data : {
                     data:me.bodyJson,
                     table:me.selectedTable.model,
@@ -281,19 +290,27 @@ var app = new Vue({
                     solid: true
                 })
             },function(response){
-                me.$bvToast.toast(response.error, {
-                    'no-auto-hide':true,
-                    'auto-hide-delay':15000,
-                    title: `Baris ${response.index}`,
-                    toaster:'b-toaster-top-full',
-                    variant: 'danger',
-                    solid: true
-                })
+                if(typeof(response)==='string'){
+                    me.$bvToast.toast(response, {
+                        'auto-hide-delay':15000,
+                        title: `Error`,
+                        toaster:'b-toaster-top-full',
+                        variant: 'danger',
+                        solid: true
+                    })
+                }else{
+                    me.$bvToast.toast(response.error, {
+                        'auto-hide-delay':15000,
+                        title: `Baris ${response.index}`,
+                        toaster:'b-toaster-bottom-full',
+                        variant: 'danger',
+                        solid: true
+                    })
+                }
 
             })
         },
         query(i){
-            // console.log(this.bodyArray)
             let val = this.headersQuery[i];
             let valOriginal = val;
             let value =val;
@@ -314,6 +331,7 @@ var app = new Vue({
             }
         },
         tableSelected(table){
+            if(!table) return;
             this.headers = table.columns.filter(dt=>{
                 return !["created_at","updated_at"].includes(dt);
             });
@@ -399,7 +417,6 @@ var app = new Vue({
             axios($options).then(response => {
                 callback(response);
             }).catch(errors => {
-                console.log(errors.response.data)
                 error(errors.response.data);
             }).then(function () {
                 me.isLoading=false;

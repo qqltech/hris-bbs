@@ -142,6 +142,7 @@ class ApiFixedController extends Controller
             if(method_exists($model, $function)){
                 if(!$model->$function()){
                     $this->messages[] ="[UNAUTHORIZED]operasi $this->operation di [$modelName] dilarang!";
+                    $this->errors[] ="Sorry, This $this->operation operation is currently forbidden!";
                     $this->isAuthorized=false;
                     return false;
                 }
