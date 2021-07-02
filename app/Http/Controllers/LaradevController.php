@@ -551,7 +551,7 @@ class LaradevController extends Controller
         $data = $this->getDirFullContents( base_path('database/migrations') );
         $request->name = str_replace(" ","_", $request->name);
         $data = array_filter($data,function($file)use ($tableName){
-            if(strpos("$file.php", "$tableName.php")!==false){
+            if(strpos("$file.php", "0_0_0_0_$tableName.php")!==false){
                 return $file;
             }
         });
@@ -1088,16 +1088,11 @@ class LaradevController extends Controller
     public function readMigrations(Request $req, $table=null)
     {
         if($table!=null){
-            $data = $this->getDirFullContents( base_path('database/migrations/projects') );
-            $data = array_filter($data,function($file)use ($table){
-                if(strpos("$file.php", "$table.php")!==false){
-                    return $file;
-                }
-            });
-            if(count($data)==0){
+            $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
+            if(!File::exists( $migrationPath )){
                 return response()->json("migration file [$table] tidak ada",400);
             }
-            return File::get( array_values($data)[0] );
+            return File::get( $migrationPath );
         }else{
             $data = $this->getDirContents( base_path('database/migrations/projects') );            
             $schemaManager = DB::getDoctrineSchemaManager();
@@ -1182,38 +1177,16 @@ class LaradevController extends Controller
     public function readAlter(Request $req, $table=null)
     {
         if($table!=null){
-            $data = $this->getDirFullContents( base_path('database/migrations/projects') );
-            $data = array_filter($data,function($file)use ($table){
-                if(strpos("$file.php", "$table.php")!==false){
-                    return $file;
-                }
-            });
-            if(count($data)==0){
-                return response()->json("migration file [$table] tidak ada",400);
-            }
-            if(strpos(array_values($data)[0], "\\projects")){
-                $alterFile = str_replace(  "\\projects\\","\\alters\\",array_values($data)[0]);
-            }else{
-                $alterFile = str_replace(  "/projects/","/alters/",array_values($data)[0]);
-            }
-            if(!File::exists( $alterFile ) && 1==2 ){
-                $realmigration = File::get( array_values($data)[0] );
+            $alterPath = base_path("database/migrations/alters/0_0_0_0_$table.php");
+            if(!File::exists( $alterPath )){
+                $realmigration = File::get( base_path("database/migrations/projects/0_0_0_0_$table.php") );
                 $realmigration = explode("public function down",$realmigration)[0];
                 $realmigration = str_replace(["});","]);","Schema::create"],["==;//","..;//","Schema::table"],$realmigration);
                 $realmigration = str_replace([");"],[")->change();"],$realmigration);
                 $realmigration = str_replace(["==;//","..;//","Schema::create"],["});//","]);//","Schema::table"],$realmigration);
-                $realmigration = str_replace(["->create("],["->table("],$realmigration);
                 return $realmigration."\n}";
             }
-            if(!File::exists( $alterFile )){
-                $migrationAlterFile = $this->getMigrationAlter();
-                return str_replace( [
-                    "__class__","__table__",
-                ],[
-                    $table,$table
-                ], $migrationAlterFile );
-            }
-            return File::get( $alterFile );
+            return File::get( $alterPath );
         }
     }
     public function readLog(Request $req, $table=null){
@@ -1223,13 +1196,12 @@ class LaradevController extends Controller
         
         Schema::disableForeignKeyConstraints();
         File::delete(glob(base_path('database/migrations')."/*.*"));
-        $data = $this->getDirFullContents( base_path('database/migrations/projects') );
-        $data = array_filter($data,function($file)use ($table){
-            if(strpos("$file.php", "$table.php")!==false){
-                return $file;
-            }
-        });
-        if(count($data)==0){
+        $dir = "projects";
+        if($req->alter){
+            $dir = "alters";
+        }
+        $migrationPath = base_path("database/migrations/$dir/0_0_0_0_$table.php");
+        if(!File::exists( $migrationPath )){
             return response()->json("migration file [$table] tidak ada",400);
         }
         if(!$req->alter){
@@ -1269,10 +1241,6 @@ class LaradevController extends Controller
         }
         // return File::get( array_values($data)[0] );
         try{
-            $dir = "projects";
-            if($req->alter){
-                $dir = "alters";
-            }
             $file = "database/migrations/$dir/0_0_0_0_"."$table.php";
             // File::put(base_path('database/migrations')."/0_0_0_0_"."$table.php",File::get( $file )); OLD
             $exitCode = Artisan::call('migrate:refresh', [
@@ -1311,7 +1279,7 @@ class LaradevController extends Controller
         File::delete(glob(base_path('database/migrations')."/*.*"));
         $data = $this->getDirFullContents( base_path('database/migrations') );
         $data = array_filter($data,function($file)use ($table){
-            if(strpos("$file.php", "$table.php")!==false){
+            if(strpos("$file.php", "0_0_0_0_$table.php")!==false){
                 return $file;
             }
         });
@@ -1382,20 +1350,15 @@ class LaradevController extends Controller
     public function editMigrations(Request $req, $table=null)
     {
         if($table!=null){
-            $data = $this->getDirFullContents( base_path('database/migrations/projects') );
-            $data = array_filter($data,function($file)use ($table){
-                if(strpos("$file.php", "$table.php")!==false){
-                    return $file;
-                }
-            });
-            if( count($data) <1){
-                return response()->json("maaf nama model $table tidak ada", 400);
+            $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
+            if(!File::exists( $migrationPath )){
+                return response()->json("migration file [$table] tidak ada",400);
             }
-            $file = File::put( base_path('database/migrations/projects')."/0_0_0_0_"."$table.php" , $req->text); 
+            $file = File::put( $migrationPath , $req->text); 
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<SAVE MIGRATION $table>");       
             }
-            return "update Migrations OK [".count($data)."]";
+            return "update Migrations OK";
         }
         $data = $this->getDirContents( base_path('database/migrations/projects') );
         if(strpos("x".$req->modul, "alias ")!==false && count(explode(" ",$req->modul))==3 ){
