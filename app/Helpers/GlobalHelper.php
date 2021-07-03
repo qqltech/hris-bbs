@@ -2058,7 +2058,9 @@ function reformatData($arrayData,$model=null){
         // if( strpos($datatype,'boolean')!==false && in_array(strtolower($data),["active","aktif","true","yes","ya"]) ){
         //     $arrayData[$key] = true;
         // }
-        if( str_replace(["null","NULL"," "],["","",""],$data)==''){
+        if( gettype($data)=='boolean' && !$data ){
+            $arrayData[$key] = "false";
+        }elseif( str_replace(["null","NULL"," "],["","",""],$data)==''){
             $arrayData[$key] = null;
         }
     }
