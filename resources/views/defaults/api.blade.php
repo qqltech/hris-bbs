@@ -161,6 +161,7 @@
                                 paginate    : "100",
                                 join        : true,
                                 joinmax     : 0,
+                                notin       : "column_name:12,13,99",
                                 addselect   : "column1,column2,column3,dst",
                                 group_by    : "column1,column2,column3,dst",
                             },
@@ -225,6 +226,23 @@
                                             susunan += fullColumnsDetailHeirs[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">" ;
                                             detailsPayloadHeirs[fullColumnsDetailHeirs[i].name] = susunan;
                                         }
+                                        (arrayDataDetailDetail.details).forEach(sub_subdt=>{
+                                            let arrayDataDetailDetailSub = data.find(sub_subdtl=>{
+                                                return sub_subdtl.model == sub_subdt;
+                                            });
+                                            let columnsNestedDetails = arrayDataDetailDetailSub.fullColumns;
+                                            let detailsPayloadHeirsOfHeirs = {};
+                                            for(let i=0; i<columnsNestedDetails.length;i++){
+                                                if( arrayDataDetailDetailSub.config.createable.includes(columnsNestedDetails[i].name) && !(columnsNestedDetails[i].comment).includes('fk') ){
+                                                    var susunanSub = "";
+                                                    susunanSub += columnsNestedDetails[i].nullable?"{required}-[":"{optional}-[";
+                                                    susunanSub += (columnsNestedDetails[i].type).replace("\\","")+"]" ;
+                                                    susunanSub += columnsNestedDetails[i].comment==""?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">" ;
+                                                    detailsPayloadHeirsOfHeirs[columnsNestedDetails[i].name] = susunanSub;
+                                                }
+                                                detailsPayloadHeirs[sub_subdt] = [detailsPayloadHeirsOfHeirs];
+                                            }
+                                        });
                                         detailsPayload[subdt] = [detailsPayloadHeirs];
                                     }
                                 });
@@ -289,6 +307,23 @@
                                             susunan += fullColumnsDetailHeirs[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">" ;
                                             detailsPayloadHeirs[fullColumnsDetailHeirs[i].name] = susunan;
                                         }
+                                        (arrayDataDetailDetail.details).forEach(sub_subdt=>{
+                                            let arrayDataDetailDetailSub = data.find(sub_subdtl=>{
+                                                return sub_subdtl.model == sub_subdt;
+                                            });
+                                            let columnsNestedDetails = arrayDataDetailDetailSub.fullColumns;
+                                            let detailsPayloadHeirsOfHeirs = {};
+                                            for(let i=0; i<columnsNestedDetails.length;i++){
+                                                if( arrayDataDetailDetailSub.config.createable.includes(columnsNestedDetails[i].name) && !(columnsNestedDetails[i].comment).includes('fk') ){
+                                                    var susunanSub = "";
+                                                    susunanSub += columnsNestedDetails[i].nullable?"{required}-[":"{optional}-[";
+                                                    susunanSub += (columnsNestedDetails[i].type).replace("\\","")+"]" ;
+                                                    susunanSub += columnsNestedDetails[i].comment==""?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">" ;
+                                                    detailsPayloadHeirsOfHeirs[columnsNestedDetails[i].name] = susunanSub;
+                                                }
+                                                detailsPayloadHeirs[sub_subdt] = [detailsPayloadHeirsOfHeirs];
+                                            }
+                                        });
                                         detailsPayload[subdt] = [detailsPayloadHeirs];
                                     }
                                 });
