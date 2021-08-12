@@ -566,24 +566,37 @@ class LaradevController extends Controller
         if(in_array("$request->name.php", $data)){
             return response()->json("maaf nama model $request->name telah terpakai", 400);
         }
-        if(Schema::hasTable($tableName)){
-            Schema::rename($tableName, $request->name);
-        }else{
-            Schema::rename($tableName, $request->name);
+        $realTableName = getBasic($tableName)->getTable();
+        $dstTableName = $request->name;
+        if(strpos($realTableName, ".")!==false){
+            $schema = explode(".", $realTableName)[0];
+            $dstTableName = "$schema.$dstTableName";
+        }
+        if(Schema::hasTable($realTableName)){
+            Schema::rename($realTableName, $request->name);
+        }else{ //misal View Table
+            Schema::rename($realTableName, $request->name);
         }
         if($request->models){
             File::put( "$this->modelsPath/CustomModels/$request->name.php", 
                 str_replace( $tableName,$request->name,File::get( "$this->modelsPath/CustomModels/$tableName.php" ) )
             );
             File::put( "$this->modelsPath/BasicModels/$request->name.php",
-            str_replace($tableName,$request->name, File::get( "$this->modelsPath/BasicModels/$tableName.php" ) )
+                str_replace($tableName,$request->name, File::get( "$this->modelsPath/BasicModels/$tableName.php" ) )
             );
             File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$request->name.php", str_replace([
-                str_replace("_","",$tableName),$tableName,
+                str_replace("_","",$tableName)." ","'$tableName'","\"$tableName\"",
             ],[
-                str_replace("_","",$request->name),$request->name
+                str_replace("_","",$request->name)." ","'$request->name'", "\"$request->name\""
             ],File::get( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" ) ));
-
+            $alterPath = base_path("database/migrations/alters/0_0_0_0_$tableName.php");
+            if(File::exists( $alterPath )){
+                File::put(base_path('database/migrations/alters')."/0_0_0_0_"."$request->name.php", str_replace([
+                    str_replace("_","",$tableName)." ","'$tableName'","\"$tableName\"",
+                ],[
+                    str_replace("_","",$request->name)." ","'$request->name'", "\"$request->name\""
+                ],File::get( base_path('database/migrations/alters')."/0_0_0_0_"."$tableName.php" ) ));
+            }
             File::delete( "$this->modelsPath/CustomModels/$tableName.php" );
             File::delete( "$this->modelsPath/BasicModels/$tableName.php" );
             File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );
@@ -870,7 +883,7 @@ class LaradevController extends Controller
             ];
             $colsArray = [];
             foreach($table->fullColumns as $col){
-                $colsArray[] = $col['name'].":".str_replace("\\","", strtolower($col['type']) );
+                $colsArray[] = $col['name'].":".str_replace("\\","", strtolower($col['type']) ).(is_numeric($col['length'])?":{$col['length']}":"");
             }
             $paste = str_replace([
                 "__namespace","__class","__table","__columnsFull","__columns",  "__lastupdate"

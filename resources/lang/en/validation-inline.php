@@ -57,7 +57,7 @@ return [
         'array'   => 'The content must have :value items or more.',
     ],
     'image'    => 'This must be an image.',
-    'in'       => 'The selected value is invalid.',
+    "in"       => 'This :attribute must be one of (:values) ',
     'in_array' => 'This value does not exist in :other.',
     'integer'  => 'This must be an integer.',
     'ip'       => 'This must be a valid IP address.',

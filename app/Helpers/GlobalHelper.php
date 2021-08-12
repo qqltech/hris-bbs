@@ -1444,11 +1444,11 @@ function _customGetData($model,$params)
         $selectFields = str_replace(["\n","  ","\t"],["","",""],$params->selectfield);
         $selectFields = explode(",", $selectFields);
         $fieldSelected= $selectFields;
-        $allColumns = array_filter($allColumns,function($dt)use($selectFields){                
-            if( in_array(explode( ".", $dt)[1], $selectFields) ){
-                return $dt;
-            }
-        });
+        // $allColumns = array_filter($allColumns,function($dt)use($selectFields){                
+        //     if( in_array(explode( ".", $dt)[1], $selectFields) ){
+        //         return $dt;
+        //     }
+        // });
     }
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
@@ -1512,12 +1512,12 @@ function _customGetData($model,$params)
                         if(in_array($fieldSearching,$allColumns)){
                             $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%$string%'"));
                         }
-                        $found = null;
-                        foreach($allColumns as $col){
-                            if(strpos($col, $fieldSearching)){
-                                $query->orWhereRaw(DB::raw("LOWER($col$additionalString) LIKE '%$string%'"));
-                            }
-                        }
+                        // $found = null;
+                        // foreach($allColumns as $col){
+                        //     if(strpos($col, $fieldSearching)){
+                        //         $query->orWhereRaw(DB::raw("LOWER($col$additionalString) LIKE '%$string%'"));
+                        //     }
+                        // }
                     }
                 }else{
                     foreach($allColumns as $column){
@@ -2033,32 +2033,19 @@ function reformatData($arrayData,$model=null){
     $dataKey=["date","tgl","tanggal","_at","etd","eta"];
     $dateFormat = env("FORMAT_DATE_FRONTEND","d/m/Y");
     foreach($arrayData as $key=>$data){
-        // if( strtolower(gettype($data))=='null'){
-        //     unset($arrayData[$key]);
-        //     continue;
-        // };
+        $datatype=getDataType($model,$key);
         if(is_array($data)){
             continue;
         }
-        $isDate=false;
-        foreach($dataKey as $dateString){
-            if(strpos(strtolower($key),$dateString)!==false && strpos($data,"/")!==false && count(explode("/",$data))>2){
-                $isDate=true;
-                break;
-            }
-        }
+        $isDate=in_array($datatype,['date','datetime','timestamp']);
         if($isDate){
             try{
                 $newData = Carbon::createFromFormat($dateFormat, $data)->format('Y-m-d');
-                $isDate=true;
-                $arrayData[$key] = $newData;                
-            }catch(Exception $e){}
-        }
-        // $datatype=getDataType($model,$key);
-        // if( strpos($datatype,'boolean')!==false && in_array(strtolower($data),["active","aktif","true","yes","ya"]) ){
-        //     $arrayData[$key] = true;
-        // }
-        if( gettype($data)=='boolean' && !$data ){
+                $arrayData[$key] = $newData;   
+            }catch(Exception $e){
+                ff($e->getMessage());
+            }
+        }elseif( gettype($data)=='boolean' && !$data ){
             $arrayData[$key] = "false";
         }elseif( str_replace(["null","NULL"," "],["","",""],$data)==''){
             $arrayData[$key] = null;
