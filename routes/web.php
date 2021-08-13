@@ -23,7 +23,7 @@ $router->get('/', function () use ($router) {
     if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
         return response()->json("SERVER WAS CLOSED",404);
     }
-    if( env("TUTORIAL",false) ){
+    if( !env("TUTORIAL",false) ){
         return app()->version();
     }
     return response()->json(["info"=>"welcome to LARAHAN fast Api Laravel Lumen-based!",
