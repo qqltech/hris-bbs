@@ -1029,10 +1029,12 @@ class LaradevController extends Controller
                 }
                 $models = [];
                 
+                $addedTables = [];
                 foreach($data as $file){
                     if($file==""){continue;};
                     $stringClass = str_replace([".php","create_","_table"],["","",""], $file);
                     $modelCandidate = "\App\Models\BasicModels\\$stringClass";
+                    $addedTables[] = $stringClass;
                     $models[] =[
                         "file" => $file,
                         "model"=> class_exists( $modelCandidate )?true:false,
