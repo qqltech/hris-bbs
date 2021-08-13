@@ -30,8 +30,9 @@
     width:50%
 } */
 #codemirror{
+    transition:all 0.25s ease-in;
     right:10px;
-    top:20px;
+    top:25px;
     position:fixed;
     width:50%;
     /* height:1000px; */

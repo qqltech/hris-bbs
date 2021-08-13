@@ -269,6 +269,28 @@ function createTable(data, isReferenced=false, caller=null){
             align:"right",
             name:"kolom2"
         });
+        if(data.columns[i].table_reference){
+          columnText.on('mouseover', function (e) {
+            stage.container().style.cursor = 'pointer';
+            if(tercheck.includes(data.columns[i].table_reference)){
+                return
+            }
+            e.currentTarget.setText( data.columns[i].table_reference )
+            e.currentTarget.setFill("black")
+            e.currentTarget.setFontSize(14);
+            layer.draw()
+          })
+          columnText.on('mouseout', function (e) {
+            stage.container().style.cursor = 'default';
+            e.currentTarget.setFontSize(11);
+            e.currentTarget.setFill((data.columns[i].table_reference?"orange":color))
+            e.currentTarget.setText( (data.columns[i].type).replace('\\',"")+" "+(data.columns[i].table_reference?"["+data.columns[i].connection+"]":"") )
+            layer.draw()
+          })
+          columnText.on('click tap', function (e) {
+              document.getElementById(data.columns[i].table_reference).click();
+          })
+        }
         col2.add(columnText);
         lastY += columnText.height();
         if(longText<columnText.width()){
@@ -383,6 +405,7 @@ function jsonGet(json){
         let checkeds = localStorage.checked!==undefined?JSON.parse(localStorage.checked):[];
         checkeds.forEach(function(tab){
           if(!tercheck.includes(tab)){
+            tercheck.push(tab)
             document.getElementById(tab).click();
           }
         });

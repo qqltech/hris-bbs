@@ -9,6 +9,7 @@ class __class extends __basicClass
         $this->user = \Auth::check()?\Auth::user():null;
     }
     public $lastUpdate  = "__lastupdate";
+    public $autoValidator  = true;
     public $createValidator = [];
     public $updateValidator = [];
     public $importValidator = [];

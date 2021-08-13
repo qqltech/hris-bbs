@@ -9,6 +9,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
+config(['start_time'=>microtime(true)]);
 $locale = strtolower(env("LOCALE","EN"));
 app('translator')->setLocale($locale);
 $app->withFacades();
@@ -89,24 +90,6 @@ if (!class_exists('Mail')) {
 if (!class_exists('MailTemplate')) {
     class_alias('App\Mails\SendMailable', 'MailTemplate');
 }
-\Illuminate\Http\Request::macro('hanya', function($array) {
-    $diff = array_filter(array_keys($this->all()),function($dt)use($array){
-        if( !in_array($dt,$array) && strpos($dt,"_d_") !==true ){
-            return $dt;
-        }
-    });
-    foreach($diff as $isi){
-        $this->getInputSource()->remove($isi);
-    }
-    return $this;
-});
-\Illuminate\Http\Request::macro('reuse', function($array) {
-    foreach(array_keys($this->all()) as $isi){
-        $this->getInputSource()->remove($isi);
-    }
-    $this->merge($array);
-    return $this;
-});
 
 \Illuminate\Http\Request::macro('getMetaData', function() {
     foreach(array_keys($this->all()) as $isi){

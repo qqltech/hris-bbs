@@ -42,80 +42,7 @@ class LaradevController extends Controller
             File::makeDirectory( base_path("database/migrations/alters"), 493, true);
         }
     }
-    public function laravelValidationMapper( $table, $columns )
-    {
-        $allRules = [];
-        foreach($columns as $key => $col){
-            if( $col['primary'] ){
-                continue;
-            }
-            $rules = [];
-            if( !$col[ "nullable" ] ){
-                // $rules[] = "required";
-                // $rules[] = "min:1";
-            }
-            // if( $col[ "unique" ] ){
-                // $rules[] = "unique:$table";
-            // }
-            if( $col[ "length" ]!==null && $col["length"]>0 ){
-                $rules[] = "max:".$col[ "length" ];
-            }
-            if( $col[ "comment" ]!==null ){
-                $comment = json_decode( $col[ "comment" ] );
-                if( isset( $comment->fk ) ){
-                    $rules[] = "prohibited";
-                }
-            }
-            $rules[] = $this->laravelValidationDataType($col['type']);
-            $rules[] = "filled";
-            
-            $allRules[ $col['name'] ] = $rules;
-        }
-        return $allRules;
-        // integer : *int
-        // boolean
-        // numeric : float,double,decimal
-        // string:text
-        // json
-        // date
-        // date_format:Y-m-d H:i:s :datetime
 
-        // unique:table
-        // required
-    }
-    public function laravelValidationDataType( $type )
-    {
-        $type = strtolower( $type );
-        if( strpos($type,"int") ){
-            return "integer";
-        }elseif( in_array($type,[
-                "float","double","decimal"
-            ]) ){
-            return "numeric";
-        }elseif( in_array($type,[
-                "text","string"
-            ]) ){
-            return "string";
-        }elseif( in_array($type,[
-                "boolean"
-            ]) ){
-            return "boolean";
-        }elseif( in_array($type,[
-                "date"
-            ]) ){
-            return "date";
-        }elseif( in_array($type,[
-                "datetime"
-            ]) ){
-            return "date_format:Y-m-d H:i:s";
-        }elseif( in_array($type,[
-                "json"
-            ]) ){
-            return "json";
-        }else{
-            return "string";
-        }
-    }
     private function getConnection($conn)
     {
         $conn = (object)$conn;
@@ -155,6 +82,14 @@ class LaradevController extends Controller
         $dbname = "";
         try {
             if($connection!=null){
+                // $connection = [
+                //     'driver'=>'mysql',
+                //     'host'=>'localhost',
+                //     'port'=>'3306',
+                //     'username'=>'root',
+                //     'password'=>'root',
+                //     'database'=>'db'
+                // ];
                 $dbname = $connection['database'];
                 $conn = $this->getConnection($connection);
                 $conn=$conn->getDoctrineSchemaManager();
@@ -211,27 +146,17 @@ class LaradevController extends Controller
         }
         return response()->json("Database ".$dbname." is already created before,migrate = $migrate");
     }
-    private function getBasicModel()
-    {
+    private function getBasicModel(){
         return File::get( base_path("templates/basicModel.stub") );
     }
-    private function getCustomModel()
-    {
+    private function getCustomModel(){
         return File::get( base_path("templates/customModel.stub") );
     }
     private function getMigration()
     {
         $template = "migration";
-        if(\Schema::getConnection()->getDriverName()!='pgsql'){
+        if(getDriver()!='pgsql'){
             $template = "migrationMysql";
-        }
-        return File::get( base_path("templates/$template.stub") );
-    }
-    private function getMigrationAlter()
-    {
-        $template = "migrationAlter";
-        if(\Schema::getConnection()->getDriverName()!='pgsql'){
-            $template = "migrationAlterMysql";
         }
         return File::get( base_path("templates/$template.stub") );
     }
@@ -266,20 +191,6 @@ class LaradevController extends Controller
                 }
                 $columns = [];
                 $columnNames = [];
-                $_uniques = [];
-                $_indexes = [];
-                $_primary = null;
-                foreach($indexes as $index){
-                    if($index->isPrimary()){
-                        $_primary = $index->getColumns()[0];
-                    }
-                    if($index->isUnique()){
-                        $_uniques=array_merge($_uniques, $index->getColumns());
-                    }
-                    $_indexes = [
-                        $index->getName()=>$index->getColumns()
-                    ];
-                }
                 foreach ($table->getColumns() as $column) {
                     foreach($indexes as $key=>$index){
                         if(in_array($column->getName(), $index->getColumns()) && !$index->isPrimary() && $index->isUnique()){
@@ -287,19 +198,12 @@ class LaradevController extends Controller
                         }
                     }
                     $columnNames[] = $column->getName();
-
                     $columns[] = [
                         "name"=>$column->getName(),
-                        "type"=> $column->getType()->getName(),
-                        "length"=> $column->getLength(),
-                        "unsigned"=> $column->getUnsigned(),
-                        "precision"=> $column->getPrecision(),
-                        "scale"=> $column->getScale(),
-                        "fixed"=> $column->getFixed(),
-                        "default"=> $column->getDefault(),
-                        "comment"=> $column->getComment()===null?"":$column->getComment(),
-                        "unique"=> in_array($column->getName(),$_uniques),
-                        "primary"=>$column->getName()===$_primary,
+                        "type"=> "".$column->getType(),
+                        "length"=> "".$column->getLength(),
+                        "default"=> "".$column->getDefault(),
+                        "comment"=> "".$column->getComment(),
                         "nullable"=> $column->getNotnull()
                     ];
                     
@@ -386,7 +290,6 @@ class LaradevController extends Controller
                     "required" => $required,
                     "uniques" => $unique,
                     'triggers'=>\App\Helpers\DBS::getTriggers($table->getName()),
-                    'validations'=>$this->laravelValidationMapper($table->getName(),$fullColumns),
                     'is_view'=>false
                 ];
                 // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
@@ -420,7 +323,6 @@ class LaradevController extends Controller
                     "required" => "[]",
                     "uniques" => [],
                     'triggers'=>[],
-                    'validations'=>[],
                     'is_view'=>true
                 ];
             }
@@ -507,8 +409,7 @@ class LaradevController extends Controller
         DB::getDoctrineSchemaManager()->dropDatabase($databaseName);
         return "delete database OK";
     }
-    public function readTables(Request $request,$table=null)
-    {
+    public function readTables(Request $request,$table=null){
         if($table){
             return $this->getFullTable($table);
         }
@@ -525,8 +426,7 @@ class LaradevController extends Controller
         return $tableNames;
     }
 
-    public function createTables(Request $request)
-    {
+    public function createTables(Request $request){
         $cols = $request->columns;
         $tableName = $request->table;
         Schema::dropIfExists($tableName);
@@ -546,8 +446,7 @@ class LaradevController extends Controller
         });
         return "create table OK";
     }
-    public function renameTables(Request $request, $tableName)
-    {
+    public function renameTables(Request $request, $tableName){
         $data = $this->getDirFullContents( base_path('database/migrations') );
         $request->name = str_replace(" ","_", $request->name);
         $data = array_filter($data,function($file)use ($tableName){
@@ -607,8 +506,7 @@ class LaradevController extends Controller
         }
         return "rename table OK";
     }
-    public function deleteTables(Request $request, $tableName)
-    {
+    public function deleteTables(Request $request, $tableName){
         Schema::dropIfExists($tableName);
         if($request->models){
             $customModel = "$this->modelsPath/CustomModels/$tableName.php";
@@ -653,10 +551,7 @@ class LaradevController extends Controller
                 return response()->json("nopassword",401);
             }
         }
-        if($request->basic){            
-            if( $request->reload ){
-                $this->createModels($request, $tableName);
-            }            
+        if($request->basic){
             return File::get(app()->path()."/Models/BasicModels/$tableName.php");
         }
         if($request->custom){
@@ -681,17 +576,16 @@ class LaradevController extends Controller
         $return = 0;
         if ( $canExec ){
             $tempFile=app()->path()."/Models/CustomModels/$tableName"."_temp.php";
-            File::put($tempFile,$request->text);
             try{
+                File::put($tempFile,$request->text);
                 $output=null;
                 $return=null;
                 exec("php -l $tempFile", $output, $return);
             }catch(\Exception $e){
                 File::delete($tempFile);
-                $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
-                return "update Model OK but check by your self okay?";
+                // $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
+                trigger_error($e->getMessage());
             }
-            ff("lolos checked");
             File::delete($tempFile);
         }else{
             $oldFile = File::get(app()->path()."/Models/CustomModels/$tableName.php");
@@ -976,7 +870,7 @@ class LaradevController extends Controller
             $paste = str_replace([
                 "__config_guarded", "__config_hidden","__config_required","__config_createable",
                 "__config_updateable","__config_searchable","__config_deleteable","__config_extendable",
-                "__config_cascade","__config_deleteOnUse","__config_casts", "__config_unique","__config_validations"
+                "__config_cascade","__config_deleteOnUse","__config_casts", "__config_unique"
             ], [
                 isset($cfg['guarded'])? (!is_array($cfg['guarded'])? "'".$cfg['guarded']."'":'["'.implode('","',$cfg['guarded']).'"]'):"['id']", 
                 isset($cfg['hidden'])? (!is_array($cfg['hidden'])? "'".$cfg['hidden']."'":'["'.implode('","',$cfg['hidden']).'"]'):"[]", 
@@ -989,8 +883,7 @@ class LaradevController extends Controller
                 isset($cfg['cascade'])?$cfg['cascade']:"true",
                 isset($cfg['deleteOnUse'])?$cfg['deleteOnUse']:"false",
                 isset($cfg['casts'])?str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($cfg['casts'], JSON_PRETTY_PRINT)):"['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']",
-                str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->uniques, JSON_PRETTY_PRINT)),
-                str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->validations, JSON_PRETTY_PRINT)),
+                str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->uniques, JSON_PRETTY_PRINT))
             ],$paste);
             $customfunction="";//__customfunction__
             if(isset($cfg['autocreate'])){
@@ -1098,97 +991,98 @@ class LaradevController extends Controller
         return $results;
     }
 
-    public function readMigrations(Request $req, $table=null)
-    {
-        if($table!=null){
-            $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
-            if(!File::exists( $migrationPath )){
-                return response()->json("migration file [$table] tidak ada",400);
-            }
-            return File::get( $migrationPath );
-        }else{
-            $data = $this->getDirContents( base_path('database/migrations/projects') );            
-            $schemaManager = DB::getDoctrineSchemaManager();
-            $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-            $tables = $schemaManager->listTables();
-            $arrayTables = []; $arrayViews = [];
-            $fk = 0;
-            foreach ($tables as $table) {
-                $tableNames = explode('.', $table->getName());
-                if( count($tableNames)>1 ){
-                    $tableName=$tableNames[1];
-                }else{
-                    $tableName=$tableNames[0];
+    public function readMigrations(Request $req, $table=null){
+        try{
+            if($table!=null){
+                $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
+                if(!File::exists( $migrationPath )){
+                    return response()->json("migration file [$table] tidak ada",400);
                 }
-                $arrayTables[] =  $tableName;
-                $FK = $table->getForeignKeys();
-                $fk += count($FK);
-                $triggers=\App\Helpers\DBS::getTriggers($table->getName());
-                foreach($triggers as $trigger){
-                    $arrayTables[] = $trigger->trigger_name;
+                return File::get( $migrationPath );
+            }else{
+                $data = $this->getDirContents( base_path('database/migrations/projects') );            
+                $schemaManager = DB::getDoctrineSchemaManager();
+                $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+                $tables = $schemaManager->listTables();
+                $arrayTables = []; $arrayViews = [];
+                $fk = 0;
+                foreach ($tables as $table) {
+                    $tableNames = explode('.', $table->getName());
+                    if( count($tableNames)>1 ){
+                        $tableName=$tableNames[1];
+                    }else{
+                        $tableName=$tableNames[0];
+                    }
+                    $arrayTables[] =  $tableName;
+                    $FK = $table->getForeignKeys();
+                    $fk += count($FK);
+                    $triggers=\App\Helpers\DBS::getTriggers($table->getName());
+                    foreach($triggers as $trigger){
+                        $arrayTables[] = $trigger->trigger_name;
+                    }
                 }
-            }
-            $views = $schemaManager->listViews();
-            foreach ($views as $view) {
-                $viewName = str_replace("public.","",$view->getName() );
-                $arrayTables[] =  $viewName;
-                $arrayViews[]=$viewName;
-            }
-            $models = [];
-
-            $addedTables = [];
-            foreach($data as $file){
-                if($file==""){continue;};
-                $stringClass = str_replace([".php","create_","_table"],["","",""], $file);
-                $modelCandidate = "\App\Models\BasicModels\\$stringClass";
-                $addedTables[] = $stringClass;
-                $models[] =[
-                    "file" => $file,
-                    "model"=> class_exists( $modelCandidate )?true:false,
-                    "table"=> in_array($stringClass, $arrayTables)?true:false,
-                    "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false,
-                    "view" => in_array($stringClass, $arrayViews)?true:false,
-                ];
-            }
-            $noMigrationTables = array_filter( $arrayTables, function( $tb ) use( $addedTables ){
-                return !in_array( $tb, $addedTables );
-            });
-            
-            foreach($noMigrationTables as $tb){
-                $this->createModels( $req, $tb );
-                $hasil = Artisan::call('migrate:generate', [
-                    '--path'    => database_path("migrations/projects"),
-                    '--tables'  => $tb,
-                    '--no-interaction'   => true,
-                ]);
-                $migrationFiles = array_filter(File::glob(database_path('migrations/projects/*.*')),function($dt)use($tb){
-                    $regex = "/(\d+)_(\d+)_(\d+)_(\d+)_create_$tb".'_table.php/';
-                    return preg_match($regex,basename($dt));
-                });
-                $migrationText = "";
+                $views = $schemaManager->listViews();
+                foreach ($views as $view) {
+                    $viewName = str_replace("public.","",$view->getName() );
+                    $arrayTables[] =  $viewName;
+                    $arrayViews[]=$viewName;
+                }
+                $models = [];
                 
-                if( count( $migrationFiles )> 0 ){
-                    $migrationText = File::get( array_values($migrationFiles)[0]);
-                    // \Storage::disk("base")->move("database/migrations/projects/".basename(array_values($migrationFiles)[0]), "database/migrations/projects/0_0_0_0_"."$tb.php");
-                    File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$tb.php", $migrationText );
-                    
-                    File::delete(array_values($migrationFiles)[0]);
+                foreach($data as $file){
+                    if($file==""){continue;};
+                    $stringClass = str_replace([".php","create_","_table"],["","",""], $file);
+                    $modelCandidate = "\App\Models\BasicModels\\$stringClass";
+                    $models[] =[
+                        "file" => $file,
+                        "model"=> class_exists( $modelCandidate )?true:false,
+                        "table"=> in_array($stringClass, $arrayTables)?true:false,
+                        "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false,
+                        "view" => in_array($stringClass, $arrayViews)?true:false,
+                    ];
                 }
-                $modelCandidate = "\App\Models\BasicModels\\$tb";
-                $models[] =[
-                    "file" => $tb,
-                    "model"=> class_exists( $modelCandidate )?true:false,
-                    "table"=> in_array($tb, $arrayTables)?true:false,
-                    "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false,
-                    "view" => in_array($tb, $arrayViews)?true:false
-                ];
+                if( isVersion(8) ){
+                    $noMigrationTables = array_filter( $arrayTables, function( $tb ) use( $addedTables ){
+                        return !in_array( $tb, $addedTables );
+                    });
+                    foreach($noMigrationTables as $tb){
+                        $this->createModels( $req, $tb );
+                        $hasil = Artisan::call('migrate:generate', [
+                            '--path'    => database_path("migrations/projects"),
+                            '--tables'  => $tb,
+                            '--no-interaction'   => true,
+                        ]);
+                        $migrationFiles = array_filter(File::glob(database_path('migrations/projects/*.*')),function($dt)use($tb){
+                            $regex = "/(\d+)_(\d+)_(\d+)_(\d+)_create_$tb".'_table.php/';
+                            return preg_match($regex,basename($dt));
+                        });
+                        $migrationText = "";
+                        
+                        if( count( $migrationFiles )> 0 ){
+                            $migrationText = File::get( array_values($migrationFiles)[0]);
+                            // \Storage::disk("base")->move("database/migrations/projects/".basename(array_values($migrationFiles)[0]), "database/migrations/projects/0_0_0_0_"."$tb.php");
+                            File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$tb.php", $migrationText );
+                            
+                            File::delete(array_values($migrationFiles)[0]);
+                        }
+                        $modelCandidate = "\App\Models\BasicModels\\$tb";
+                        $models[] =[
+                            "file" => $tb,
+                            "model"=> class_exists( $modelCandidate )?true:false,
+                            "table"=> in_array($tb, $arrayTables)?true:false,
+                            "alias"=>class_exists( $modelCandidate )?( isset((new $modelCandidate )->alias)?true:false ):false,
+                            "view" => in_array($tb, $arrayViews)?true:false
+                        ];
+                    }
+                }
+                return ["models"=>$models,"realfk"=>$fk];
             }
-            return ["models"=>$models,"realfk"=>$fk];
+        }catch(\Exception $e){
+            return response()->json(["error"=>$e->getFile()."-".$e->getLine()."-".$e->getMessage()],400);
         }
     }
 
-    public function readAlter(Request $req, $table=null)
-    {
+    public function readAlter(Request $req, $table=null){
         if($table!=null){
             $alterPath = base_path("database/migrations/alters/0_0_0_0_$table.php");
             if(!File::exists( $alterPath )){
@@ -1254,20 +1148,30 @@ class LaradevController extends Controller
         }
         // return File::get( array_values($data)[0] );
         try{
-            $file = "database/migrations/$dir/0_0_0_0_"."$table.php";
-            // File::put(base_path('database/migrations')."/0_0_0_0_"."$table.php",File::get( $file )); OLD
-            $exitCode = Artisan::call('migrate:refresh', [
-                '--path' => $file,
-                '--force' => true,
-            ]);
-            $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
-            // File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php"); OLD
-        }catch(Exception $e){
-            File::delete(glob(base_path('database/migrations')."/*.*"));
-            if( File::exists( base_path('database/migrations')."/0_0_0_0_"."$table.php" ) ){
+            if( isVersion(8) ){
+                $file = "database/migrations/$dir/0_0_0_0_"."$table.php";
+                $exitCode = Artisan::call('migrate:refresh', [
+                    '--path' => $file,
+                    '--force' => true,
+                ]);
+            }elseif( isVersion(6) ){
+                $file = base_path( "database/migrations/$dir")."/0_0_0_0_"."$table.php";
+                File::put(base_path('database/migrations')."/0_0_0_0_"."$table.php",File::get( $file ));
+                $exitCode = Artisan::call('migrate:refresh', [
+                    '--force' => true,
+                ]);
                 File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php");
             }
-            return response()->json(["error"=>$e->getMessage(),base_path()], 422);
+            // $req->rewrite_custom = $req->rewrite_custom;
+            $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
+        }catch(Exception $e){
+            if( isVersion(6) ){
+                File::delete(glob(base_path('database/migrations')."/*.*"));
+                if( File::exists( base_path('database/migrations')."/0_0_0_0_"."$table.php" ) ){
+                    File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php");
+                }
+            }
+            return response()->json(["error"=>$e->getMessage()], 422);
         }
         Schema::enableForeignKeyConstraints();
         if($req->alter){
@@ -1360,8 +1264,7 @@ class LaradevController extends Controller
         }
         return "update Basic Model Alias from $parent OK";
     }
-    public function editMigrations(Request $req, $table=null)
-    {
+    public function editMigrations(Request $req, $table=null){
         if($table!=null){
             $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
             if(!File::exists( $migrationPath )){
@@ -1449,7 +1352,7 @@ class LaradevController extends Controller
             "__class__","__table__",
         ],[
             str_replace("_","",$modul),$modul
-        ], $this->getMigration() ));
+        ],$this->getMigration() ));
         
         return response()->json("pembuatan file migration OK");
     }
@@ -1477,8 +1380,7 @@ class LaradevController extends Controller
         }
         return $data;
     }
-    public function uploadWithCreate(Request $req)
-    {
+    public function uploadWithCreate(Request $req){
         DB::disableQueryLog();
         $data = $req->data; 
         DB::beginTransaction();   

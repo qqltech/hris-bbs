@@ -1287,9 +1287,9 @@ if (! function_exists('table_config')) {
         // }
         // $schema->setComment($string);
         // return true;
-		if(Schema::getConnection()->getDriverName()=='mysql'){
+		if(getDriver()=='mysql'){
             Schema::getConnection()->statement("ALTER TABLE $table comment = '$string'");
-        }if(Schema::getConnection()->getDriverName()=='pgsql'){
+        }if(getDriver()=='pgsql'){
             Schema::getConnection()->statement("COMMENT ON TABLE $table IS '$string'");
         }
     }
@@ -1375,13 +1375,13 @@ function _customGetData($model,$params)
         $fieldSelected[] = "$table.$column";
         $metaColumns[$column] = "frontend";
     }
-    if(!in_array(class_basename($model),array_keys(config('tables')))){
-        $func = "metaFields";
-        if( method_exists( $model, $func) ){
-            $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
-        }
-        config(['tables'=>array_merge(config('tables'), [class_basename($model)=>$metaColumns]) ]);
-    }
+    // if(!in_array(class_basename($model),array_keys(config('tables')))){
+    //     $func = "metaFields";
+    //     if( method_exists( $model, $func) ){
+    //         $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
+    //     }
+    //     config(['tables'=>array_merge(config('tables'), [class_basename($model)=>$metaColumns]) ]);
+    // }
     $allColumns = $fieldSelected;
     $kembar = [];
     $joined = [];
@@ -1499,7 +1499,7 @@ function _customGetData($model,$params)
     if($params->search){
         $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
-        $additionalString = Schema::getConnection()->getDriverName()=="pgsql"?"::text":"";
+        $additionalString = getDriver()=="pgsql"?"::text":"";
         $model = $model->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield,$table) {
                 if($searchfield!=null){
@@ -1551,6 +1551,30 @@ function _customGetData($model,$params)
         $model = $model->whereNotIn(str_replace("this.","$table.", $columnNotIn), $idNotIn );
     }
     
+    if( req("filters") ){
+        $additionalString = getDriver()=="pgsql"?"::text":"";
+        $filters = explode(",",req("filters"));
+        $operator = req("filters_operator")?req("filters_operator"):(getDriver()=="pgsql"?"~*":'LIKE');
+        $aliases = [];
+        if( method_exists( $modelExtender, 'aliases') ){
+            $aliases = $modelExtender->aliases();
+        }
+        $model = $model->where( function($q)use($filters,$aliases,$additionalString,$operator){
+            foreach($filters as $filter){
+                $filterKeys = explode( "=", $filter);
+                if( count($filterKeys)>2 ){
+                    trigger_error("maaf pencarian tidak boleh mengandung tanda (=)");
+                }
+                $keyFilter = $filterKeys[0];
+                $keyAliased = array_search( $keyFilter,$aliases ) ;
+                if( $keyAliased ){
+                    $keyFilter = $keyAliased;
+                }
+                $q->whereRaw( "{$keyFilter}$additionalString $operator '{$filterKeys[1]}'");
+            }
+        });
+    }
+    
     if(isset($params->group_by) && $params->group_by!=null){
         $model = $model->groupBy(DB::raw($params->group_by));
     }
@@ -1578,7 +1602,11 @@ function _customGetData($model,$params)
     }else{
        $data = $final->get(); 
     }
-    if(!method_exists($modelExtender, "transformRowData")){
+    if(!method_exists($modelExtender, "transformRowData") || (req("transform") && req("transform")==='false') ){
+        if(!$params->caller){
+            $addData = collect(['processed_time' => round(microtime(true)-config("start_time"),5)]);
+            $data = $addData->merge($data);
+        }
         return $data;
     }
     if($params->caller){
@@ -1694,8 +1722,9 @@ function _customGetData($model,$params)
             $fixedData = gettype($newFixedData)=='array' ? $newFixedData : $fixedData;
         }
         $data = array_merge([
-            "data"=>$fixedData],[
-            "metaScript"=>method_exists( $modelExtender, "metaScriptList" )?$modelExtender->metaScriptList():null,
+            "data"=>$fixedData
+        ],[
+            // "metaScript"=>method_exists( $modelExtender, "metaScriptList" )?$modelExtender->metaScriptList():null,
             "total"=>$data->total(),
             "current_page"=>$data->currentPage(),
             "per_page"=>$data->perPage(),
@@ -1704,7 +1733,8 @@ function _customGetData($model,$params)
             "last_page"=>$data->lastPage(),
             "has_next"=>$data->hasMorePages(),
             "prev"=>$data->previousPageUrl(),
-            "next"=>$data->nextPageUrl()
+            "next"=>$data->nextPageUrl(),
+            "processed_time"=>round(microtime(true)-config("start_time"),5)
         ]);
     }
     return $data;
@@ -1724,13 +1754,13 @@ function _customFind($model, $params)
         $fieldSelected[] = "$table.$column";
         $metaColumns[$column] = "frontend";
     }
-    if(!in_array(class_basename($model),array_keys(config('tables')))){
-        $func = "metaFields";
-        if( method_exists( $model, $func) ){
-            $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
-        }
-        config(['tables'=>array_merge(config('tables'), [class_basename($model)=>$metaColumns]) ]);
-    }
+    // if(!in_array(class_basename($model),array_keys(config('tables')))){
+    //     $func = "metaFields";
+    //     if( method_exists( $model, $func) ){
+    //         $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
+    //     }
+    //     config(['tables'=>array_merge(config('tables'), [class_basename($model)=>$metaColumns]) ]);
+    // }
     $joined=[];
     $allColumns = $fieldSelected;
     if( $params->join ){
@@ -1861,7 +1891,7 @@ function _customFind($model, $params)
         }
     }
     $data = reformatDataResponse($data);
-    if(method_exists($modelExtender, "transformRowData")){
+    if(method_exists($modelExtender, "transformRowData") && (!req("transform") || (req("transform") && req("transform")=='true'))){
         $data = $modelExtender->transformRowData($data);
     }
     if($params->single){
@@ -2043,7 +2073,7 @@ function reformatData($arrayData,$model=null){
                 $newData = Carbon::createFromFormat($dateFormat, $data)->format('Y-m-d');
                 $arrayData[$key] = $newData;   
             }catch(Exception $e){
-                ff($e->getMessage());
+                
             }
         }elseif( gettype($data)=='boolean' && !$data ){
             $arrayData[$key] = "false";
@@ -2423,4 +2453,10 @@ function req($key=null){
 function isJson($args) {
     json_decode($args);
     return (json_last_error()===JSON_ERROR_NONE);
+}
+function getDriver(){
+    return Schema::getConnection()->getDriverName();
+}
+function isVersion( $var ){
+    return (strpos(app()->version(), "^$var.")!==false);
 }

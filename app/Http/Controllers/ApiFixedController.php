@@ -39,9 +39,9 @@ class ApiFixedController extends Controller
     {
         DB::disableQueryLog();
         $this->isBackdoor = $backdoor;
-        if(config('tables')==null){
-            config(['tables'=>[]]);
-        }
+        // if(config('tables')==null){
+        //     config(['tables'=>[]]);
+        // }
         $this->formatDate=env("FORMAT_DATE_FRONTEND","d/m/Y");
         $this->isMultipart = (strpos($request->header("Content-Type"),"multipart") !==FALSE)?true:false;
         $this->originalRequest = $request->capture();
@@ -87,7 +87,6 @@ class ApiFixedController extends Controller
         if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}
         if(!$this->is_operation_authorized($this->parentModelName )){return;};
         if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
-        if(!$this->is_data_valid_type($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_not_unique($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_model_deletable($this->parentModelName, $this->requestData)){return;};
@@ -142,7 +141,7 @@ class ApiFixedController extends Controller
             if(method_exists($model, $function)){
                 if(!$model->$function()){
                     $this->messages[] ="[UNAUTHORIZED]operasi $this->operation di [$modelName] dilarang!";
-                    $this->errors[] ="Sorry, This $this->operation operation is currently forbidden!";
+                    $this->errors[] ="Maaf, Operasi $this->operation untuk data ini dilarang!";
                     $this->isAuthorized=false;
                     return false;
                 }
@@ -204,10 +203,70 @@ class ApiFixedController extends Controller
         $modelCandidate     = "\App\Models\CustomModels\\$modelName";
         $model              = new $modelCandidate;
         $operationValidator = $this->operation."Validator";
-        $arrayValidation    = $model->$operationValidator;        
+        $arrayValidation    = $model->$operationValidator;
+
+        if(isset($model->autoValidator) && $model->autoValidator){
+            $requiredFields    = $model->required;
+            $datatypeValidator  = array_filter( $model->columnsFull, function($dt)use($arrayValidation){
+                $keys = explode(":",$dt);
+                $typeData = $keys[1];
+                return !in_array($keys[0],array_keys($arrayValidation)) &&
+                    ( strpos($typeData,"int")!==false
+                    || in_array($typeData, ["decimal","float","numeric","double","boolean","date","timestamp","datetime","string","text","varchar"] ));
+            });
+            $autoValidators = [];
+            foreach($datatypeValidator as $idx => $dt ){
+                $validString = explode(":",$dt);
+                $payload = strtolower($validString[0]);
+                if( in_array($payload, ['created_at','updated_at']) ){
+                    continue;
+                }
+                $typeData = strtolower($validString[1]);
+                $length = count( $validString ) > 2 ? $validString[2] : null;
+                $result = "";
+                $fieldValidator = null;
+                if( strpos($typeData,"int")!==false ){
+                    $fieldValidator = (in_array($payload,$requiredFields)?"required":"nullable")."|integer";
+                }elseif( in_array($typeData,["float","decimal","numeric","double"]  )){
+                    $fieldValidator = (in_array($payload,$requiredFields)?"required":"nullable")."|numeric";
+                }elseif( in_array($typeData,["boolean"] )){
+                    $fieldValidator = (in_array($payload,$requiredFields)?"required":"nullable")."|boolean";
+                }elseif( in_array($typeData,["date","datetime","timestamp"]  )){
+                    $fieldValidator = (in_array($payload,$requiredFields)?"required":"nullable").'|date_multi_format:"Y-m-d H:i:s","Y-m-d G:i:s","Y-m-d H:i","Y-m-d G:i","Y-m-d","d/m/Y"' ;
+                }elseif( in_array($typeData,["text","string"]  )){
+                    $fieldValidator = (in_array($payload,$requiredFields)?"required":"nullable").($length?"|max:$length":"")."|string" ;
+                }
+                if($fieldValidator){
+                    if( $operation!=='create' ){
+                        $fieldValidator = str_replace("required","filled",$fieldValidator);
+                    }
+                    $autoValidators[$payload] = $fieldValidator;
+                }
+            }
+        }
+
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
-                $isiData = reformatData($isiData);
+                if(isset($model->autoValidator) && $model->autoValidator){
+                    $validator = Validator::make($isiData, $autoValidators);
+                    if ( $validator->fails()) {
+                        foreach($validator->errors()->all() as $error){
+                            $this->errors[] = "[INVALID]".$error."[$modelName] index[$i]";
+                        }
+                        $this->isAuthorized=false;
+                        return false;
+                    }
+                }
+                $isiData = reformatData($isiData,$model);
+                if( $operation=='update' && isset($isiData['id']) ){
+                    $operationId = $isiData['id'];
+                    $arrayValidation = array_map(function($dtm) use ($operationId){
+                        if(strpos($dtm, "unique")!==false){
+                            $dtm = $dtm.",$operationId";
+                        }
+                        return $dtm;
+                    }, $arrayValidation);
+                }
                 $validator = Validator::make($isiData, $arrayValidation);
                 if ( $validator->fails()) {
                     foreach($validator->errors()->all() as $error){
@@ -218,39 +277,26 @@ class ApiFixedController extends Controller
                 }
             }
         }else{
-            $data = reformatData($data);
-            $validator = Validator::make($data, $arrayValidation);
-            if ( $validator->fails()) {
-                foreach($validator->errors()->all() as $error){
-                    $this->errors[] = "[INVALID]".$error."[$modelName]";
-                }
-                $this->isAuthorized=false;
-                return false;
-            }
-        }
-        return true;
-    }
-    private function is_data_valid_type($modelName, $data, $operation=null)
-    {
-        if($operation==null){
-            $operation = $this->operation;
-        }
-        if( !in_array($operation,["create","update"]) ){return true;}
-        $modelCandidate     = "\App\Models\CustomModels\\$modelName";
-        $model              = new $modelCandidate;
-        $arrayValidation    = $model->defaultValidation;        
-        if(isset($data[0]) && is_array($data[0])){
-            foreach ($data as $i => $isiData){
-                $validator = Validator::make($isiData, $arrayValidation);
+            if(isset($model->autoValidator) && $model->autoValidator){
+                $validator = Validator::make($data, $autoValidators);
                 if ( $validator->fails()) {
                     foreach($validator->errors()->all() as $error){
-                        $this->errors[] = "[INVALID]".$error."[$modelName] index[$i]";
+                        $this->errors[] = "[INVALID]".$error."[$modelName]";
                     }
                     $this->isAuthorized=false;
                     return false;
                 }
             }
-        }else{
+            $data = reformatData($data,$model);
+            if( $operation=='update' ){
+                $operationId = $this->operationId;
+                $arrayValidation = array_map(function($dtm) use ($operationId){
+                    if(strpos($dtm, "unique")!==false){
+                        $dtm = $dtm.",$operationId";
+                    }
+                    return $dtm;
+                }, $arrayValidation);
+            }
             $validator = Validator::make($data, $arrayValidation);
             if ( $validator->fails()) {
                 foreach($validator->errors()->all() as $error){
@@ -329,7 +375,6 @@ class ApiFixedController extends Controller
                         $this->is_model_exist($key);
                         $this->is_operation_authorized($key );
                         $this->is_data_required($key, $value);
-                        $this->is_data_valid_type($key,$value);
                         $this->is_data_valid($key,$value);
                         $this->is_detail_valid($key,$value);
                     }
@@ -341,7 +386,6 @@ class ApiFixedController extends Controller
                     $this->is_model_exist($key);
                     $this->is_operation_authorized($key );
                     $this->is_data_required($key, $value);
-                    $this->is_data_valid_type($key,$value);
                     $this->is_data_valid($key,$value);
                     $this->is_detail_valid($key,$value);
                 }
@@ -486,11 +530,19 @@ class ApiFixedController extends Controller
                 }
                 $finalData  = $createBeforeEvent["data"];
                 
-                $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
+                $finalModel = ($this->getParentClass($model))->create(reformatData($finalData,$model));
                 $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
                     if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){
+                        if(!$this->is_data_required($key, $value,"create")){ 
+                            $this->operationOK=false;
+                            return;
+                        };
+                        if(!$this->is_data_valid($key, $value,"create")){ 
+                            $this->operationOK=false;
+                            return;
+                        };
                         $this->createOperation($key, $value,$finalModel->id, $modelName);
                     }
                 }
@@ -518,6 +570,9 @@ class ApiFixedController extends Controller
             }
             $createBeforeEvent = $model->createBefore($model, $processedData, $this->requestMeta);
             if(isset($createBeforeEvent['errors'])){
+                if($this->isBackdoor){
+                    return $createBeforeEvent['errors'];
+                }
                 $this->operationOK=false;
                 $this->errors = $createBeforeEvent['errors'];
                 return;
@@ -547,7 +602,7 @@ class ApiFixedController extends Controller
                 }
             }
             
-            $finalModel = ($this->getParentClass($model))->create(reformatData($finalData));
+            $finalModel = ($this->getParentClass($model))->create(reformatData($finalData,$model));
             $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
@@ -558,12 +613,19 @@ class ApiFixedController extends Controller
                     if( count($tableSingleArray)>1){
                         $tableSingle = $tableSingleArray[1];
                     }
+                    if(!$this->is_data_required($key, $value,"create")){ 
+                        $this->operationOK=false;
+                        return;
+                    };
+                    if(!$this->is_data_valid($key, $value,"create")){ 
+                        $this->operationOK=false;
+                        return;
+                    };
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());
                 }
             }
         }
         if($this->isBackdoor && $parentId==null){
-            
             if(method_exists($model, "createAfterTransaction")){
                 $newData = $this->readOperation( $modelName, (object)[], $finalModel->id )['data'];
                 $newfunction = "createAfterTransaction";
@@ -574,12 +636,25 @@ class ApiFixedController extends Controller
                     $this->requestMeta
                 );
             }
+            return [
+                "status"=>"Data has been created successfully"
+            ];
         }
         $model = null;   
     }
     public function readOperation( $modelName, $params=null, $id=null )
     {
         $params=(array)$params;
+        if( $id && isset($params['simplest']) && $params['simplest']=='true' ){
+            $model = getBasic($modelName);
+            if( isset($params['selectfield']) ){
+                $model = $model->selectRaw($params['selectfield']);
+            }
+            return [
+                "data"=>$model->find($id),
+                "processed_time"=>round(microtime(true)-config("start_time"),5)
+            ];
+        }
         foreach($params as $key => $param){
             if(is_array($param)){
                 continue;
@@ -601,12 +676,13 @@ class ApiFixedController extends Controller
             $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->single      = isset($data->single) ? ($data->single=="false"?false:true):false;
             $p->id          = $id;
-            $p->joinMax        = isset($data->joinMax) ? $data->joinMax:0;
+            $p->joinMax     = isset($data->joinMax) ? $data->joinMax:0;
             $overrideParams = $model->overrideGetParams($p,$id);
             return [
                 "data"=>$model->customFind($overrideParams),
-                "meta"=>config('tables'),
-                "metaScript"=>method_exists( $model, "metaScript" )?$model->metaScript():null
+                "processed_time"=>round(microtime(true)-config("start_time"),5)
+                // "meta"=>config('tables'),
+                // "metaScript"=>method_exists( $model, "metaScript" )?$model->metaScript():null
             ];
         }else{
             $p->where_raw   = isset($data->where) ? $data->where : null;
@@ -629,7 +705,7 @@ class ApiFixedController extends Controller
             return $model->customGet($overrideParams);
         }
     }
-    private function deleteOperation( $modelName, $params=null, $id=null, $fk=null )
+    public function deleteOperation( $modelName, $params=null, $id=null, $fk=null )
     {
         $modelNameExplode = explode('.', $modelName);
         $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$modelName:$modelNameExplode[1]);
@@ -670,7 +746,7 @@ class ApiFixedController extends Controller
         }
         $model = null;
     }
-    private function updateOperation($modelName, $data=null, $id=null)
+    public function updateOperation($modelName, $data=null, $id=null)
     {
         if(!$this->operationOK){return;}
         $modelCandidate = "\App\Models\CustomModels\\$modelName";
@@ -688,6 +764,9 @@ class ApiFixedController extends Controller
         $processedData  = array_merge($eliminatedData, $additionalData);
         $updateBeforeEvent = $model->updateBefore($model, $processedData, $this->requestMeta,$id);
         if(isset($updateBeforeEvent['errors'])){
+            if($this->isBackdoor){
+                return $updateBeforeEvent['errors'];
+            }
             $this->operationOK=false;
             $this->errors = $updateBeforeEvent['errors'];
             return;
@@ -716,7 +795,7 @@ class ApiFixedController extends Controller
                 }
             }
         }
-        $finalModel = $preparedModel->update(reformatData($finalData));
+        $finalModel = $preparedModel->update(reformatData($finalData,$preparedModel));
         $model->updateAfter($finalModel, $processedData, $this->requestMeta, $id);
         $this->success[] = "SUCCESS: data update in ".$model->getTable()." id: $id";
                 
@@ -752,16 +831,8 @@ class ApiFixedController extends Controller
             }
             foreach($data[$detailClass] as $index => $valDetail){
                 if(isset($valDetail['id']) && is_numeric($valDetail['id']) && (new $modelCandidate)->where($fkName,$id)->where('id',$valDetail['id'])->count()>0){
-                    if(!$this->is_data_valid_type($detailClass,$valDetail)){ 
-                        $this->operationOK=false;
-                        return;
-                    };
-                    if(!$this->is_data_valid($detailClass,$valDetail)){ 
-                        $this->operationOK=false;
-                        return;
-                    };
                     $this->updateOperation($detailClass, $valDetail, $valDetail['id']);
-                    $detailIds [] = $valDetail['id'];
+                    $detailIds[]=$valDetail['id'];
                     $detailOld [] = $valDetail;
                 }else{
                     $detailNew [] = $valDetail;
@@ -774,10 +845,6 @@ class ApiFixedController extends Controller
             }
             if( count($detailNew)>0){
                 if(!$this->is_data_required($detailClass, $detailNew,"create")){ 
-                    $this->operationOK=false;
-                    return;
-                };
-                if(!$this->is_data_valid_type($detailClass, $detailNew,"create")){ 
                     $this->operationOK=false;
                     return;
                 };
@@ -804,11 +871,10 @@ class ApiFixedController extends Controller
         //     }
         // }
         
-        if($this->isBackdoor){
-            
-            if(method_exists($model, "createAfterTransaction")){
+        if($this->isBackdoor && $this->parentModelName === $modelName){
+            if(method_exists($model, "updateAfterTransaction")){
                 $newData = $this->readOperation( $modelName, (object)[], $id )['data'];
-                $newfunction = "createAfterTransaction";
+                $newfunction = "updateAfterTransaction";
                 $model->$newfunction( 
                     $newData,
                     $newData, 
@@ -816,6 +882,10 @@ class ApiFixedController extends Controller
                     $this->requestMeta
                 );
             }
+            
+            return [
+                "status"=>"Data has been updated successfully"
+            ];
         }
         $model = null;  
     }
@@ -843,7 +913,6 @@ class ApiFixedController extends Controller
                 $model = new $modelCandidate;
                 
                 if( (isset($model->transaction_config) || method_exists($model, $this->operation."AfterTransaction")) && $this->operationId!==null){
-                    
                     $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
                 }
                 $function = $this->operation."Operation";
@@ -861,24 +930,34 @@ class ApiFixedController extends Controller
                     if(!$this->operationOK){
                         return response()->json([
                             "status"    => "$this->operation data failed",
-                            "warning"  => $this->messages, 
+                            // "warning"  => $this->messages, 
                             "success"  => $this->success, 
                             "errors"  => $this->errors, 
-                            "request" => $this->requestData,
-                            "id"      => $this->operationId
+                            // "request" => $this->requestData,
+                            "id"      => $this->operationId,
+                            "processed_time"=>round(microtime(true)-config("start_time"),5)
                         ],400);
                     }
                 }
             }catch(Exception $e){
                 DB::rollback();
-                return response()->json([
-                    "status"    => "$this->operation data gagal", 
-                    "warning"  => $this->messages, 
-                    "success"  => $this->success, 
-                    "errors"    => ["error"=>$e->getMessage(),"line"=>$e->getLine(),"file"=>$e->getFile()],
-                    "request" => $this->requestData,
-                    "id"        => $this->operationId
-                ],400);
+                if( !isJson($e->getMessage()) ){
+                    return response()->json([
+                        "status"    => "$this->operation data failed",
+                        // "warning"  => $this->messages, 
+                        "success"  => $this->success, 
+                        "errors"  => $e->getMessage().", File:".$e->getFile().", Line:".$e->getLine(), 
+                        // "request" => $this->requestData,
+                        "id"      => $this->operationId,
+                        "processed_time"=>round(microtime(true)-config("start_time"),5)
+                    ],400);
+                }
+                $resp = json_decode( $e->getMessage());
+                return response()->json( isset($resp['errors'])?$resp:[
+                    "errors"=>$resp,
+                    "processed_time"=>round(microtime(true)-config("start_time"),5),
+                    "status"    => "$this->operation data failed"
+                ] ,400);
             }
             if($this->operationOK){
                 if(method_exists($model, $this->operation."AfterTransaction")){
@@ -982,13 +1061,13 @@ class ApiFixedController extends Controller
                     ]));
                 }
                 $responses = [
-                    "operation" => $this->operation,
+                    // "operation" => $this->operation,
                     "status"    => "$this->operation data berhasil", 
-                    "warning"  => $this->messages, 
+                    // "warning"  => $this->messages, 
                     "success"  => $this->success, 
                     "errors"  => $this->errors,
-                    "request" => $this->requestData,
-                    "id"      => $this->operationId
+                    // "request" => $this->requestData,
+                    "id"      => $this->operationId,
                 ];
                 if(method_exists($model, "transformResponse")){
                     $newResponses = $model->transformResponse($responses);
@@ -996,6 +1075,7 @@ class ApiFixedController extends Controller
                         $responses=$newResponses;
                     }
                 }
+                $responses["processed_time"] = round(microtime(true)-config("start_time"),5);
                 return response()->json($responses,200);
             }else{
                 DB::rollback();
@@ -1013,11 +1093,12 @@ class ApiFixedController extends Controller
                 }
                 return response()->json([
                     "status"    => "$this->operation data gagal",
-                    "warning"   => $this->messages, 
+                    // "warning"   => $this->messages, 
                     "success"   => $this->success, 
                     "errors"    => $this->errors, 
-                    "request"   => $this->requestData,
-                    "id"        => $this->operationId
+                    // "request"   => $this->requestData,
+                    "id"        => $this->operationId,
+                    "processed_time"=>round(microtime(true)-config("start_time"),5)
                 ],422);
             }
         }else{
@@ -1035,10 +1116,11 @@ class ApiFixedController extends Controller
             }
             return response()->json([
                 "status"    => "$this->operation data failed",
-                "warning"  => $this->messages, 
+                // "warning"  => $this->messages, 
                 "success"  => $this->success, 
                 "errors"  => $this->errors, 
-                "request" => $this->requestData,
+                // "request" => $this->requestData,,
+                "processed_time"=>round(microtime(true)-config("start_time"),5),
                 "id"        => $this->operationId
             ],422);
         }
