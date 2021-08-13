@@ -28,7 +28,7 @@ class DBS extends \Illuminate\Support\Facades\DB {
 				if(!is_string($row)){
 					$merged[]=str_replace('"',"",str_replace_array('?', $row->getBindings(), $row->toSql()).";\n");
 				}else{
-					if( Schema::getConnection()->getDriverName() == 'pgsql' && strpos(" ".$row, 'UPDATE') == FALSE){
+					if( getDriver() == 'pgsql' && strpos(" ".$row, 'UPDATE') == FALSE){
 						$row = str_replace("set "," ",$row);
 						$row = str_replace("SET "," ",$row);
 				}
@@ -104,7 +104,7 @@ class DBS extends \Illuminate\Support\Facades\DB {
 
 	public static function getTriggers($table){
 		$data = null;
-		if( Schema::getConnection()->getDriverName() == 'pgsql'){
+		if( getDriver() == 'pgsql'){
 			$data = new \Staudenmeir\LaravelCte\Query\Builder(\DB::connection());
 			$data = $data->from("information_schema.triggers")
 			->select("prosrc as action_statement","event_object_table",
@@ -115,11 +115,13 @@ class DBS extends \Illuminate\Support\Facades\DB {
 					->select("pg_trigger.tgname","pg_proc.prosrc")
 				)
 			->join('mytrigger', 'tgname', '=', 'trigger_name');
-		}elseif( Schema::getConnection()->getDriverName() == 'mysql'){
+		}elseif( getDriver() == 'mysql'){
 			$data = \DB::table("information_schema.triggers")
 			->select("action_statement","event_object_table",
 					"action_timing","event_manipulation","trigger_name");
 			
+		}else{
+			return [];
 		}
 		return $data->where('event_object_table',$table)->get();
 	}

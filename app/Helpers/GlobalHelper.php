@@ -1289,7 +1289,7 @@ if (! function_exists('table_config')) {
         // return true;
 		if(getDriver()=='mysql'){
             Schema::getConnection()->statement("ALTER TABLE $table comment = '$string'");
-        }if(getDriver()=='pgsql'){
+        }elseif(getDriver()=='pgsql'){
             Schema::getConnection()->statement("COMMENT ON TABLE $table IS '$string'");
         }
     }

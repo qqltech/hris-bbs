@@ -3,6 +3,7 @@ mkdir database/migrations/projects
 mkdir database/migrations/alters
 cp database/migrations/__defaults/*.* database/migrations/projects/
 cp .env-example .env
+touch database/database.sqlite
 chmod 777 .gitignore
 chmod 777 .env
 chmod 777 -R app/Models
