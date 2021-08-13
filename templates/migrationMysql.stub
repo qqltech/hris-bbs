@@ -27,8 +27,8 @@ class __class__ extends Migration
             "deleteOnUse"   => "false",
             "extendable"    => "false",
             "casts"     => [
-                'created_at' => 'datetime:d-m-Y',
-                'updated_at' => 'datetime:d-m-Y'
+                'created_at' => 'datetime:d/m/Y H:i',
+                'updated_at' => 'datetime:d/m/Y H:i'
             ],
             "autocreate"  =>[
                 //"creator_id"=>"auth:id"

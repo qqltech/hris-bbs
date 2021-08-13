@@ -33,14 +33,7 @@ class __class extends Model
     __hasMany
     __hasManyThrough
     __belongsTo
-    public function getCreatedAtAttribute($date)
-    {
-        return $date?Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('d/m/Y H:i'):date("d-m-Y");
-    }
-    public function getUpdatedAtAttribute($date)
-    {
-        return $date?Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('d/m/Y H:i'):date("d-m-Y");
-    }
+    
     public function customFind($p){return _customFind($this, $p);}
     public function customGet($p){return _customGetData($this,$p);}
     __customfunction__
