@@ -20,6 +20,7 @@ class OauthClients extends Migration
             ->nullable()->comment('{"fk": "false"}');
             $table->string('name');
             $table->string('secret', 100);
+            $table->string('provider')->nullable();
             $table->text('redirect');
             $table->boolean('personal_access_client');
             $table->boolean('password_client');
