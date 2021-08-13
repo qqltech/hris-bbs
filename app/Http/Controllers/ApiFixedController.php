@@ -92,17 +92,9 @@ class ApiFixedController extends Controller
         if(!$this->is_model_deletable($this->parentModelName, $this->requestData)){return;};
         $this->is_detail_valid($this->parentModelName, $this->requestData);
     }
-    private function checkNumeric($data){
-        try {
-            $data+0; 
-            return true;
-        }catch(Exception $e){
-            return false;
-        };
-    }
     private function serializeMultipartData(){
         foreach( $this->requestData as $key=>$value ){
-            if( $this->checkNumeric($value) ){
+            if( is_numeric($value) ){
                 continue;
             }
             $triedJSON = json_decode( $value, true);
