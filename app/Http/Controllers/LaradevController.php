@@ -200,10 +200,14 @@ class LaradevController extends Controller
                     $columnNames[] = $column->getName();
                     $columns[] = [
                         "name"=>$column->getName(),
-                        "type"=> "".$column->getType(),
-                        "length"=> "".$column->getLength(),
-                        "default"=> "".$column->getDefault(),
-                        "comment"=> "".$column->getComment(),
+                        "type"=> isVersion(6)?$column->getType():$column->getType()->getName(),
+                        "length"=> $column->getLength(),
+                        "unsigned"=> $column->getUnsigned(),
+                        "precision"=> $column->getPrecision(),
+                        "scale"=> $column->getScale(),
+                        "fixed"=> $column->getFixed(),
+                        "default"=> $column->getDefault(),
+                        "comment"=> $column->getComment(),
                         "nullable"=> $column->getNotnull()
                     ];
                     
