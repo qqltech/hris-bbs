@@ -32,7 +32,7 @@ return [
         ],
         'sqlite' => [
             'driver' => 'sqlite',
-            'database' => DATABASE_PATH('database.sqlite'),
+            'database' => env('DB_DATABASE', DATABASE_PATH('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => false,
         ],
