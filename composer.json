@@ -19,7 +19,8 @@
         "starlight93/oauth2": "^1.0",
         "staudenmeir/laravel-cte": "^1.2",
         "stevebauman/location": "^5.0",
-        "kitloong/laravel-migrations-generator": "^4.5"
+        "kitloong/laravel-migrations-generator": "^4.5",
+        "ext-pdo_sqlite": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
