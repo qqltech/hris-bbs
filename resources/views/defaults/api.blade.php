@@ -1,4 +1,4 @@
-<html>
+<html style="scroll-behavior: smooth;">
     <head>
         <title>FRONTEND - Larahan</title>
         <link rel="icon" href="{{url('favicon.ico')}}">
@@ -12,36 +12,33 @@
             
         </p>
         <div id="codemirror">
-            <textarea id="code"></textarea>
-            <p><button style="position:fixed;right:10px;bottom:40px; background-color:red;color:white" id="toggle">Hide!</button>
+            <textarea id="code" style="display:none"></textarea>
+            <p><button style="position:fixed;right:10px;bottom:40px; background-color:red;color:white;z-index:99" id="toggle">Hide!</button>
             <!-- <a href="javascript:void(0)" class="button" id="run" style="margin-left:75% !important">Run on Console!</a> -->
             </p>
         </div>
         <div>
             <table border="1">
                 <thead>
-                    <th>Model</th>
+                    <th>Resources</th>
                     <th colspan="4">Actions</th>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
+                        <td id="model_login">
                             Authorization
                         </td>
-                        <td colspan="2" align="center">
-                            <button id="login" href="javascript:void(0)">LOGIN</button>
-                        </td>
-                        <td colspan="2" align="center">
-                            <button href="javascript:void(0)">GET ME</button>
+                        <td colspan="4" align="center">
+                            <button id="login_login" href="javascript:void(0)">LOGIN</button>
                         </td>
                     </tr>
                     @foreach($models as $key => $model)                        
                         <tr>
-                            <td style="padding:0 5 0 5">{{$model->model}}</td>
-                            <td><button class="read" href="javascript:void(0)" style="font-size:10px" index={{$key}}>READ</button></td>
-                            <td><button class="create" href="javascript:void(0)" style="font-size:10px" index={{$key}}>CREATE</button></td>
-                            <td><button class="update" href="javascript:void(0)" style="font-size:10px" index={{$key}}>UPDATE</button></td>
-                            <td><button class="notice" href="javascript:void(0)" style="font-size:10px" index={{$key}}>NOTICE</button></td>
+                            <td style="padding:0 5 0 5;transition: all 0.2s ease-in" id="model_{{$model->model}}" class="model-name">{{$model->model}}</td>
+                            <td><button id="btn_read_{{$model->model}}" class="read" href="javascript:void(0)" style="font-size:10px" index={{$key}}>READ</button></td>
+                            <td><button id="btn_create_{{$model->model}}" class="create" href="javascript:void(0)" style="font-size:10px" index={{$key}}>CREATE</button></td>
+                            <td><button id="btn_update_{{$model->model}}" class="update" href="javascript:void(0)" style="font-size:10px" index={{$key}}>UPDATE</button></td>
+                            <td><button id="btn_notice_{{$model->model}}" class="notice" href="javascript:void(0)" style="font-size:10px" index={{$key}}>NOTICE</button></td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -69,6 +66,7 @@
             <script src="{{url('defaults/addon/lint/javascript-lint.js')}}"></script>
             <script src="{{url('defaults/addon/lint/css-lint.js')}}"></script>
             <script>
+            var codeMirrorElement = document.getElementById("codemirror");
             function submitApi(data,callback=function(response){},error=function(error){}){
                 let me = this;
                 var $options   =
@@ -105,28 +103,51 @@
                 var isToggled=false;
                 document.getElementById("toggle").onclick = function(){
                     if(isToggled){
-                        document.getElementById("codemirror").style.display = "block";
+                        codeMirrorElement.style.transform="translateX(150%)"
+                        codeMirrorElement.style.display = "block";
+                        setTimeout(function(){
+                            codeMirrorElement.style.transform="translateX(0%)"
+                        },500)
                         document.getElementById("modelSelected").style.display = "block";
                         isToggled = false;
                     }else{
-                        document.getElementById("codemirror").style.display = "none";
+                        codeMirrorElement.style.display = "none";
                         document.getElementById("modelSelected").style.display = "none";
                         isToggled = true;
                     }
                 };
-                var buttonLogin = document.getElementById('login');
+                var buttonLogin = document.getElementById('login_login');
                 buttonLogin.addEventListener('click',function(){
+                    window.location.hash=`login_login`
                     codemirror.setValue("");
                     var newData = {
                         url: "/login",
                         method: "POST",
                         headers: {
-                            "authorization": "BearerToken",
                             "Cache-Control": "no-cache"
                         },
                         body      : {
-                            "email":"email",
+                            "email":"email or username",
                             "password":"password"
+                        },
+                        response:{
+                            "access_token": {
+                                "id": "xxxxx",
+                                "user_id": 0,
+                                "client_id": 0,
+                                "name": "user name",
+                                "scopes": [],
+                                "revoked": false,
+                                "expires_at": "YYYY-MM-DD HH:MM:ss"
+                            },
+                            "token": "secret_token",
+                            "token_type": "Bearer",
+                            "data": {
+                                "id": 0,
+                                "name": "User Name",
+                                "email": "email",
+                                "username": "username"
+                            }
                         }
                     };
                     
@@ -134,7 +155,11 @@
                     codemirror.setOption('theme','monokai');
                     codemirror.setValue(JSON.stringify(newData,null,"\t"));
                     document.getElementById("modelSelected").innerText="LOGIN [POST]";
-                    document.getElementById("codemirror").style.display = "block";
+                    codeMirrorElement.style.transform="translateX(150%)"
+                    codeMirrorElement.style.display = "block";
+                    setTimeout(function(){
+                        codeMirrorElement.style.transform="translateX(0%)"
+                    })
                     document.getElementById("modelSelected").style.display = "block";
                 });
                 var classname = document.getElementsByClassName("read");
@@ -143,37 +168,52 @@
                         codemirror.setValue("");
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
+                        window.location.hash=`read_${arrayData.model}`
                         var newData = {
-                            url: "/operation/"+arrayData.model,
+                            url: "/operation/"+(arrayData.model.includes(".")?arrayData.model.split(".")[1]:arrayData.model),
                             method: "GET",
                             headers: {
                                 "authorization": "BearerToken",
                                 "Cache-Control": "no-cache"
                             },
-                            parameters      : {
+                            parameters_for_list_and_by_id      : {
                                 selectfield : "column1,column2,column3,dst",
+                                join        : true,
+                                joinmax     : 0,
+                                transform   : true
+                            },
+                            parameters_list : {
+                                page        : 1,
+                                paginate    : 100,
                                 where       : "column1='kata' AND column2=999",
                                 orderby     : "id",
                                 ordertype   : "ASC",
                                 orderbyraw  : "id ASC,col2 DESC",
-                                search      : "stringpotongankata",
-                                searchfield : "column_tercari1,column_tercari2,dst",
-                                paginate    : "100",
-                                join        : true,
-                                joinmax     : 0,
+                                filters     : "column1:keyword,column2:keyword2,columnX:keywordX",
+                                filters_operator : "~*",
+                                search      : "searched_string",
+                                searchfield : "column1,column2,columnX",
                                 notin       : "column_name:12,13,99",
-                                addselect   : "column1,column2,column3,dst",
+                                addselect   : "column1,column2,column3,sum(column) as sumcol,dst",
                                 group_by    : "column1,column2,column3,dst",
                             },
+                            parameters_by_id: {
+                                single      : false,
+                                simplest    : false
+                            },
                             basic_response  : arrayData.columns,
-                            real_response  : "silahkan dicoba di operation"
+                            real_response  : "Silahkan dicoba di operation atau POSTMAN"
                         };
                         
                         codemirror.setOption('mode','javascript');
                         codemirror.setOption('theme','monokai');
                         codemirror.setValue(JSON.stringify(newData,null,"\t"));
                         document.getElementById("modelSelected").innerText=arrayData.model+"[GET]";
-                        document.getElementById("codemirror").style.display = "block";
+                        codeMirrorElement.style.transform="translateX(150%)"
+                        codeMirrorElement.style.display = "block";
+                        setTimeout(function(){
+                            codeMirrorElement.style.transform="translateX(0%)"
+                        },500)
                         document.getElementById("modelSelected").style.display = "block";
                     });
                 });
@@ -183,13 +223,14 @@
                         codemirror.setValue("");
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
+                        window.location.hash=`create_${arrayData.model}`
                         var newData = {
                             payloadFields : arrayData.config.createable,
                         };
-                        let fullColumns = arrayData.fullColumns;
+                        let fullColumns = arrayData.fullColumns.filter(dt=>!['creator_id','editor_id','approver_id'].includes(dt));
                         var newForm = {};
                         for(let i=0; i<fullColumns.length;i++){
-                            if( arrayData.config.createable.includes(fullColumns[i].name) && !(fullColumns[i].comment).includes('fk') ){
+                            if( arrayData.config.createable.includes(fullColumns[i].name) && ( !fullColumns[i].comment || (fullColumns[i].comment && !(fullColumns[i].comment).includes('fk')) ) ){
                                 var susunan = "";
                                 susunan += fullColumns[i].nullable?"{required}-[":"{optional}-[";
                                 susunan += (fullColumns[i].type).replace("\\","")+"]" ;
@@ -205,7 +246,7 @@
                             let fullColumnsDetail = arrayDataDetail.fullColumns;
                             let detailsPayload = {};
                             for(let i=0; i<fullColumnsDetail.length;i++){
-                                if( arrayDataDetail.config.createable.includes(fullColumnsDetail[i].name) && !(fullColumnsDetail[i].comment).includes('fk') ){
+                                if( arrayDataDetail.config.createable.includes(fullColumnsDetail[i].name) && (!fullColumnsDetail[i].comment || (fullColumnsDetail[i].comment && !(fullColumnsDetail[i].comment).includes('fk'))) ){
                                     var susunan = "";
                                     susunan += fullColumnsDetail[i].nullable?"{required}-[":"{optional}-[";
                                     susunan += (fullColumnsDetail[i].type).replace("\\","")+"]" ;
@@ -219,7 +260,7 @@
                                     let fullColumnsDetailHeirs = arrayDataDetailDetail.fullColumns;
                                     let detailsPayloadHeirs = {};
                                     for(let i=0; i<fullColumnsDetailHeirs.length;i++){
-                                        if( arrayDataDetailDetail.config.createable.includes(fullColumnsDetailHeirs[i].name) && !(fullColumnsDetailHeirs[i].comment).includes('fk') ){
+                                        if( arrayDataDetailDetail.config.createable.includes(fullColumnsDetailHeirs[i].name) && (!fullColumnsDetailHeirs[i].comment || (fullColumnsDetailHeirs[i].comment && !(fullColumnsDetailHeirs[i].comment).includes('fk')) ) ){
                                             var susunan = "";
                                             susunan += fullColumnsDetailHeirs[i].nullable?"{required}-[":"{optional}-[";
                                             susunan += (fullColumnsDetailHeirs[i].type).replace("\\","")+"]" ;
@@ -233,28 +274,36 @@
                                             let columnsNestedDetails = arrayDataDetailDetailSub.fullColumns;
                                             let detailsPayloadHeirsOfHeirs = {};
                                             for(let i=0; i<columnsNestedDetails.length;i++){
-                                                if( arrayDataDetailDetailSub.config.createable.includes(columnsNestedDetails[i].name) && !(columnsNestedDetails[i].comment).includes('fk') ){
+                                                if( arrayDataDetailDetailSub.config.createable.includes(columnsNestedDetails[i].name) && (!columnsNestedDetails[i].comment || (columnsNestedDetails[i].comment && !(columnsNestedDetails[i].comment).includes('fk'))) ){
                                                     var susunanSub = "";
                                                     susunanSub += columnsNestedDetails[i].nullable?"{required}-[":"{optional}-[";
                                                     susunanSub += (columnsNestedDetails[i].type).replace("\\","")+"]" ;
                                                     susunanSub += columnsNestedDetails[i].comment==""?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">" ;
                                                     detailsPayloadHeirsOfHeirs[columnsNestedDetails[i].name] = susunanSub;
                                                 }
-                                                detailsPayloadHeirs[sub_subdt] = [detailsPayloadHeirsOfHeirs];
+                                                detailsPayloadHeirs[ sub_subdt.includes(".") ? sub_subdt.split(".")[1]:sub_subdt ] = [detailsPayloadHeirsOfHeirs];
                                             }
                                         });
-                                        detailsPayload[subdt] = [detailsPayloadHeirs];
+                                        detailsPayload[subdt.includes(".") ? subdt.split(".")[1]:subdt] = [detailsPayloadHeirs];
                                     }
                                 });
-                                newForm[dt] = [detailsPayload];
+                                newForm[dt.includes(".") ? dt.split(".")[1]:dt] = [detailsPayload];
                             }
                         });
                         
                         codemirror.setOption('mode','javascript');
                         codemirror.setOption('theme','monokai');
-                        codemirror.setValue(JSON.stringify(newForm,null,"\t"));
+                        codemirror.setValue(JSON.stringify({
+                            url:"/operation/"+(arrayData.model.includes(".")?arrayData.model.split(".")[1]:arrayData.model),
+                            method: "POST",
+                            body:newForm
+                        },null,"\t"));
                         document.getElementById("modelSelected").innerText=arrayData.model+"[CREATE]";
-                        document.getElementById("codemirror").style.display = "block";
+                        codeMirrorElement.style.transform="translateX(150%)"
+                        codeMirrorElement.style.display = "block";
+                        setTimeout(function(){
+                            codeMirrorElement.style.transform="translateX(0%)"
+                        },500)
                         document.getElementById("modelSelected").style.display = "block";
                     });
                 });
@@ -264,10 +313,11 @@
                         codemirror.setValue("");
                         let index = element.getAttribute("index");
                         let arrayData = data[index];
+                        window.location.hash=`update_${arrayData.model}`
                         var newData = {
                             payloadFields : arrayData.config.createable,
                         };
-                        let fullColumns = arrayData.fullColumns;
+                        let fullColumns = arrayData.fullColumns.filter(dt=>!['creator_id','editor_id','approver_id'].includes(dt));
                         var newForm = {};
                         for(let i=0; i<fullColumns.length;i++){
                             if( arrayData.config.createable.includes(fullColumns[i].name) ){
@@ -314,28 +364,36 @@
                                             let columnsNestedDetails = arrayDataDetailDetailSub.fullColumns;
                                             let detailsPayloadHeirsOfHeirs = {};
                                             for(let i=0; i<columnsNestedDetails.length;i++){
-                                                if( arrayDataDetailDetailSub.config.createable.includes(columnsNestedDetails[i].name) && !(columnsNestedDetails[i].comment).includes('fk') ){
+                                                if( arrayDataDetailDetailSub.config.createable.includes(columnsNestedDetails[i].name) ){
                                                     var susunanSub = "";
                                                     susunanSub += columnsNestedDetails[i].nullable?"{required}-[":"{optional}-[";
                                                     susunanSub += (columnsNestedDetails[i].type).replace("\\","")+"]" ;
                                                     susunanSub += columnsNestedDetails[i].comment==""?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">" ;
                                                     detailsPayloadHeirsOfHeirs[columnsNestedDetails[i].name] = susunanSub;
                                                 }
-                                                detailsPayloadHeirs[sub_subdt] = [detailsPayloadHeirsOfHeirs];
+                                                detailsPayloadHeirs[sub_subdt.includes(".") ? sub_subdt.split(".")[1]:sub_subdt] = [detailsPayloadHeirsOfHeirs];
                                             }
                                         });
-                                        detailsPayload[subdt] = [detailsPayloadHeirs];
+                                        detailsPayload[subdt.includes(".") ? subdt.split(".")[1]:subdt] = [detailsPayloadHeirs];
                                     }
                                 });
-                                newForm[dt] = [detailsPayload];
+                                newForm[dt.includes(".") ? dt.split(".")[1]:dt] = [detailsPayload];
                             }
                         });
                         
                         codemirror.setOption('mode','javascript');
                         codemirror.setOption('theme','monokai');
-                        codemirror.setValue(JSON.stringify(newForm,null,"\t"));
-                        document.getElementById("modelSelected").innerText=arrayData.model+"[CREATE]";
-                        document.getElementById("codemirror").style.display = "block";
+                        codemirror.setValue(JSON.stringify({
+                            url:"/operation/"+(arrayData.model.includes(".")?arrayData.model.split(".")[1]:arrayData.model)+"/{id}",
+                            method: "PUT",
+                            body:newForm
+                        },null,"\t"));
+                        document.getElementById("modelSelected").innerText=arrayData.model+"[UPDATE]";
+                        codeMirrorElement.style.transform="translateX(150%)"
+                        codeMirrorElement.style.display = "block";
+                        setTimeout(function(){
+                            codeMirrorElement.style.transform="translateX(0%)"
+                        },500)
                         document.getElementById("modelSelected").style.display = "block";
                     });
                 });
@@ -355,7 +413,11 @@
                             codemirror.setOption('mode','reStructuredText')
                             codemirror.setOption('theme','chrome');
                             document.getElementById("modelSelected").innerText=model+" [NOTICE]";
-                            document.getElementById("codemirror").style.display = "block";
+                            codeMirrorElement.style.transform="translateX(150%)"
+                            codeMirrorElement.style.display = "block";
+                            setTimeout(function(){
+                                codeMirrorElement.style.transform="translateX(0%)"
+                            })
                             document.getElementById("modelSelected").style.display = "block";
                             codemirror.setValue( (response.data).replace("\t","") );
                         },function(errors){
@@ -363,6 +425,35 @@
                         });
                     })
                 });
+                var first=true
+                const onHasChange = ()=>{
+                    if( window.location.hash && (window.location.hash).includes("btn") ){
+                        return
+                    }
+                    var classname = document.getElementsByClassName("model-name");
+                    Array.from(classname).forEach(function(element) {
+                        element.style.backgroundColor="white"
+                        element.style.color="black"
+                    })
+                    document.getElementById('model_login').style.backgroundColor="white"
+                    document.getElementById('model_login').style.color="black"
+                    if(window.location.hash){
+                        const mode = window.location.hash.split("_")[0];
+                        const model = window.location.hash.replace(`${mode}_`,'');
+                        const elem = document.getElementById(`model_${model}`)
+                        if(first){
+                            const tombol = document.getElementById(window.location.hash.replace("#","btn_"))
+                            tombol.click()
+                            window.location.hash = window.location.hash.replace("#","#btn_")
+                        }
+                        elem.style.backgroundColor="green"
+                        elem.style.color="white"
+                        var classname = document.getElementsByClassName("notice");
+                    }
+                    first=false;
+                };
+                window.onhashchange = onHasChange
+                onHasChange()
             </script>
     </body>
 </html>
