@@ -13,13 +13,14 @@
         "guzzlehttp/guzzle": "^6.3",
         "illuminate/mail": "^8.27",
         "illuminate/notifications": "^8.36",
+        "intervention/image": "^2.6",
         "jenssegers/agent": "^2.6",
+        "kitloong/laravel-migrations-generator": "^4.5",
         "laravel/lumen-framework": "^8.0",
         "maatwebsite/excel": "^3.1",
         "starlight93/oauth2": "^1.0",
         "staudenmeir/laravel-cte": "^1.2",
-        "stevebauman/location": "^5.0",
-        "kitloong/laravel-migrations-generator": "^4.5"
+        "stevebauman/location": "^5.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

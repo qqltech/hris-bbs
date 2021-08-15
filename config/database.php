@@ -4,6 +4,7 @@ return [
     'connections' => [
         'mysql' => [
             'driver' => 'mysql',
+            'timezone' => env('DB_TIMEZONE', '+07:00'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'forge'),
@@ -19,6 +20,7 @@ return [
         ],
         'pgsql' => [
             'driver' => 'pgsql',
+            'timezone' => env('DB_TIMEZONE', '+07:00'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'forge'),
@@ -32,6 +34,7 @@ return [
         ],
         'sqlite' => [
             'driver' => 'sqlite',
+            'timezone' => env('DB_TIMEZONE', '+07:00'),
             'database' => env('DB_DATABASE', DATABASE_PATH('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => false,
