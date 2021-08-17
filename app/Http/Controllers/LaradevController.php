@@ -579,7 +579,7 @@ class LaradevController extends Controller
         $canExec =  !in_array('exec', $disabled);
         $return = 0;
         if ( $canExec ){
-            $tempFile=app()->path()."/Models/CustomModels/$tableName"."_temp.php";
+            $tempFile="$this->modelsPath/CustomModels/$tableName"."_temp.php";
             try{
                 File::put($tempFile,$request->text);
                 $output=null;
@@ -592,18 +592,25 @@ class LaradevController extends Controller
             }
             File::delete($tempFile);
         }else{
-            $oldFile = File::get(app()->path()."/Models/CustomModels/$tableName.php");
-            File::put( app()->path()."/Models/CustomModels/$tableName.php", $request->text );
+            $oldFile = File::get("$this->modelsPath/CustomModels/$tableName.php");
+            if( File::exists( "$this->modelsPath/CustomModels/$tableName.php") ){
+                File::delete("$this->modelsPath/CustomModels/$tableName.php" );
+            }
+            File::put( "$this->modelsPath/CustomModels/$tableName.php", $request->text );
             $className = "\\App\\Models\\CustomModels\\$tableName";
             try{
                 $testedClass = new $className();
             }catch(\Throwable $e){
-                File::put(app()->path()."/Models/CustomModels/$tableName.php", $oldFile );
+                File::put("$this->modelsPath/CustomModels/$tableName.php", $oldFile );
                 return response()->json('Error: '.$e->getMessage(),422);
             }
         }
         if($return===0){
-            $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text );
+
+            if( File::exists( "$this->modelsPath/CustomModels/$tableName.php") ){
+                File::delete("$this->modelsPath/CustomModels/$tableName.php" );
+            }
+            $file = File::put("$this->modelsPath/CustomModels/$tableName.php", $request->text );
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<SAVE MODEL $tableName>");       
             }
@@ -909,7 +916,7 @@ class LaradevController extends Controller
                 }
             }
             $paste = str_replace("__customfunction__",$customfunction,$paste);
-            if( ! File::exists( "$this->modelsPath/BasicModels/$className.php") ){
+            if( File::exists( "$this->modelsPath/BasicModels/$className.php") ){
                 File::delete("$this->modelsPath/BasicModels/$className.php" );
             }
             File::put( "$this->modelsPath/BasicModels/$className.php",$paste);
@@ -1244,7 +1251,10 @@ class LaradevController extends Controller
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
     }
     public function editAlter(Request $req, $table=null){
-        $file = File::put( base_path('database/migrations/alters')."/0_0_0_0_"."$table.php" , $req->text); 
+        if( File::exists( base_path("database/migrations/alters/0_0_0_0_$table.php") ) ){
+            File::delete( base_path("database/migrations/alters/0_0_0_0_$table.php") );
+        }
+        File::put( base_path("database/migrations/alters/0_0_0_0_$table.php") , $req->text); 
         if(env('GIT_ENABLE', false)){ 
             $this->git_push(".","<SAVE ALTER $table>");       
         }
@@ -1275,6 +1285,9 @@ class LaradevController extends Controller
             $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
             if(!File::exists( $migrationPath )){
                 return response()->json("migration file [$table] tidak ada",400);
+            }
+            if( File::exists( $migrationPath ) ){
+                File::delete( $migrationPath );
             }
             $file = File::put( $migrationPath , $req->text); 
             if(env('GIT_ENABLE', false)){ 

@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": "^7.2|^8.0",
+        "ext-pdo_sqlite": "^8.0",
         "cpliakas/git-wrapper": "^3.0",
         "doctrine/dbal": "^3.0",
         "flipbox/lumen-generator": "^8.2",
