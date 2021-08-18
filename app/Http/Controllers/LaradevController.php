@@ -1033,7 +1033,10 @@ class LaradevController extends Controller
                     }
                 }
                 $views = $schemaManager->listViews();
-                foreach ($views as $view) {
+                foreach ($views as $view) {            
+                    if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
+                        continue;
+                    }
                     $viewName = str_replace("public.","",$view->getName() );
                     $arrayTables[] =  $viewName;
                     $arrayViews[]=$viewName;
@@ -1074,7 +1077,11 @@ class LaradevController extends Controller
                         if( count( $migrationFiles )> 0 ){
                             $migrationText = File::get( array_values($migrationFiles)[0]);
                             // \Storage::disk("base")->move("database/migrations/projects/".basename(array_values($migrationFiles)[0]), "database/migrations/projects/0_0_0_0_"."$tb.php");
-                            File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$tb.php", $migrationText );
+                            File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$tb.php", (str_replace([
+                                "class Create","Table extends"
+                            ],[
+                                "class "," extends"
+                            ],$migrationText))."\r\n\r\n\r\n\r\n" );
                             
                             File::delete(array_values($migrationFiles)[0]);
                         }
@@ -1125,33 +1132,32 @@ class LaradevController extends Controller
             return response()->json("migration file [$table] tidak ada",400);
         }
         if(!$req->alter){
-            $aliasTable=null;
-            $tableStringClass = "\App\Models\BasicModels\\$table";
-            if(class_exists( $tableStringClass )){
-                $currentModel = new $tableStringClass;
-                $aliasTable=$currentModel->getTable();               
-                try{
-                    \DB::unprepared("DROP TABLE IF EXISTS $aliasTable");
-                }catch(\Exception $e){}
-            }
             if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
                 $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
                 $tableName = explode("_timing_",$samaran)[0];
+                $modelObj = getBasic($tableName);
+                if($modelObj){
+                    $tableName = $modelObj->getTable();
+                }
                 try{
                     DB::unprepared("                    
                         DROP TRIGGER IF EXISTS $table ON $tableName;
                         DROP FUNCTION IF EXISTS fungsi_"."$table();
                     ");
                 }catch(\Exception $e){}
-            }
-            if(Schema::hasTable($aliasTable===null?$table:$aliasTable)){                
+            }else{
+                $realTable = $table;
+                $modelObj = getBasic($table);
+                if( $modelObj ){
+                    $realTable = $modelObj->getTable();
+                }
                 try{
-                    Schema::dropIfExists($aliasTable===null?$table:$aliasTable);
+                    DB::unprepared("DROP TABLE IF EXISTS $realTable");
+                }catch(\Exception $e){}
+                try{
+                    DB::unprepared("DROP VIEW IF EXISTS $realTable;");
                 }catch(\Exception $e){}
             }
-            try{
-                DB::unprepared("DROP VIEW IF EXISTS $table;");
-            }catch(\Exception $e){}
            
             // Schema::connection('flyingpgsql')->dropIfExists($currentModel->getTable());
             // return response()->json([Schema::hasTable($currentModel->getTable())?'ada':'tidak'],422);
@@ -1206,45 +1212,44 @@ class LaradevController extends Controller
         if($req->password!=="jajanenak"){
             return response()->json("unauthorized password salah",401);
         }
-        File::delete(glob(base_path('database/migrations')."/*.*"));
-        $data = $this->getDirFullContents( base_path('database/migrations') );
-        $data = array_filter($data,function($file)use ($table){
-            if(strpos("$file.php", "0_0_0_0_$table.php")!==false){
-                return $file;
-            }
-        });
-        if(count($data)==0){
-            return response()->json("migration file [$table] tidak ada",400);
-        }
         try{
-            if(strpos( array_values($data)[0] , "/projects")!==false){
-                if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
-                    $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
-                    $tableName = explode("_timing_",$samaran)[0];
-                    DB::unprepared("                    
-                        DROP TRIGGER IF EXISTS $table ON $tableName;
-                        DROP FUNCTION IF EXISTS fungsi_"."$table();
-                    ");
-                }elseif(Schema::hasTable($table)){
-                    Schema::dropIfExists($table);
-                }else{
-                    DB::unprepared("DROP VIEW IF EXISTS $table;");
-                }
-                File::delete( "$this->modelsPath/CustomModels/$table.php" );
-                File::delete( "$this->modelsPath/BasicModels/$table.php" );
-            }
-            if( count(array_values($data))>1 ){
-                foreach(array_values($data) as $file){
-                    if( !(strpos( $file , "/projects")!==false) ){
-                        File::delete( $file );
-                    }
-                }
+            File::delete(glob(base_path('database/migrations')."/*.*"));//g penting sih
+            if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
+                $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
+                $tableName = getBasic(explode("_timing_",$samaran)[0])->getTable();
+                DB::unprepared("
+                    DROP TRIGGER IF EXISTS $table ON $tableName;
+                    DROP FUNCTION IF EXISTS fungsi_"."$table();
+                ");
             }else{
-                File::delete( array_values($data)[0] );
+                $realTable = $table;
+                $modelObj = getBasic($table);
+                if($modelObj){
+                    $realTable = $modelObj->getTable();
+                }
+                try{
+                    DB::unprepared("DROP TABLE IF EXISTS $realTable");
+                }catch(\Exception $e){}
+                try{
+                    DB::unprepared("DROP VIEW IF EXISTS $realTable;");
+                }catch(\Exception $e){}
             }
-        }catch(Exception $e){
-            return response()->json($e->getMessage(),400);
+            if( File::exists( "$this->modelsPath/BasicModels/$table.php") ){
+                File::delete("$this->modelsPath/BasicModels/$table.php" );
+            }
+            if( File::exists( "$this->modelsPath/CustomModels/$table.php") ){
+                File::delete("$this->modelsPath/CustomModels/$table.php" );
+            }
+            if( File::exists( base_path("database/migrations/projects/0_0_0_0_$table.php") ) ){
+                File::delete( base_path("database/migrations/projects/0_0_0_0_$table.php") );
+            }
+            if( File::exists( base_path("database/migrations/alters/0_0_0_0_$table.php") ) ){
+                File::delete( base_path("database/migrations/alters/0_0_0_0_$table.php") );
+            }
+        }catch(\Exception $e){
+            return response()->json($e->getMessage(),422);
         }
+        
         if(env('GIT_ENABLE', false)){ 
             $this->git_push(".","<DROP $table>");       
         }
