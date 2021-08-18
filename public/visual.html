@@ -167,7 +167,7 @@ function createTable(data, isReferenced=false, caller=null){
     data['columns'] = data.fullColumns;
     for(let i=1; i<data.columns.length;i++){
         let comment={};let required=true;
-        if(data.columns[i].comment!=''){
+        if(data.columns[i].comment){
           comment = JSON.parse(data.columns[i].comment);
         }
         if(comment['src']!==undefined){
