@@ -1270,27 +1270,13 @@ if (! function_exists('table_config')) {
     function table_config($table, $array)
     {
         $string = json_encode($array);
-        // $string = str_replace("{","[",json_encode($string, JSON_PRETTY_PRINT));
-        // $string = str_replace("}","]", $string);
-        // $string = str_replace(":","\t\t=>", $string);
-        // $schema = new \Doctrine\DBAL\Schema\Schema();
-        // $schema = Schema::getConnection()->getDoctrineSchemaManager();
-        // $tables = $schema->listTables();
-        // foreach ($tables as $tbl) {
-        //     $tbName = $tbl->getName();
-        //     if($tbName == $table){
-        //         $tbl->addOption("comment",$string);
-        //         $tbl->dropColumn("id");
-        //         file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-        //             .json_encode($tbl->getColumns()));
-        //     }
-        // }
-        // $schema->setComment($string);
-        // return true;
-		if(getDriver()=='mysql'){
-            Schema::getConnection()->statement("ALTER TABLE $table comment = '$string'");
-        }elseif(getDriver()=='pgsql'){
-            Schema::getConnection()->statement("COMMENT ON TABLE $table IS '$string'");
+        try{
+            if(getDriver()=='mysql'){
+                Schema::getConnection()->statement("ALTER TABLE $table comment = '$string'");
+            }elseif(getDriver()=='pgsql'){
+                Schema::getConnection()->statement("COMMENT ON TABLE $table IS '$string'");
+            }
+        }catch(\Exception $e){
         }
     }
 }
@@ -2299,11 +2285,11 @@ function Async($class,$func,$args){
 }
 function getBasic($name){
     $string = "\App\Models\BasicModels\\$name";
-    return new $string;
+    return class_exists( $string )?new $string:null;
 }
 function getCustom($name){
     $string = "\App\Models\CustomModels\\$name";
-    return new $string;
+    return class_exists( $string )?new $string:null;
 }
 function getRoute(){
     return app()->request->route()[1]['as'];
