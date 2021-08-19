@@ -2,6 +2,6 @@
 return [
     'timezone' => env("APP_TIMEZONE","Asia/Jakarta"),
 
-    'key' => '44 characters',
+    'key' => env('APP_KEY',''),
     'cipher' => env('APP_CIPHER','AES-256-CBC'),
 ];
