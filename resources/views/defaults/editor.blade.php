@@ -17,6 +17,13 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-splitpane@1.0.6/dist/vue-split-pane.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
     <style>
+    .nav-tabs {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+    }
         .ace-monokai .ace_marker-layer .ace_active-line {
             /* background: #49483E; */
         }
@@ -152,7 +159,7 @@
                 <div class='ml-5' v-if="treeData.length==0">
                     <b-spinner style="width: 2rem; height: 2rem;margin-top:5%" label="Large Spinner"></b-spinner>
                 </div>
-                    <ul id="demo" style="list-style-type: none;margin: 3px;padding: 0;font-size:12px;">
+                    <ul id="demo" style="list-style-type: none;margin: 3px;padding: 0;font-size:12px;padding-bottom:65px;">
                         <tree-item
                             v-for="(tree,index) in treeData"
                             class="item"
@@ -172,25 +179,25 @@
                     content-class="mt-0" style="width:100%;" nav-class='monokai-inactive-tab' @input="changeTab" @changed="changedArrayTab">
                 <b-tab  v-for="(item,index) in $store.state.activeEditors" :ref="item.jenis+'-'+item.title">
                     <template #title style="font-size:9px;">
-                        <span class="dot" style="height: 9px;width: 9px;background-color: #dc3545;border-radius: 50%;display: inline-block;"
+                        <!-- <span class="dot" style="height: 9px;width: 9px;background-color: #dc3545;border-radius: 50%;display: inline-block;"
                         v-if="$store.state.activeEditorTitle==item.jenis+'-'+item.title"
-                        ></span>
-                        <!-- <b-spinner 
-                            style="max-height:10px;max-width:10px;"
+                        ></span> -->
+                        <b-spinner 
+                            style="max-height:10px;max-width:10px;background-color: #dc3545;"
                             type="grow" 
                             small 
                             label="Active" 
                             v-if="$store.state.activeEditorTitle==item.jenis+'-'+item.title">
-                        </b-spinner> -->
+                        </b-spinner>
                         <b-icon size="sm" :icon="item.icon" style="max-height:15px;"></b-icon>
                         <small style="font-size:12px;color:#ccccc7 !important;" :title="item.jenis">{{item.title}} 
                             <!-- <span style='font-size:10px;'>{{item.jenis}}</span> -->
                         </small>
-                        <b-btn title="Close" class="monokai-inactive-tab" size="sm" 
+                        <span title="Close" class="monokai-inactive-tab" 
                             @click="$store.commit('removeActiveEditors',{ index:index, item:item})"
-                            style="padding:0px !important;font-size:12px;margin:auto;"/>
-                            &nbsp;&nbsp;x&nbsp;&nbsp;
-                        </b-btn>
+                            style="margin-left:5px;padding:3px !important;font-size:12px;border-radius:3px;"/>
+                            &nbsp;x&nbsp;
+                        </span>
                     </template>
                     <div style="max-height:94%">
                             <vue-ace-editor 
@@ -1309,7 +1316,7 @@ vm = new Vue({
                 me.$store.commit('addActiveEditors',{
                     title:itemLengkap.name,
                     jenis:item.name,
-                    value:item.name=='Log'?JSON.stringify(response.data, null, 2):response.data,
+                    value:(item.name=='Log'?JSON.stringify(response.data, null, 2):response.data),
                     icon: icon,
                     readOnly:(item.name).toLowerCase().includes('basic')||item.name=='Log',
                     action:action,
@@ -1320,9 +1327,15 @@ vm = new Vue({
                     fontFamily: item.name=='Log'?'Monospace':'Consolas',
                     highlightActiveLine: true,
                     enableBasicAutocompletion:true,
-                    maxLines:parseInt(window.innerHeight/13.9),
-                    minLines:parseInt(window.innerHeight/13.9)
+                    maxLines:parseInt(window.innerHeight/14.3),
+                    minLines:parseInt(window.innerHeight/14.3)
                 })
+                setTimeout(function(){
+                    try{
+                        var theScroll = document.getElementsByClassName("nav-tabs")[0];
+                        theScroll.scrollTo(theScroll.scrollLeftMax,0)
+                    }catch(e){}
+                },1000)
             }).catch(error => {
                 try{
                     Swal.fire({
@@ -1337,7 +1350,7 @@ vm = new Vue({
             });
         },
         openFile: function(item) {
-            console.log(item)
+            //console.log(item)
             // Vue.set(item, "children", []);
             // this.addItem(item);
         },
@@ -1358,6 +1371,12 @@ vm = new Vue({
 //         });
 //     }
 // }, false);
+const scrollContainer = document.getElementsByClassName("nav-tabs")[0];
+
+scrollContainer.addEventListener("wheel", (evt) => {
+    evt.preventDefault();
+    scrollContainer.scrollLeft += evt.deltaY;
+});
 </script>
 </body>
 </html>

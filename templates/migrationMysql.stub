@@ -45,3 +45,8 @@ class __class__ extends Migration
         Schema::dropIfExists('__table__');
     }
 }
+
+
+
+
+

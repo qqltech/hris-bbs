@@ -49,3 +49,8 @@ class __class__ extends Migration
         Schema::connection('flyingpgsql')->dropIfExists('__table__');
     }
 }
+
+
+
+
+

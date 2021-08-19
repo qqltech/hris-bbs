@@ -38,3 +38,6 @@ class __class extends Model
     public function customGet($p){return _customGetData($this,$p);}
     __customfunction__
 }
+
+
+
