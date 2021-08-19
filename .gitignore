@@ -12,6 +12,6 @@ Homestead.yaml
 /app/Models/BasicModels
 /app/Models/SuperModels
 /logs
-*.bat
 *.tar.gz
 *_log
+database/database.sqlite
