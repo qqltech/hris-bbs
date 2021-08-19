@@ -14,4 +14,4 @@ Homestead.yaml
 /logs
 *.tar.gz
 *_log
-database/database.sqlite
+database/database.sqlite 
