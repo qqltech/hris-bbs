@@ -1,2 +1,2 @@
 <?php 
-return ['app.timezone' => env("APP_TIMEZONE","Asia/Jakarta")];
+return ['timezone' => env("APP_TIMEZONE","Asia/Jakarta")];
