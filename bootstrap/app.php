@@ -10,7 +10,8 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 config(['start_time'=>microtime(true)]);
-$locale = strtolower(env("LOCALE","EN"));
+$locale = strtolower(env("APP_TIMEZONE","Asia/Jakarta"));
+date_default_timezone_set('Asia/Jakarta');
 app('translator')->setLocale($locale);
 $app->withFacades();
 
