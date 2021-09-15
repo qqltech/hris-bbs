@@ -89,7 +89,7 @@ class ApiFixedController extends Controller
         if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_not_unique($this->parentModelName, $this->requestData)){return;};
-        if(!$this->is_model_deletable($this->parentModelName, $this->requestData)){return;};
+        if(!$this->is_model_deletable($this->parentModelName, $this->operationId)){return;};
         $this->is_detail_valid($this->parentModelName, $this->requestData);
     }
     private function serializeMultipartData(){
@@ -385,7 +385,7 @@ class ApiFixedController extends Controller
         }
         $model = null;
     }
-    private function is_model_deletable($modelName, $data)
+    private function is_model_deletable($modelName, $refId )
     {
         if( !in_array($this->operation,["delete"]) ){return true;}
         $modelNameExplode = explode('.', $modelName);
@@ -411,10 +411,10 @@ class ApiFixedController extends Controller
                     if(strpos($relation,$modelName)!==false){
                         $colArr = explode("=", $relation)[1];
                         $col    = $colArr;
-                        $existing = $modelHeir->where($col, $this->operationId )->limit(1)->get();
+                        $existing = $modelHeir->where($col, $refId )->limit(1)->get();
                         if(count($existing)>0){
-                            $this->messages[] = "USED: cannot delete id $this->operationId in [$modelName]. It is being used in child $heir";
-                            $this->errors[] = "FAILED: cannot delete this resource, It is still being used in another resource.";
+                            $this->messages[] = "USED: cannot delete id $refId in [$modelName]. It is being used in child $heir";
+                            $this->errors[] = "Cannot delete this resource, It or it's child is being referred in another resource.";
                             $this->isAuthorized=false;
                             return false;
                         };
@@ -422,11 +422,12 @@ class ApiFixedController extends Controller
                 }
             }
         }
-        if($cascade){
-            foreach( $detailsArray as $detail ){             
-                $this->is_model_deletable($detail, null);
-            }
-        }
+        // if($cascade){
+        //     foreach( $detailsArray as $detail ){
+        //         $detailData = DB::table($detail)->where;
+        //         $this->is_model_deletable($detail, $id);
+        //     }
+        // }
         $model = null;
         return true;
     }
@@ -629,7 +630,9 @@ class ApiFixedController extends Controller
                 );
             }
             return [
-                "status"=>"Data has been created successfully"
+                "status"=> "Data has been created successfully",
+                "model" => $modelName,
+                "id"    => $finalModel->id
             ];
         }
         $model = null;   
@@ -732,6 +735,9 @@ class ApiFixedController extends Controller
                 $dataDetail = $model->where((count($tableExplode)==1?$table:$tableExplode[1])."_id","=",$id)->get();              
                 // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=gagal");  
                 foreach( $dataDetail as $dtl ){
+                    if(!$this->is_model_deletable($detail, $dtl->id)){
+                        return;
+                    };
                     $this->deleteOperation($detail, null, $dtl->id, $id);
                 }
             }
@@ -749,6 +755,11 @@ class ApiFixedController extends Controller
         if(!$preparedModel){
             $this->errors[]="[NOT FOUND]ID $id in model [$modelName] does not exist";
             $this->operationOK=false;
+            if($this->isBackdoor){
+                return [
+                    "status"=>"[NOT FOUND]ID $id in model [$modelName] does not exist"
+                ];
+            }
             return;
         }
         $additionalData = $this->createAdditionalData($model, $data);
@@ -863,7 +874,7 @@ class ApiFixedController extends Controller
         //     }
         // }
         
-        if($this->isBackdoor && $this->parentModelName === $modelName){
+        if($this->isBackdoor){
             if(method_exists($model, "updateAfterTransaction")){
                 $newData = $this->readOperation( $modelName, (object)[], $id )['data'];
                 $newfunction = "updateAfterTransaction";
@@ -874,9 +885,10 @@ class ApiFixedController extends Controller
                     $this->requestMeta
                 );
             }
-            
             return [
-                "status"=>"Data has been updated successfully"
+                "status"=>"Data has been updated successfully",
+                "model" => $modelName,
+                "id"=>$id
             ];
         }
         $model = null;  
@@ -944,7 +956,7 @@ class ApiFixedController extends Controller
                         "processed_time"=>round(microtime(true)-config("start_time"),5)
                     ],400);
                 }
-                $resp = json_decode( $e->getMessage());
+                $resp = json_decode( $e->getMessage(), true);
                 return response()->json( isset($resp['errors'])?$resp:[
                     "errors"=>$resp,
                     "processed_time"=>round(microtime(true)-config("start_time"),5),
