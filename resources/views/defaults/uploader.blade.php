@@ -410,7 +410,7 @@ var app = new Vue({
                 method      : 'POST',
                 data        : data.data,
                 headers     : {
-                    laradev:"quantumleap150671"
+                    laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
                 }
             }
             me.isLoading=true;
