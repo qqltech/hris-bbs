@@ -19,10 +19,18 @@ $router->get('/get-updates', "sseController@getUpdate");
 $router->post('/model', "ModelerController@modelFromDB");
 $router->get('/api','NonApiController@resources');
 
-$router->get('/', function () use ($router) {
+$router->get('/', function (Request $request) use ($router) {
     if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
         return response()->json("SERVER WAS CLOSED",404);
     }
+
+    if( env("LANDING") ){
+        $funcArr = explode(".", env("LANDING"));
+        $class = getCustom($funcArr[0]);
+        $func = $funcArr[1];
+        return $class->$func($request);
+    }
+
     if( !env("TUTORIAL",false) ){
         return app()->version();
     }
