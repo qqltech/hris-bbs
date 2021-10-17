@@ -83,10 +83,6 @@ class ApiFixedController extends Controller
                 $this->operation = "read";
                 break;
         }
-        if( $this->operation == 'create' && ( isset($this->requestData['_method']) && (strtolower($this->requestData['_method'])=='put') ) ){
-            $this->operation = 'update';
-        }
-        
         if(!$this->is_model_exist( $this->parentModelName )){return;};
         if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}
         if(!$this->is_operation_authorized($this->parentModelName )){return;};
@@ -647,7 +643,14 @@ class ApiFixedController extends Controller
         if( $id && isset($params['simplest']) && $params['simplest']=='true' ){
             $model = getBasic($modelName);
             if( isset($params['selectfield']) ){
-                $model = $model->selectRaw($params['selectfield']);
+                $selectField = str_replace([
+                        "this.","\n","\t"
+                    ],[
+                        $model->getTable().".", "", ""
+                    ],
+                    $params['selectfield']
+                );
+                $model = $model->selectRaw( $selectField );
             }
             return [
                 "data"=>$model->find($id),
