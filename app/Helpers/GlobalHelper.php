@@ -2002,7 +2002,7 @@ function _uploadexcel($model, $request)
         DB::commit();
       	return response()->json(["status"=>"success","data"=>$bulkData],200);
 }
-function uploadfile($model,$req){
+function uploadfile($model, $req, $uniqueName=null ){
     $modelArray = explode("\\",get_class($model));
     $modelName = end($modelArray);
     $validator = Validator::make($req->all(), [
@@ -2012,11 +2012,16 @@ function uploadfile($model,$req){
         return $validator->errors()->all();
     }
     $code= Carbon::now()->format('his').crc32(uniqid());
-    $fileName = $req->filename?$req->filename:sanitizeString($req->file->getClientOriginalName());
+    if($uniqueName){
+        $fileName = $uniqueName.".{$req->file->extension()}";
+    }else{
+        $fileName = $req->filename?$req->filename.".{$req->file->extension()}":sanitizeString($req->file->getClientOriginalName());
+        $fileName = $code."_".$fileName;
+    }
     Storage::disk('uploads')->putFileAs(
-        $modelName, $req->file, $code."_".$fileName
+        $modelName, $req->file, $fileName
     );
-    return url("/uploads/$modelName/".$code."_".$fileName);
+    return url("/uploads/$modelName/".$fileName);
 }
 function ff($data,$id=""){
     $channel=env("LOG_CHANNEL",env('APP_NAME',uniqid()));
@@ -2427,7 +2432,7 @@ function removeLog($filename=null){
 
 function req($key=null){
     if(app()->request->method()=="GET" ){
-        $data = (object)app()->request->all();
+        $data = (object)config('request');
     }else{
         $data = json_decode(file_get_contents('php://input'));
     }
@@ -2445,4 +2450,40 @@ function getDriver(){
 }
 function isVersion( $var ){
     return (strpos(app()->version(), "^$var.")!==false);
+}
+
+/**
+ * Casts from request param for all basic models
+ */
+function getCastsParam():array{
+    $casters = [];
+    if(req('casts')){
+        try{
+            $rawCasters = explode(",", req('casts'));
+        
+            foreach($rawCasters as $key => $caster){
+                $casterArr = explode(":", $caster, 2);
+                $casters[$casterArr[0]] = $casterArr[1];
+            }
+        }catch(\Exception $e){
+            abort(500,json_encode(["error"=>["casts parameter has wrong format"]]));
+        }
+    }
+    return $casters;
+}
+
+/**
+ * Get error exception postgresql
+ */
+function pgsqlParseError( string $msg ):string {
+    if(strpos($msg,'SQLSTATE')!==false){
+        try{
+            $errors = explode("ERROR: ",$msg,2);
+            $exception = explode("\n",$errors[1],2);
+            $msg = $exception[0];
+        }catch(\Exception $e){
+            ff($e->getMessage());
+        }
+    }
+    return $msg;
 }
