@@ -176,28 +176,29 @@
                                 "authorization": "BearerToken",
                                 "Cache-Control": "no-cache"
                             },
-                            parameters_for_list_and_by_id      : {
-                                selectfield : "column1,column2,column3,dst",
+                            parameters_for_list_and_single      : {
+                                selectfield : "column_name1,column_name2,column3,dst",
                                 join        : true,
                                 joinmax     : 0,
-                                transform   : true
+                                transform   : true,
+                                casts       : "column_name1:array,column_name2:datetime:d-m-Y"
                             },
-                            parameters_list : {
+                            parameters_read_list : {
                                 page        : 1,
                                 paginate    : 100,
-                                where       : "column1='kata' AND column2=999",
-                                orderby     : "id",
+                                where       : "column_name1='kata' AND column_name2 ~* 'caridata'",
+                                orderby     : "column_name",
                                 ordertype   : "ASC",
-                                orderbyraw  : "id ASC,col2 DESC",
-                                filters     : "column1:keyword,column2:keyword2,columnX:keywordX",
+                                orderbyraw  : "column_name1 ASC,column_name2 DESC",
+                                filters     : "column_name1:keyword,column_name2:keyword2",
                                 filters_operator : "~*",
-                                search      : "searched_string",
-                                searchfield : "column1,column2,columnX",
+                                search      : "keyword",
+                                searchfield : "column_name1,column_name2",
                                 notin       : "column_name:12,13,99",
-                                addselect   : "column1,column2,column3,sum(column) as sumcol,dst",
-                                group_by    : "column1,column2,column3,dst",
+                                addselect   : "column_name1,sum(column) as sumfield",
+                                group_by    : "column_name1,column_name2,column3",
                             },
-                            parameters_by_id: {
+                            parameters_read_single: {
                                 single      : false,
                                 simplest    : false
                             },
@@ -234,7 +235,7 @@
                                 var susunan = "";
                                 susunan += fullColumns[i].nullable?"{required}-[":"{optional}-[";
                                 susunan += (fullColumns[i].type).replace("\\","")+"]" ;
-                                susunan += fullColumns[i].comment==""?"-<data:input>":"-<data:"+fullColumns[i].comment+">" ;
+                                susunan += (!fullColumns[i].comment?"-<data:input>":"-<data:"+fullColumns[i].comment+">") ;
                                 newForm[fullColumns[i].name] = susunan;
                             }
                         }
@@ -250,7 +251,7 @@
                                     var susunan = "";
                                     susunan += fullColumnsDetail[i].nullable?"{required}-[":"{optional}-[";
                                     susunan += (fullColumnsDetail[i].type).replace("\\","")+"]" ;
-                                    susunan += fullColumnsDetail[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetail[i].comment+">" ;
+                                    susunan += (!fullColumnsDetail[i].comment?"-<data:input>":"-<data:"+fullColumnsDetail[i].comment+">") ;
                                     detailsPayload[fullColumnsDetail[i].name] = susunan;
                                 }
                                 (arrayDataDetail.details).forEach(subdt=>{
@@ -264,7 +265,7 @@
                                             var susunan = "";
                                             susunan += fullColumnsDetailHeirs[i].nullable?"{required}-[":"{optional}-[";
                                             susunan += (fullColumnsDetailHeirs[i].type).replace("\\","")+"]" ;
-                                            susunan += fullColumnsDetailHeirs[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">" ;
+                                            susunan += (!fullColumnsDetailHeirs[i].comment?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">") ;
                                             detailsPayloadHeirs[fullColumnsDetailHeirs[i].name] = susunan;
                                         }
                                         (arrayDataDetailDetail.details).forEach(sub_subdt=>{
@@ -278,7 +279,7 @@
                                                     var susunanSub = "";
                                                     susunanSub += columnsNestedDetails[i].nullable?"{required}-[":"{optional}-[";
                                                     susunanSub += (columnsNestedDetails[i].type).replace("\\","")+"]" ;
-                                                    susunanSub += columnsNestedDetails[i].comment==""?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">" ;
+                                                    susunanSub += (!columnsNestedDetails[i].comment?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">") ;
                                                     detailsPayloadHeirsOfHeirs[columnsNestedDetails[i].name] = susunanSub;
                                                 }
                                                 detailsPayloadHeirs[ sub_subdt.includes(".") ? sub_subdt.split(".")[1]:sub_subdt ] = [detailsPayloadHeirsOfHeirs];
@@ -324,7 +325,7 @@
                                 var susunan = "";
                                 susunan += fullColumns[i].nullable?"{required}-[":"{optional}-[";
                                 susunan += (fullColumns[i].type).replace("\\","")+"]" ;
-                                susunan += fullColumns[i].comment==""?"-<data:input>":"-<data:"+fullColumns[i].comment+">" ;
+                                susunan += (!fullColumns[i].comment?"-<data:input>":"-<data:"+fullColumns[i].comment+">") ;
                                 newForm[fullColumns[i].name] = susunan;
                             }
                         }
@@ -340,7 +341,7 @@
                                     var susunan = "";
                                     susunan += fullColumnsDetail[i].nullable?"{required}-[":"{optional}-[";
                                     susunan += (fullColumnsDetail[i].type).replace("\\","")+"]" ;
-                                    susunan += fullColumnsDetail[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetail[i].comment+">" ;
+                                    susunan += (!fullColumnsDetail[i].comment?"-<data:input>":"-<data:"+fullColumnsDetail[i].comment+">") ;
                                     detailsPayload[fullColumnsDetail[i].name] = susunan;
                                 }
                                 (arrayDataDetail.details).forEach(subdt=>{
@@ -354,7 +355,7 @@
                                             var susunan = "";
                                             susunan += fullColumnsDetailHeirs[i].nullable?"{required}-[":"{optional}-[";
                                             susunan += (fullColumnsDetailHeirs[i].type).replace("\\","")+"]" ;
-                                            susunan += fullColumnsDetailHeirs[i].comment==""?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">" ;
+                                            susunan += (!fullColumnsDetailHeirs[i].comment?"-<data:input>":"-<data:"+fullColumnsDetailHeirs[i].comment+">") ;
                                             detailsPayloadHeirs[fullColumnsDetailHeirs[i].name] = susunan;
                                         }
                                         (arrayDataDetailDetail.details).forEach(sub_subdt=>{
@@ -368,7 +369,7 @@
                                                     var susunanSub = "";
                                                     susunanSub += columnsNestedDetails[i].nullable?"{required}-[":"{optional}-[";
                                                     susunanSub += (columnsNestedDetails[i].type).replace("\\","")+"]" ;
-                                                    susunanSub += columnsNestedDetails[i].comment==""?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">" ;
+                                                    susunanSub += (!columnsNestedDetails[i].comment?"-<data:input>":"-<data:"+columnsNestedDetails[i].comment+">") ;
                                                     detailsPayloadHeirsOfHeirs[columnsNestedDetails[i].name] = susunanSub;
                                                 }
                                                 detailsPayloadHeirs[sub_subdt.includes(".") ? sub_subdt.split(".")[1]:sub_subdt] = [detailsPayloadHeirsOfHeirs];
