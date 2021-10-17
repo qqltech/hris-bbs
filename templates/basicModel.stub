@@ -7,11 +7,19 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class __class extends Model
-{    
-    public $lastUpdate  = "__lastupdate";
+{   
+    /**
+     * Basic Laravel model properties
+     */
     protected $table    = '__table';
     protected $guarded  = __config_guarded;
     protected $hidden   = __config_hidden;
+    protected $casts    = __config_casts;
+    protected $fillable = __config_createable;
+
+    /**
+     * Additional properties
+     */
     public $columns     = __columns;
     public $columnsFull = __columnsFull;
     public $joins       = __joins;
@@ -21,7 +29,6 @@ class __class extends Model
     public $detailsHeirs= __detailsHeirs;
     public $unique      = __config_unique;
     public $required    = __config_required;
-    protected $fillable = __config_createable;
     public $createable  = __config_createable;
     public $updateable  = __config_updateable;
     public $searchable  = __config_searchable;
@@ -29,11 +36,21 @@ class __class extends Model
     public $cascade     = __config_cascade;
     public $extendable  = __config_extendable;
     public $deleteOnUse = __config_deleteOnUse;
-    protected $casts    = __config_casts;
+
+    /**
+     * Basic Laravel model relationship if needed
+     */
     __hasMany
     __hasManyThrough
     __belongsTo
-    
+    /**
+     * @override Laravel function
+     */
+    public function getCasts(){return array_merge($this->casts, getCastsParam());}
+
+    /**
+     * Additional function
+     */
     public function customFind($p){return _customFind($this, $p);}
     public function customGet($p){return _customGetData($this,$p);}
     __customfunction__
