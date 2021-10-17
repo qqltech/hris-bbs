@@ -15,6 +15,7 @@
         "illuminate/mail": "^8.27",
         "illuminate/notifications": "^8.36",
         "intervention/image": "^2.6",
+        "intervention/imagecache": "^2.5",
         "jenssegers/agent": "^2.6",
         "kitloong/laravel-migrations-generator": "^4.5",
         "laravel/lumen-framework": "^8.0",
