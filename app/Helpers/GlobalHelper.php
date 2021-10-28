@@ -2002,7 +2002,7 @@ function _uploadexcel($model, $request)
         DB::commit();
       	return response()->json(["status"=>"success","data"=>$bulkData],200);
 }
-function uploadfile($model, $req, $uniqueName=null ){
+function uploadfile($model, $req, $uniqueName=null, $extension=true ){
     $modelArray = explode("\\",get_class($model));
     $modelName = end($modelArray);
     $validator = Validator::make($req->all(), [
@@ -2013,9 +2013,9 @@ function uploadfile($model, $req, $uniqueName=null ){
     }
     $code= Carbon::now()->format('his').crc32(uniqid());
     if($uniqueName){
-        $fileName = $uniqueName.".{$req->file->extension()}";
+        $fileName = $uniqueName.($extension?$req->file->extension():'');
     }else{
-        $fileName = $req->filename?$req->filename.".{$req->file->extension()}":sanitizeString($req->file->getClientOriginalName());
+        $fileName = $req->filename?$req->filename.($extension?$req->file->extension():''):sanitizeString($req->file->getClientOriginalName());
         $fileName = $code."_".$fileName;
     }
     Storage::disk('uploads')->putFileAs(
