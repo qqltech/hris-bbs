@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 $router->group(['prefix'=>'docs'], function () use ($router) {
     $router->get('/frontend', function(){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
@@ -145,5 +146,47 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
     
     $router->get('/documentation/{dt}', function($dt){
         return view("docs.docs-".(str_replace([".md","_"],["",""],strtolower($dt))) );
+    });
+    $router->get('/blades', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        return view('defaults.unauthorized')->with('data',[
+            'page'=>'halaman backend',
+            'url'=>url("docs/blades")
+        ]);
+    });
+    $router->post('/blades', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
+            return view('defaults.unauthorized')->with('data',[
+                'page'=>'halaman blades',
+                'url'=>url("docs/blades"),
+                'salah'=>true
+            ]);
+        }else{            
+            try{
+                $data = [
+                    'page'=>'halaman blades',
+                    'url'=>url("docs/blades"),
+                    'password'=>$req->password,
+                    'salah'=>true
+                ];
+            }catch(Exception $e){
+                return $e->getMessage();
+            }
+            $dir = resource_path("views/projects");
+            
+            if( ! File::exists($dir) ){
+                File::makeDirectory( $dir, 493, true);
+            }
+            $files = array_filter(scandir($dir),function($dt){
+                return !in_array($dt,['.','..']);
+            });
+            $files = array_values($files);
+            return view("defaults.blades", compact("files") );
+        }
     });
 });
