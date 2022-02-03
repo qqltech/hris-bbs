@@ -1,7 +1,14 @@
 <?php
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 $router->group(['prefix'=>'docs'], function () use ($router) {
+    $router->get('/frontend-params', function(){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        $list = DB::table("default_params")->selectRaw("modul,name,note,is_active,params,prepared_query")->orderBy('modul')->get();
+        return view("defaults.paramaker-frontend",compact('list'));
+    });
+    
     $router->get('/frontend', function(){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);
@@ -147,6 +154,36 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
     $router->get('/documentation/{dt}', function($dt){
         return view("docs.docs-".(str_replace([".md","_"],["",""],strtolower($dt))) );
     });
+
+    $router->get('/paramaker', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        return view('defaults.unauthorized')->with('data',[
+            'page'=>'halaman template prepared parameter',
+            'url'=>url("docs/paramaker")
+        ]);
+    });
+    $router->post('/paramaker', function(Request $req){
+        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return response()->json("SERVER WAS CLOSED",404);
+        }
+        if(!Schema::hasTable("default_params")){
+            abort(404);
+        }
+        
+        if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
+            return view('defaults.unauthorized')->with('data',[
+                'page'=>'halaman template prepared parameter',
+                'url'=>url("docs/paramaker"),
+                'salah'=>true
+            ]);
+        }else{
+            $list = DB::table("default_params")->orderBy('modul')->get();
+            return view("defaults.paramaker",compact('list'));
+        }
+    });
+
     $router->get('/blades', function(Request $req){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);

@@ -100,7 +100,7 @@ _number::cb	$data.no_rekening	$data.nama_rekening	$data.saldo_awal::.r	$data.deb
                     id:me.selectedTemplate.id
                 },
                 headers     : {
-                    laradev:"quantumleap150671",
+                    laradev:"{{env('LARADEVPASSWORD','bismillah')}}",
                 }
             }
             me.isLoading=true;

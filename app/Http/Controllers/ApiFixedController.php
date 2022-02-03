@@ -25,6 +25,7 @@ class ApiFixedController extends Controller
     private $errors       = [];
     private $success       = [];
     private $parentModelName;
+    private $isDetailDirection = false;
     private $lastParentId;
     private $lastParentName;
     private $operationId=null;
@@ -46,7 +47,7 @@ class ApiFixedController extends Controller
         $this->isMultipart = (strpos($request->header("Content-Type"),"multipart") !==FALSE)?true:false;
         $this->originalRequest = $request->capture();
         $this->requestData = $request->all();
-        $this->requestMeta = $request->getMetaData();
+        $this->requestMeta = $request->capture()->getMetaData();
         if(config('request')==null){
             config(['request'=>$this->requestData]);
             config(['requestHeader'=>$this->requestMeta->header()]);
@@ -55,6 +56,7 @@ class ApiFixedController extends Controller
         }
         $this->parentModelName=$request->route("modelname");
         $this->operationId=($request->route("id")!=null&&$request->route("id")!="")?$request->route("id"):null;
+
         if($backdoor){
             return;
         }
@@ -91,6 +93,21 @@ class ApiFixedController extends Controller
         if(!$this->is_data_not_unique($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_model_deletable($this->parentModelName, $this->operationId)){return;};
         $this->is_detail_valid($this->parentModelName, $this->requestData);
+
+        if( $request->route("detailmodelname") ){
+            $this->isDetailDirection = true;
+            $this->parentModelName = $request->route("detailmodelname");
+            $this->operationId = $request->route("detailid");
+
+            if(!$this->is_model_exist( $this->parentModelName )){return;};
+            if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}
+            if(!$this->is_operation_authorized($this->parentModelName )){return;};
+            if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
+            if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
+            if(!$this->is_data_not_unique($this->parentModelName, $this->requestData)){return;};
+            if(!$this->is_model_deletable($this->parentModelName, $this->operationId)){return;};
+            $this->is_detail_valid($this->parentModelName, $this->requestData);
+        }
     }
     private function serializeMultipartData(){
         foreach( $this->requestData as $key=>$value ){
@@ -195,6 +212,9 @@ class ApiFixedController extends Controller
         $modelCandidate     = "\App\Models\CustomModels\\$modelName";
         $model              = new $modelCandidate;
         $operationValidator = $this->operation."Validator";
+        $customString       = $this->operation."ValidatorResponse";
+        $customResponseValidator = isset($model->$customString) ? $model->$customString : [];
+        
         $arrayValidation    = $model->$operationValidator;
 
         if(isset($model->autoValidator) && $model->autoValidator){
@@ -240,10 +260,22 @@ class ApiFixedController extends Controller
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 if(isset($model->autoValidator) && $model->autoValidator){
-                    $validator = Validator::make($isiData, $autoValidators);
+                    $validator = Validator::make($isiData, $autoValidators, $customResponseValidator);
                     if ( $validator->fails()) {
                         foreach($validator->errors()->all() as $error){
-                            $this->errors[] = "[INVALID]".$error."[$modelName] index[$i]";
+                            $nativeError = $error;                            
+                            // preg_match( '/\.(\d+)\./', $nativeError,  $match );
+                            // if( count($match)>1){
+                            //     $error = str_replace($match[0]," Sub Index: ".($match[1]+1)." ", $nativeError);
+                            // }
+                            $error = str_replace("."," line: ".($i+1).".", $error);
+                            if(method_exists($model, "validationErrorReplacer")){
+                                $error = $model->validationErrorReplacer($error);
+                            }
+                            $formattedError = "[INVALID]".$error."[$modelName] index[$i]";
+                            if( !in_array( $formattedError, $this->errors ) ){
+                                $this->errors[] = $formattedError;
+                            }
                         }
                         $this->isAuthorized=false;
                         return false;
@@ -259,10 +291,22 @@ class ApiFixedController extends Controller
                         return $dtm;
                     }, $arrayValidation);
                 }
-                $validator = Validator::make($isiData, $arrayValidation);
+                $validator = Validator::make($isiData, $arrayValidation,  $customResponseValidator);
                 if ( $validator->fails()) {
                     foreach($validator->errors()->all() as $error){
-                        $this->errors[] = "[INVALID]".$error."[$modelName] index[$i]";
+                        $nativeError = $error;                       
+                        // preg_match( '/\.(\d+)\./', $nativeError,  $match );
+                        // if( count($match)>1){
+                        //     $error = str_replace($match[0]," Sub Index: ".($match[1]+1)." ", $nativeError);
+                        // }
+                        $error = str_replace("."," line: ".($i+1).".", $error); 
+                        if(method_exists($model, "validationErrorReplacer")){
+                            $error = $model->validationErrorReplacer($error);
+                        }
+                        $formattedError = "[INVALID]".$error."[$modelName] index[$i]";
+                        if( !in_array( $formattedError, $this->errors ) ){
+                            $this->errors[] = $formattedError;
+                        }
                     }
                     $this->isAuthorized=false;
                     return false;
@@ -270,9 +314,12 @@ class ApiFixedController extends Controller
             }
         }else{
             if(isset($model->autoValidator) && $model->autoValidator){
-                $validator = Validator::make($data, $autoValidators);
+                $validator = Validator::make($data, $autoValidators, $customResponseValidator);
                 if ( $validator->fails()) {
                     foreach($validator->errors()->all() as $error){
+                        if(method_exists($model, "validationErrorReplacer")){
+                            $error = $model->validationErrorReplacer($error);
+                        }
                         $this->errors[] = "[INVALID]".$error."[$modelName]";
                     }
                     $this->isAuthorized=false;
@@ -289,9 +336,12 @@ class ApiFixedController extends Controller
                     return $dtm;
                 }, $arrayValidation);
             }
-            $validator = Validator::make($data, $arrayValidation);
+            $validator = Validator::make($data, $arrayValidation, $customResponseValidator);
             if ( $validator->fails()) {
                 foreach($validator->errors()->all() as $error){
+                    if(method_exists($model, "validationErrorReplacer")){
+                        $error = $model->validationErrorReplacer($error);
+                    }
                     $this->errors[] = "[INVALID]".$error."[$modelName]";
                 }
                 $this->isAuthorized=false;
@@ -491,6 +541,14 @@ class ApiFixedController extends Controller
         
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
+                config([
+                    'operating'=>[
+                        'type'      => 'create',
+                        'detail'    => $modelName,
+                        'index'     => isset( $isiData['_additionalIdx'] ) ? $isiData['_additionalIdx'] : $i
+                    ]
+                ]);
+                $isiData["_seq"] = $i;
                 $additionalData = $this->createAdditionalData($model, $isiData);
                 $eliminatedData = $this->createEliminationData($model, $isiData);
                 $processedData  = array_merge($eliminatedData, $additionalData);
@@ -524,7 +582,7 @@ class ApiFixedController extends Controller
                 $finalData  = $createBeforeEvent["data"];
                 
                 $finalModel = ($this->getParentClass($model))->create(reformatData($finalData,$model));
-                $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
+                $model->createAfter($finalModel, $isiData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
                     if(is_array($value) && count($value)>0 && $this->checkDetailExist($key, $detailsArray) ){
@@ -580,6 +638,9 @@ class ApiFixedController extends Controller
                         ]);
                         if ( $validator->fails()) {
                             foreach($validator->errors()->all() as $error){
+                                if(method_exists($model, "validationErrorReplacer")){
+                                    $error = $model->validationErrorReplacer($error);
+                                }
                                 $this->errors[] = "[INVALID]".$error."[$modelName]";
                             }
                             $this->operationOK=false;
@@ -596,7 +657,7 @@ class ApiFixedController extends Controller
             }
             
             $finalModel = ($this->getParentClass($model))->create(reformatData($finalData,$model));
-            $model->createAfter($finalModel, $processedData, $this->requestMeta, $finalModel->id);
+            $model->createAfter($finalModel, $data, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
             foreach( $data as $key => $value ){
@@ -741,10 +802,17 @@ class ApiFixedController extends Controller
                 $tableExplode = explode('.', $table);
                 $dataDetail = $model->where((count($tableExplode)==1?$table:$tableExplode[1])."_id","=",$id)->get();              
                 // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=gagal");  
-                foreach( $dataDetail as $dtl ){
+                foreach( $dataDetail as $idxDtl => $dtl ){
                     if(!$this->is_model_deletable($detail, $dtl->id)){
                         return;
                     };
+                    config([
+                        'operating'=>[
+                            'type'      => 'delete',
+                            'detail'    => $detail,
+                            'index'     => $idxDtl
+                        ]
+                    ]);
                     $this->deleteOperation($detail, null, $dtl->id, $id);
                 }
             }
@@ -791,6 +859,9 @@ class ApiFixedController extends Controller
                     ]);
                     if ( $validator->fails()) {
                         foreach($validator->errors()->all() as $error){
+                            if(method_exists($model, "validationErrorReplacer")){
+                                $error = $model->validationErrorReplacer($error);
+                            }
                             $this->errors[] = "[INVALID]".$error."[$modelName]";
                         }
                         $this->operationOK=false;
@@ -840,11 +911,20 @@ class ApiFixedController extends Controller
                 $fkName.="_id";
             }
             foreach($data[$detailClass] as $index => $valDetail){
-                if(isset($valDetail['id']) && is_numeric($valDetail['id']) && (new $modelCandidate)->where($fkName,$id)->where('id',$valDetail['id'])->count()>0){
+                if(isset($valDetail['id']) && is_numeric($valDetail['id']) && 
+                    (new $modelCandidate)->where($fkName,$id)->where('id',$valDetail['id'])->count()>0){
+                    config([
+                        'operating'=>[
+                            'type'      => 'update',
+                            'detail'    => $detail,
+                            'index'     => $index
+                        ]
+                    ]);
                     $this->updateOperation($detailClass, $valDetail, $valDetail['id']);
                     $detailIds[]=$valDetail['id'];
                     $detailOld [] = $valDetail;
                 }else{
+                    $valDetail['_additionalIdx'] = $index;
                     $detailNew [] = $valDetail;
                 }
             };
@@ -862,7 +942,6 @@ class ApiFixedController extends Controller
                     $this->operationOK=false;
                     return;
                 };
-                
                 $this->createOperation($detailClass, $detailNew, $id, $model->getTable()); //jeregi
             }
             // foreach($detailOld as $oldDetail){
@@ -900,8 +979,12 @@ class ApiFixedController extends Controller
         }
         $model = null;  
     }
-    public function router(Request $request, $modelname, $id=null)
+    public function router(Request $request, $modelname, $id=null, $detailmodelname=null, $detailid=null)
     {
+        if( $detailmodelname ){
+            $modelname = $detailmodelname;
+            $id = $detailid;
+        }
         if($this->isAuthorized){
             if($this->customOperation){
                 $modelCandidate = "\App\Models\CustomModels\\$this->parentModelName";
@@ -912,11 +995,11 @@ class ApiFixedController extends Controller
                     $this->messages[] ="[UNKNOWN] function [$functionName] in Model [$this->parentModelName] does not exist";
                     return response()->json(["messages"=>$this->messages],400);
                 }
-                $result = $model->$function($this->originalRequest);
+                $result = $model->$function(  $request );
                 return $result;
             }
             if($this->operation=='read'){
-                return $this->readOperation($modelname,$this->requestData,$id);
+                return $this->readOperation($modelname, $this->requestData,$id);
             }
             DB::beginTransaction();
             try{

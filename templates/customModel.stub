@@ -32,7 +32,11 @@ class __class extends __basicClass
     {
         return true;
     }
-    public function readRoleCheck()
+    public function listRoleCheck() // read list of data
+    {
+        return true;
+    }
+    public function readRoleCheck() // read a row of data
     {
         return true;
     }
@@ -77,14 +81,14 @@ class __class extends __basicClass
     {
         
     }    
-    public function createAfterTransaction($newdata, $olddata, $data, $meta)
+    /*public function createAfterTransaction($newdata, $olddata, $data, $meta)
     {
-        //do here
+        
     }
     public function updateAfterTransaction($newdata, $olddata, $data, $meta)
     {
-        //do here
-    }
+
+    }*/
     public function overrideGetParams($params, $id=null)
     {
         /*if( $params->where_raw != '' && $params->where_raw != null ){
@@ -143,28 +147,6 @@ class __class extends __basicClass
     		return \Excel::download(new \ExportExcel($query), \Carbon::now()->format('d-m-Y')."_".$this->getTable().'.xlsx');    
         }
     }
-
-    public function custom_getdraftid($request)
-    {
-        $karakterSeq = 4;
-        $namakolom = "no_transaction";
-        $prefix = "BB".date('Ymd');
-        $data = $this->latest('id')->first();
-      	if($data){
-          $count = substr($data->$namakolom, -($karakterSeq)) + 1;        
-        }else{
-        	$count=1;
-        }
-        $no = $prefix . str_repeat("0", $karakterSeq - strlen($count)) . $count;
-      	return response()->json($no);
-    }
-
-    /*public function frontendNotice(){
-    	return implode("\n",[
-        	"1. Catatan 1 field abc tidak boleh lagi",
-          	"2. Field tanggal dengan format yyyy-mm-dd",          	
-        ]);
-    }*/
 }
 
 

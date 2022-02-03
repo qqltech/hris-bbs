@@ -28,6 +28,8 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         
         $router->get('/migrations', 'LaradevController@readMigrations');
         $router->get('/logs/{table}', 'LaradevController@readLog');
+        $router->get('/tests/{table}', 'LaradevController@readTest');
+        $router->put('/tests/{table}', 'LaradevController@editTest');
         $router->get('/alter/{table}', 'LaradevController@readAlter');
         $router->put('/alter/{table}', 'LaradevController@editAlter');
         $router->get('/migrations/{table}', 'LaradevController@readMigrations');
@@ -39,12 +41,15 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->get('/dorealfk', 'LaradevController@setPhysicalForeignKeys');
 
         $router->get('/migrate/{table}', 'LaradevController@doMigrate');
+        $router->get('/do-test/{table}', 'LaradevController@doTest');
+        $router->get('/queries10rows/{table}', 'LaradevController@queries10rows');
         $router->get('/refreshalias/{table}', 'LaradevController@refreshAlias');
 
         $router->post("/uploadlengkapi","LaradevController@uploadLengkapi");
         $router->post("/uploadtest","LaradevController@uploadTest");
         $router->post("/uploadwithcreate","LaradevController@uploadWithCreate");
         $router->post("/uploadtemplate","LaradevController@uploadTemplate");
+        $router->post("/paramaker","LaradevController@paramaker");
     });
 
     $router->post("/getnotice","LaradevController@getNotice");

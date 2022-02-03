@@ -1350,6 +1350,8 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
 function _customGetData($model,$params)
 {
     $table = $model->getTable();
+    $className = class_basename( $model );
+    $isParent = $className == (app()->request->route('detailmodelname') || app()->request->route('modelname'));
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;    
     $modelCandidate = "\\".get_class($model);
@@ -1361,17 +1363,17 @@ function _customGetData($model,$params)
         $fieldSelected[] = "$table.$column";
         $metaColumns[$column] = "frontend";
     }
-    // if(!in_array(class_basename($model),array_keys(config('tables')))){
-    //     $func = "metaFields";
-    //     if( method_exists( $model, $func) ){
-    //         $metaColumns = array_merge( $metaColumns, $model->$func($model->columns) );
-    //     }
-    //     config(['tables'=>array_merge(config('tables'), [class_basename($model)=>$metaColumns]) ]);
-    // }
     $allColumns = $fieldSelected;
     $kembar = [];
     $joined = [];
-    if( $params->join ){
+    $enableJoin = $params->join;
+    if( $isParent ){
+        $enableJoin = req('join') ?? $params->join;
+    }else{
+        $enableJoin = req($className."_join") ?? true;
+    }
+    $enableJoin = is_bool($enableJoin) ? $enableJoin : (strtolower($enableJoin) === 'false' ? false : true);
+    if( $enableJoin ){
         foreach( $model->joins as $join ){
             $arrayJoins=explode("=",$join);
             $arrayParents=explode(".",$arrayJoins[0]);
@@ -1426,15 +1428,11 @@ function _customGetData($model,$params)
             }
         }
     }
-    if($params->selectfield){
-        $selectFields = str_replace(["this.","\n","  ","\t"],["$table.","","",""],$params->selectfield);
+    if($params->selectfield || ($isParent && req('selectfield')) || req($className."_selectfield")){
+        $rawSelectFields = req($className."_selectfield") ?? req('selectfield') ?? $params->selectfield;
+        $selectFields = str_replace(["this.","\n","  ","\t"],["$table.","","",""], $rawSelectFields);
         $selectFields = explode(",", $selectFields);
         $fieldSelected= $selectFields;
-        // $allColumns = array_filter($allColumns,function($dt)use($selectFields){                
-        //     if( in_array(explode( ".", $dt)[1], $selectFields) ){
-        //         return $dt;
-        //     }
-        // });
     }
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
@@ -1442,10 +1440,12 @@ function _customGetData($model,$params)
         $fieldSelected = array_merge( $fieldSelected, explode(",",$addSelect));
     }
     
-    if( isset($params->addJoin) && $params->addJoin!=null ){
-        $joiningString = str_replace("this.","$table.",strtolower($params->addJoin));
+    if( $params->addJoin || ($isParent && req('addjoin')) || req($className."_addjoin") ){
+        $addJoin = req($className."_addjoin") ?? req('addjoin') ?? $params->addJoin;            
+        $joiningString = str_replace("this.","$table.",strtolower($addJoin));
         $joins = explode( ",", $joiningString );
         foreach($joins as $join){
+            $join = strtolower($join);
             if(strpos( $join, " and ")!==FALSE){
                 $join = explode(" and ",$join);
                 $joinedTable=explode(".",$join[0])[0];
@@ -1457,15 +1457,15 @@ function _customGetData($model,$params)
                             $parent = "{$explodes[0]}.{$explodes[1]}";
                         }else{
                             $parent = $explodes[0];
-                        }                        
+                        }
                         $onParent = explode("=",$statement)[0];
                         $onMe = explode("=",$statement)[1];
                         $q->on($onParent,"=",$onMe);
                     }
                 });
             }else{
-                $candParent = explode("=",$join)[0];
-                $explodes = explode(".",$candParent);
+                $candParent = explode("=", $join)[0];
+                $explodes = explode(".", $candParent);
                 if( count($explodes)>2 ){
                     $parent = $explodes[0].".".$explodes[1];
                 }else{
@@ -1486,18 +1486,22 @@ function _customGetData($model,$params)
         $searchfield = $params->searchfield;
         $string  = strtolower($params->search);
         $additionalString = getDriver()=="pgsql"?"::text":"";
+
+        $isAutoPrefix = req('auto_prefix')===null?true:req('auto_prefix');
+        $isAutoPrefix = $isAutoPrefix==='false'?false:true;
         $model = $model->where(
-            function ($query)use($allColumns,$string,$additionalString, $searchfield,$table) {
+            function ($query)use($allColumns,$string,$additionalString, $searchfield,$table,$isAutoPrefix) {
                 if($searchfield!=null){
                     $searchfieldArray = explode(",", strtolower($searchfield) );
                     foreach($searchfieldArray as $fieldSearching){
-                        if(strpos($fieldSearching,".")===false){
+                        if($isAutoPrefix && strpos($fieldSearching,".")===false){
                             $fieldSearching = "this.$fieldSearching";
                         }
                         $fieldSearching = str_replace( "this.","$table.", $fieldSearching );
-                        if(in_array($fieldSearching,$allColumns)){
+                        // if(in_array($fieldSearching,$allColumns)){
                             $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%$string%'"));
-                        }
+                            // $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%?%'"),[$string]); // calon
+                        // }
                         // $found = null;
                         // foreach($allColumns as $col){
                         //     if(strpos($col, $fieldSearching)){
@@ -1511,41 +1515,54 @@ function _customGetData($model,$params)
                             continue;
                         }
                         $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
+                        // $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%?%'"),[$string]); // calon
                     }
                 }
         });
-        // $model = $model->where(
-        //     function ($query)use($allColumns,$string,$additionalString, $searchfield) {
-        //         foreach($allColumns as $column){
-        //             if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
-        //                 continue;
-        //             }
-        //             $arrayColumn = explode(".",$column);
-        //             if($searchfield!=null && !in_array(end($arrayColumn), explode(",", $searchfield))){
-        //                 continue;
-        //             }
-        //             $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
-        //         }
-        // });
+    }
+    /**
+     * Filter direct params misal this.column:21
+     */
+    $requestDataArr = (array)req();
+    $directFilter = [];
+    foreach($requestDataArr as $key => $val){
+        if(Str::startsWith($key, "this_")){
+            $directFilter[]=$key;
+            $model = $model->where(str_replace("this_","$table.",$key ), $val);
+        }
     }
     if($params->where_raw){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
+
+    if(app()->request->route('detailmodelname')){
+        $parentModelName = app()->request->route('modelname');
+        $parentId = app()->request->route('id');
+
+        $model = $model->where(function($q)use( $parentModelName, $parentId ){
+            $q->where( $parentModelName."_id", $parentId );
+        });
+    }
+
     if(isset($params->notIn) && $params->notIn!==null && strpos($params->notIn,":")!==false ){
         $columnNotIn = explode(":", $params->notIn)[0];
         $idNotIn = explode(",", explode(":", $params->notIn)[1]);
         $model = $model->whereNotIn(str_replace("this.","$table.", $columnNotIn), $idNotIn );
     }
     
-    if( req("filters") ){
+    if( req( $className."_filters" ) || ($isParent && req ("filters" )) ){
         $additionalString = getDriver()=="pgsql"?"::text":"";
-        $filters = explode(",",req("filters"));
-        $operator = req("filters_operator")?req("filters_operator"):(getDriver()=="pgsql"?"~*":'LIKE');
+        $currentFilters = req( $className."_filters") ?? req("filters");
+        $filters = explode(",", $currentFilters);
+        $filterOperators = req( $className."_filters_operator") ?? req("filters_operator");
+        $operator = $filterOperators ?? (getDriver()=="pgsql"?"~*":'LIKE');
         $aliases = [];
         if( method_exists( $modelExtender, 'aliases') ){
             $aliases = $modelExtender->aliases();
         }
-        $model = $model->where( function($q)use($filters,$aliases,$additionalString,$operator){
+        $isAutoPrefix = req('auto_prefix')===null?true:req('auto_prefix');
+        $isAutoPrefix = $isAutoPrefix==='false'?false:true;
+        $model = $model->where( function($q)use($filters,$aliases,$additionalString,$operator,$table,$isAutoPrefix){
             foreach($filters as $filter){
                 $filterKeys = explode( "=", $filter);
                 if( count($filterKeys)>2 ){
@@ -1556,15 +1573,61 @@ function _customGetData($model,$params)
                 if( $keyAliased ){
                     $keyFilter = $keyAliased;
                 }
+                if( $isAutoPrefix && strpos($keyFilter,".")===false  ){
+                    $keyFilter = "$table.$keyFilter";
+                }
                 $q->whereRaw( "{$keyFilter}$additionalString $operator '{$filterKeys[1]}'");
             }
         });
     }
     
-    if(isset($params->group_by) && $params->group_by!=null){
-        $model = $model->groupBy(DB::raw($params->group_by));
-    }
+    if( req("query_name") ){
+        $rawWhere = DB::table("default_params")->select("prepared_query","params")
+            ->where("name",req("query_name"))->first();
+        if(!$rawWhere){
+            trigger_error(json_encode(["errors"=>"query_name ".req('query_name')." does not exist"]));
+        }
 
+        $whereStr = $rawWhere->prepared_query;
+        if( !empty($rawWhere->params) ){
+            $paramsArr = explode(",", $rawWhere->params);
+            $backendParams = [];
+            $frontendParams = [];
+            $frontendParamSent = (array) req();
+            foreach($paramsArr as $param){
+                if( strpos($param,"backend_")===false ){
+                    if(!in_array($param, array_keys($frontendParamSent)) ) {
+                        trigger_error(json_encode(["errors"=>"parameter $param does not exist"]));
+                    }
+                    $frontendParams[] = $param;
+                }else{
+                    $backendParams[] = $param;
+                }
+            }
+
+            $acceptedParams = array_only( $frontendParamSent, $frontendParams );
+            if( config( req("query_name") ) ){
+                $acceptedParams = array_merge( $acceptedParams, config( req("query_name") ) );
+            }
+
+            $model = $model->where(function($q)use($table, $whereStr, $acceptedParams){
+                $q->whereRaw(str_replace("this.","$table.", $whereStr ), $acceptedParams );
+            });
+        }else{
+            $model = $model->where(function($q)use($table,$whereStr){
+                $q->whereRaw(str_replace("this.","$table.",$whereStr ) );
+            });
+        }
+    }
+    
+    if(  req("orin") && strpos(req("orin"),":")!==false ){
+        $columnIn = explode(":", req("orin"))[0];
+        $idsIn = explode(",", explode(":", req("orin"))[1]);
+        $model = $model->orWhereRaw( str_replace("this.","$table.", $columnIn)." IN (".implode(',',$idsIn).")" );
+    }
+    if(isset($params->group_by) && $params->group_by!=null){
+        $model = $model->groupBy( DB::raw(str_replace("this.", "$table.", urldecode($params->group_by) )) );
+    }
     
     if($params->order_by_raw){
         $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );
@@ -1579,7 +1642,7 @@ function _customGetData($model,$params)
                 }
             }
         }
-        $model=$model->orderBy($order,$params->order_type==null?"asc":$params->order_type);
+       $model=$model->orderBy(\DB::raw($order),$params->order_type==null?"asc":$params->order_type);
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
 
@@ -1616,7 +1679,7 @@ function _customGetData($model,$params)
                 continue;
             }
             $fixedData[$index] = $transformedData;
-            foreach(["create","update","delete","read","print"] as $akses){
+            foreach(["create","update","delete","read","print","list"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( ["meta_$akses"=>$modelExtender->$func()], $fixedData[$index]);
@@ -1694,7 +1757,7 @@ function _customGetData($model,$params)
                 continue;
             }
             $fixedData[$index] = $transformedData;
-            foreach(["create","update","delete","read","print"] as $akses){
+            foreach(["create","update","delete","read","print","list"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( ["meta_$akses"=>$modelExtender->$func()], $fixedData[$index] );
@@ -1800,15 +1863,11 @@ function _customFind($model, $params)
             _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
         }
     }
-    if($params->selectfield){
-        $selectFields = $params->selectfield;
+    if($params->selectfield || req('selectfield')){
+        $rawSelectFields = req('selectfield') ?? $params->selectfield;
+        $selectFields = str_replace(["this.","\n","  ","\t"],["$table.","","",""], $rawSelectFields);
         $selectFields = explode(",", $selectFields);
         $fieldSelected= $selectFields;
-        // array_filter($fieldSelected,function($dt)use($selectFields){
-        //     if( in_array(explode(" AS",explode( ".", $dt)[1])[0], $selectFields)  || strpos(strtolower($dt),"sum(")!==false || strpos(strtolower($dt),"count(")!==false){
-        //         return $dt;
-        //     }
-        // });
     }
     
     if( isset($params->addSelect) && $params->addSelect!=null ){
@@ -1816,8 +1875,9 @@ function _customFind($model, $params)
         $fieldSelected = array_merge( $fieldSelected, explode(",",$addSelect));
     }
     
-    if( isset($params->addJoin) && $params->addJoin!=null ){
-        $joiningString = str_replace("this.","$table.",strtolower($params->addJoin));
+    if( $params->addJoin || req('addjoin') ){
+        $addJoin = req('addjoin') ?? $params->addJoin;
+        $joiningString = str_replace("this.","$table.",strtolower($addJoin));
         $joins = explode( ",", $joiningString );
         foreach($joins as $join){
             if(strpos( $join, " and ")!==FALSE){
@@ -1855,6 +1915,15 @@ function _customFind($model, $params)
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
+    if(app()->request->route('detailmodelname')){
+        $parentModelName = app()->request->route('modelname');
+        $parentId = app()->request->route('id');
+
+        $model = $model->where(function($q)use( $parentModelName, $parentId ){
+            $q->where( $parentModelName."_id", $parentId );
+        });
+    }
+
     $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
     if( !$data ){
         abort(404,json_encode([
@@ -1934,6 +2003,12 @@ function _customFind($model, $params)
             $data[$newKey] = $data[$key];
             unset($data[$key]);
         }
+    }
+    $func="transformArrayData";
+    if( method_exists( $modelExtender, $func )  ){
+        $newFixedData = $modelExtender->$func( $data );
+        $fixedData = gettype($newFixedData)=='array' ? $newFixedData : $data;
+        $data   = $fixedData;
     }
     return $data;
 }
@@ -2026,6 +2101,7 @@ function uploadfile($model, $req, $uniqueName=null, $extension=true ){
 function ff($data,$id=""){
     $channel=env("LOG_CHANNEL",env('APP_NAME',uniqid()));
     $client = new \GuzzleHttp\Client();
+    $socketServer=env("LOG_SENDER");
     try{
         if(!in_array(gettype($data),["object","array"])){
             $data = [$data];
@@ -2036,14 +2112,14 @@ function ff($data,$id=""){
         $filename = explode("/",$dtrace->file);
         $data = array_merge($data,[ "debug_id"=>$id." [".str_replace(".php","",end($filename))."-$dtrace->line]"]);        
         $client->post(
-            "https://backend.dejozz.com/chatbot/public/websocket-send/$channel",
+            "$socketServer/$channel",
             [
                 'form_params' => $data
             ]
         );
     }catch(\Exception $e){
         $client->post(
-            "https://backend.dejozz.com/chatbot/public/websocket-send/$channel",
+            "$socketServer/$channel",
             [
                 'form_params' => ["debug_error"=>$e->getMessage(),"debug_id"=>$id]
             ]
@@ -2324,7 +2400,7 @@ function renderpdf( $config,$arrayData,$pageConfig=[],$type="pdf" ){
     $payLoad = array_merge($payLoad,$pageConfig);
     try{    
         $response = $client->post(
-            env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_htmlpdf.php"),
+            env('HTMLPDF_RENDERER'),
             [
                 'json' => $payLoad,
                 'headers' => [
@@ -2361,7 +2437,7 @@ function renderXLS( $config,$arrayData,$pageConfig=[] ){
         ];
         $payLoad = array_merge($payLoad,$pageConfig);
         $response = $client->post(
-            env('PDF_RENDERER',"https://backend.dejozz.com/pdfrenderer/v2_xlsx.php"),
+            env('XLS_RENDERER'),
             [
                 'json' => $payLoad,
                 'headers' => [
@@ -2417,6 +2493,26 @@ function getLog($filename=null,$string=false){
     }
     return json_decode(File::get($path),true);
 }
+function getTest($filename=null,$string=false){
+    if($filename===null){
+        $dtrace = (object)debug_backtrace(1,true)[0];
+        $filenameArr = explode(php_uname('s')=='Linux'?"/":"\\",$dtrace->file);
+        $filename = str_replace(".php",".json",end($filenameArr));
+    }
+    $filename = Str::camel(ucfirst($filename));
+    $path = base_path("tests/$filename"."Test.php");
+    if( ! File::exists($path) ){
+        return str_replace( [
+            "___class___"
+        ],[
+            $filename
+        ],File::get( base_path("templates/test.stub") ) );
+    }
+    if($string){
+        return File::get($path);
+    }
+    return File::get($path);
+}
 function removeLog($filename=null){
     if($filename===null){
         $dtrace = (object)debug_backtrace(1,true)[0];
@@ -2431,11 +2527,12 @@ function removeLog($filename=null){
 }
 
 function req($key=null){
-    if(app()->request->method()=="GET" ){
-        $data = (object)config('request');
-    }else{
-        $data = json_decode(file_get_contents('php://input'));
-    }
+    // if(app()->request->method()=="GET" ){
+    //     $data = (object)config('request');
+    // }else{
+    //     $data = json_decode(file_get_contents('php://input'));
+    // }
+    $data = json_decode(json_encode( config('request') ));
     if($key!==null){
         return isset($data->$key)? $data->$key : null;
     }

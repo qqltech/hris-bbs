@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Http\Request;
 
 abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 {
@@ -10,5 +11,10 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
     public function createApplication()
     {
         return require __DIR__.'/../bootstrap/app.php';
+    }
+    public function setUp():void
+    {
+        parent::setUp();
+        app(Request::class);
     }
 }

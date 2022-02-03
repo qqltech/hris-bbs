@@ -197,6 +197,7 @@
                                 notin       : "column_name:12,13,99",
                                 addselect   : "column_name1,sum(column) as sumfield",
                                 group_by    : "column_name1,column_name2,column3",
+                                query_name  : "Query Name di /docs/frontend-params"
                             },
                             parameters_read_single: {
                                 single      : false,

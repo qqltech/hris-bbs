@@ -14,16 +14,16 @@ $router->group(['prefix'=>'operation'], function () use ($router) {
         $router->patch('/{modelname}/{id}', 'ApiFixedController@router');  //UPDATE SINGLE PARENT-ALL-DETAILS
         $router->delete('/{modelname}/{id}', 'ApiFixedController@router'); //DELETE SINGLE PARENT-ALL-DETAILS
 
-        $router->get('/{modelname}/{id}/{subdetail}', 'ApiController@level2');    //LIST PARENT SUBDETAIL TERTENTU
-        $router->post('/{modelname}/{id}/{subdetail}', 'ApiController@level2');   //CREATE SUBDETAIL TERTENTU DARI PARENT ID
-        $router->put('/{modelname}/{id}/{subdetail}', 'ApiController@level2');    //UPDATE SUBDETAIL TERTENTU DARI PARENT ID
-        $router->patch('/{modelname}/{id}/{subdetail}', 'ApiController@level2');  //UPDATE SUBDETAIL TERTENTU DARI PARENT ID
-        $router->delete('/{modelname}/{id}/{subdetail}', 'ApiController@level2'); //DELETE SUBDETAIL TERTENTU DARI PARENT ID
+        $router->get('/{modelname}/{id}/{detailmodelname}',['as'=>'read_list_detail', 'uses'=> 'ApiFixedController@router']);    //LIST PARENT DETAIL TERTENTU
+        $router->get('/{modelname}/{id}/{detailmodelname}/{detailid}',['as'=>'read_id_detail', 'uses'=>'ApiFixedController@router']);   //CREATE DETAIL TERTENTU DARI PARENT ID
+        //$router->put('/{modelname}/{id}/{detailmodelname}', 'ApiController@router');    //UPDATE DETAIL TERTENTU DARI PARENT ID
+        //$router->patch('/{modelname}/{id}/{detailmodelname}', 'ApiController@router');  //UPDATE DETAIL TERTENTU DARI PARENT ID
+        //$router->delete('/{modelname}/{id}/{detailmodelname}', 'ApiController@router'); //DELETE DETAIL TERTENTU DARI PARENT ID
 
-        $router->get('/{modelname}/{id}/{subdetail}/{idsubdetail}', 'ApiController@level3');
-        $router->put('/{modelname}/{id}/{subdetail}/{idsubdetail}', 'ApiController@level3');
-        $router->patch('/{modelname}/{id}/{subdetail}/{idsubdetail}', 'ApiController@level3');
-        $router->delete('/{modelname}/{id}/{subdetail}/{idsubdetail}', 'ApiController@level3');
+        //$router->get('/{modelname}/{id}/{detailmodelname}/{iddetailmodelname}', 'ApiController@level3');
+        //$router->put('/{modelname}/{id}/{detailmodelname}/{iddetailmodelname}', 'ApiController@level3');
+        //$router->patch('/{modelname}/{id}/{detailmodelname}/{iddetailmodelname}', 'ApiController@level3');
+        //$router->delete('/{modelname}/{id}/{detailmodelname}/{iddetailmodelname}', 'ApiController@level3');
 
     });
 

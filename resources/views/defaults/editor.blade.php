@@ -211,7 +211,7 @@
                         @click="$store.dispatch(item.action, item)"
                         :class="item.action=='alter'?'bg-warning':(!item.migrated?'bg-success':'bg-danger')" 
                         style="z-index:999999;position:fixed;right:18px;bottom:30px;" 
-                        v-if="item.action&&item.action!='log'" :title="item.action" size="sm">
+                        v-if="item.action && item.action!='log' && item.action!='test'" :title="item.action" size="sm">
                         <b-icon :icon="!item.migrated?'arrow-up-circle':'lightning-fill'" v-if="!$store.state.migrating"></b-icon>
                         <b-spinner small type="grow" v-if="$store.state.migrating"></b-spinner><span v-if="$store.state.migrating">Altering/Migrating...</span>
                             
@@ -226,6 +226,16 @@
                         <b-icon icon="arrow-down-circle" v-if="!$store.state.migrating"></b-icon>                            
                     </b-btn>
                     <b-btn pill
+                        v-if="item.action=='test' && item.migrated"
+                        :disabled="$store.state.testing"
+                        @click="$store.dispatch('test', item)"
+                        class="bg-primary" 
+                        style="z-index:999999;position:fixed;right:20px;bottom:30px;" 
+                        title="Run Test" size="sm">
+                        <b-icon icon="lightning-fill" v-if="!$store.state.testing"></b-icon>
+                        <b-spinner small type="grow" v-if="$store.state.testing"></b-spinner><span v-if="$store.state.testing">Running test...</span>                        
+                    </b-btn>
+                    <b-btn pill
                         v-if="['log',''].includes(item.action)"
                         @click="$store.dispatch('reload', item)"
                         class="bg-default" 
@@ -238,6 +248,14 @@
         </div>
       </template>
     </split-pane>
+
+        <b-modal v-model="$store.state.showModal" size="md" hide-footer title="Results" content-class="bg-dark text-white">
+       
+                <div class="text-left">
+                    <p v-html="$store.state.modalHtml" />
+                </div>
+
+        </b-modal>
     <!-- <b-overlay :show="$store.state.prompt" no-wrap style="z-index: 999999">
         <template #overlay>          
           <div
@@ -729,7 +747,10 @@ vm = new Vue({
                 prompt:false,
                 prompt_type:"text-danger",
                 prompt_text:"errors",   
-                migrating:false
+                migrating:false,
+                testing:false,
+                showModal:false,
+                modalHtml:``
             },
             mutations: {
                 changeTab(state,index){
@@ -820,7 +841,10 @@ vm = new Vue({
                         operation = "models";
                     }else if((activeEditor.jenis).toLowerCase().includes("migration")){
                         operation = "migrations";
+                    }else if((activeEditor.jenis).toLowerCase().includes("testing")){
+                        operation = "tests";
                     }
+                    
                     
                     axios({
                         url         : `{{url('laradev')}}/${operation}/${activeEditor.title}`,
@@ -991,6 +1015,35 @@ vm = new Vue({
                         });
                     }
                 },
+                async test({commit,state}, item){
+                    let me = this;
+                    state.testing = true;
+                    axios({
+                        url         : `{{url('laradev/do-test')}}/${item.title}`,
+                        method      : 'get',
+                        credentials : true,
+                        body        : null,
+                        headers     : {
+                            laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
+                        }
+                    }).then(response => {
+                        state.modalHtml=response.data.text+'<br/>'+response.data.output
+                        state.showModal=true
+
+                    }).catch(error => {
+                        window.console.clear();
+                        Swal.fire({
+                            title: `Failed!`,
+                            text: 'Check Your Console',
+                            icon: 'error',
+                            confirmButtonText: 'Ok!'
+                        })
+                        console.log(error.response.data)
+                    }).then(function () {
+                        state.testing = false;
+                    });
+                    
+                },
                 async reload({commit,state}, item){
                     const { value: confirm } = await Swal.fire({
                         title: `Reload Model?`,
@@ -1128,6 +1181,12 @@ vm = new Vue({
                     })
                 }
                 children.push({
+                    migrated:true,name: "Testing",icon:"hammer",src:filename
+                })
+                children.push({
+                    migrated:true,name: "Last 10 Rows",icon:"eye",src:filename
+                })
+                children.push({
                     migrated:true,name: "Delete",icon:"trash",src:filename
                 })
                 treeData.push({
@@ -1148,7 +1207,7 @@ vm = new Vue({
                 icon: 'warning',
                 title: `Debugger is trying to connect to channel [${me.channel}]...`
             });
-            this.connection = new WebSocket("wss://backend.dejozz.com:9001/"+me.channel);
+            this.connection = new WebSocket("{{env('LOG_SERVER')}}/"+me.channel);
             this.connection.onopen = function() {
                 console.log("%c debug is ready to use","background: #222; color: #a0ff5c;font-weight: bold;");
                 Toast.fire({
@@ -1277,6 +1336,31 @@ vm = new Vue({
             }
             if(item.name=='Migration'){
                 icon='lightning'; action='migrate'; endpoint="/migrations/"+item.src;
+            }else if(item.name=='Testing'){
+                icon='hammer'; action='test';endpoint="/tests/"+item.src;
+            }else if( item.name=='Last 10 Rows' ){
+                axios({
+                    url         : "{{url('laradev/queries10rows')}}/"+itemLengkap.name,
+                    method      : 'get',
+                    credentials : true,
+                    headers     : {
+                        laradev:"{{env('LARADEVPASSWORD','bismillah')}}"
+                    }
+                }).then(response => {
+                    me.$store.state.modalHtml=response.data
+                    me.$store.state.showModal=true
+                }).catch(error => {
+                    window.console.clear();
+                    Swal.fire({
+                        title: `Failed!`,
+                        text: 'Check Your Console',
+                        icon: 'error',
+                        confirmButtonText: 'Ok!'
+                    })
+                }).then(function () {
+                    return;
+                });
+                return
             }else if(item.name=='Log'){
                 icon='search'; action='log';endpoint="/logs/"+item.src;
             }else if(item.name=='Alter'){

@@ -17,3 +17,6 @@ Homestead.yaml
 local-*.*
 database/*.sqlite
 resources/views/projects
+.phpunit.*.*
+tests
+testlogs/*

@@ -20,6 +20,7 @@ class DefaultFileStorage extends Migration
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->enum('type',['file','image'])->nullable();
             $table->text('filename')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

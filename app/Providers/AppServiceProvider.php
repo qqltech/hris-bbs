@@ -37,9 +37,17 @@ class AppServiceProvider extends ServiceProvider
               }
             }
             return false;
-        }, ":attribute format must be:[Y-m-d H:i:s], [Y-m-d] or [d/m/Y]");
+        }, "The :attribute format must be:[Y-m-d H:i:s], [Y-m-d] or [d/m/Y].");
+
         Validator::extend('forbidden', function ($attribute, $value, $parameters) {
             return false;
-        }, ":attribute field is forbidden to send");
+        }, "The :attribute field is forbidden to send.");
+
+        Validator::extend('no_space_only', function ($attribute, $value, $parameters) {
+            if( str_replace( [' ',"\t","\n"], ["","",""], $value ) == '' ){
+                return false;
+            }
+            return true;
+        }, "The :attribute field must not be whitespaces only.");
     }
 }

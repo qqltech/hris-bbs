@@ -12,9 +12,11 @@ use Doctrine\DBAL\Types\FloatType;
 use Doctrine\DBAL\Types\Type;
 use App\Helpers\PLSQL as PLSQL;
 use App\Helpers\DBS as DBS;
+use Illuminate\Support\Str;
 use App\Models\Defaults\User;
 use Exception;
 use DateTime;
+use Validator;
 
 class LaradevController extends Controller
 {
@@ -1119,6 +1121,76 @@ class LaradevController extends Controller
     public function readLog(Request $req, $table=null){
         return getLog($table.".json");
     }
+    public function readTest(Request $req, $table=null){
+        return getTest($table);
+    }
+    public function queries10rows(Request $erq, $table=null){
+        $model = getBasic($table);
+        $columns = $model->columns;
+        $orderCol = in_array("id", $columns)?"id":$columns[0];
+        $rows = DB::table($model->getTable())->orderBy($orderCol, 'desc')->limit(10)->get()->toArray();
+        if(!$rows){
+            $rows = [];
+        }
+        $htmlData = "<div class='bg-white text-center' style='padding:5px;max-height:93vh;min-height:15vh;width:100vw;position:fixed;left:0;top:5%;overflow:auto;'>
+        <table cellspacing='0' cellpadding='0' border=1 class='text-dark table table-striped' style='width:100%;font-size:0.75em;'>
+        <thead class='bg-success text-white'><tr>{{HEADER}}</tr></thead><tbody>{{BODY}}</tbody><tfoot>{{FOOTER}}</tfoot></table></div>";
+        $header = "";
+        foreach($columns as $col){
+            $header.="<th class='font-bold'>$col</th>";
+        }
+        $htmlData = str_replace("{{HEADER}}", $header, $htmlData);
+
+        $tbody = "";
+        $tr="<tr>{{tds}}</tr>";
+        foreach($rows as $row){
+            $row = (array)$row;
+            $tds = "";
+            foreach($columns as $col){
+                $tds.="<td>{$row[$col]}</td>";
+            }
+            $tbody.=(str_replace("{{tds}}", $tds, $tr));
+        }
+        $htmlData = str_replace("{{BODY}}", $tbody, $htmlData);
+        $htmlData = str_replace("{{FOOTER}}", $tbody==''?"<p class='text-dark text-center'>No Data</p>":'', $htmlData);
+
+        return $htmlData;
+    }
+    public function doTest(Request $req, $table=null){
+        putenv("APP_ENV=testing");
+        $disabled = explode(',', str_replace(" ","",ini_get('disable_functions')) );
+        $canExec =  !in_array('exec', $disabled);
+        if($canExec ){
+            $return = 0;
+            try{
+                $table = Str::camel(ucfirst($table));
+                $className = $table."Test";
+                $fileExe = base_path("vendor/phpunit/phpunit/phpunit");
+                $fileLog = base_path("testlogs/$className.txt");
+                $basePath = base_path();
+                $output  = null;
+                $return  = null;
+                exec("cd $basePath && php $fileExe --filter=$className --testdox-text=testlogs/$className.txt", $output, $return);
+                $fileLogRes = File::get($fileLog);;
+            }catch(\Exeption $e){
+                return response($e->getMessage(), 400);
+            }
+            return [ 
+                "output" => str_replace(['Failed','OK'],[
+                    "<span class='text-danger'>Failed</span>",
+                    "<span class='text-success'>OK</span>"
+                ], join("<br>", $output) ) ,
+                "text" => str_replace(["\n",'[ ]','[x]'],[
+                    "<br>",
+                    "[ <span class='text-danger'>Failed!</span> ]",
+                    "[ <span class='text-success'>Success</span> ]"
+                ],$fileLogRes),
+                "failed" => $return?true:false
+            ];
+        }else{
+            abort(401, "exec PHP cannot be used!, do with CLI");
+        }
+    }
     public function doMigrate(Request $req, $table=null){
         
         Schema::disableForeignKeyConstraints();
@@ -1265,6 +1337,13 @@ class LaradevController extends Controller
         }
         return "update Alter OK";
     }
+    public function editTest(Request $req, $table=null){
+        $table = Str::camel(ucfirst($table));
+        $path = base_path("tests/$table"."Test.php");
+        File::put($path, $req->text);
+        return "update Test OK";
+    }
+    
     public function refreshAlias(Request $req,$table){
         // return response()->json($parent,400);
         $className = "\\App\\Models\\BasicModels\\$table";   
@@ -1529,5 +1608,39 @@ class LaradevController extends Controller
             ]);
         }
         return DB::table($request->table)->select('name','template','id')->get();;
+    }
+
+    public function paramaker(Request $req){
+        $isNew =  !is_numeric($req->id);
+        $id = $isNew?-1:$req->id;
+        $validator = Validator::make($req->all(), [
+            "name"=>"unique:default_params,name,$id|required",
+            "prepared_query"=>"required"
+        ]);
+        $preparedQuery = $req->prepared_query;
+        preg_match_all("/(:\w+)/", $preparedQuery, $m);
+        
+        $preparedQueryParams = array_map(function($dt){
+            return str_replace( ":", "", $dt);
+        },$m[0]);
+        
+        $preparedQueryParamsFixed = [];
+        foreach($preparedQueryParams as $qparam){
+            if(!in_array( $qparam, $preparedQueryParamsFixed )){
+                $preparedQueryParamsFixed[] = $qparam;
+            }
+        }
+        $dataArr = $req->except('id','changed');
+        $dataArr['params'] = implode(",", $preparedQueryParamsFixed);
+
+        if ( $validator->fails()) {
+           return response()->json($validator->errors()->all(), 422);
+        }
+        if($isNew){
+            return DB::table("default_params")->insertGetId( $dataArr );
+        }else{
+            getBasic("default_params")->find($req->id)->update( $dataArr );
+            return 'update ok';
+        }
     }
 }
