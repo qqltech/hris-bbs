@@ -507,6 +507,7 @@ class LaradevController extends Controller
             File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );
         }
         $this->createModels( $request, 'abcdefghijklmnopq' );
+        \Cache::forget('migration-list');
         if(env('GIT_ENABLE', false)){
             $this->git_push(".","<RENAME $tableName -> $request->name>");
         }
@@ -1004,6 +1005,15 @@ class LaradevController extends Controller
         return $results;
     }
 
+    public function readMigrationsOrCache(Request $req){
+        $self = $this;
+        $migrationLists = \Cache::rememberForever('migration-list', function ()use($self, $req) {
+            return $self->readMigrations( $req, null);
+        });
+
+        return $migrationLists;
+    }
+
     public function readMigrations(Request $req, $table=null){
         try{
             if($table!=null){
@@ -1255,6 +1265,7 @@ class LaradevController extends Controller
             }
             // $req->rewrite_custom = $req->rewrite_custom;
             $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
+            \Cache::forget('migration-list');
         }catch(Exception $e){
             if( isVersion(6) ){
                 File::delete(glob(base_path('database/migrations')."/*.*"));
@@ -1380,6 +1391,7 @@ class LaradevController extends Controller
             return "update Migrations OK";
         }
         $data = $this->getDirContents( base_path('database/migrations/projects') );
+        \Cache::forget('migration-list');
         if(strpos("x".$req->modul, "alias ")!==false && count(explode(" ",$req->modul))==3 ){
             $modul = explode(" ",  $req->modul)[2];
             $tableSrc   = explode(" ",  $req->modul)[1];
@@ -1408,8 +1420,7 @@ class LaradevController extends Controller
                 str_replace("_","",$modul),$tableSrc
             ],File::get( base_path("templates/migrationalias.stub") ) ));
             return response()->json("pembuatan file migration Alias OK");
-        }
-        if(strpos("x".$req->modul, "view ")!==false && count(explode(" ",$req->modul))==2 ){
+        }elseif(strpos("x".$req->modul, "view ")!==false && count(explode(" ",$req->modul))==2 ){
             $modul   = explode(" ",  $req->modul)[1];
             if(in_array("$modul.php", $data)){
                 return response()->json("maaf nama model $modul telah terpakai", 400);
@@ -1421,9 +1432,7 @@ class LaradevController extends Controller
                 str_replace("_","",$modul),$modul
             ],File::get( base_path("templates/migrationview.stub") ) ));
             return response()->json("pembuatan file migration View OK");
-        }
-
-        if(strpos("x".$req->modul, "trigger ")!==false && count(explode(" ",$req->modul))==4 ){
+        }elseif(strpos("x".$req->modul, "trigger ")!==false && count(explode(" ",$req->modul))==4 ){
             $modul   = explode(" ",  $req->modul)[1];
             $time    = explode(" ",  $req->modul)[2];
             $action    = explode(" ",  $req->modul)[3];

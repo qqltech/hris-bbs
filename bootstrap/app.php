@@ -91,6 +91,9 @@ if (!class_exists('Mail')) {
 if (!class_exists('MailTemplate')) {
     class_alias('App\Mails\SendMailable', 'MailTemplate');
 }
+if (!class_exists('Cache')) {
+    class_alias('Illuminate\Support\Facades\Cache', 'Cache');
+}
 
 \Illuminate\Http\Request::macro('getMetaData', function() {
     foreach(array_keys($this->all()) as $isi){
