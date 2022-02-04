@@ -9,7 +9,7 @@ use App\Traits\ModelTrait;
 
 class __class extends Model
 {   
-    use App\Traits\ModelTrait;
+    use ModelTrait;
 
     /**
      * Basic Laravel model properties
