@@ -36,13 +36,11 @@ class ApiFixedController extends Controller
     private $formatDate='Y-m-d';
     private $isBackdoor = false;
 
-    public function __construct(Request $request,$backdoor=false)
+    public function __construct(Request $request, $backdoor=false)
     {
+        
         DB::disableQueryLog();
         $this->isBackdoor = $backdoor;
-        // if(config('tables')==null){
-        //     config(['tables'=>[]]);
-        // }
         $this->formatDate=env("FORMAT_DATE_FRONTEND","d/m/Y");
         $this->isMultipart = (strpos($request->header("Content-Type"),"multipart") !==FALSE)?true:false;
         $this->originalRequest = $request->capture();
@@ -54,8 +52,9 @@ class ApiFixedController extends Controller
             config(['requestMethod'=>$this->requestMeta->method()]);
             config(['requestOrigin'=>$this->requestMeta->path()]);
         }
-        $this->parentModelName=$request->route("modelname");
-        $this->operationId=($request->route("id")!=null&&$request->route("id")!="")?$request->route("id"):null;
+        
+        $this->parentModelName = $request->route()[2]['modelname'];
+        $this->operationId = @$request->route()[2]['id'];
 
         if($backdoor){
             return;
@@ -94,10 +93,10 @@ class ApiFixedController extends Controller
         if(!$this->is_model_deletable($this->parentModelName, $this->operationId)){return;};
         $this->is_detail_valid($this->parentModelName, $this->requestData);
 
-        if( $request->route("detailmodelname") ){
+        if( @$request->route()[2]['detailmodelname'] ){
             $this->isDetailDirection = true;
-            $this->parentModelName = $request->route("detailmodelname");
-            $this->operationId = $request->route("detailid");
+            $this->parentModelName = @$request->route()[2]['detailmodelname'];
+            $this->operationId = @$request->route()[2]['detailid'];
 
             if(!$this->is_model_exist( $this->parentModelName )){return;};
             if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}

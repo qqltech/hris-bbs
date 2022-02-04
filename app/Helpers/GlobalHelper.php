@@ -1351,7 +1351,7 @@ function _customGetData($model,$params)
 {
     $table = $model->getTable();
     $className = class_basename( $model );
-    $isParent = $className == (app()->request->route('detailmodelname') || app()->request->route('modelname'));
+    $isParent = $className == (@app()->request->route()[2]['detailmodelname'] || @app()->request->route()[2]['modelname']);
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;    
     $modelCandidate = "\\".get_class($model);
@@ -1535,9 +1535,9 @@ function _customGetData($model,$params)
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
 
-    if(app()->request->route('detailmodelname')){
-        $parentModelName = app()->request->route('modelname');
-        $parentId = app()->request->route('id');
+    if(@app()->request->route()[2]['detailmodelname']){
+        $parentModelName = @app()->request->route()[2]['modelname'];
+        $parentId = @app()->request->route()[2]['id'];
 
         $model = $model->where(function($q)use( $parentModelName, $parentId ){
             $q->where( $parentModelName."_id", $parentId );
@@ -1915,9 +1915,9 @@ function _customFind($model, $params)
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
-    if(app()->request->route('detailmodelname')){
-        $parentModelName = app()->request->route('modelname');
-        $parentId = app()->request->route('id');
+    if(@app()->request->route()[2]['detailmodelname']){
+        $parentModelName = @app()->request->route('modelname');
+        $parentId = @app()->request->route('id');
 
         $model = $model->where(function($q)use( $parentModelName, $parentId ){
             $q->where( $parentModelName."_id", $parentId );
@@ -2373,10 +2373,10 @@ function getCustom($name){
     return class_exists( $string )?new $string:null;
 }
 function getRoute(){
-    return app()->request->route()[1]['as'];
+    return @app()->request->route()[1]['as'];
 }
 function isRoute($val){
-    return app()->request->route()[1]['as']==$val;
+    return @app()->request->route()[1]['as']==$val;
 }
 
 function getRawData($query){

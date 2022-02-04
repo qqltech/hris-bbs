@@ -56,11 +56,11 @@ class LaradevController extends Controller
 
     public function databaseCheck(Request $request)
     {
-        if($request->db_autocreate && $request->db_autocreate=="true"){
+        if($request->has('db_autocreate') && $request->db_autocreate=="true"){
             return $this->databaseCreateLocal($request);
         }
         try {
-            if($request->host){
+            if($request->has('host') ){
                 // driver,host,port,username,password,database
                 if($request->driver=="pgsql" && !isset($request->database) ){                
                     $connection->database = "postgres";
@@ -130,15 +130,15 @@ class LaradevController extends Controller
         }
         $migrate="no";
         try{
-            if($request->db_migrate && $request->db_migrate=="true"){
+            if($request->has('db_migrate') && $request->db_migrate=="true"){
                 Artisan::call("migrate:".($request->db_fresh && $request->db_fresh=="true"?"fresh":"refresh"),[
                     "--path"=>"database/migrations/__defaults" , "--force"=>true
                 ]
                 );
-                if($request->db_seed && $request->db_seed=="true"){
+                if($request->has('db_seed') && $request->db_seed=="true"){
                     Artisan::call("db:seed");
                 }
-                if($request->db_passport && $request->db_passport=="true"){
+                if($request->has('db_passport') && $request->db_passport=="true"){
                     Artisan::call("passport:install");
                 }
                 $migrate="yes";
@@ -419,7 +419,7 @@ class LaradevController extends Controller
         if($table){
             return $this->getFullTable($table);
         }
-        if($request->details){
+        if($request->has('details') ){
             return $this->getFullTables();
         }
         $schemaManager = DB::getDoctrineSchemaManager();
@@ -482,7 +482,7 @@ class LaradevController extends Controller
         }else{ //misal View Table
             Schema::rename($realTableName, $request->name);
         }
-        if($request->models){
+        if($request->has('models')){
             File::put( "$this->modelsPath/CustomModels/$request->name.php", 
                 str_replace( $tableName,$request->name,File::get( "$this->modelsPath/CustomModels/$tableName.php" ) )
             );
@@ -515,7 +515,7 @@ class LaradevController extends Controller
     }
     public function deleteTables(Request $request, $tableName){
         Schema::dropIfExists($tableName);
-        if($request->models){
+        if($request->has('models')){
             $customModel = "$this->modelsPath/CustomModels/$tableName.php";
             $basicModel = "$this->modelsPath/BasicModels/$tableName.php";
             File::delete( $customModel );
@@ -531,10 +531,10 @@ class LaradevController extends Controller
                 "--path"=>"database/migrations/__defaults" , "--force"=>true
             ]
         );
-        if($request->seed){
+        if($request->has('seed')){
             Artisan::call("db:seed");
         }
-        if($request->passport){
+        if($request->has('passport')){
             Artisan::call("passport:install");
         }
         return "migration ok";
@@ -552,21 +552,21 @@ class LaradevController extends Controller
         $className = "\\App\\Models\\CustomModels\\$tableName";   
         $class = new $className();
         if(isset($class->password)){
-            if( !isset($request->password)){return response()->json("nopassword",401);}
-            else
-            if($request->password!==$class->password){
+            if( !isset($request->password)){
+                return response()->json("nopassword",401);
+            }elseif($request->password!==$class->password){
                 return response()->json("nopassword",401);
             }
         }
-        if($request->basic){
+        if($request->has('basic')){
             return File::get(app()->path()."/Models/BasicModels/$tableName.php");
         }
-        if($request->custom){
+        if($request->has('custom')){
             return File::get(app()->path()."/Models/CustomModels/$tableName.php");
         }
         $basic = File::get(app()->path()."/Models/BasicModels/$tableName.php");
         $file = File::get(app()->path()."/Models/CustomModels/$tableName.php");
-        if($request->script_only){
+        if($request->has('script_only')){
             return ['basic'=> $basic, 'custom'=>$file];
         }
         return [
@@ -630,7 +630,7 @@ class LaradevController extends Controller
         $schema = $this->getFullTables(true);
         $tables = $schema['tables'];
         Schema::disableForeignKeyConstraints();
-        if($request->drop){
+        if($request->has('drop') && $request->drop=='true'){
             foreach($schema['children'] as $child => $data){
                 foreach($data as $ch){
                 if($ch['physical']){
@@ -744,7 +744,7 @@ class LaradevController extends Controller
         // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
         // .json_encode( $schema['tables'] ));
         // return $schema;
-        if($request->fresh){
+        if($request->has('fresh') && $request->fresh=='true'){
             File::delete( File::glob("$this->modelsPath/CustomModels/*.*") );
             File::delete( File::glob("$this->modelsPath/BasicModels/*.*") );
         }
@@ -798,7 +798,7 @@ class LaradevController extends Controller
             ],[
                 $this->prefixNamespace, $className, $tableName,'["'.implode('","',$colsArray).'"]', '["'.implode('","',$table->columns).'"]', date('d/m/Y H:i:s')
             ],$data);
-            if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
+            if( ($request->has('rewrite_custom') && $request->rewrite_custom=='true') || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
                 $pasteCustom = str_replace([
                     "__namespace","__class","__basicClass", "__lastupdate"
                 ],[
@@ -924,7 +924,7 @@ class LaradevController extends Controller
             }
             File::put( "$this->modelsPath/BasicModels/$className.php",$paste);
             if( $tableKhusus!==null && $className!==$tableKhusus ){continue;}
-            if($request->rewrite_custom || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
+            if( ($request->has('rewrite_custom') && $request->rewrite_custom=='true') || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
                 $pasteCustom = str_replace([
                     "__defaults","__autocreate","__autoupdate","__readers","__writers"
                 ],[
@@ -1206,14 +1206,15 @@ class LaradevController extends Controller
         Schema::disableForeignKeyConstraints();
         File::delete(glob(base_path('database/migrations')."/*.*"));
         $dir = "projects";
-        if($req->alter){
+        if($req->has('alter')){
             $dir = "alters";
         }
         $migrationPath = base_path("database/migrations/$dir/0_0_0_0_$table.php");
         if(!File::exists( $migrationPath )){
             return response()->json("migration file [$table] tidak ada",400);
         }
-        if(!$req->alter){
+        
+        if( !$req->has('alter') ){
             if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
                 $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
                 $tableName = explode("_timing_",$samaran)[0];
@@ -1244,7 +1245,8 @@ class LaradevController extends Controller
             // Schema::connection('flyingpgsql')->dropIfExists($currentModel->getTable());
             // return response()->json([Schema::hasTable($currentModel->getTable())?'ada':'tidak'],422);
         }
-        if($req->down){
+
+        if($req->has('down')){
             return "database migration ok, $table model downed successfully";
         }
         // return File::get( array_values($data)[0] );
@@ -1276,7 +1278,7 @@ class LaradevController extends Controller
             return response()->json(["error"=>$e->getMessage()], 422);
         }
         Schema::enableForeignKeyConstraints();
-        if($req->alter){
+        if($req->has('alter')){
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<ALTER $table>");       
             }
@@ -1289,7 +1291,7 @@ class LaradevController extends Controller
         }
     }
     public function deleteAll(Request $req, $table){
-        if(!$req->password){
+        if(!$req->has('password')){
             return response()->json($req->all(),401);
         }
         if($req->password!=="jajanenak"){
@@ -1336,6 +1338,8 @@ class LaradevController extends Controller
         if(env('GIT_ENABLE', false)){ 
             $this->git_push(".","<DROP $table>");       
         }
+        
+        \Cache::forget('migration-list');
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
     }
     public function editAlter(Request $req, $table=null){

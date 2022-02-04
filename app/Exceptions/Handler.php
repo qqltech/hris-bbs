@@ -52,7 +52,6 @@ class Handler extends ExceptionHandler
     {
         \DB::rollback();
         $rendered = parent::render($request, $e);
-        // return $rendered;
         $msg = $this->getFixedMessage($e);
         $responseError = [
             '_code' => $rendered->getStatusCode(),

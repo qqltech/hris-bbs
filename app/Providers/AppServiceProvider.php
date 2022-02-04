@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        config(['start_time'=>microtime(true)]);
     }
     public function boot()
     {

@@ -8,7 +8,7 @@ class defaultparams extends Migration
 {
     public function up()
     {
-        Schema::connection('flyingpgsql')->create('default_params', function (Blueprint $table) {
+        Schema::create('default_params', function (Blueprint $table) {
             $table->bigIncrements('id');
 
             $table->string('name',100)->unique();
@@ -25,7 +25,7 @@ class defaultparams extends Migration
     }
     public function down()
     {
-        Schema::connection('flyingpgsql')->dropIfExists('default_params');
+        Schema::dropIfExists('default_params');
     }
 }
 

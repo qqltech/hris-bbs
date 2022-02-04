@@ -9,7 +9,6 @@ require_once __DIR__.'/../vendor/autoload.php';
 $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
-config(['start_time'=>microtime(true)]);
 $locale = strtolower(env("LOCALE","EN"));
 date_default_timezone_set(env("APP_TIMEZONE","Asia/Jakarta"));
 app('translator')->setLocale($locale);
@@ -39,6 +38,12 @@ $app->routeMiddleware([
     'laradev' => App\Http\Middleware\Laradev::class,
 ]);
 
+//  for swoole service provider
+if( env('SWOOLE', false) ){
+    $app->register(SwooleTW\Http\LumenServiceProvider::class);
+}
+
+$app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class); //DEFAULT
 $app->register(Stevebauman\Location\LocationServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
