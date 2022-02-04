@@ -5,9 +5,12 @@ namespace __namespace;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Traits\ModelTrait;
 
 class __class extends Model
 {   
+    use App\Traits\ModelTrait;
+
     /**
      * Basic Laravel model properties
      */
@@ -43,16 +46,7 @@ class __class extends Model
     __hasMany
     __hasManyThrough
     __belongsTo
-    /**
-     * @override Laravel function
-     */
-    public function getCasts(){return array_merge($this->casts, getCastsParam());}
-
-    /**
-     * Additional function
-     */
-    public function customFind($p){return _customFind($this, $p);}
-    public function customGet($p){return _customGetData($this,$p);}
+    
     __customfunction__
 }
 
