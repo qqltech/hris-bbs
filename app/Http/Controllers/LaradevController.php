@@ -750,6 +750,7 @@ class LaradevController extends Controller
         }
         $dataForJSON = [];
         $tableKhusus = $tableName;
+        
         foreach($schema['tables'] as $key => $table)
         {
             // file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='.json_encode( $table ));
@@ -1069,7 +1070,9 @@ class LaradevController extends Controller
                         "view" => in_array($stringClass, $arrayViews)?true:false,
                     ];
                 }
-                if( isVersion(8) ){
+
+                //  Create New Migration File if needed
+                if( !isVersion(6) && env("AUTOCREATE_MIGRATION") ){
                     $noMigrationTables = array_filter( $arrayTables, function( $tb ) use( $addedTables ){
                         return !in_array( $tb, $addedTables );
                     });
@@ -1134,11 +1137,15 @@ class LaradevController extends Controller
     public function readTest(Request $req, $table=null){
         return getTest($table);
     }
-    public function queries10rows(Request $erq, $table=null){
+    public function queries10rows(Request $req, $table=null){
         $model = getBasic($table);
         $columns = $model->columns;
         $orderCol = in_array("id", $columns)?"id":$columns[0];
         $rows = DB::table($model->getTable())->orderBy($orderCol, 'desc')->limit(10)->get()->toArray();
+        if($req->has('json')){
+            return $rows;
+        }
+
         if(!$rows){
             $rows = [];
         }
@@ -1187,13 +1194,13 @@ class LaradevController extends Controller
             }
             return [ 
                 "output" => str_replace(['Failed','OK'],[
-                    "<span class='text-danger'>Failed</span>",
-                    "<span class='text-success'>OK</span>"
+                    "<span class='text-danger'> Failed </span>",
+                    "<span class='text-success'> OK </span>"
                 ], join("<br>", $output) ) ,
                 "text" => str_replace(["\n",'[ ]','[x]'],[
                     "<br>",
-                    "[ <span class='text-danger'>Failed!</span> ]",
-                    "[ <span class='text-success'>Success</span> ]"
+                    "<span class='text-danger'>[ Failed! ]</span>",
+                    "<span class='text-success'>[ Success ]</span>"
                 ],$fileLogRes),
                 "failed" => $return?true:false
             ];
@@ -1396,6 +1403,10 @@ class LaradevController extends Controller
         }
         $data = $this->getDirContents( base_path('database/migrations/projects') );
         \Cache::forget('migration-list');
+        if(!$req->has('modul')){
+            return response()->json("Maaf modul wajib diisi", 400);
+        }
+
         if(strpos("x".$req->modul, "alias ")!==false && count(explode(" ",$req->modul))==3 ){
             $modul = explode(" ",  $req->modul)[2];
             $tableSrc   = explode(" ",  $req->modul)[1];
@@ -1655,5 +1666,53 @@ class LaradevController extends Controller
             getBasic("default_params")->find($req->id)->update( $dataArr );
             return 'update ok';
         }
+    }
+
+    public function runQuery(Request $req ){
+        if( !$req->has('statement')){
+            return response()
+                    ->json([
+                        "message"=>"statement is required, commit is optional"
+                    ], 400);
+        }
+
+        $isCommit = $req->has('commit');
+        $state = $req->statement;
+        $stateToLower = Str::lower($state);
+        $isNeedTransaction = Str::contains( $stateToLower, "delete from") || Str::contains( $stateToLower, "update ") || Str::contains( $stateToLower, "insert into");
+        try{
+            if($isNeedTransaction){
+                DB::beginTransaction();
+            }
+
+            if( Str::contains($state, ";") ){
+                $stateArr = explode(";", $state);
+                
+                foreach( $stateArr as $q ){
+                    $qLower = Str::lower( $q );
+                    if( Str::contains( $qLower, "delete from") || Str::contains( $qLower, "update ") || Str::contains( $qLower, "insert into") ){
+                        DB::unprepared( $q );
+                        $result = 'query ok';
+                    }else{
+                        $result = DB::select( $q );
+                    }
+                }
+            }else{
+                $result = DB::select( $state );
+            }
+        }catch( \Exception $e ){
+            DB::rollback();
+            return $e->getMessage();
+        }
+
+        if( $isNeedTransaction ){
+            if($isCommit){
+                DB::commit();
+            }else{
+                DB::rollback();
+            }
+        }
+
+        return $result;
     }
 }

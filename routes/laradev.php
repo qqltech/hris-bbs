@@ -50,6 +50,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->post("/uploadwithcreate","LaradevController@uploadWithCreate");
         $router->post("/uploadtemplate","LaradevController@uploadTemplate");
         $router->post("/paramaker","LaradevController@paramaker");
+        $router->post("/run-query","LaradevController@runQuery");
     });
 
     $router->post("/getnotice","LaradevController@getNotice");
@@ -67,7 +68,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);
         }
-        if(!isset($req->password) || $req->password!=env("CONFIGPASSWORD","pulangcepat")){
+        if( !$req->has('password') || $req->password!=env("CONFIGPASSWORD","pulangcepat")){
             return view('defaults.unauthorized')->with('data',[
                 'page'=>'halaman config',
                 'url'=>url("/laradev"),
@@ -79,4 +80,25 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
     });
 
     $router->post('/trio/{table}', 'LaradevController@deleteAll');
+
+    $router->post('/connect', function(Request $req){
+        if(!$req->has('password')){
+            return response()->json([
+                'message'=>'password is required'
+            ], 401);
+        }
+
+        $backendPassword = env("LARADEVPASSWORD");
+        if( $backendPassword !== $req->password ){
+            return response()->json([
+                'message'=>'unauthenticated'
+            ], 401);
+        }
+
+        return response()->json([
+            "socket_server"=> env('LOG_SERVER'),
+            "socket_protocol"=>env('LOG_PROTOCOLS'),
+            "socket_room"=>env('LOG_CHANNEL')
+        ]);
+    });
 });

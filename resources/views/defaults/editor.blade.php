@@ -1207,7 +1207,13 @@ vm = new Vue({
                 icon: 'warning',
                 title: `Debugger is trying to connect to channel [${me.channel}]...`
             });
-            this.connection = new WebSocket("{{env('LOG_SERVER')}}/"+me.channel);
+            if( "{{env('LOG_PROTOCOLS')}}" ){
+                const protocolStr = "{{env('LOG_PROTOCOLS')}}";
+                this.connection = new WebSocket("{{env('LOG_SERVER')}}/"+me.channel, protocolStr.split(","));
+            }else{
+                this.connection = new WebSocket("{{env('LOG_SERVER')}}/"+me.channel);
+            }
+
             this.connection.onopen = function() {
                 console.log("%c debug is ready to use","background: #222; color: #a0ff5c;font-weight: bold;");
                 Toast.fire({

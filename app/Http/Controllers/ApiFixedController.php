@@ -53,7 +53,7 @@ class ApiFixedController extends Controller
             config(['requestOrigin'=>$this->requestMeta->path()]);
         }
         
-        $this->parentModelName = $request->route()[2]['modelname'];
+        $this->parentModelName = @$request->route()[2]['modelname'];
         $this->operationId = @$request->route()[2]['id'];
 
         if($backdoor){
