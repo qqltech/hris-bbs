@@ -1689,6 +1689,9 @@ class LaradevController extends Controller
                 $stateArr = explode(";", $state);
                 
                 foreach( $stateArr as $q ){
+                    if( !$q ){
+                        continue;
+                    }
                     $qLower = Str::lower( $q );
                     if( Str::contains( $qLower, "delete from") || Str::contains( $qLower, "update ") || Str::contains( $qLower, "insert into") ){
                         DB::unprepared( $q );
@@ -1702,7 +1705,7 @@ class LaradevController extends Controller
             }
         }catch( \Exception $e ){
             DB::rollback();
-            return $e->getMessage();
+            return response()->json( $e->getFile().":".$e->getMessage(), 400);
         }
 
         if( $isNeedTransaction ){
@@ -1713,6 +1716,8 @@ class LaradevController extends Controller
             }
         }
 
-        return $result;
+        return [
+            'data'=>$result
+        ];
     }
 }
