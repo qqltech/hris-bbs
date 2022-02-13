@@ -99,7 +99,13 @@ if (!class_exists('MailTemplate')) {
 if (!class_exists('Cache')) {
     class_alias('Illuminate\Support\Facades\Cache', 'Cache');
 }
+if( !class_exists('HasMany') ) {
+    class_alias('Illuminate\Database\Eloquent\Relations\HasMany', 'HasMany');
+}
 
+if( !class_exists('BelongsTo') ) {
+    class_alias('Illuminate\Database\Eloquent\Relations\BelongsTo', 'BelongsTo');
+}
 \Illuminate\Http\Request::macro('getMetaData', function() {
     foreach(array_keys($this->all()) as $isi){
         $this->getInputSource()->remove($isi);

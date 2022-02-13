@@ -723,12 +723,12 @@ class LaradevController extends Controller
         $this->prefixNamespace = "App\Models\BasicModels";
         $this->prefixNamespaceCustom = "App\Models\CustomModels";
         $this->hasMany = "
-    public function __child()
+    public function __child() :\HasMany
     {
         return \$this->hasMany('App\Models\BasicModels\__child', '__cld_column', '__parent_column');
     }";
         $this->belongsTo ="
-    public function __parent()
+    public function __relatedColumn() :\BelongsTo
     {
         return \$this->belongsTo('App\Models\BasicModels\__parent', '__child_column', '__prt_column');
     }";
@@ -785,7 +785,6 @@ class LaradevController extends Controller
                     'updateable'=> isset($cfg['updateable'])? $cfg['updateable']:array_values(array_filter($table->columns,function($dt){ if($dt!='id'){return $dt;} } )),
                     'searchable'=> isset($cfg['searchable'])? $cfg['searchable']:array_values(array_filter($table->columns,function($dt){ if($dt!='id'){return $dt;} } )),
                     'deleteable'=> isset($cfg['deleteable'])?($cfg['deleteable']=="false"?false:true):true,
-                    'extendable'=> isset($cfg['extendable'])?($cfg['extendable']=="false"?false:true):false,
                     'deleteOnUse'=> isset($cfg['deleteOnUse'])?($cfg['deleteOnUse']=="false"?false:true):false,
                     'casts'     => isset($cfg['casts'])?$cfg['casts']:['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']
                 ]
@@ -795,15 +794,15 @@ class LaradevController extends Controller
                 $colsArray[] = $col['name'].":".str_replace("\\","", strtolower($col['type']) ).(is_numeric($col['length'])?":{$col['length']}":"");
             }
             $paste = str_replace([
-                "__namespace","__class","__table","__columnsFull","__columns",  "__lastupdate"
+                "__namespace","__class","__table","__columnsFull","__columns"
             ],[
-                $this->prefixNamespace, $className, $tableName,'["'.implode('","',$colsArray).'"]', '["'.implode('","',$table->columns).'"]', date('d/m/Y H:i:s')
+                $this->prefixNamespace, $className, $tableName,'["'.implode('","',$colsArray).'"]', '["'.implode('","',$table->columns).'"]'
             ],$data);
             if( ($request->has('rewrite_custom') && $request->rewrite_custom=='true') || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
                 $pasteCustom = str_replace([
-                    "__namespace","__class","__basicClass", "__lastupdate"
+                    "__namespace","__class","__basicClass"
                 ],[
-                    $this->prefixNamespaceCustom, $className, "\\$this->prefixNamespace\\$className", date('d/m/Y H:i:s')
+                    $this->prefixNamespaceCustom, $className, "\\$this->prefixNamespace\\$className"
                 ],$dataCustom);
             }
             $hasMany = "";
@@ -869,12 +868,12 @@ class LaradevController extends Controller
                     $fk=(object)$fk;
                     $joins[] = "$fk->parent.$fk->parent_column=$fk->child.$fk->child_column";
                     $belongsTo.=str_replace([
-                        "__parent", "__child_column","__prt_column"
+                        "__parent", "__child_column","__prt_column","__relatedColumn"
                     ],[
-                        $fk->parent, $fk->child_column, $fk->parent_column
+                        $fk->parent, $fk->child_column, $fk->parent_column, (Str::endsWith($fk->child_column,'_id')? substr($fk->child_column, 0, -3) : $fk->child_column)
                     ],$this->belongsTo);
                 }
-                $paste = str_replace("__belongsTo","",$paste);
+                $paste = str_replace("__belongsTo",$belongsTo,$paste);
                 $paste = str_replace("__joins", '["'.implode('","',$joins).'"]' ,$paste);
             }else{
                 $paste = str_replace("__belongsTo","",$paste);
@@ -883,58 +882,28 @@ class LaradevController extends Controller
             
             $paste = str_replace("__belongsTo","",$paste); //mematikan belongsTo
             $paste = str_replace([
-                "__config_guarded", "__config_hidden","__config_required","__config_createable",
-                "__config_updateable","__config_searchable","__config_deleteable","__config_extendable",
+                "__config_guarded","__config_required","__config_createable",
+                "__config_updateable","__config_searchable","__config_deleteable",
                 "__config_cascade","__config_deleteOnUse","__config_casts", "__config_unique"
             ], [
                 isset($cfg['guarded'])? (!is_array($cfg['guarded'])? "'".$cfg['guarded']."'":'["'.implode('","',$cfg['guarded']).'"]'):"['id']", 
-                isset($cfg['hidden'])? (!is_array($cfg['hidden'])? "'".$cfg['hidden']."'":'["'.implode('","',$cfg['hidden']).'"]'):"[]", 
                 isset($cfg['required'])? (!is_array($cfg['required'])? "'".$cfg['required']."'":'["'.implode('","',$cfg['required']).'"]'):$table->required, 
                 isset($cfg['createable'])? (!is_array($cfg['createable'])? "'".$cfg['createable']."'":'["'.implode('","',$cfg['createable']).'"]'):'["'.implode('","',array_filter($table->columns,function($dt){ if($dt!='id'){return $dt;} } )).'"]',
                 isset($cfg['updateable'])? (!is_array($cfg['updateable'])? "'".$cfg['updateable']."'":'["'.implode('","',$cfg['updateable']).'"]'):'["'.implode('","',array_filter($table->columns,function($dt){ if($dt!='id'){return $dt;} } )).'"]',
                 isset($cfg['searchable'])? (!is_array($cfg['searchable'])? "'".$cfg['searchable']."'":'["'.implode('","',$cfg['searchable']).'"]'):'["'.implode('","',array_filter($table->columns,function($dt){ if($dt!='id'){return $dt;} } )).'"]',
                 isset($cfg['deleteable'])?$cfg['deleteable']:"true",
-                isset($cfg['extendable'])?$cfg['extendable']:"false",
                 isset($cfg['cascade'])?$cfg['cascade']:"true",
                 isset($cfg['deleteOnUse'])?$cfg['deleteOnUse']:"false",
                 isset($cfg['casts'])?str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($cfg['casts'], JSON_PRETTY_PRINT)):"['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']",
                 str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->uniques, JSON_PRETTY_PRINT))
             ],$paste);
-            $customfunction="";//__customfunction__
-            if(isset($cfg['autocreate'])){
-                foreach($cfg['autocreate'] as $kolom => $rumus){
-                    if( strpos($rumus, '}') !== false ){
-                        $customfunction.="public function create_$kolom(\$request){\n\t\treturn "
-                            .str_replace(["auth:","request:","{","}"],["\Auth::user()->","\$request->","",""],$rumus)
-                            .";\n\t}\n";
-                    }
-                }
-            }
-            if(isset($cfg['autoupdate'])){
-                foreach($cfg['autoupdate'] as $kolom => $rumus){
-                    if( strpos($rumus, '}') !== false ){
-                        $customfunction.="public function update_$kolom(\$request){\n\t\treturn "
-                            .str_replace(["auth:","request:","{","}"],["\Auth::user()->","\$request->","",""],$rumus)
-                            .";\n\t}\n";
-                    }
-                }
-            }
-            $paste = str_replace("__customfunction__",$customfunction,$paste);
+
             if( File::exists( "$this->modelsPath/BasicModels/$className.php") ){
                 File::delete("$this->modelsPath/BasicModels/$className.php" );
             }
             File::put( "$this->modelsPath/BasicModels/$className.php",$paste);
             if( $tableKhusus!==null && $className!==$tableKhusus ){continue;}
             if( ($request->has('rewrite_custom') && $request->rewrite_custom=='true') || !File::exists( "$this->modelsPath/CustomModels/$className.php" ) ){
-                $pasteCustom = str_replace([
-                    "__defaults","__autocreate","__autoupdate","__readers","__writers"
-                ],[
-                    isset($table->values)?str_replace(["{","}",'":',"\\","\n"," "],["[","]",'"=>',"","",""],json_encode($table->values, JSON_PRETTY_PRINT)):"[]",
-                    isset($cfg['autocreate'])?str_replace(["{","}",'":',"\\","\n"," "],["[","]",'"=>',"","",""],json_encode($cfg['autocreate'], JSON_PRETTY_PRINT)):"[]",
-                    isset($cfg['autoupdate'])?str_replace(["{","}",'":',"\\","\n"," "],["[","]",'"=>',"","",""],json_encode($cfg['autoupdate'], JSON_PRETTY_PRINT)):"[]",
-                    isset($cfg['readers'])?str_replace(["{","}",'":',"\\","\n"," "],["[","]",'"=>',"","",""],json_encode($cfg['readers'], JSON_PRETTY_PRINT)):"[]",
-                    isset($cfg['writers'])?str_replace(["{","}",'":',"\\","\n"," "],["[","]",'"=>',"","",""],json_encode($cfg['writers'], JSON_PRETTY_PRINT)):"[]"
-                ],$pasteCustom);
                 File::put( "$this->modelsPath/CustomModels/$className.php",$pasteCustom);
             }
         }
@@ -1143,6 +1112,13 @@ class LaradevController extends Controller
         $orderCol = in_array("id", $columns)?"id":$columns[0];
         $rows = DB::table($model->getTable())->orderBy($orderCol, 'desc')->limit(10)->get()->toArray();
         if($req->has('json')){
+            if(!$rows){
+                $fakeData = [];
+                foreach( $model->columns as $col){
+                    $fakeData[ $col ]='(NULL)';
+                }
+                $rows = [$fakeData];
+            }
             return $rows;
         }
 

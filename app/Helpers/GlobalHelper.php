@@ -13,6 +13,8 @@ use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
+
 if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
@@ -1651,7 +1653,7 @@ function _customGetData($model,$params)
     }else{
        $data = $final->get(); 
     }
-    if(!method_exists($modelExtender, "transformRowData") || (req("transform") && req("transform")==='false') ){
+    if( req("transform")==='false' ){
         if(!$params->caller){
             $addData = collect(['processed_time' => round(microtime(true)-config("start_time"),5)]);
             $data = $addData->merge($data);
@@ -1674,25 +1676,30 @@ function _customGetData($model,$params)
             }
         }
         foreach($tempData as $row){
-            $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
-            if( gettype($transformedData)=='boolean' ){
-                continue;
-            }
-            $fixedData[$index] = $transformedData;
-            foreach(["create","update","delete","read","print","list"] as $akses){
-                $func = $akses."roleCheck";
-                if( method_exists( $modelExtender, $func) ){
-                    $fixedData[$index] = array_merge( ["meta_$akses"=>$modelExtender->$func()], $fixedData[$index]);
+            $transformedData = reformatDataResponse($row);
+            if(method_exists($modelExtender, "transformRowData")){
+                $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
+                if( gettype($transformedData)=='boolean' ){
+                    continue;
                 }
             }
-            foreach($pureModel->details as $detail){ 
+
+            $fixedData[$index] = $transformedData;
+            foreach(["create","update","delete","read"] as $akses){
+                $func = $akses."roleCheck";
+                if( method_exists( $modelExtender, $func) ){
+                    $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
+                }
+            }
+            foreach($pureModel->details as $detail){
                 $detailArray = explode(".",$detail);
                 $detailClass = $detail;
                 if( count($detailArray)>1 ){
                     $detailClass = $detailArray[1];
                 }          
-                $modelCandidate = "\App\Models\CustomModels\\$detailClass";
-                $model      = new $modelCandidate;
+                // $modelCandidate = "\App\Models\CustomModels\\$detailClass";
+                // $model      = new $modelCandidate;
+                $model      = getCustom($detailClass);
                 $details    = $model->details;
                 $columns    = $model->columns;
                 $fkName     = $pureModel->getTable();
@@ -1752,15 +1759,19 @@ function _customGetData($model,$params)
             }
         }
         foreach($tempData as $row){
-            $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
-            if( gettype($transformedData)=='boolean' ){
-                continue;
+            $transformedData = reformatDataResponse($row);
+            if(method_exists($modelExtender, "transformRowData")){
+                $transformedData = $modelExtender->transformRowData(reformatDataResponse($row));
+                if( gettype($transformedData)=='boolean' ){
+                    continue;
+                }
             }
+            
             $fixedData[$index] = $transformedData;
-            foreach(["create","update","delete","read","print","list"] as $akses){
+            foreach(["create","update","delete","read"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
-                    $fixedData[$index] = array_merge( ["meta_$akses"=>$modelExtender->$func()], $fixedData[$index] );
+                    $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
                 }
             }
             $index++;
@@ -1926,13 +1937,8 @@ function _customFind($model, $params)
 
     $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
     if( !$data ){
-        abort(404,json_encode([
-            "status"    => "read data gagal",
-            "warning"   => [], 
-            "success"   => [], 
-            "errors"    => ["[NOT FOUND]ID $params->id in model [$table] does not exist"], 
-            "request"   => [],
-            "id"        => $params->id
+        abort(404, json_encode([
+            'message'=>"Maaf Data tidak ditemukan"
         ]));
     }
     $data=$data->toArray();
@@ -1959,8 +1965,9 @@ function _customFind($model, $params)
         if( count($detailArray)>1 ){
             $detailClass = $detailArray[1];
         }
-        $modelCandidate = "\App\Models\CustomModels\\$detailClass";
-        $model          = new $modelCandidate;
+        // $modelCandidate = "\App\Models\CustomModels\\$detailClass";
+        // $model          = new $modelCandidate;
+        $model      = getCustom($detailClass);
         $fk_child = array_filter($model->joins,function($join)use($pureModel){
             $parentString       = explode("=",$join)[0];
             $parentArray        = explode(".",$parentString);
@@ -2369,9 +2376,19 @@ function getBasic($name){
     return class_exists( $string )?new $string:null;
 }
 function getCustom($name){
+
+    if( config("custom_$name") ){
+        return config("custom_$name");
+    }
+    
     $string = "\App\Models\CustomModels\\$name";
-    return class_exists( $string )?new $string:null;
+    $calledClass = class_exists( $string )?new $string:null;
+    if($calledClass){
+        config( ["custom_$name" => $calledClass] );
+    }
+    return $calledClass;
 }
+
 function getRoute(){
     return @app()->request->route()[1]['as'];
 }
@@ -2499,13 +2516,14 @@ function getTest($filename=null,$string=false){
         $filenameArr = explode(php_uname('s')=='Linux'?"/":"\\",$dtrace->file);
         $filename = str_replace(".php",".json",end($filenameArr));
     }
+    $table = $filename;
     $filename = Str::camel(ucfirst($filename));
     $path = base_path("tests/$filename"."Test.php");
     if( ! File::exists($path) ){
         return str_replace( [
-            "___class___"
+            "___class___","__resource__"
         ],[
-            $filename
+            $filename, $table
         ],File::get( base_path("templates/test.stub") ) );
     }
     if($string){
@@ -2583,4 +2601,32 @@ function pgsqlParseError( string $msg ):string {
         }
     }
     return $msg;
+}
+
+/**
+ * Abort error with json message
+ * @param Array|Object|Str $msg
+ * @param Str|Int $code
+ * @return Void
+ */
+if (! function_exists('responseError')) {
+    function responseError( $msg, $code = 422 )
+    {
+        $fixedMsg = is_object($msg) ? (array)$msg:$msg;
+
+        if( is_array($msg) ){
+            if( !isset($msg['message'])){
+                $fixedMsg['message'] = "Undefined ";
+            }
+        }else{
+            $fixedMsg = [
+                "message" => "Invalid Data",
+                "errors" => null
+            ];
+        }
+        $fixedMsg['server_time'] = Carbon::now()->format('Y-m-d H:i:s');
+        $fixedMsg['execution_time'] = round(microtime(true)-config("start_time"),5);
+        $fixedMsg['code'] = $code;
+        throw new ValidationException( null, response()->json($fixedMsg, $code));
+    }
 }

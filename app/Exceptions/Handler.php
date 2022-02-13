@@ -54,8 +54,8 @@ class Handler extends ExceptionHandler
         $rendered = parent::render($request, $e);
         $msg = $this->getFixedMessage($e);
         $responseError = [
-            '_code' => $rendered->getStatusCode(),
-            '_meta' => [],
+            'processed_time' => round(microtime(true)-config("start_time"),5),
+            'code' => $rendered->getStatusCode()
         ];
         if( is_array($msg) ){
             $responseError = array_merge( $responseError, $msg );

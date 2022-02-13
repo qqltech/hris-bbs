@@ -16,7 +16,6 @@ class __class extends Model
      */
     protected $table    = '__table';
     protected $guarded  = __config_guarded;
-    protected $hidden   = __config_hidden;
     protected $casts    = __config_casts;
     protected $fillable = __config_createable;
 
@@ -37,7 +36,6 @@ class __class extends Model
     public $searchable  = __config_searchable;
     public $deleteable  = __config_deleteable;
     public $cascade     = __config_cascade;
-    public $extendable  = __config_extendable;
     public $deleteOnUse = __config_deleteOnUse;
 
     /**
@@ -46,8 +44,6 @@ class __class extends Model
     __hasMany
     __hasManyThrough
     __belongsTo
-    
-    __customfunction__
 }
 
 

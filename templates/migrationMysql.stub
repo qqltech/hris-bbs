@@ -17,7 +17,6 @@ class __class__ extends Migration
         });
 
         table_config('__table__', [
-            "hidden"        => "none",
             "guarded"       => ["id"],
             "required"      => [],
             "!createable"   => ["id","created_at","updated_at"],
@@ -29,15 +28,7 @@ class __class__ extends Migration
             "casts"     => [
                 'created_at' => 'datetime:d/m/Y H:i',
                 'updated_at' => 'datetime:d/m/Y H:i'
-            ],
-            "autocreate"  =>[
-                //"creator_id"=>"auth:id"
-            ],
-            "autoupdate"  =>[
-                //"editor_id"=>"auth:id"
-            ],
-            "readers"     =>[],
-            "writers"     =>[]
+            ]
         ]);
     }
     public function down()

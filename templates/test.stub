@@ -11,9 +11,11 @@ class ___class___Test extends TestCase
     public function testCreatingData()
     {
         $user = User::where('username', 'USERNAME')->first();
+        $this->assertNotEmpty( $user );
+        
         Passport::actingAs($user);
 
-        $this->call('POST', '/operation/resource_name', [
+        $this->call('POST', '/operation/__resource__', [
             "key"=> "value"
         ]);
 
@@ -23,7 +25,7 @@ class ___class___Test extends TestCase
         $this->assertEquals( 200, $this->response->status() );
         $this->seeJsonStructure( ['status'] );
 
-        $this->seeInDatabase('resource_name', ['key' => 'value']);
+        $this->seeInDatabase('__resource__', ['key' => 'value']);
     }
 }
 
