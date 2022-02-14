@@ -38,6 +38,46 @@ class __class extends Model
     public $cascade     = __config_cascade;
     public $deleteOnUse = __config_deleteOnUse;
 
+    protected static function booted()
+    {
+        parent::boot();
+        static::creating(function ( $model ) {
+            if( method_exists($model, 'onCreating') ) $model->onCreating($model);
+        });
+
+        self::created(function( $model ){
+            if( method_exists($model, 'onCreated') ) $model->onCreated($model);
+        });
+
+        self::saving(function( $model ){
+            if( method_exists($model, 'onSaving') ) $model->onSaving($model);
+        });
+
+        self::saved(function( $model ){
+            if( method_exists($model, 'onSaved') ) $model->onSaved($model);
+        });
+
+        self::updating(function( $model ){
+            if( method_exists($model, 'onUpdating') ) $model->onUpdating($model);
+        });
+
+        self::updated(function( $model ){
+            if( method_exists($model, 'onUpdated') ) $model->onUpdated($model);
+        });
+
+        self::deleting(function( $model ){
+            if( method_exists($model, 'onDeleting') ) $model->onDeleting($model);
+        });
+
+        self::deleted(function( $model ){
+            if( method_exists($model, 'onDeleted') ) $model->onDeleted($model);
+        });
+
+        self::retrieved(function( $model){
+            if( method_exists($model, 'onRetrieved') ) $model->onRetrieved($model);
+        });        
+    }
+
     /**
      * Basic Laravel model relationship if needed
      */
