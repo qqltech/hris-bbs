@@ -28,7 +28,3 @@ class ___class___Test extends TestCase
         $this->seeInDatabase('__resource__', ['key' => 'value']);
     }
 }
-
-
-
-

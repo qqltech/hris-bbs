@@ -85,6 +85,3 @@ class __class extends Model
     __hasManyThrough
     __belongsTo
 }
-
-
-
