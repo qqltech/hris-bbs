@@ -16,6 +16,8 @@ $router->group(['prefix'=>'operation'], function () use ($router) {
 
         $router->get('/{modelname}/{id}/{detailmodelname}',['as'=>'read_list_detail', 'uses'=> 'ApiFixedController@router']);    //LIST PARENT DETAIL TERTENTU
         $router->get('/{modelname}/{id}/{detailmodelname}/{detailid}',['as'=>'read_id_detail', 'uses'=>'ApiFixedController@router']);   //CREATE DETAIL TERTENTU DARI PARENT ID
+        $router->get('/{modelname}/{id}/{detailmodelname}/{detailid}/{subdetailmodelname}',['as'=>'read_list_sub_detail', 'uses'=>'ApiFixedController@router']);   //CREATE DETAIL TERTENTU DARI PARENT ID
+        $router->get('/{modelname}/{id}/{detailmodelname}/{detailid}/{subdetailmodelname}/{subdetailid}',['as'=>'read_id_sub_detail', 'uses'=>'ApiFixedController@router']);   //CREATE DETAIL TERTENTU DARI PARENT ID
         //$router->put('/{modelname}/{id}/{detailmodelname}', 'ApiController@router');    //UPDATE DETAIL TERTENTU DARI PARENT ID
         //$router->patch('/{modelname}/{id}/{detailmodelname}', 'ApiController@router');  //UPDATE DETAIL TERTENTU DARI PARENT ID
         //$router->delete('/{modelname}/{id}/{detailmodelname}', 'ApiController@router'); //DELETE DETAIL TERTENTU DARI PARENT ID

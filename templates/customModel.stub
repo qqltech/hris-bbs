@@ -5,10 +5,9 @@ namespace __namespace;
 class __class extends __basicClass
 {    
     public function __construct()
-    {        
-        //  code here if needed
+    {
+        parent::booted();
     }
-    
 
 }
 

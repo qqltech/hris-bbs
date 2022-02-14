@@ -1,12 +1,50 @@
 <?php
 
 namespace App\Traits;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 trait ModelTrait {
     /**
      * Additional function
      */
     public $autoValidator  = true;
+    public $useEncryption  = false;
+
+    public $importValidator = [];   // laravel validation
+
+    public $excepts         = [];
+    public $createAdditionalData = []; // example: 'field'=>'auth:id'
+    public $updateAdditionalData = [];
+
+    /**
+     *  @param object [ 'type'=>'find' or 'get', 'caller'=> null ]
+     */
+    public function scopeFinal( $query, object $option )
+    {
+        return $query;
+    }
+    
+    public function getEncrypter(){
+        $keyPlain = env('APP_KEY');// another example to generate string: md5('12345678910');
+        $key = substr($keyPlain, 0, 32);
+        $encrypter = new \Illuminate\Encryption\Encrypter( $key, config('app.cipher' ) /**AES-256-CBC*/ );
+        return $encrypter;
+    }
+
+    public function encrypt( string $plainText ){
+        $encrypter = $this->getEncrypter();
+        return $encrypter->encrypt( $plainText );
+    }
+
+    public function  decrypt( string $encryptedText ){
+        $encrypter = $this->getEncrypter();
+        try {
+            return $encrypter->decrypt( $encryptedText );
+        } catch (DecryptException $e) {
+            return false;
+        }
+    }
 
     public function createValidator(){
         return [];
@@ -15,12 +53,6 @@ trait ModelTrait {
     public function updateValidator(){
         return [];
     }
-
-    public $importValidator = [];   // laravel validation
-
-    public $excepts         = [];
-    public $createAdditionalData = []; // example: 'field'=>'auth:id'
-    public $updateAdditionalData = [];
 
     public function customFind($p){
         if( method_exists( $this, "queryCacheById") ){
@@ -55,10 +87,18 @@ trait ModelTrait {
      * @override Laravel function
      */
     public function getCasts(){
-        return array_merge($this->casts, getCastsParam());
+        $casts = $this->casts;
+        return array_merge($casts, getCastsParam());
     }
 
-    function overrideGetParams( object $params, int $id=null )
+    public function getIdAttribute($val){
+        if(!$this->useEncryption){
+            return $val;
+        }
+        return $this->encrypt( $val );
+    }
+
+    function overrideGetParams( object $params, mixed $id=null )
     {
         if( $id ){
             $params->selectfield = $params->selectfield;
@@ -175,10 +215,10 @@ trait ModelTrait {
         return $arrayData;
     }
 
-    function extendJoin( $model )
+    function extendJoin( $model ) use($self)
     {
         $runtimeSql = "SELECT * FROM other_tables";
-        $model = $model->leftJoinSub( $runtimeSql, 'runtime_sql', function ($join) {
+        $model = $self->leftJoinSub( $runtimeSql, 'runtime_sql', function ($join) {
             $join->on("{$this->getTable()}.id", '=', 'runtime_sql.id');
         });
         
@@ -219,4 +259,5 @@ trait ModelTrait {
         return _uploadexcel($this, $request);
     }
 */
+
 }

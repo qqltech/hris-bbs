@@ -24,8 +24,8 @@ $router->get('/', function (Request $request) use ($router) {
         return response()->json("SERVER WAS CLOSED",404);
     }
 
-    if( env("LANDING") ){
-        $funcArr = explode(".", env("LANDING"));
+    if( env("LANDING_RESPONSE") ){
+        $funcArr = explode(".", env("LANDING_RESPONSE"));
         $class = getCustom($funcArr[0]);
         $func = $funcArr[1];
         return $class->$func($request);

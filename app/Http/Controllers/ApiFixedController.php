@@ -86,7 +86,7 @@ class ApiFixedController extends Controller
                 break;
         }
         if(!$this->is_model_exist( $this->parentModelName )){return;};
-        if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}
+        if($this->operationId != null && !is_numeric($this->operationId) && strlen($this->operationId)<30 ){ $this->customOperation=true; return;}
         if(!$this->is_operation_authorized($this->parentModelName, $this->operationId )){return;};
         if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
@@ -100,7 +100,29 @@ class ApiFixedController extends Controller
             $this->operationId = @$request->route()[2]['detailid'];
 
             if(!$this->is_model_exist( $this->parentModelName )){return;};
-            if($this->operationId != null && !is_numeric($this->operationId) ){ $this->customOperation=true; return;}
+            if($this->operationId != null && !is_numeric($this->operationId) && strlen($this->operationId)<30  ){
+                $this->customOperation=true; 
+                return;
+            }
+            if(!$this->is_operation_authorized($this->parentModelName, $this->operationId )){return;};
+            if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
+            if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
+            if(!$this->is_data_not_unique($this->parentModelName, $this->requestData)){return;};
+            if(!$this->is_model_deletable($this->parentModelName, $this->operationId)){return;};
+            $this->is_detail_valid($this->parentModelName, $this->requestData);
+        }
+
+
+        if( @$request->route()[2]['subdetailmodelname'] ){
+            $this->isDetailDirection = true;
+            $this->parentModelName = @$request->route()[2]['subdetailmodelname'];
+            $this->operationId = @$request->route()[2]['subdetailid'];
+
+            if(!$this->is_model_exist( $this->parentModelName )){return;};
+            if($this->operationId != null && !is_numeric($this->operationId) && strlen($this->operationId)<30  ){
+                $this->customOperation=true; 
+                return;
+            }
             if(!$this->is_operation_authorized($this->parentModelName, $this->operationId )){return;};
             if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
             if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
@@ -124,13 +146,31 @@ class ApiFixedController extends Controller
         $newModel = new $string;
         return $newModel;
     }
-    private function is_model_exist($modelName)
+    private function is_model_exist( $modelName )
     {
         $modelCandidate = "\App\Models\BasicModels\\$modelName";
         if( !class_exists( $modelCandidate ) ){
-            
-            abort(500, json_encode([
-                'message'=>"Maaf Sumber Data tidak tersedia"
+            if( env('MODEL_RESOLVER') ){
+                $resolvers = explode( ".", env('MODEL_RESOLVER') );
+                $classResolver = getCustom( $resolvers[0] );
+                $funcResolver = $resolvers[1];
+                if( method_exists($classResolver,$funcResolver)){
+                    $realModelName = $classResolver->$funcResolver( $modelName );
+                    $modelCandidate = "\App\Models\BasicModels\\$realModelName";
+                    if( $realModelName && class_exists( $modelCandidate ) ){
+                        config( ['custom_'.$modelName => getCustom( $realModelName ) ] );
+                        return true;
+                    }else{
+                        abort(404, json_encode([
+                            'message'=>"Maaf Sumber Data tidak tersedia",
+                            'resource'=>$realModelName
+                        ]));
+                    }
+                }
+            }
+            abort(404, json_encode([
+                'message'=>"Maaf Sumber Data tidak tersedia",
+                'resource'=>$modelName
             ]));
             $this->errors[] ="[UNKNOWN]Model [$modelName] does not exist";
             $this->isAuthorized=false;
@@ -813,7 +853,8 @@ class ApiFixedController extends Controller
         $params=(object)$params;
         // $modelCandidate = "\App\Models\CustomModels\\$modelName";
         // $model          = new $modelCandidate;
-        $model          = getCustom($modelName);
+        $model          = getCustom( $modelName );
+        config( [ "parentTable" => $model->getTable() ] );
         $details        = $model->details;
         $columns        = $model->columns;
         $defaultColumn  = in_array("updated_at",$columns)?'updated_at':$columns[ array_rand($columns) ];
@@ -1111,12 +1152,24 @@ class ApiFixedController extends Controller
         }
         $model = null;  
     }
-    public function router(Request $request, $modelname, $id=null, $detailmodelname=null, $detailid=null)
+    public function router(Request $request, $modelname, $id=null, $detailmodelname=null, $detailid=null, $subdetailmodelname=null, $subdetailid=null )
     {
         if( $detailmodelname ){
             $modelname = $detailmodelname;
+            config(['parent_lv1_id'=>$id]);
             $id = $detailid;
         }
+        
+        if( $subdetailmodelname ){
+            $modelname = $subdetailmodelname;
+            config(['parent_lv2_id'=>$detailid]);
+            $id = $subdetailid;
+        }
+
+        if( $this->operation==='read' && !$id ){
+            $this->operation = 'list';
+        }
+        
         if($this->isAuthorized){
             if($this->customOperation){
                 $function = "custom_".$this->operationId;
@@ -1125,6 +1178,11 @@ class ApiFixedController extends Controller
                 // $model = new $modelCandidate;
                 $model = getCustom($modelname);
                 if( !method_exists( $model, $function ) ){
+
+                    abort(404, json_encode([
+                        'message'=>"Maaf, operasi ini tidak ditemukan",
+                        "resource"=>$modelname
+                    ]));
                     $this->messages[] ="[UNKNOWN] function [$functionName] in Model [$this->parentModelName] does not exist";
                     return response()->json(["messages"=>$this->messages],400);
                 }

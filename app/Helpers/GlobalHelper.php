@@ -1353,6 +1353,21 @@ function _customGetData($model,$params)
 {
     $table = $model->getTable();
     $className = class_basename( $model );
+    
+    $givenScopes = [];
+    if($table == config( "parentTable") && req('scopes')){
+        $scopes = explode(",", req('scopes'));
+        foreach( $scopes as $scope ){
+            if( !$model->hasNamedScope($scope) ){
+                abort(422,json_encode([
+                    'message'=>"Scope $scope tidak ditemukan",
+                    "resource"=>$className
+                ]));
+            }
+        }
+        $givenScopes = $scopes;
+    }
+
     $isParent = $className == (@app()->request->route()[2]['detailmodelname'] || @app()->request->route()[2]['modelname']);
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
     $pureModel=$model;    
@@ -1537,12 +1552,31 @@ function _customGetData($model,$params)
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
 
-    if(@app()->request->route()[2]['detailmodelname']){
+    if( isRoute('read_list_detail') ){
         $parentModelName = @app()->request->route()[2]['modelname'];
+        $parentModel = getCustom($parentModelName);
+        $parentTable = getTableOnly($parentModel->getTable());
         $parentId = @app()->request->route()[2]['id'];
+        if($parentModel->useEncryption){
+            $parentId = $parentModel->decrypt($parentId);
+        }
 
-        $model = $model->where(function($q)use( $parentModelName, $parentId ){
-            $q->where( $parentModelName."_id", $parentId );
+        $model = $model->where(function($q)use( $parentTable, $parentId ){
+            $q->where( $parentTable."_id", $parentId );
+        });
+    }
+
+    if( isRoute('read_list_sub_detail') ){
+        $parentModelName = @app()->request->route()[2]['detailmodelname'];
+        $parentModel = getCustom($parentModelName);
+        $parentTable = getTableOnly($parentModel->getTable());
+        $parentId = @app()->request->route()[2]['detailid'];
+        if($parentModel->useEncryption){
+            $parentId = $parentModel->decrypt($parentId);
+        }
+
+        $model = $model->where(function($q)use( $parentTable, $parentId ){
+            $q->where( $parentTable."_id", $parentId );
         });
     }
 
@@ -1647,11 +1681,15 @@ function _customGetData($model,$params)
        $model=$model->orderBy(\DB::raw($order),$params->order_type==null?"asc":$params->order_type);
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
+    
+    $finalObj = (object)[
+        'type'=>'get', 'caller'=>$params->caller
+    ];
 
     if(!$params->caller){
-       $data = $final->paginate($params->paginate,["*"], 'page', $page = $params->page);
+       $data = $final->scopes($givenScopes)->final($finalObj)->paginate($params->paginate,["*"], 'page', $page = $params->page);
     }else{
-       $data = $final->get(); 
+       $data = $final->scopes($givenScopes)->final($finalObj)->get(); 
     }
     if( req("transform")==='false' ){
         if(!$params->caller){
@@ -1691,6 +1729,13 @@ function _customGetData($model,$params)
                     $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
                 }
             }
+
+            if($pureModel->useEncryption){
+                $currentId = $pureModel->decrypt($fixedData[$index]['id']);
+            }else{
+                $currentId = $fixedData[$index]['id'];
+            }
+
             foreach($pureModel->details as $detail){
                 $detailArray = explode(".",$detail);
                 $detailClass = $detail;
@@ -1716,7 +1761,7 @@ function _customGetData($model,$params)
                     $fkName.="_id";
                 }
                 $p = (Object)[];
-                $p->where_raw   = $fkName."=".$fixedData[$index]["id"];
+                $p->where_raw   = $fkName."=".$currentId;
                 $p->order_by    = null;
                 $p->order_type  = null;
                 $p->order_by_raw= null;
@@ -1766,7 +1811,7 @@ function _customGetData($model,$params)
                     continue;
                 }
             }
-            
+
             $fixedData[$index] = $transformedData;
             foreach(["create","update","delete","read"] as $akses){
                 $func = $akses."roleCheck";
@@ -1803,10 +1848,25 @@ function _customGetData($model,$params)
 function _customFind($model, $params)
 {
     $table = $model->getTable();
+    $className = class_basename( $model );
+    $givenScopes = [];
+    if($table == config( "parentTable") && req('scopes')){
+        $scopes = explode(",", req('scopes'));
+        foreach( $scopes as $scope ){
+            if( !$model->hasNamedScope($scope) ){
+                abort(422,json_encode([
+                    'message'=>"Scope $scope tidak ditemukan",
+                    "resource"=>$className
+                ]));
+            }
+        }
+        $givenScopes = $scopes;
+    }
     $joinMax = isset($params->joinMax)?$params->joinMax:0;
-    $pureModel=$model;
+    $pureModel = $model;
     $modelCandidate = "\\".get_class($model);
     // $modelCandidate = "\App\Models\CustomModels\\$table";
+    $idToFind = $pureModel->useEncryption ? $pureModel->decrypt($params->id) : $params->id;
     $modelExtender  = new $modelCandidate;
     $fieldSelected=[];
     $metaColumns=[];
@@ -1926,16 +1986,40 @@ function _customFind($model, $params)
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
-    if(@app()->request->route()[2]['detailmodelname']){
-        $parentModelName = @app()->request->route('modelname');
-        $parentId = @app()->request->route('id');
+    
+    if( isRoute('read_list_detail') ){
+        $parentModelName = @app()->request->route()[2]['modelname'];
+        $parentModel = getCustom($parentModelName);
+        $parentTable = getTableOnly($parentModel->getTable());
+        $parentId = @app()->request->route()[2]['id'];
+        if($parentModel->useEncryption){
+            $parentId = $parentModel->decrypt($parentId);
+        }
 
-        $model = $model->where(function($q)use( $parentModelName, $parentId ){
-            $q->where( $parentModelName."_id", $parentId );
+        $model = $model->where(function($q)use( $parentTable, $parentId ){
+            $q->where( $parentTable."_id", $parentId );
         });
     }
 
-    $data = $model->select(DB::raw(implode(",",$fieldSelected) ))->find($params->id);
+    if( isRoute('read_list_sub_detail') ){
+        $parentModelName = @app()->request->route()[2]['detailmodelname'];
+        $parentModel = getCustom($parentModelName);
+        $parentTable = getTableOnly($parentModel->getTable());
+        $parentId = @app()->request->route()[2]['detailid'];
+        if($parentModel->useEncryption){
+            $parentId = $parentModel->decrypt($parentId);
+        }
+
+        $model = $model->where(function($q)use( $parentTable, $parentId ){
+            $q->where( $parentTable."_id", $parentId );
+        });
+    }
+    
+    $finalObj = (object)[
+        'type'=>'find', 'caller'=>null
+    ];
+
+    $data = $model->scopes($givenScopes)->select(DB::raw(implode(",",$fieldSelected) ))->final($finalObj)->find($idToFind);
     if( !$data ){
         abort(404, json_encode([
             'message'=>"Maaf Data tidak ditemukan"
@@ -1958,7 +2042,8 @@ function _customFind($model, $params)
     if($params->single){
         return $data;
     }
-    $id = $params->id;
+    
+    $id = $idToFind;
     foreach($pureModel->details as $detail){
         $detailArray = explode(".",$detail);
         $detailClass = $detail;
@@ -2603,30 +2688,23 @@ function pgsqlParseError( string $msg ):string {
     return $msg;
 }
 
-/**
- * Abort error with json message
- * @param Array|Object|Str $msg
- * @param Str|Int $code
- * @return Void
- */
-if (! function_exists('responseError')) {
-    function responseError( $msg, $code = 422 )
-    {
-        $fixedMsg = is_object($msg) ? (array)$msg:$msg;
-
-        if( is_array($msg) ){
-            if( !isset($msg['message'])){
-                $fixedMsg['message'] = "Undefined ";
-            }
-        }else{
-            $fixedMsg = [
-                "message" => "Invalid Data",
-                "errors" => null
-            ];
-        }
-        $fixedMsg['server_time'] = Carbon::now()->format('Y-m-d H:i:s');
-        $fixedMsg['execution_time'] = round(microtime(true)-config("start_time"),5);
-        $fixedMsg['code'] = $code;
-        throw new ValidationException( null, response()->json($fixedMsg, $code));
+function getTableOnly(string $tableName){
+    if( Str::contains($tableName, ".") ){
+        $exploded = explode(".", $tableName);
+        return end($exploded);
     }
+    return $tableName;
+}
+
+function getModelNameByLevel( int $level = 1 ){
+    $name = 'modelname';
+    if( $level === 2 ){
+        $name = 'detailmodelname';
+    }elseif( $level === 2 ){
+        $name = 'subdetailmodelname';
+    }else{
+        return null;
+    }
+
+    return @app()->request->route()[2][ $name ];
 }
