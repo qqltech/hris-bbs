@@ -323,6 +323,9 @@ class ApiFixedController extends Controller
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
                 if(isset($model->autoValidator) && $model->autoValidator){
+                    if($model->useEncryption && isset( $isiData['id'] ) && !is_numeric( $isiData ['id'] )){
+                        $isiData['id'] = $model->decrypt($isiData['id']);
+                    }
                     $validator = Validator::make($isiData, $autoValidators, $customResponseValidator);
                     if ( $validator->fails() ) {
                         //  #invalid data
@@ -354,6 +357,9 @@ class ApiFixedController extends Controller
                 $isiData = reformatData($isiData,$model);
                 if( $operation=='update' && isset($isiData['id']) ){
                     $operationId = $isiData['id'];
+                    if($model->useEncryption && !is_numeric( $operationId )){
+                        $operationId = $model->decrypt($operationId);
+                    }
                     $arrayValidation = array_map(function($dtm) use ($operationId){
                         if(strpos($dtm, "unique")!==false){
                             $dtm = $dtm.",$operationId";
@@ -391,6 +397,9 @@ class ApiFixedController extends Controller
             }
         }else{
             if(isset($model->autoValidator) && $model->autoValidator){
+                if($model->useEncryption && isset( $data['id'] ) && !is_numeric( $data ['id'] )){
+                    $data['id'] = $model->decrypt($data['id']);
+                }
                 $validator = Validator::make($data, $autoValidators, $customResponseValidator);
                 if ( $validator->fails()) {
                     //  #invalid data
@@ -412,6 +421,9 @@ class ApiFixedController extends Controller
             $data = reformatData($data,$model);
             if( $operation=='update' ){
                 $operationId = $this->operationId;
+                if($model->useEncryption && !is_numeric( $operationId )){
+                    $operationId = $model->decrypt($operationId);
+                }
                 $arrayValidation = array_map(function($dtm) use ($operationId){
                     if(strpos($dtm, "unique")!==false){
                         $dtm = $dtm.",$operationId";
@@ -447,14 +459,21 @@ class ApiFixedController extends Controller
         $model          = getCustom( $modelName );
         $arrayValidation    = $model->unique;
         if($this->operation == 'update'){
+            $operationId = $this->operationId;
+            if($model->useEncryption && !is_numeric( $operationId )){
+                $operationId = $model->decrypt($operationId);
+            }
             $newArrayValidation = [];
             foreach($arrayValidation as $key => $validation){
-                $newArrayValidation[$key] = $validation.",$this->operationId";
+                $newArrayValidation[$key] = $validation.",$operationId";
             }
             $arrayValidation = $newArrayValidation;
         }
         if(isset($data[0]) && is_array($data[0])){
             foreach ($data as $i => $isiData){
+                if($model->useEncryption && isset( $isiData['id'] ) && !is_numeric( $isiData ['id'] )){
+                    $isiData['id'] = $model->decrypt($isiData['id']);
+                }
                 $validator = Validator::make($isiData, $arrayValidation);
                 if ( $validator->fails()) {
                     //  #invalid data
@@ -471,6 +490,9 @@ class ApiFixedController extends Controller
                 }
             }
         }else{
+            if($model->useEncryption && isset( $data['id'] ) && !is_numeric( $data ['id'] )){
+                $data['id'] = $model->decrypt($data['id']);
+            }
             $validator = Validator::make($data, $arrayValidation);
             if ( $validator->fails()) {
                 //  #invalid data
@@ -900,6 +922,9 @@ class ApiFixedController extends Controller
         // $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$modelName:$modelNameExplode[1]);
         // $model          = new $modelCandidate;
         $model          = getCustom( (count($modelNameExplode)==1?$modelName:$modelNameExplode[1]) );
+        if( !is_numeric($id) && $model->useEncryption ){
+            $id = $model->decrypt( $id );
+        }
         $table          = $model->getTable();
         $detailsArray   = $model->details; 
         $cascade        = $model->cascade;
@@ -963,6 +988,9 @@ class ApiFixedController extends Controller
         // $modelCandidate = "\App\Models\CustomModels\\$modelName";
         // $model          = new $modelCandidate;
         $model          = getCustom( $modelName );
+        if( !is_numeric($id) && $model->useEncryption ){
+            $id = $model->decrypt( $id );
+        }
         $detailsArray   = $model->details; 
         $cascade        = $model->cascade;
         $preparedModel  = $model->find($id);
@@ -1060,8 +1088,13 @@ class ApiFixedController extends Controller
                 $fkName.="_id";
             }
             foreach($data[$detailClass] as $index => $valDetail){
-                if(isset($valDetail['id']) && is_numeric($valDetail['id']) && 
-                    $modelChild->where($fkName,$id)->where('id',$valDetail['id'])->count()>0){
+                $isChildOfParent = false;
+                if( isset($valDetail['id']) ){
+                    $valDetail['id'] = !is_numeric($valDetail['id']) && $modelChild->useEncryption? $modelChild->decrypt( $valDetail['id'] ): $valDetail['id'];
+                    $isChildOfParent = $modelChild->where($fkName,$id)->where('id', $valDetail['id'])->exists();
+                }
+
+                if($isChildOfParent){
 
                     if( !$this->is_operation_authorized($detailClass, $valDetail['id']) ){
                         $this->operationOK = false;
