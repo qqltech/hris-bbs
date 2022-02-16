@@ -51,6 +51,16 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->post("/uploadtemplate","LaradevController@uploadTemplate");
         $router->post("/paramaker","LaradevController@paramaker");
         $router->post("/run-query","LaradevController@runQuery");
+
+        $router->get("/javascript", "LaradevController@getJsFile");
+        $router->get("/javascript/{filename}","LaradevController@getJsFile");
+        $router->put("/javascript/{filename}","LaradevController@saveJsFile");
+        $router->delete("/javascript/{filename}","LaradevController@deleteJsFile");
+
+        $router->get("/blades", "LaradevController@getBladeFile");
+        $router->get("/blades/{filename}","LaradevController@getBladeFile");
+        $router->put("/blades/{filename}","LaradevController@saveBladeFile");
+        $router->delete("/blades/{filename}","LaradevController@deleteBladeFile");
     });
 
     $router->post("/getnotice","LaradevController@getNotice");
@@ -80,6 +90,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
     });
 
     $router->post('/trio/{table}', 'LaradevController@deleteAll');
+    $router->delete('/trio/{table}', 'LaradevController@deleteAll');
 
     $router->post('/connect', function(Request $req){
         if(!$req->has('password')){

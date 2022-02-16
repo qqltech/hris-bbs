@@ -981,7 +981,18 @@ class LaradevController extends Controller
             return $self->readMigrations( $req, null);
         });
 
-        return $migrationLists;
+
+        $jsFiles = array_filter( scandir( base_path('public/js') ), function($dt) {
+            return !in_array($dt,['.','..','README.md']);
+        });
+        
+        $bladesFiles = array_filter( scandir( base_path('resources/views/projects') ), function($dt) {
+            return !in_array($dt,['.','..','readme.md']);
+        });
+        return array_merge($migrationLists,[
+            "js"=> array_values( $jsFiles ),
+            "blades"=> array_values( $bladesFiles )
+        ]);
     }
 
     public function readMigrations(Request $req, $table=null){
@@ -993,7 +1004,7 @@ class LaradevController extends Controller
                 }
                 return File::get( $migrationPath );
             }else{
-                $data = $this->getDirContents( base_path('database/migrations/projects') );            
+                $data = $this->getDirContents( base_path('database/migrations/projects') );
                 $schemaManager = DB::getDoctrineSchemaManager();
                 $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
                 $tables = $schemaManager->listTables();
@@ -1079,7 +1090,11 @@ class LaradevController extends Controller
                         ];
                     }
                 }
-                return ["models"=>$models,"realfk"=>$fk];
+
+                return [
+                    "models"=>$models,
+                    "realfk"=>$fk 
+                ];
             }
         }catch(\Exception $e){
             return response()->json(["error"=>$e->getFile()."-".$e->getLine()."-".$e->getMessage()],400);
@@ -1230,7 +1245,8 @@ class LaradevController extends Controller
         }
 
         if($req->has('down')){
-            return "database migration ok, $table model downed successfully";
+            \Cache::forget('migration-list');
+            return "database migration ok, $table was downed successfully";
         }
         // return File::get( array_values($data)[0] );
         try{
@@ -1274,12 +1290,6 @@ class LaradevController extends Controller
         }
     }
     public function deleteAll(Request $req, $table){
-        if(!$req->has('password')){
-            return response()->json($req->all(),401);
-        }
-        if($req->password!=="jajanenak"){
-            return response()->json("unauthorized password salah",401);
-        }
         try{
             File::delete(glob(base_path('database/migrations')."/*.*"));//g penting sih
             if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
@@ -1383,6 +1393,17 @@ class LaradevController extends Controller
             return response()->json("Maaf modul wajib diisi", 400);
         }
 
+        if(Str::endswith($req->modul, '.js')){
+            $path = base_path( public_path("/js/$req->modul") );
+            File::put( public_path("/js/$req->modul"), "//   javascript");
+            return response()->json("pembuatan file javascript berhasil, silahkan refresh list");
+        }
+        if(Str::endswith($req->modul, '.blade')){
+            $path = base_path("resources/views/projects/$req->modul.php");
+            File::put( $path, "<?php\n // blade php file");
+            return response()->json("pembuatan file blade berhasil, silahkan refresh list");
+        }
+
         if(strpos("x".$req->modul, "alias ")!==false && count(explode(" ",$req->modul))==3 ){
             $modul = explode(" ",  $req->modul)[2];
             $tableSrc   = explode(" ",  $req->modul)[1];
@@ -1459,6 +1480,52 @@ class LaradevController extends Controller
         
         return response()->json("pembuatan file migration OK");
     }
+
+    public function getJsFile(Request $req, string $filename = null ){
+        if( $filename ){
+            $path = public_path("js/$filename.js");
+            return File::get( $path );
+        }
+
+        return [];
+    }
+
+    public function saveJsFile(Request $req, string $filename ){
+
+        $path = public_path("js/$filename.js");
+        $file = File::put( $path , $req->text); 
+        return response()->json("js file was saved");
+    }
+
+    public function deleteJsFile(Request $req, string $filename ){
+
+        $path = public_path("js/$filename.js");
+        $file = File::delete( $path ); 
+        return response()->json("js file was delete");
+    }
+
+    public function getBladeFile(Request $req, string $filename = null ){
+        if( $filename ){
+            $path = base_path("resources/views/projects/$filename.blade.php");
+            return File::get( $path );
+        }
+
+        return [];
+    }
+
+    public function saveBladeFile(Request $req, string $filename ){
+
+        $path = base_path("resources/views/projects/$filename.blade.php");
+        $file = File::put( $path , $req->text); 
+        return response()->json("blade file was saved");
+    }
+
+    public function deleteBladeFile(Request $req, string $filename ){
+        $path = base_path("resources/views/projects/$filename.blade.php");
+        $file = File::delete( $path ); 
+        return response()->json("blade file was deleted");
+    }
+
     public function getNotice(Request $req){
         $model = $req->data;
         if(strpos($model,".")!==false){

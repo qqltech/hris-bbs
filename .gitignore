@@ -2,6 +2,7 @@
 /.idea
 Homestead.json
 Homestead.yaml
+/public/js/*.js
 /public/uploads
 /public/models.json
 /public/.htaccess
@@ -17,7 +18,7 @@ Homestead.yaml
 *_log
 local-*.*
 database/*.sqlite
-resources/views/projects
+resources/views/projects/*.blade.php
 .phpunit.*.*
 tests
 testlogs/*
