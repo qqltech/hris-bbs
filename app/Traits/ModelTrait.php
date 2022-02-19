@@ -24,7 +24,16 @@ trait ModelTrait {
     {
         return $query;
     }
-    
+
+    /**
+     * for frontend usage, checking auth before request data
+     */
+    public function custom_authorize( $req ){
+        return response()->json( [
+            'success'=>true
+        ],200);
+    }
+
     public function getEncrypter(){
         $keyPlain = env('APP_KEY');// another example to generate string: md5('12345678910');
         $key = substr($keyPlain, 0, 32);

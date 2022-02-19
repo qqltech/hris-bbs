@@ -1687,7 +1687,12 @@ function _customGetData($model,$params)
     ];
 
     if(!$params->caller){
-       $data = $final->scopes($givenScopes)->final($finalObj)->paginate($params->paginate,["*"], 'page', $page = $params->page);
+       $data = $final->scopes($givenScopes)->final($finalObj);
+       if(req('simplest')){
+           $data = $data->simplePaginate($params->paginate,["*"], 'page', $page = $params->page);
+       }else{
+            $data = $data->paginate($params->paginate,["*"], 'page', $page = $params->page);
+       }
     }else{
        $data = $final->scopes($givenScopes)->final($finalObj)->get(); 
     }
