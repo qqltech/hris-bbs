@@ -879,7 +879,6 @@ class ApiFixedController extends Controller
         config( [ "parentTable" => $model->getTable() ] );
         $details        = $model->details;
         $columns        = $model->columns;
-        $defaultColumn  = in_array("updated_at",$columns)?'updated_at':$columns[ array_rand($columns) ];
         $data = (object)$params;
         $p = (Object)[];
         if($id!=null){
@@ -897,7 +896,7 @@ class ApiFixedController extends Controller
             ];
         }else{
             $p->where_raw   = isset($data->where) ? $data->where : null;
-            $p->order_by    = isset($data->orderby) ? $data->orderby:$model->getTable().".$defaultColumn";
+            $p->order_by    = isset($data->orderby) ? $data->orderby:$model->getTable().".id";
             $p->order_type  = isset($data->ordertype) ? $data->ordertype:"DESC";
             $p->addselect  = isset($data->addselect) ? urldecode($data->addselect):null;
             $p->union  = isset($data->union) ? urldecode($data->union):null;
