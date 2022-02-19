@@ -1835,12 +1835,12 @@ function _customGetData($model,$params)
             "data"=>$fixedData
         ],[
             // "metaScript"=>method_exists( $modelExtender, "metaScriptList" )?$modelExtender->metaScriptList():null,
-            "total"=>$data->total(),
+            "total"=>req('simplest')?null: $data->total(),
             "current_page"=>$data->currentPage(),
             "per_page"=>$data->perPage(),
             "from"=>$data->firstItem(),
             "to"=>$data->lastItem(),
-            "last_page"=>$data->lastPage(),
+            "last_page"=>req('simplest')?null:$data->lastPage(),
             "has_next"=>$data->hasMorePages(),
             "prev"=>$data->previousPageUrl(),
             "next"=>$data->nextPageUrl(),
