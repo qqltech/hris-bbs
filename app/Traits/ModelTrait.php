@@ -105,7 +105,7 @@ trait ModelTrait {
 
     public function getIdAttribute($val){
         if(!$this->useEncryption){
-            return $val;
+            return (int)$val;
         }
         return $this->encrypt( $val );
     }
