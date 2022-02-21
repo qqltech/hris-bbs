@@ -99,8 +99,8 @@ trait ModelTrait {
         $casts = $this->casts;
         if(!$this->useEncryption){
             $casts[$this->getKeyName()] = 'integer';
-            ff($casts);
         }
+        ff($casts);
         return array_merge($casts, getCastsParam());
     }
 
