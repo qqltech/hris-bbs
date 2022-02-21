@@ -846,7 +846,6 @@ class ApiFixedController extends Controller
     }
     public function readOperation( $modelName, $params=null, $id=null )
     {
-        ff('ok');
         $params=(array)$params;
         if( $id && isset($params['simplest']) && $params['simplest']=='true' ){
             $model = getBasic($modelName);
@@ -861,7 +860,7 @@ class ApiFixedController extends Controller
                 $model = $model->selectRaw( $selectField );
             }
             return [
-                "data"=>[],$model->find($id),
+                "data"=>$model->find($id),
                 "processed_time"=>round(microtime(true)-config("start_time"),5)
             ];
         }
