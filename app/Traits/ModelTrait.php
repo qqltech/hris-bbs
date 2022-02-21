@@ -100,7 +100,6 @@ trait ModelTrait {
         if(!$this->useEncryption){
             $casts[$this->getKeyName()] = 'integer';
         }
-        ff($casts);
         return array_merge($casts, getCastsParam());
     }
 

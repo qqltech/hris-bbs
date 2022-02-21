@@ -859,6 +859,7 @@ class ApiFixedController extends Controller
                 );
                 $model = $model->selectRaw( $selectField );
             }
+            ff($model->getCasts());
             return [
                 "data"=>$model->find($id),
                 "processed_time"=>round(microtime(true)-config("start_time"),5)
