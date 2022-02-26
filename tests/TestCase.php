@@ -1,7 +1,11 @@
 <?php
+
+namespace Tests;
+
+use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
 
-abstract class TestCase extends Laravel\Lumen\Testing\TestCase
+abstract class TestCase extends BaseTestCase
 {
     /**
      * Creates the application.

@@ -39,13 +39,11 @@ $app->routeMiddleware([
 ]);
 
 //  for swoole service provider
-if( env('SWOOLE', false) ){
-    $app->register(SwooleTW\Http\LumenServiceProvider::class);
+if( env('SWOOLE', false) ){ // belum update
+    // $app->register(SwooleTW\Http\LumenServiceProvider::class);
 }
 
-$app->register(SwooleTW\Http\LumenServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class); //DEFAULT
-$app->register(Stevebauman\Location\LocationServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class); //DEFAULT
 $app->register(Starlight93\Oauth2\PassportServiceProvider::class);
@@ -53,8 +51,8 @@ $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
-$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
-$app->register(\KitLoong\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
+// $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->register(\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
@@ -81,6 +79,9 @@ $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 if (!class_exists('Excel')) {
     class_alias('Maatwebsite\Excel\Facades\Excel', 'Excel');
 }
+if (!class_exists('Str')) {
+    class_alias('Illuminate\Support\Str', 'Str');
+}
 if (!class_exists('Carbon')) {
     class_alias('Carbon\Carbon', 'Carbon');
 }
@@ -95,6 +96,9 @@ if (!class_exists('Mail')) {
 }
 if (!class_exists('MailTemplate')) {
     class_alias('App\Mails\SendMailable', 'MailTemplate');
+}
+if (!class_exists('File')) {
+    class_alias('Illuminate\Support\Facades\File', 'File');
 }
 if (!class_exists('Cache')) {
     class_alias('Illuminate\Support\Facades\Cache', 'Cache');

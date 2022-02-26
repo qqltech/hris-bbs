@@ -1052,7 +1052,7 @@ class LaradevController extends Controller
                 }
 
                 //  Create New Migration File if needed
-                if( !isVersion(6) && env("AUTOCREATE_MIGRATION") ){
+                if( env("AUTOCREATE_MIGRATION") ){
                     $noMigrationTables = array_filter( $arrayTables, function( $tb ) use( $addedTables ){
                         return !in_array( $tb, $addedTables );
                     });
@@ -1250,30 +1250,15 @@ class LaradevController extends Controller
         }
         // return File::get( array_values($data)[0] );
         try{
-            if( isVersion(8) ){
-                $file = "database/migrations/$dir/0_0_0_0_"."$table.php";
-                $exitCode = Artisan::call('migrate:refresh', [
-                    '--path' => $file,
-                    '--force' => true,
-                ]);
-            }elseif( isVersion(6) ){
-                $file = base_path( "database/migrations/$dir")."/0_0_0_0_"."$table.php";
-                File::put(base_path('database/migrations')."/0_0_0_0_"."$table.php",File::get( $file ));
-                $exitCode = Artisan::call('migrate:refresh', [
-                    '--force' => true,
-                ]);
-                File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php");
-            }
+            $file = "database/migrations/$dir/0_0_0_0_"."$table.php";
+            $exitCode = Artisan::call('migrate:refresh', [
+                '--path' => $file,
+                '--force' => true,
+            ]);
             // $req->rewrite_custom = $req->rewrite_custom;
             $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
             \Cache::forget('migration-list');
         }catch(Exception $e){
-            if( isVersion(6) ){
-                File::delete(glob(base_path('database/migrations')."/*.*"));
-                if( File::exists( base_path('database/migrations')."/0_0_0_0_"."$table.php" ) ){
-                    File::delete(base_path('database/migrations')."/0_0_0_0_"."$table.php");
-                }
-            }
             return response()->json(["error"=>$e->getMessage()], 422);
         }
         Schema::enableForeignKeyConstraints();

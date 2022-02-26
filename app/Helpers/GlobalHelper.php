@@ -2713,3 +2713,47 @@ function getModelNameByLevel( int $level = 1 ){
 
     return @app()->request->route()[2][ $name ];
 }
+
+function saveFileToCache( $modelName, $field, $file, $user_id='anonymous', $seconds = 1800 ){
+    $key = $modelName."_".$field."_".$user_id."_".sanitizeString($file->getClientOriginalName());
+    $path =  $file->getRealPath();
+    $blob = base64_encode(\File::get($path));
+    \Cache::put( $key, $blob, $seconds);
+    
+    return $key;
+}
+
+function pullFileFromCache($modelName, $field, $filename, $user_id='anonymous'){
+    $key = $modelName."_".$field."_".$user_id."_".sanitizeString($filename);
+
+    $cacheContent = \Cache::get( $key );
+    if(!$cacheContent){
+        return null;
+    }
+    
+    $contents = base64_decode( $cacheContent );
+    return $contents;
+}
+
+function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', $oldFile = null ){
+    $key = $modelName."_".$field."_".$user_id."_".sanitizeString($filename);
+    $contents = pullFileFromCache($modelName, $field, $filename, $user_id);
+
+    if( !$contents ){
+        if(!$oldFile){
+            abort(422, json_encode(['message'=>"File `$filename` tidak ada atau telah melebihi 30 menit, upload ulang dan segera submit"]));
+        }else{
+            return $oldFile;
+        }
+    }
+    
+    $code = \Carbon::now()->format('his').crc32(uniqid());
+    $fixedFileName = $code.":::".$filename;
+    if(!File::exists(public_path("uploads/$modelName"))){
+        umask(0000);
+        File::makeDirectory( public_path("uploads/$modelName"), 493, true);
+    }
+
+    $path = \File::put(public_path("uploads/$modelName/$fixedFileName"), $contents);
+    return $fixedFileName;
+}

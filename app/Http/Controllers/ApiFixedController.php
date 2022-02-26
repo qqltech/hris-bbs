@@ -677,6 +677,7 @@ class ApiFixedController extends Controller
         // $modelCandidate = "\App\Models\CustomModels\\$modelName";
         // $model          = new $modelCandidate;
         $model          = getCustom($modelName);
+        $preparedModel = getBasic($modelName);
         $detailsArray   = $model->details;
         
         if(isset($data[0]) && is_array($data[0])){
@@ -720,8 +721,9 @@ class ApiFixedController extends Controller
                     return;
                 }
                 $finalData  = $createBeforeEvent["data"];
-                
-                $finalModel = ($this->getParentClass($model))->create(reformatData($finalData,$model));
+                $finalData  = reformatData($finalData,$model);
+
+                $finalModel = $preparedModel->create( $finalData );
                 $model->createAfter($finalModel, $isiData, $this->requestMeta, $finalModel->id);
                 $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
                 foreach( $isiData as $key => $value ){
@@ -802,7 +804,9 @@ class ApiFixedController extends Controller
                 }
             }
             
-            $finalModel = ($this->getParentClass($model))->create(reformatData($finalData,$model));
+            $finalData  = reformatData($finalData,$model);
+
+            $finalModel = $preparedModel->create( $finalData );
             $model->createAfter($finalModel, $data, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
@@ -992,7 +996,7 @@ class ApiFixedController extends Controller
         }
         $detailsArray   = $model->details; 
         $cascade        = $model->cascade;
-        $preparedModel  = $model->find($id);
+        $preparedModel  = getBasic($modelName)->find($id);
         if(!$preparedModel){
             abort(404, json_encode([
                 'message'=>"Maaf Data tidak ditemukan untuk diupdate",
@@ -1052,7 +1056,32 @@ class ApiFixedController extends Controller
                 }
             }
         }
-        $finalModel = $preparedModel->update(reformatData($finalData,$preparedModel));
+
+        $finalData  = reformatData($finalData,$preparedModel);
+
+        // if( count($model->fileColumns)>0 ){
+        //     foreach( $finalData as $key => $value ){
+        //         if( $value && in_array($key, $model->fileColumns) ){
+        //             $modelName = getTableOnly( $model->getTable() );
+        //             $field = $key;
+        //             $file = $value;
+        //             $userId = \Auth::user()->id;
+        //             $oldFile = null;
+        //             if( $preparedModel->$key ){
+        //                 $oldFileArr = explode(":::", $preparedModel->$key);
+        //                 $oldFile = end($oldFileArr);
+        //                 if($oldFile == $value){
+        //                     $oldFile = $preparedModel->$key;
+        //                 }else{
+        //                     $oldFile = null;
+        //                 }
+        //             }
+        //             $finalData[$key] = moveFileFromCache( $modelName, $field, $file, $userId, $oldFile );
+        //         }
+        //     }
+        // }
+        
+        $finalModel = $preparedModel->update($finalData);
         $model->updateAfter($finalModel, $processedData, $this->requestMeta, $id);
         $this->success[] = "SUCCESS: data update in ".$model->getTable()." id: $id";                
         

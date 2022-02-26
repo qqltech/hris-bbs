@@ -8,5 +8,8 @@ class __class extends __basicClass
     {
         parent::booted();
     }
+    
+    public $fileColumns    = [];
 
+    
 }

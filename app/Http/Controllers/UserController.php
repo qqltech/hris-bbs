@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use Jenssegers\Agent\Agent;
 use Illuminate\Support\Facades\Hash;
-use Stevebauman\Location\Location;
 use Exception;
 class UserController extends Controller
 {
@@ -69,7 +68,6 @@ class UserController extends Controller
                 $user->platformversion = $agent->version($agent->platform());
                 $user->browser=$agent->browser();
                 $user->browserversion=$agent->version($agent->browser());
-                $user->location=(new Location)->get($request->ip());
                 return response()->json([
                     'access_token' => $tokenResult->token,
                     'token' =>$tokenResult->accessToken,
@@ -104,7 +102,6 @@ class UserController extends Controller
             $request->user()->platformversion = $agent->version($agent->platform());
             $request->user()->browser=$agent->browser();
             $request->user()->browserversion=$agent->version($agent->browser());
-            $request->user()->location=(new Location)->get($request->ip());
             return response()->json($request->user());
         }catch(Exception $e){
             $response = 'You Need Logged in';

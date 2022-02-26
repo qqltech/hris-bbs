@@ -3,11 +3,13 @@
 namespace App\Traits;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Casts\Upload;
 
 trait ModelTrait {
     /**
      * Additional function
      */
+    public $fileColumns    = [];
     public $autoValidator  = true;
     public $useEncryption  = false;
 
@@ -96,10 +98,16 @@ trait ModelTrait {
      * @override Laravel function
      */
     public function getCasts(){
-        $casts = $this->casts;
-        if(!$this->useEncryption){
-            $casts[$this->getKeyName()] = 'integer';
+        $custom = getCustom( getTableOnly( $this->getTable() ) );
+        if(!$custom->useEncryption){
+            $custom->casts[$custom->getKeyName()] = 'integer';
         }
+        if( count($custom->fileColumns)>0 ){
+            foreach($custom->fileColumns as $col){
+                $custom->casts[$col] = Upload::class;
+            }
+        }
+        $casts = $custom->casts;
         return array_merge($casts, getCastsParam());
     }
 
@@ -203,6 +211,27 @@ trait ModelTrait {
         
     }
 
+    public function custom_upload( $request ){
+        $validator = \Validator::make($request->all(), [
+            'file' => "required|file|max:10000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,jpeg,png,bmp,mp4,mp3,mpg,mpeg,mkv,3gp,ods",
+            'field'=> "required|string|".(count($this->fileColumns)>0?"in:".implode(",",$this->fileColumns):"")
+        ]);
+        if ( $validator->fails()) {
+            return abort(422, json_encode([ 
+                'message'   => "Berkas tidak diterima, pastikan jenis dan ukuran tepat.",
+                "errors"    => $validator->errors()
+            ]));
+        }
+        
+        $field = $request->field;
+        $modelName = getTableOnly( $this->getTable() );
+        $file = $request->file;
+        $userId = ($request->user()->id ?? 'anonymous');
+        
+        $resultKey  = saveFileToCache( $modelName, $field, $file, $userId );
+        return response()->json(['message'=>'Successfully stored temporary file and will be removed in 30 mins', 'key'=> $resultKey]);
+    }
+    
     /*
     function createAfterTransaction( $newdata, $olddata, $data, $meta )
     {
@@ -272,4 +301,52 @@ trait ModelTrait {
     }
 */
 
+    protected static function booted()
+    {
+        parent::boot();
+        static::creating(function ( $model ) {
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onCreating') ) $custom->onCreating($model);
+        });
+
+        self::created(function( $model ){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onCreated') ) $custom->onCreated($model);
+        });
+
+        self::saving(function( $model ){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onSaving') ) $custom->onSaving($model);
+        });
+
+        self::saved(function( $model ){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onSaved') ) $custom->onSaved($model);
+        });
+
+        self::updating(function( $model ){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onUpdating') ) $custom->onUpdating($model);
+        });
+
+        self::updated(function( $model ){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onUpdated') ) $custom->onUpdated($model);
+        });
+
+        self::deleting(function( $model ){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onDeleting') ) $custom->onDeleting($model);
+        });
+
+        self::deleted(function( $model ){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onDeleted') ) $custom->onDeleted($model);
+        });
+
+        self::retrieved(function( $model){
+            $custom = getCustom( getTableOnly( $model->getTable() ) );
+            if( method_exists($custom, 'onRetrieved') ) $custom->onRetrieved($model);
+        });        
+    }
 }
