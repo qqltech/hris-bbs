@@ -20,6 +20,14 @@ trait ModelTrait {
     public $updateAdditionalData = [];
 
     /**
+     * Untuk keperluan authenticate frontend
+     */
+    public function custom_authenticate( $req ) 
+    {
+        return true;
+    }
+
+    /**
      *  @param object [ 'type'=>'find' or 'get', 'caller'=> null ]
      */
     public function scopeFinal( $query, object $option )
