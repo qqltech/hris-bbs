@@ -941,7 +941,7 @@ class ApiFixedController extends Controller
             $this->operationOK=false;
             return;
         }
-        $deleteBeforeEvent = $model->deleteBefore($model, $preparedModel, $this->requestMeta, $id);        
+        $deleteBeforeEvent = $model->deleteBefore($preparedModel, $preparedModel, $this->requestMeta, $id);        
         if(isset($deleteBeforeEvent['errors'])){
             $this->operationOK=false;
             $this->errors = $deleteBeforeEvent['errors'];
@@ -1014,7 +1014,7 @@ class ApiFixedController extends Controller
         $additionalData = $this->createAdditionalData($model, $data);
         $eliminatedData = $this->createEliminationData($model, $data);
         $processedData  = array_merge($eliminatedData, $additionalData);
-        $updateBeforeEvent = $model->updateBefore($model, $processedData, $this->requestMeta,$id);
+        $updateBeforeEvent = $model->updateBefore($preparedModel, $processedData, $this->requestMeta,$id);
         if(isset($updateBeforeEvent['errors'])){
             if($this->isBackdoor){
                 return $updateBeforeEvent['errors'];
