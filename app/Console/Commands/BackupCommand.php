@@ -69,7 +69,8 @@ class BackupCommand extends Command
             $database = env('DB_DATABASE');
             
             $file = date('Y-m-d') . '-dump-' . $database . '.sql';
-            $command = sprintf('mysqldump --column-statistics=0 -h %s -u %s -p\'%s\' %s > %s', 
+            // --column-statistics=0
+            $command = sprintf('mysqldump -h %s -u %s -p\'%s\' %s > %s', 
                         $host, 
                         $username, 
                         $password, 
