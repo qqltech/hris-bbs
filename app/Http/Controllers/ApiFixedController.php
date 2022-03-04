@@ -316,7 +316,8 @@ class ApiFixedController extends Controller
             $keyAdditionalData = $operation."AdditionalData";
             $additionalData = $model->$keyAdditionalData;
             foreach( $additionalData as $key => $dt ){
-                $autoValidators[$key] = "forbidden";
+                //  don't use this
+                // $autoValidators[$key] = "forbidden";
             }
         }
 
