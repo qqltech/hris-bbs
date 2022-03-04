@@ -51,6 +51,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->post("/uploadtemplate","LaradevController@uploadTemplate");
         $router->post("/paramaker","LaradevController@paramaker");
         $router->post("/run-query","LaradevController@runQuery");
+        $router->get("/run-backup","LaradevController@runBackup");
 
         $router->get("/javascript", "LaradevController@getJsFile");
         $router->get("/javascript/{filename}","LaradevController@getJsFile");

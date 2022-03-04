@@ -1748,4 +1748,13 @@ class LaradevController extends Controller
             'data'=>$result
         ];
     }
+
+    public function runBackup(){
+        try{
+            Artisan::call("backup");
+        }catch(Exception $e){
+            return response()->json($e->getMessage(), 422);
+        }
+        return 'backup ok';
+    }
 }
