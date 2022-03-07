@@ -2754,6 +2754,11 @@ function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', 
         File::makeDirectory( public_path("uploads/$modelName"), 493, true);
     }
 
+    //  remove old file
+    if( $oldFile && File::exists( public_path("uploads/$modelName/$oldFile") ) ){
+        File::delete( public_path( "uploads/$modelName/$oldFile" ) );
+    }
+
     $path = \File::put(public_path("uploads/$modelName/$fixedFileName"), $contents);
     return $fixedFileName;
 }

@@ -942,18 +942,34 @@ class ApiFixedController extends Controller
             $this->operationOK=false;
             return;
         }
+        
         $deleteBeforeEvent = $model->deleteBefore($preparedModel, $preparedModel, $this->requestMeta, $id);        
         if(isset($deleteBeforeEvent['errors'])){
             $this->operationOK=false;
             $this->errors = $deleteBeforeEvent['errors'];
             return;
         }
+        
         $this->requestData = $preparedModel;
-        $preparedModel->delete(); 
+        
+        if( count( $model->fileColumns ) > 0 ){
+            if( !config( 'files_to_remove' ) ){
+                config([ 'files_to_remove' => [] ]);
+            }
+            $oldArr = config( 'files_to_remove' );
+            foreach( $model->fileColumns as $col ){
+                if( $preparedModel->$col ){
+                    $oldArr[] =  getTableOnly( $modelName )."/".$preparedModel->$col;
+                }
+            }
+            config([ 'files_to_remove' => $oldArr ]);
+        }
+
+        $preparedModel->delete();
         $model->deleteAfter($model, $preparedModel, $this->requestMeta, $id);
-        // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=$table pra");
+        
         $this->success[] = "SUCCESS: data deleted in $table id: $id";
-        // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=$table");
+        
         if($cascade){
             foreach( $detailsArray as $detail ){
                 $detailsExplode = explode('.', $detail);
@@ -962,7 +978,7 @@ class ApiFixedController extends Controller
                 $model          = getCustom( (count($detailsExplode)==1?$detail:$detailsExplode[1]) );
                 $tableExplode = explode('.', $table);
                 $dataDetail = $model->where((count($tableExplode)==1?$table:$tableExplode[1])."_id","=",$id)->get();              
-                // file_get_contents("https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text=gagal");  
+                
                 foreach( $dataDetail as $idxDtl => $dtl ){
                     if(!$this->is_model_deletable( $detail, $dtl->id )){
                         return;
@@ -1260,7 +1276,7 @@ class ApiFixedController extends Controller
                 // $model = new $modelCandidate;
                 $model = getCustom($modelname);
                 
-                if( (isset($model->transaction_config) || method_exists($model, $this->operation."AfterTransaction")) && $this->operationId!==null){
+                if( method_exists($model, $this->operation."AfterTransaction") && $this->operationId!==null ){
                     $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
                 }
                 $function = $this->operation."Operation";
@@ -1319,82 +1335,6 @@ class ApiFixedController extends Controller
                         $this->requestMeta
                     );
                 }
-                if( isset($model->transaction_config) ){
-                    try{
-                        if(!isset($newData)){
-                            if($this->operation=='delete'){
-                                $newData = $oldData;
-                            }else{
-                                $newData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
-                            }
-                        }
-                        $config = (object)$model->transaction_config;
-                        $isMultiple = $config->current_pivot_header_multiple;
-                        // $details = $newData[$config->current_detail_table];
-                        if(!$isMultiple){
-                            $beforeTransactionId = $newData[$config->current_pivot_header_column];
-                            $beforeTransactionData = $this->readOperation( $config->before_transaction_table, (object)[], $beforeTransactionId )['data'];
-                            $beforeTransactionDetails = $beforeTransactionData[$config->before_transaction_detail_table];
-                            $lolos = true;
-                            foreach($beforeTransactionDetails as $i => $dtl){
-                                $detail_id  = $dtl['id'];
-                                $detail_qty = $dtl[$config->before_transaction_detail_column_qty];
-                                if(\DB::table($config->current_detail_table)->where($config->current_pivot_detail_column,$detail_id)->count()>0){
-                                    $sum = \DB::table($config->current_detail_table)
-                                            ->selectRaw("SUM($config->current_detail_column_qty) as qtysum")
-                                            ->where($config->current_pivot_detail_column,$detail_id)
-                                            ->first();
-                                    if($sum->qtysum<$detail_qty){
-                                        $lolos = false;
-                                        break;
-                                    };
-                                }else{
-                                    $lolos = false;
-                                    break;
-                                }
-                            }
-                            \DB::table($config->before_transaction_table)
-                                ->where("id", $beforeTransactionId)->update([
-                                    $config->before_transaction_column_status => $lolos?$config->status_close:$config->status_open
-                                ]);
-                        }else{
-                            $arrayBeforeTransactionIds = [];
-                            $currentDetails = $newData[$config->current_detail_table];
-                            foreach($currentDetails as $dtl){
-                                if(!in_array($dtl[$config->current_pivot_header_column],$arrayBeforeTransactionIds)){
-                                    $arrayBeforeTransactionIds[]=$dtl[$config->current_pivot_header_column];
-                                }
-                            }
-                            foreach($arrayBeforeTransactionIds as $beforeTransactionId){
-                                $beforeTransactionData = $this->readOperation( $config->before_transaction_table, (object)[], $beforeTransactionId )['data'];
-                                $beforeTransactionDetails = $beforeTransactionData[$config->before_transaction_detail_table];
-                                $lolos = true;
-                                foreach($beforeTransactionDetails as $i => $dtl){
-                                    $detail_id  = $dtl['id'];
-                                    $detail_qty = $dtl[$config->before_transaction_detail_column_qty];
-                                    if(\DB::table($config->current_detail_table)->where($config->current_pivot_detail_column,$detail_id)->count()>0){
-                                        $sum = \DB::table($config->current_detail_table)
-                                                ->selectRaw("SUM($config->current_detail_column_qty) as qtysum")
-                                                ->where($config->current_pivot_detail_column,$detail_id)
-                                                ->first();
-                                        if($sum->qtysum<$detail_qty){
-                                            $lolos = false;
-                                            break;
-                                        };
-                                    }else{
-                                        $lolos = false;
-                                        break;
-                                    }
-                                }
-                                \DB::table($config->before_transaction_table)
-                                    ->where("id", $beforeTransactionId)->update([
-                                        $config->before_transaction_column_status => $lolos?$config->status_close:$config->status_open
-                                    ]);
-                            }
-                        }
-                        
-                    }catch(\Exception $e){}
-                }
 
                 DB::commit();
                 if(env('DEFAULT_ACTIVITIES',false)){
@@ -1424,7 +1364,16 @@ class ApiFixedController extends Controller
                         $responses=$newResponses;
                     }
                 }
-                $responses["processed_time"] = round(microtime(true)-config("start_time"),5);
+                $responses["processed_time"] = 'e'.round(microtime(true)-config("start_time"),5);
+                if(config('files_to_remove')){
+                    foreach( config( 'files_to_remove' ) as $path ){
+                        if( File::exists( public_path("uploads/$path") ) ){
+                            File::delete( public_path( "uploads/$path" ) );
+                        }
+                    }
+
+                }
+
                 return response()->json($responses,200);
             }else{
                 DB::rollback();

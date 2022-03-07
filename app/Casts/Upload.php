@@ -16,10 +16,13 @@ class Upload implements CastsAttributes
      */
     public function get($model, $key, $value, $attributes)
     {
-        if( !$value || ($value && \Str::contains(":::", $value) )){
+        if( !$value || ($value && !\Str::contains($value,":::") )){
             return $value;
         }
-        $dataArr = explode(":::", $value);
+        if(app()->request->isMethod('GET')){
+            return url("/uploads/".getTableOnly( $model->getTable() )."/$value");
+        }
+        $dataArr = explode("/", $value);
         return end($dataArr);
     }
  
@@ -34,7 +37,6 @@ class Upload implements CastsAttributes
      */
     public function set($model, $key, $value, $attributes)
     {
-
         $custom = getCustom( getTableOnly( $model->getTable() ) );
         if( count($custom->fileColumns)>0 && in_array($key,$custom->fileColumns) ){
             $modelName = getTableOnly( $model->getTable() );
@@ -44,13 +46,14 @@ class Upload implements CastsAttributes
             $oldFile = null;
             
             if( $model->$key ){
+                if(\Str::contains($value, ":::")){
+                    $valueArr = explode("/", $value);
+                    $value = end($valueArr);
+                    return $value;
+                }
                 $oldFileArr = explode(":::", $model->$key);
                 $oldFile = end($oldFileArr);
-                if($oldFile == $value){
-                    $oldFile = $model->$key;
-                }else{
-                    $oldFile = null;
-                }
+                $oldFile = $model->$key;
             }
             $value = moveFileFromCache( $modelName, $field, $file, $userId, $oldFile );
         }
