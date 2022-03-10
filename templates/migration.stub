@@ -34,9 +34,16 @@ class __class__ extends Migration
                 'updated_at' => 'datetime:d/m/Y H:i'
             ]
         ]);
+
+        // if( $data = \Cache::pull('__table__') ){
+        //     \DB::table('public.__table__')->insert( json_decode( json_encode( $data ), true ) );
+        // }
     }
     public function down()
     {
+        // if( Schema::connection('flyingpgsql')->hasTable('__table__') ){
+        //     \Cache::put('__table__', \DB::table('public.__table__')->get(), 60*30 );
+        // }
         Schema::connection('flyingpgsql')->dropIfExists('__table__');
     }
 }

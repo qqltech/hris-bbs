@@ -30,9 +30,20 @@ class __class__ extends Migration
                 'updated_at' => 'datetime:d/m/Y H:i'
             ]
         ]);
+
+        // if( $data = \Cache::get('__table__') ){
+        //     try{
+        //         \DB::table('__table__')->insert( json_decode( json_encode( $data ), true ) );
+        //     }catch(\Exception $e){
+                
+        //     }
+        // }
     }
     public function down()
     {
+        // if( Schema::hasTable('__table__') ){
+        //     \Cache::put('__table__', \DB::table('__table__')->get(), 60*30 );
+        // }
         Schema::dropIfExists('__table__');
     }
 }
