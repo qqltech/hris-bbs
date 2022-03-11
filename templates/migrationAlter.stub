@@ -9,7 +9,7 @@ class __class__ extends Migration
     
     public function up()
     {
-        Schema::table($tableName, function (Blueprint $table) {
+        Schema::table($this->tableName, function (Blueprint $table) {
             //$table->string('_existColumnName_')->change();
             //$table->string('_columnName_');
             //$table->dropColumn([ ]);
