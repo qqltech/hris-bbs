@@ -5,14 +5,13 @@ use Illuminate\Support\Facades\Schema;
 
 class __class__ extends Migration
 {
-    public function __construct()
-    { config(['database.connections.flyingpgsql'=>array_merge(config('database.connections.pgsql'),
-            ['schema'=>'public'])]);
-    }
+    $tableName = "__table__";
+    
     public function up()
     {
-        Schema::connection('flyingpgsql')->table('__table__', function (Blueprint $table) {
-            //$table->string('_columnName_')->change();
+        Schema::table($tableName, function (Blueprint $table) {
+            //$table->string('_existColumnName_')->change();
+            //$table->string('_columnName_');
             //$table->dropColumn([ ]);
         });
     }

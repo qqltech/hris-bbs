@@ -154,12 +154,14 @@ class LaradevController extends Controller
     private function getCustomModel(){
         return File::get( base_path("templates/customModel.stub") );
     }
-    private function getMigration()
+    private function getMigrationFile()
     {
         $template = "migration";
-        if(getDriver()!='pgsql'){
-            $template = "migrationMysql";
-        }
+        return File::get( base_path("templates/$template.stub") );
+    }
+    private function getAlterFile()
+    {
+        $template = "migrationAlter";
         return File::get( base_path("templates/$template.stub") );
     }
     private function getFullTables($toModel=false,$tableKhusus=null)
@@ -1102,15 +1104,14 @@ class LaradevController extends Controller
     }
 
     public function readAlter(Request $req, $table=null){
-        if($table!=null){
+        if( $table!=null ){
             $alterPath = base_path("database/migrations/alters/0_0_0_0_$table.php");
             if(!File::exists( $alterPath )){
-                $realmigration = File::get( base_path("database/migrations/projects/0_0_0_0_$table.php") );
-                $realmigration = explode("public function down",$realmigration)[0];
-                $realmigration = str_replace(["});","]);","Schema::create"],["==;//","..;//","Schema::table"],$realmigration);
-                $realmigration = str_replace([");"],[")->change();"],$realmigration);
-                $realmigration = str_replace(["==;//","..;//","Schema::create"],["});//","]);//","Schema::table"],$realmigration);
-                return $realmigration."\n}";
+                return str_replace([
+                    "__class__","__table__",
+                ],[
+                    str_replace("_","", $table), getBasic($table)->getTable()
+                ], $this->getAlterFile());
             }
             return File::get( $alterPath );
         }
@@ -1119,7 +1120,10 @@ class LaradevController extends Controller
         return getLog($table.".json");
     }
     public function readTest(Request $req, $table=null){
-        return getTest($table);
+        $file = getTest($table);
+        $schema = $this->getSchema($table);
+        $schema = str_replace(["{","}",'":'],["[","]",'" =>'],json_encode($schema, JSON_PRETTY_PRINT));
+        return str_replace('__payload__', str_replace("\n","\n\t\t","$schema"), $file);
     }
     public function queries10rows(Request $req, $table=null){
         $model = getBasic($table);
@@ -1213,7 +1217,7 @@ class LaradevController extends Controller
         }
         
         if( !$req->has('alter') ){
-            if(strpos($table,"_after_")!==false || strpos($table,"_before_")!==false){
+            if( Str::contains( $table, "_after_" ) || Str::contains( $table, "_before_" ) ){
                 $samaran = str_replace(['_after_','_before_'],["_timing_","_timing_"],$table);
                 $tableName = explode("_timing_",$samaran)[0];
                 $modelObj = getBasic($tableName);
@@ -1226,42 +1230,42 @@ class LaradevController extends Controller
                         DROP FUNCTION IF EXISTS fungsi_"."$table();
                     ");
                 }catch(\Exception $e){}
-            }else{
-                $realTable = $table;
-                $modelObj = getBasic($table);
-                if( $modelObj ){
-                    $realTable = $modelObj->getTable();
-                }
-                try{
-                    DB::unprepared("DROP TABLE IF EXISTS $realTable");
-                }catch(\Exception $e){}
-                try{
-                    DB::unprepared("DROP VIEW IF EXISTS $realTable;");
-                }catch(\Exception $e){}
             }
-           
-            // Schema::connection('flyingpgsql')->dropIfExists($currentModel->getTable());
-            // return response()->json([Schema::hasTable($currentModel->getTable())?'ada':'tidak'],422);
         }
 
-        if($req->has('down')){
+        if( $req->has('down') ){
+            $realTable = $table;
+            $modelObj = getBasic($table);
+            if( $modelObj ){
+                $realTable = $modelObj->getTable();
+            }
+            
+            //  asumsi table atau view
+            if( Schema::hasTable( $realTable ) ){
+                Schema::dropIfExists( $realTable );
+            }else{
+                DB::unprepared("DROP VIEW IF EXISTS $realTable;");
+            }
+
             \Cache::forget('migration-list');
             return "database migration ok, $table was downed successfully";
         }
-        // return File::get( array_values($data)[0] );
+        
         try{
-            $file = "database/migrations/$dir/0_0_0_0_"."$table.php";
-            $exitCode = Artisan::call('migrate:refresh', [
+            $file = "database/migrations/$dir/0_0_0_0_$table.php";
+            $exitCode = Artisan::call( 'migrate:refresh', [
                 '--path' => $file,
                 '--force' => true,
             ]);
-            // $req->rewrite_custom = $req->rewrite_custom;
+            ff($exitCode);
             $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
-            \Cache::forget('migration-list');
+            \Cache::forget( 'migration-list' );
         }catch(Exception $e){
             return response()->json(["error"=>$e->getMessage()], 422);
         }
+
         Schema::enableForeignKeyConstraints();
+
         if($req->has('alter')){
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<ALTER $table>");       
@@ -1411,7 +1415,7 @@ class LaradevController extends Controller
             ],$stringModelSrc);
             File::put( "$this->modelsPath/BasicModels/$modul.php",$stringModelSrc);
             File::put( "$this->modelsPath/CustomModels/$modul.php", str_replace($tableSrc,$modul,File::get("$this->modelsPath/CustomModels/$tableSrc.php")) );
-            File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$modul.php", str_replace([
+            File::put(base_path('database/migrations/projects')."/0_0_0_0_$modul.php", str_replace([
                 "__class__","__table__",
             ],[
                 str_replace("_","",$modul),$tableSrc
@@ -1423,7 +1427,7 @@ class LaradevController extends Controller
                 return response()->json("maaf nama model $modul telah terpakai", 400);
             }
             
-            File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$modul.php", str_replace([
+            File::put(base_path('database/migrations/projects')."/0_0_0_0_$modul.php", str_replace([
                 "__class__","__table__",
             ],[
                 str_replace("_","",$modul),$modul
@@ -1457,11 +1461,11 @@ class LaradevController extends Controller
             return response()->json("maaf nama model $modul telah terpakai", 400);
         }
         
-        File::put(base_path('database/migrations/projects')."/0_0_0_0_"."$modul.php", str_replace([
+        File::put(base_path('database/migrations/projects')."/0_0_0_0_$modul.php", str_replace([
             "__class__","__table__",
         ],[
             str_replace("_","",$modul),$modul
-        ],$this->getMigration() ));
+        ],$this->getMigrationFile() ));
         
         return response()->json("pembuatan file migration OK");
     }
@@ -1696,7 +1700,7 @@ class LaradevController extends Controller
         }
     }
 
-    public function runQuery(Request $req ){
+    public function runQuery( Request $req ){
         if( !$req->has('statement')){
             return response()
                     ->json([
@@ -1756,5 +1760,26 @@ class LaradevController extends Controller
             return response()->json($e->getMessage(), 422);
         }
         return 'backup ok';
+    }
+
+    public function getSchema( $api, $header = null ){
+        $m = getBasic( $api );
+        $body = [];
+        foreach( $m->columnsFull as $col ){
+            $explodedArr = explode( ":", $col );
+            $key = $explodedArr[0];
+            $body[ $key ] = str_replace( ":0", '', substr_replace( $col, "", 0, strlen("$key:") ) )
+            .(in_array($key, $m->required)?":required":":optional")
+            .(in_array($key, $m->unique)?":unique":"")
+            .(in_array($key, $m->getGuarded())?":autocreate":"")
+            .(in_array($key, ['created_at','updated_at','deleted_at'])?":autocreate":"")
+            .($header && $key === $header."_id"?":autocreate":"");
+        }
+        foreach( $m->details as $detail ){
+            $detailName = getTableOnly($detail);
+            $body[ $detailName ] = [ $this->getSchema( $detailName, $api ) ];
+        }
+
+        return $body;
     }
 }

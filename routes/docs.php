@@ -9,6 +9,10 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         return view("defaults.paramaker-frontend",compact('list'));
     });
     
+    $router->get('/schema/{api}', function(Request $req, $api){
+        return (new \App\Http\Controllers\LaradevController)->getSchema( $api );
+    });
+
     $router->get('/frontend', function(){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return response()->json("SERVER WAS CLOSED",404);

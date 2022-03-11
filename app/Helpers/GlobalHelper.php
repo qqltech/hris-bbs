@@ -2606,14 +2606,14 @@ function getTest($filename=null,$string=false){
         $filenameArr = explode(php_uname('s')=='Linux'?"/":"\\",$dtrace->file);
         $filename = str_replace(".php",".json",end($filenameArr));
     }
-    $table = $filename;
+    $table = getBasic( $filename )->getTable();
     $filename = Str::camel(ucfirst($filename));
     $path = base_path("tests/$filename"."Test.php");
     if( ! File::exists($path) ){
         return str_replace( [
-            "___class___","__resource__"
+            "___class___","__table__","__resource__"
         ],[
-            $filename, $table
+            $filename, $table, $filename
         ],File::get( base_path("templates/test.stub") ) );
     }
     if($string){

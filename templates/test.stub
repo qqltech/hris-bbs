@@ -15,16 +15,18 @@ class ___class___Test extends TestCase
         
         Passport::actingAs($user);
 
-        $this->call('POST', '/operation/__resource__', [
-            "key"=> "value"
-        ]);
+        $payload = __payload__;
+
+        $this->call('POST', '/operation/__resource__', $payload);
 
         $responseArr = json_decode( $this->response->getContent(),true );
     //  ff( $responseArr, 'dump data' );
 
         $this->assertEquals( 200, $this->response->status() );
-        $this->seeJsonStructure( ['status'] );
+    //    $this->seeJsonStructure( ['status'] );
 
-        $this->seeInDatabase('__resource__', ['key' => 'value']);
+        $this->seeInDatabase('__table__', array_filter($payload, function($dt){
+            return !is_array($dt);
+        } ));
     }
 }
