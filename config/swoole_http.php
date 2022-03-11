@@ -1,4 +1,7 @@
 <?php
+if( !env('SWOOLE', false) ){ // belum update
+    return [];
+}
 return [
     'server' => [
         'host' => env('SWOOLE_HTTP_HOST', '127.0.0.1'),
