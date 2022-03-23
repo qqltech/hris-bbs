@@ -1182,7 +1182,8 @@ class LaradevController extends Controller
                 $basePath = base_path();
                 $output  = null;
                 $return  = null;
-                exec("cd $basePath && php $fileExe --filter=$className --testdox-text=testlogs/$className.txt", $output, $return);
+                $phpBin = substr(phpversion(),0,3);
+                exec("cd $basePath && $phpBin $fileExe --filter=$className --testdox-text=testlogs/$className.txt", $output, $return);
                 $fileLogRes = File::get($fileLog);;
             }catch(\Exeption $e){
                 return response($e->getMessage(), 400);
