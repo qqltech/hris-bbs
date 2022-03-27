@@ -2239,8 +2239,6 @@ function reformatData($arrayData,$model=null){
             }catch(Exception $e){
                 
             }
-        }elseif( gettype($data)=='boolean' && !$data ){
-            $arrayData[$key] = "false";
         }elseif( str_replace(["null","NULL"," "],["","",""],$data)==''){
             $arrayData[$key] = null;
         }
