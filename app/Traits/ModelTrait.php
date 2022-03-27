@@ -115,6 +115,23 @@ trait ModelTrait {
                 $custom->casts[$col] = Upload::class;
             }
         }
+        foreach( $this->columnsFull as $col ){
+            $colArr = explode(":", $col);
+            $columnName = $colArr[0];
+            $dataType = $colArr[1];
+
+            if(!in_array( $columnName, array_keys($custom->casts) )){
+                if( \Str::contains($dataType,'boolean') ){
+                    $custom->casts[ $columnName ] = 'boolean';
+                }elseif( \Str::contains( $dataType, 'int' ) ){
+                    $custom->casts[ $columnName ] = 'integer';
+                }elseif( \Str::contains( $dataType, 'decimal' ) || \Str::contains( $dataType, 'numeric' ) ){
+                    $custom->casts[ $columnName ] = 'float';
+                }elseif( \Str::contains( $dataType, 'json' ) ){
+                    $custom->casts[ $columnName ] = 'array';
+                }
+            }
+        }
         $casts = $custom->casts;
         return array_merge($casts, getCastsParam());
     }
