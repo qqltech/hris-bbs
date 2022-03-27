@@ -51,12 +51,12 @@ trait ModelTrait {
         return $encrypter;
     }
 
-    public function encrypt( string $plainText ){
+    public function encrypt( $plainText ){
         $encrypter = $this->getEncrypter();
         return $encrypter->encrypt( $plainText );
     }
 
-    public function  decrypt( string $encryptedText ){
+    public function  decrypt( $encryptedText ){
         $encrypter = $this->getEncrypter();
         try {
             return $encrypter->decrypt( $encryptedText );
