@@ -426,7 +426,7 @@ class ApiFixedController extends Controller
                     $operationId = $model->decrypt($operationId);
                 }
                 $arrayValidation = array_map(function($dtm) use ($operationId){
-                    if(strpos($dtm, "unique")!==false){
+                    if(!is_array($dtm) && strpos($dtm, "unique")!==false){
                         $dtm = $dtm.",$operationId";
                     }
                     return $dtm;
