@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\BackupCommand::class
+        \App\Console\Commands\BackupCommand::class,
+        \App\Console\Commands\RestoreCommand::class
     ];
 
     /**

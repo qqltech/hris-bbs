@@ -61,8 +61,6 @@ class BackupCommand extends Command
             $sqlLineList = $schemaManager->createSchema()->toSql($schemaManager->getDatabasePlatform());
             File::put("$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
 
-            $ds = DIRECTORY_SEPARATOR;
-
             $host = env('DB_HOST');
             $username = env('DB_USERNAME');
             $password = env('DB_PASSWORD');
