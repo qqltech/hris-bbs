@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schema;
 
 class __class__ extends Migration
 {
-    $tableName = "__table__";
+    protected $tableName = "__table__";
     
     public function up()
     {
