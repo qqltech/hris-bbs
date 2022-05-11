@@ -589,7 +589,8 @@ class LaradevController extends Controller
                 File::put($tempFile,$request->text);
                 $output=null;
                 $return=null;
-                exec("php -l $tempFile", $output, $return);
+                $phpBin = env('PHPBIN','php');
+                exec("$phpBin -l $tempFile", $output, $return);
             }catch(\Exception $e){
                 File::delete($tempFile);
                 // $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
@@ -1182,7 +1183,8 @@ class LaradevController extends Controller
                 $basePath = base_path();
                 $output  = null;
                 $return  = null;
-                $phpBin = 'php'.substr(phpversion(),0,3);
+                // $phpBin = 'php'.substr(phpversion(),0,3);
+                $phpBin = env('PHPBIN','php');
                 exec("cd $basePath && $phpBin $fileExe --filter=$className --testdox-text=testlogs/$className.txt", $output, $return);
                 $fileLogRes = File::get($fileLog);;
             }catch(\Exeption $e){
