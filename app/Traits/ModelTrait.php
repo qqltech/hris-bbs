@@ -36,6 +36,30 @@ trait ModelTrait {
     }
 
     /**
+     *  @param object
+     */
+    public function scopeOrin( $query )
+    {
+        if( trim(explode(":", req("orin"))[1]) == '' ) return;
+        $table = $this->getTable();
+        $columnIn = explode(":", req("orin"))[0];
+        $idsIn = explode(",", explode(":", req("orin"))[1]);
+        $query->orWhereRaw( str_replace("this.","$table.", $columnIn)." IN (".implode(',',$idsIn).")" );
+    }
+
+    /**
+     *  @param object
+     */
+    public function scopeNotin( $query )
+    {
+        if( trim(explode(":", req("notin"))[1]) == '' ) return;
+        $table = $this->getTable();
+        $columnNotIn = explode(":", req("notin"))[0];
+        $idNotIn = explode(",", explode(":", req("notin"))[1]);
+        $query->whereNotIn(str_replace("this.","$table.", $columnNotIn), $idNotIn );
+    }
+
+    /**
      * for frontend usage, checking auth before request data
      */
     public function custom_authorize( $req ){

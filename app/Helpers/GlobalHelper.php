@@ -1580,10 +1580,8 @@ function _customGetData($model,$params)
         });
     }
 
-    if(isset($params->notIn) && $params->notIn!==null && strpos($params->notIn,":")!==false ){
-        $columnNotIn = explode(":", $params->notIn)[0];
-        $idNotIn = explode(",", explode(":", $params->notIn)[1]);
-        $model = $model->whereNotIn(str_replace("this.","$table.", $columnNotIn), $idNotIn );
+    if(  req("notin") && strpos(req("notin"),":")!==false ){
+        $givenScopes[] = 'notin';
     }
     
     if( req( $className."_filters" ) || ($isParent && req ("filters" )) ){
@@ -1657,10 +1655,9 @@ function _customGetData($model,$params)
     }
     
     if(  req("orin") && strpos(req("orin"),":")!==false ){
-        $columnIn = explode(":", req("orin"))[0];
-        $idsIn = explode(",", explode(":", req("orin"))[1]);
-        $model = $model->orWhereRaw( str_replace("this.","$table.", $columnIn)." IN (".implode(',',$idsIn).")" );
+        $givenScopes[] = 'orin';
     }
+
     if(isset($params->group_by) && $params->group_by!=null){
         $model = $model->groupBy( DB::raw(str_replace("this.", "$table.", urldecode($params->group_by) )) );
     }
