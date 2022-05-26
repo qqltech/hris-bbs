@@ -3,8 +3,12 @@
 namespace App\Helpers;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Class untuk generate PLSQL: trigger, views, procedure, materialized views dengan PHP
+ */
 class PLSQL {
 
+    protected $db = "mysql";
 	private $when="";
 	private $table;
 	private $time="before" ;
@@ -13,9 +17,13 @@ class PLSQL {
 	private $code;
 	private $declare="";
 
+    function __construct(){
+        $this->db =  env('DB_CONNECTION');
+    }
+
 	public static function table($table){
-		$a= new PLSQL();
-		return $a->setTable($table);
+		$class = new PLSQL();
+		return $class->setTable($table);
 	}
 
 	public function setTable($table){
@@ -58,7 +66,7 @@ class PLSQL {
 
 	public function declare($variable){
 		$text="";
-		if(Schema::getConnection()->getDriverName()=='mysql'){
+		if( $this->db=='mysql'){
 			if(is_array($variable)){
 				foreach($variable  as $key=>$isi){
 					$text .= "DECLARE $key $isi;";
@@ -67,7 +75,7 @@ class PLSQL {
 			if($this->declare == ""){
 				$text= $text;
 			}
-		}elseif(Schema::getConnection()->getDriverName()=='pgsql'){
+		}elseif( $this->db == 'pgsql'){
 			if(is_array($variable)){
 				foreach($variable  as $key=>$isi){
 					if( strpos(strtolower($isi), "double") !== false ){
@@ -86,13 +94,14 @@ class PLSQL {
 	}
 
 	public function pgsqlCreate() {
+        $tableSnake = str_replace( ".", "_", $this->table );
 		if($this->when !== ""){
 			$this->when = " when (".$this->when.") ";
 		}
-		 $this->query="
-		 DROP TRIGGER IF EXISTS ".$this->table."_".$this->time."_".$this->action." ON $this->table;
-		 DROP FUNCTION IF EXISTS fungsi_".$this->table."_".$this->time."_".$this->action."();
-		 CREATE OR REPLACE FUNCTION fungsi_".$this->table."_".$this->time."_".$this->action."() 
+        $this->query="
+		 DROP TRIGGER IF EXISTS ".$tableSnake."_".$this->time."_".$this->action." ON $this->table;
+		 DROP FUNCTION IF EXISTS fungsi_".$tableSnake."_".$this->time."_".$this->action."();
+		 CREATE OR REPLACE FUNCTION fungsi_".$tableSnake."_".$this->time."_".$this->action."() 
 		 \n
 		 RETURNS trigger
 		 \n
@@ -105,42 +114,45 @@ class PLSQL {
 		 RETURN NEW;
 		 END$$; 
 		 
-		 CREATE TRIGGER ".$this->table."_".$this->time."_".$this->action."
+		 CREATE TRIGGER ".$tableSnake."_".$this->time."_".$this->action."
 		 ".$this->time." ".$this->action." ON ".$this->table."
 		 \n
 		 FOR EACH ROW
 		 \n
 		 $this->when
 		 \n
-		 EXECUTE PROCEDURE fungsi_".$this->table."_".$this->time."_".$this->action."();
+		 EXECUTE PROCEDURE fungsi_".$tableSnake."_".$this->time."_".$this->action."();
 		 ";
-		  return $this->query;
+        
+        return $this->query;
 	 }
 	 
 	 public function drop() {
-		 $this->query="
-		 DROP TRIGGER IF EXISTS ".$this->table."_".$this->time."_".$this->action." ON $this->table;
-		 DROP FUNCTION IF EXISTS fungsi_".$this->table."_".$this->time."_".$this->action."();	
-		 ";
-		 try{
-			\DB::unprepared($this->query);
-		 }catch(\Exception $e){
-			$this->query="
-				DROP TRIGGER IF EXISTS ".$this->table."_".$this->time."_".$this->action.";
-				DROP FUNCTION IF EXISTS fungsi_".$this->table."_".$this->time."_".$this->action."();		
-			";
-			\DB::unprepared($this->query);
-			return "mysql trigger/func/view terhapus";
-		 }
-	 }
+        $tableSnake = str_replace( ".", "_", $this->table );
+        $this->query="
+        DROP TRIGGER IF EXISTS ".$tableSnake."_".$this->time."_".$this->action." ON $this->table;
+        DROP FUNCTION IF EXISTS fungsi_".$tableSnake."_".$this->time."_".$this->action."();	
+        ";
+        try{
+            \DB::unprepared($this->query);
+        }catch(\Exception $e){
+            $this->query="
+                DROP TRIGGER IF EXISTS ".$tableSnake."_".$this->time."_".$this->action.";
+                DROP FUNCTION IF EXISTS fungsi_".$tableSnake."_".$this->time."_".$this->action."();		
+            ";
+            \DB::unprepared($this->query);
+            return "mysql trigger/func/view terhapus";
+        }
+    }
 
 	 public function mysqlCreate() {
+        $tableSnake = str_replace( ".", "_", $this->table );
 		if($this->when !== ""){
 			$this->when = " when (".$this->when.") ";
 		}
 		 $this->query="
-		 DROP TRIGGER IF EXISTS ".$this->table."_".$this->time."_".$this->action." ;
-		 CREATE TRIGGER ".$this->table."_".$this->time."_".$this->action."
+		 DROP TRIGGER IF EXISTS ".$tableSnake."_".$this->time."_".$this->action." ;
+		 CREATE TRIGGER ".$tableSnake."_".$this->time."_".$this->action."
 		 ".$this->time."
 		 ".$this->action." ON ".$this->table."
 		 FOR EACH ROW
@@ -153,9 +165,9 @@ class PLSQL {
 	 }
 
 	 public function create(){
-		if(Schema::getConnection()->getDriverName()=='mysql'){
+		if( $this->db == 'mysql' ){
 			$query = $this->mysqlCreate();
-		}elseif(Schema::getConnection()->getDriverName()=='pgsql'){
+		}elseif( $this->db == 'pgsql' ){
 			$query = $this->pgsqlCreate();
 		}
 		\DB::unprepared($query);
