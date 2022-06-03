@@ -594,7 +594,7 @@ class ApiFixedController extends Controller
                     if(strpos($relation,$modelName)!==false){
                         $colArr = explode("=", $relation)[1];
                         $col    = $colArr;
-                        $existing = $modelHeir->where($col, $refId )->limit(1)->get();
+                        $existing = $modelHeir->where($col, $refId )->withoutGlobalScopes()->limit(1)->get();
                         if(count($existing)>0){
                             abort(422, json_encode([
                                 'message'=>"Maaf data telah terintegrasi dengan data lain, tidak dapat dihapus",
@@ -865,7 +865,7 @@ class ApiFixedController extends Controller
                 $model = $model->selectRaw( $selectField );
             }
             return [
-                "data"=>$model->find($id),
+                "data"=>$model->withoutGlobalScopes()->find($id),
                 "processed_time"=>round(microtime(true)-config("start_time"),5)
             ];
         }
@@ -932,7 +932,7 @@ class ApiFixedController extends Controller
         $table          = $model->getTable();
         $detailsArray   = $model->details; 
         $cascade        = $model->cascade;
-        $preparedModel  = $model->find($id);
+        $preparedModel  = $model->withoutGlobalScopes()->find($id);
         if(!$preparedModel){
             abort(404, json_encode([
                 'message'=>"Maaf Data tidak ditemukan untuk dihapus",
@@ -977,7 +977,7 @@ class ApiFixedController extends Controller
                 // $model          = new $modelCandidate;
                 $model          = getCustom( (count($detailsExplode)==1?$detail:$detailsExplode[1]) );
                 $tableExplode = explode('.', $table);
-                $dataDetail = $model->where((count($tableExplode)==1?$table:$tableExplode[1])."_id","=",$id)->get();              
+                $dataDetail = $model->where((count($tableExplode)==1?$table:$tableExplode[1])."_id","=",$id)->withoutGlobalScopes()->get();              
                 
                 foreach( $dataDetail as $idxDtl => $dtl ){
                     if(!$this->is_model_deletable( $detail, $dtl->id )){
@@ -1013,7 +1013,7 @@ class ApiFixedController extends Controller
         }
         $detailsArray   = $model->details; 
         $cascade        = $model->cascade;
-        $preparedModel  = getBasic($modelName)->find($id);
+        $preparedModel  = getBasic($modelName)->withoutGlobalScopes()->find($id);
         if(!$preparedModel){
             abort(404, json_encode([
                 'message'=>"Maaf Data tidak ditemukan untuk diupdate",
@@ -1164,7 +1164,7 @@ class ApiFixedController extends Controller
                 }
             };
             
-            $dataDetail = $modelChild->where($fkName,$id)->whereNotIn('id',$detailIds)->get();                
+            $dataDetail = $modelChild->where($fkName,$id)->whereNotIn('id',$detailIds)->withoutGlobalScopes()->get();                
             foreach( $dataDetail as $dtl ){
                 $oldOperation = $this->operation;
                 $this->operation = 'delete';

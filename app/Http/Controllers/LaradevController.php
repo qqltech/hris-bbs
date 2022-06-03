@@ -248,7 +248,7 @@ class LaradevController extends Controller
                                 $column->setUnsigned(true);
                             }
                         }
-                        if( isset($comment->src) && $comment->src!="false" ){
+                        if( @$comment->src ){
                             $fk = $comment->src;
                             $arrayFK = explode(".", $fk);
                             if(end($arrayFK)=="id"){
@@ -335,7 +335,7 @@ class LaradevController extends Controller
                 ];
             }
         }catch(Exception $e){
-            return null;
+            trigger_error($e->getMessage());
         }
         $data = [
             "tables"=>$tables,
