@@ -6,7 +6,7 @@ class __class extends __basicClass
 {    
     public function __construct()
     {
-        parent::booted();
+        parent::__construct();
     }
     
     public $fileColumns    = [];

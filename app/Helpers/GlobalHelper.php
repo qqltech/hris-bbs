@@ -1349,6 +1349,54 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
     }
     
 }
+function _joinRecursiveAlias($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,&$model,$tableName,$params){
+    $tableStringClass = "\App\Models\BasicModels\\$tableName";
+    $currentModel = new $tableStringClass;
+    
+    foreach( $currentModel->joins as $join ){
+        $arrayJoins=explode("=",$join);
+        $arrayParents=explode(".",$arrayJoins[0]);
+
+        if(count($arrayParents)>2){
+            $parent = $arrayParents[1];
+            $fullParent = $arrayParents[0].".".$arrayParents[1];
+        }else{
+            $parent = $arrayParents[0];
+            $fullParent=$parent;
+        }
+        $onParent = $arrayJoins[0];
+        $onMe = $arrayJoins[1];
+        $joined[]=$fullParent;
+        $parentClassString = "\App\Models\BasicModels\\$parent";
+
+        $meArr = explode( ".", $onMe );
+        $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
+
+        if( !class_exists($parentClassString) ){
+            continue;
+        }
+        if(isset($params->caller) && $params->caller==$parent){
+            continue;                
+        }
+              
+        $parentName = "$fullParent AS $aliasParent";
+        $onParent = str_replace($fullParent,$aliasParent,$onParent);
+            
+        $model = $model->leftJoin($parentName, $onParent, "=", $onMe);
+        $parentClass = new $parentClassString;
+
+        foreach($parentClass->columns as $column){
+            $colTemp        = "$aliasParent.$column AS ".'"'.$aliasParent."_".$column.'"';
+            $fieldSelected[]= $colTemp;
+            $allColumns[]   = "$aliasParent.$column";
+        }
+        
+        if($joinMax>1){
+            _joinRecursiveAlias($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+        }
+    }
+    
+}
 function _customGetData($model,$params)
 {
     $table = $model->getTable();
@@ -1408,19 +1456,27 @@ function _customGetData($model,$params)
             $onMe = $arrayJoins[1];
             $parentClassString = "\App\Models\BasicModels\\$parent";
             
+            $meArr = explode( ".", $onMe );
+            $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
+
             if( !class_exists($parentClassString) ){
                 continue;
             }
+
             if($params->caller && $params->caller==$parent){
                 continue;                
             }
-            if( !isset($kembar[$parent]) ){
-                $kembar[$parent] = 1;
-            }else{
-                $kembar[$parent] = $kembar[$parent]+1;
+
+            if(req('api_version')!=2){
+                if( !isset($kembar[$parent]) ){
+                    $kembar[$parent] = 1;
+                }else{
+                    $kembar[$parent] = $kembar[$parent]+1;
+                }
             }
+
             $parentName = $fullParent;
-            if($kembar[$parent]>1){
+            if(req('api_version')!=2 && $kembar[$parent]>1){
                 $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
                 // $onParent = str_replace($parent,"tes".$parent.(string)$kembar[$parent],$onParent); //OLD CODE
                 $onParentArray=explode(".",$onParent);
@@ -1429,19 +1485,34 @@ function _customGetData($model,$params)
                 }
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
-            $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
+
+            if(req('api_version')==2){
+                $parentName = "$fullParent AS $aliasParent";
+                $onParent = str_replace($fullParent,$aliasParent,$onParent);
+            }
+
+            $model = $model->leftJoin($parentName, $onParent, "=", $onMe);
             $parentClass = new $parentClassString;
-            if($kembar[$parent]>1){
+            if( req('api_version') !=2 && $kembar[$parent]>1 ){
                 $parentName = $parent.(string)$kembar[$parent];
             }
             foreach($parentClass->columns as $column){
-                $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                if( req('api_version')==2 ){
+                    $colTemp = "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
+                }else{
+                    $colTemp = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                }
+
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
             }
             
             if($joinMax>0){
-                _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+                if(req('api_version')==2){
+                    _joinRecursiveAlias($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+                }else{
+                    _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+                }
             }
         }
     }
@@ -1531,7 +1602,13 @@ function _customGetData($model,$params)
                         if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
                             continue;
                         }
-                        $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%$string%'"));
+                        $kolomFixed = $column.$additionalString;
+                        if(strpos( strtolower($kolomFixed), ' as ' )!==false){
+                            $kolomFixedArr = explode(' as ', strtolower($kolomFixed));
+                            $kolomFixed = end($kolomFixedArr);
+                        }
+                        
+                        $query->orWhereRaw(DB::raw("LOWER($kolomFixed) LIKE '%$string%'"));
                         // $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%?%'"),[$string]); // calon
                     }
                 }
@@ -1616,42 +1693,7 @@ function _customGetData($model,$params)
     }
     
     if( req("query_name") ){
-        $rawWhere = DB::table("default_params")->select("prepared_query","params")
-            ->where("name",req("query_name"))->first();
-        if(!$rawWhere){
-            trigger_error(json_encode(["errors"=>"query_name ".req('query_name')." does not exist"]));
-        }
-
-        $whereStr = $rawWhere->prepared_query;
-        if( !empty($rawWhere->params) ){
-            $paramsArr = explode(",", $rawWhere->params);
-            $backendParams = [];
-            $frontendParams = [];
-            $frontendParamSent = (array) req();
-            foreach($paramsArr as $param){
-                if( strpos($param,"backend_")===false ){
-                    if(!in_array($param, array_keys($frontendParamSent)) ) {
-                        trigger_error(json_encode(["errors"=>"parameter $param does not exist"]));
-                    }
-                    $frontendParams[] = $param;
-                }else{
-                    $backendParams[] = $param;
-                }
-            }
-
-            $acceptedParams = array_only( $frontendParamSent, $frontendParams );
-            if( config( req("query_name") ) ){
-                $acceptedParams = array_merge( $acceptedParams, config( req("query_name") ) );
-            }
-
-            $model = $model->where(function($q)use($table, $whereStr, $acceptedParams){
-                $q->whereRaw(str_replace("this.","$table.", $whereStr ), $acceptedParams );
-            });
-        }else{
-            $model = $model->where(function($q)use($table,$whereStr){
-                $q->whereRaw(str_replace("this.","$table.",$whereStr ) );
-            });
-        }
+        $givenScopes[] = 'queryParam';
     }
     
     if(  req("orin") && strpos(req("orin"),":")!==false ){
@@ -1903,17 +1945,21 @@ function _customFind($model, $params)
             $onParent = $arrayJoins[0];
             $onMe = $arrayJoins[1];
             $parentClassString = "\App\Models\BasicModels\\$parent";
-    
+
+            $meArr = explode( ".", $onMe );
+            $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
+
             if( !class_exists($parentClassString) ){
                 continue;
             }
+
             if( !isset($kembar[$parent]) ){
                 $kembar[$parent] = 1;
             }else{
                 $kembar[$parent] = $kembar[$parent]+1;
             }
             $parentName = $fullParent;
-            if($kembar[$parent]>1){
+            if(req('api_version')!=2 && $kembar[$parent]>1){
                 $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
                 $onParentArray=explode(".",$onParent);
                 if( count( $onParentArray )>2 ){
@@ -1921,19 +1967,34 @@ function _customFind($model, $params)
                 }
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
+
+            if(req('api_version')==2){
+                $parentName = "$fullParent AS $aliasParent";
+                $onParent = str_replace($fullParent,$aliasParent,$onParent);
+                // trigger_error(json_encode([$parentName,$onParent,$onMe]));
+            }
+
             $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
             $parentClass = new $parentClassString;
-            if($kembar[$parent]>1){
+            if(req('api_version') !=2 && $kembar[$parent]>1){
                 $parentName = $parent.(string)$kembar[$parent];
             }
             foreach($parentClass->columns as $column){
-                $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                if( req('api_version')==2 ){
+                    $colTemp = "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
+                }else{
+                    $colTemp = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                }
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
             }
         }
         if($joinMax>0){
-            _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+            if(req('api_version')==2){
+                _joinRecursiveAlias($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+            }else{
+                _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
+            }
         }
     }
     if($params->selectfield || req('selectfield')){

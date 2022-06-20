@@ -16,11 +16,13 @@
         "guzzlehttp/guzzle": "^7.4",
         "illuminate/mail": "^9.1",
         "illuminate/notifications": "^9.1",
+        "illuminate/redis": "^9.17",
         "intervention/image": "^2.7",
         "intervention/imagecache": "^2.5",
         "jenssegers/agent": "^2.6",
         "laravel/lumen-framework": "^9.0",
         "maatwebsite/excel": "^3.1",
+        "predis/predis": "^1.1",
         "starlight93/html-pdf-excel": "dev-development",
         "starlight93/oauth2": "^1.2",
         "staudenmeir/laravel-cte": "^1.6"

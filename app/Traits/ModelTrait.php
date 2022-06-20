@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Traits;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Contracts\Encryption\DecryptException;
+use  App\Helpers\Cryptor;
 use App\Casts\Upload;
+use Illuminate\Support\Str;
 
 trait ModelTrait {
     /**
@@ -60,6 +60,58 @@ trait ModelTrait {
     }
 
     /**
+     *  @param object
+     */
+    public function scopeQueryParam( $query )
+    {
+        $table = $this->getTable();
+        $queryNames = req("query_name");
+
+        $query->where(function($q)use($table, $queryNames){
+            foreach(explode( ',', $queryNames ) as $queryName){
+                if( !$queryName ) continue;
+                $rawWhere = DB::table("default_params")
+                    ->select("prepared_query","params")
+                    ->where("name",$queryName)->first();
+                
+                if(!$rawWhere){
+                    trigger_error(json_encode(["errors"=>"query_name ".req('query_name')." does not exist"]));
+                }
+
+                $whereStr = $rawWhere->prepared_query;
+                if( !empty($rawWhere->params) ){
+                    $paramsArr = explode(",", $rawWhere->params);
+                    $backendParams = [];
+                    $frontendParams = [];
+                    $frontendParamSent = (array) req();
+                    foreach($paramsArr as $param){
+                        if( strpos($param,"backend_")===false ){
+                            if(!in_array($param, array_keys($frontendParamSent)) ) {
+                                $frontendParamSent[$param] = \PDO::PARAM_NULL;
+                                abort(422, json_encode([
+                                    "errors"=>"parameter $param does not exist",
+                                    "message"=>"parameter $param does not exist"
+                                ]));
+                            }
+                            $frontendParams[] = $param;
+                        }else{
+                            $backendParams[] = $param;
+                        }
+                    }
+
+                    $acceptedParams = array_only( $frontendParamSent, $frontendParams );
+                    if( config( $queryName ) ){
+                        $acceptedParams = array_merge( $acceptedParams, config( $queryName ) );
+                    }
+                    
+                    $q->whereRaw(str_replace("this.","$table.", $whereStr ), $acceptedParams );
+                }else{
+                    $q->whereRaw(str_replace("this.","$table.",$whereStr ) );
+                }
+            }
+        });
+    }
+    /**
      * for frontend usage, checking auth before request data
      */
     public function custom_authorize( $req ){
@@ -69,9 +121,10 @@ trait ModelTrait {
     }
 
     public function getEncrypter(){
-        $keyPlain = env('APP_KEY');// another example to generate string: md5('12345678910');
-        $key = substr($keyPlain, 0, 32);
-        $encrypter = new \Illuminate\Encryption\Encrypter( $key, config('app.cipher' ) /**AES-256-CBC*/ );
+        // $keyPlain = env('APP_KEY');// another example to generate string: md5('12345678910');
+        // $key = substr($keyPlain, 0, 32);
+        // $encrypter = new \Illuminate\Encryption\Encrypter( $key, config('app.cipher' ) /**AES-256-CBC*/ );
+        $encrypter = new Cryptor /**AES-256-CBC*/;
         return $encrypter;
     }
 
@@ -82,11 +135,7 @@ trait ModelTrait {
 
     public function  decrypt( $encryptedText ){
         $encrypter = $this->getEncrypter();
-        try {
-            return $encrypter->decrypt( $encryptedText );
-        } catch (DecryptException $e) {
-            return false;
-        }
+        return $encrypter->decrypt( $encryptedText, true );
     }
 
     public function createValidator(){
@@ -396,6 +445,20 @@ trait ModelTrait {
         self::retrieved(function( $model){
             $custom = getCustom( getTableOnly( $model->getTable() ) );
             if( method_exists($custom, 'onRetrieved') ) $custom->onRetrieved($model);
+            if($custom->useEncryption){
+                foreach ($model->toArray() as $key => $val) {
+                    if (Str::endsWith($key, '_id') ) {
+                        $model[$key] = $model->encrypt( $val );
+                    } else if (strpos($key, '.') > -1) {
+                        $exp = explode('.', $key);
+                        if (Str::endsWith($exp[count($exp) - 1], '_id') && is_numeric($val)) {
+                            $model[$key] = $model->encrypt($val);
+                        } else if (Str::is('id', $exp[count($exp) - 1]) && is_numeric($val)) {
+                            $model[$key] = $model->encrypt($val);
+                        }
+                    }
+                }
+            }
         });        
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Jobs\DefaultActivities;
 use Excel;
+use  App\Helpers\Cryptor;
 
 class ApiFixedController extends Controller
 {
@@ -86,7 +87,7 @@ class ApiFixedController extends Controller
                 break;
         }
         if(!$this->is_model_exist( $this->parentModelName )){return;};
-        if($this->operationId != null && !is_numeric($this->operationId) && strlen($this->operationId)<30 ){ $this->customOperation=true; return;}
+        if($this->operationId != null && !is_numeric($this->operationId) && !is_numeric((new Cryptor)->decrypt($this->operationId, true)) ){ $this->customOperation=true; return;}
         if(!$this->is_operation_authorized($this->parentModelName, $this->operationId )){return;};
         if(!$this->is_data_required($this->parentModelName, $this->requestData)){return;};
         if(!$this->is_data_valid($this->parentModelName, $this->requestData)){return;};
@@ -100,7 +101,7 @@ class ApiFixedController extends Controller
             $this->operationId = @$request->route()[2]['detailid'];
 
             if(!$this->is_model_exist( $this->parentModelName )){return;};
-            if($this->operationId != null && !is_numeric($this->operationId) && strlen($this->operationId)<30  ){
+            if($this->operationId != null && !is_numeric($this->operationId) && !is_numeric((new Cryptor)->decrypt($this->operationId, true))  ){
                 $this->customOperation=true; 
                 return;
             }
@@ -119,7 +120,7 @@ class ApiFixedController extends Controller
             $this->operationId = @$request->route()[2]['subdetailid'];
 
             if(!$this->is_model_exist( $this->parentModelName )){return;};
-            if($this->operationId != null && !is_numeric($this->operationId) && strlen($this->operationId)<30  ){
+            if($this->operationId != null && !is_numeric($this->operationId) && !is_numeric((new Cryptor)->decrypt($this->operationId, true))  ){
                 $this->customOperation=true; 
                 return;
             }
@@ -820,10 +821,12 @@ class ApiFixedController extends Controller
                     }
                     if(!$this->is_data_required($key, $value,"create")){ 
                         $this->operationOK=false;
+                        if($this->isBackdoor) { abort(422,json_encode(["message"=>"Invalid Data", "errors"=>$this->errors])); }
                         return;
                     };
                     if(!$this->is_data_valid($key, $value,"create")){ 
                         $this->operationOK=false;
+                        if($this->isBackdoor) { abort(422,json_encode(["message"=>"Invalid Data", "errors"=>$this->errors])); }
                         return;
                     };
                     $this->createOperation($key, $value, $finalModel->id, $model->getTable());

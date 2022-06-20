@@ -181,7 +181,8 @@
                                 join        : true,
                                 joinmax     : 0,
                                 transform   : true,
-                                casts       : "column_name1:array,column_name2:datetime:d-m-Y"
+                                casts       : "column_name1:array,column_name2:datetime:d-m-Y",
+                                api_version : "2"
                             },
                             parameters_read_list : {
                                 page        : 1,

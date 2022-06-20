@@ -42,7 +42,7 @@ $app->routeMiddleware([
 if( env('SWOOLE', false) ){ // belum update
     // $app->register(SwooleTW\Http\LumenServiceProvider::class);
 }
-
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class); //DEFAULT
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class); //DEFAULT
@@ -63,6 +63,7 @@ $app->router->group([
     require __DIR__.'/../routes/public.php';
     require __DIR__.'/../routes/docs.php';
     require __DIR__.'/../routes/custom.php';
+    require __DIR__.'/../routes/operation-lite.php';
 });
 
 $app->singleton('filesystem', function ($app) { 
