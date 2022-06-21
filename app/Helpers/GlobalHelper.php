@@ -2818,3 +2818,36 @@ function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', 
     $path = \File::put(public_path("uploads/$modelName/$fixedFileName"), $contents);
     return $fixedFileName;
 }
+
+function getArrayFromExcel( $file, $dateColumns = [] ){
+    $data = \Excel::toArray( null, $file );
+    $rows = $data[0];
+    $columns = $rows[0];    // columns
+    $bulkData = [];
+    
+    foreach($rows as $rowIndex => $array){
+        if( $rowIndex == 0 ){
+            continue; 
+        }
+        $row = [];
+        foreach($columns as $col => $columnName){
+            $columnName = str_replace(' ', '', $columnName); // remove space
+            if(in_array(strtolower($columnName),[ /*remove unused cols*/ ])){
+                continue;
+            } //remove unused
+            
+            $val = $array[$col];
+            if(in_array($columnName, $dateColumns) ){ //format tanggal INTEGER excel to date y-m-d
+                try{
+                    $val = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($array[$col])->format('d/m/Y');                  
+                }catch(\Exception $e){
+                    $val = date('d/m/Y');
+                }
+            }
+            $row[$columnName] = $val;
+        }
+        $bulkData[] = $row;
+    }
+
+    return $bulkData;
+}
