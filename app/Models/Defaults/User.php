@@ -23,7 +23,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function getFromHeaderToken( $bearerToken = null ){
         $access_token = $bearerToken ?? app()->request->header('Authorization');
-        if($access_token) return null;
+        if(!$access_token) return null;
         $auth_header = explode(' ', $access_token);
         $token = $auth_header[1];
         $token_parts = explode('.', $token);
