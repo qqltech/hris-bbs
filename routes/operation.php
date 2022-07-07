@@ -3,7 +3,7 @@ use Illuminate\Http\Request;
 
 $router->group(['prefix'=>'operation'], function () use ($router) {
 
-    $router->group(['middleware'=>'auth'], function () use ($router) {
+    $router->group(['middleware'=>['project','auth']], function () use ($router) {
 
         $router->get('/{modelname}',['as'=>'read_list', 'uses'=> 'ApiFixedController@router']);         //LIST PARENTS
         $router->post('/{modelname}', 'ApiFixedController@router');        //CREATE PARENT-ALL-DETAILS
