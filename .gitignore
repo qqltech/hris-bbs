@@ -5,7 +5,7 @@ Homestead.yaml
 /public/js/*.js
 /public/uploads
 /public/models.json
-/public/.htaccess
+# /public/.htaccess
 .env
 .editorconfig
 /database/migrations/projects
