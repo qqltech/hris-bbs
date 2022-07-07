@@ -36,6 +36,7 @@ $app->routeMiddleware([
     'throttle' => Starlight93\Oauth2\Middleware\ThrottleRequests::class,
     'cors' => \Fruitcake\Cors\HandleCors::class,
     'laradev' => App\Http\Middleware\Laradev::class,
+    'project' => App\Http\Middleware\ProjectMiddleware::class,
 ]);
 
 //  for swoole service provider
