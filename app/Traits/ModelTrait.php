@@ -329,6 +329,10 @@ trait ModelTrait {
         $resultKey  = saveFileToCache( $modelName, $field, $file, $userId );
         return response()->json(['message'=>'Successfully stored temporary file and will be removed in 30 mins', 'key'=> $resultKey]);
     }
+
+    public function custom_generate_row( $request ){
+        return createModelRow($this);
+    }
     
     /*
     function createAfterTransaction( $newdata, $olddata, $data, $meta )

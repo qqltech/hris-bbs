@@ -1122,7 +1122,7 @@ class LaradevController extends Controller
     }
     public function readTest(Request $req, $table=null){
         $file = getTest($table);
-        $schema = $this->getSchema($table);
+        $schema = getSchema($table);
         $schema = str_replace(["{","}",'":'],["[","]",'" =>'],json_encode($schema, JSON_PRETTY_PRINT));
         return str_replace('__payload__', str_replace("\n","\n\t\t","$schema"), $file);
     }
@@ -1711,8 +1711,9 @@ class LaradevController extends Controller
                     ], 400);
         }
 
-        $isCommit = $req->has('commit');
         $state = $req->statement;
+        $isCommit = Str::contains( Str::lower($state), ':commit' );
+        $state = str_replace( ':commit', '', Str::lower($state) );
         $stateToLower = Str::lower($state);
         $isNeedTransaction = Str::contains( $stateToLower, "delete from") || Str::contains( $stateToLower, "update ") || Str::contains( $stateToLower, "insert into");
         try{
@@ -1763,26 +1764,5 @@ class LaradevController extends Controller
             return response()->json($e->getMessage(), 422);
         }
         return 'backup ok';
-    }
-
-    public function getSchema( $api, $header = null ){
-        $m = getBasic( $api );
-        $body = [];
-        foreach( $m->columnsFull as $col ){
-            $explodedArr = explode( ":", $col );
-            $key = $explodedArr[0];
-            $body[ $key ] = str_replace( ":0", '', substr_replace( $col, "", 0, strlen("$key:") ) )
-            .(in_array($key, $m->required)?":required":":optional")
-            .(in_array($key, $m->unique)?":unique":"")
-            .(in_array($key, $m->getGuarded())?":autocreate":"")
-            .(in_array($key, ['created_at','updated_at','deleted_at'])?":autocreate":"")
-            .($header && $key === $header."_id"?":autocreate":"");
-        }
-        foreach( $m->details as $detail ){
-            $detailName = getTableOnly($detail);
-            $body[ $detailName ] = [ $this->getSchema( $detailName, $api ) ];
-        }
-
-        return $body;
     }
 }

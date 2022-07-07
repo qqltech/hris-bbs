@@ -1272,13 +1272,10 @@ if (! function_exists('table_config')) {
     function table_config($table, $array)
     {
         $string = json_encode($array);
-        try{
-            if(getDriver()=='mysql'){
-                Schema::getConnection()->statement("ALTER TABLE $table comment = '$string'");
-            }elseif(getDriver()=='pgsql'){
-                Schema::getConnection()->statement("COMMENT ON TABLE $table IS '$string'");
-            }
-        }catch(\Exception $e){
+        if(getDriver()=='mysql'){
+            Schema::getConnection()->statement("ALTER TABLE $table comment = '$string'");
+        }elseif(getDriver()=='pgsql'){
+            Schema::getConnection()->statement("COMMENT ON TABLE $table IS '$string'");
         }
     }
 }
@@ -2697,7 +2694,7 @@ function req($key=null){
     //     $data = json_decode(file_get_contents('php://input'));
     // }
     $data = json_decode(json_encode( config('request') ));
-    if($key!==null){
+    if($key){
         return isset($data->$key)? $data->$key : null;
     }
     return $data;
@@ -2850,4 +2847,92 @@ function getArrayFromExcel( $file, $dateColumns = [] ){
     }
 
     return $bulkData;
+}
+
+
+function getSchema( $api, $header = null, $isRelation = false, $isDetailed = false ){
+    $m = getBasic( $api );
+    $body = [];
+    foreach( $m->columnsFull as $col ){
+        $explodedArr = explode( ":", $col );
+        $key = $explodedArr[0];
+        $body[ $key ] = str_replace( ":0", '', substr_replace( $col, "", 0, strlen("$key:") ) )
+        .(in_array($key, $m->required)?":required":":optional")
+        .(in_array($key, $m->unique)?":unique":"")
+        .(in_array($key, $m->getGuarded())?":autocreate":"")
+        .(in_array($key, ['created_at','updated_at','deleted_at'])?":autocreate":"")
+        .($header && $key === $header."_id"?":autocreate":"");
+
+        if( $isDetailed && !$isRelation && Str::endsWith($key, '_id') && method_exists( $m, str_replace('_id', '', $key) ) ){
+            $parent = str_replace('_id', '', $key);
+            if( $parent !== $header ){
+                $relatedTable = $m->$parent()->getRelated()->getTable();
+
+                if( Str::contains($relatedTable, '.') ){
+                    $relatedTable = explode('.', $relatedTable)[1];
+                }
+                
+                $relatedKeys = getSchema( $relatedTable, null, true, $isDetailed );
+                foreach($relatedKeys as $relatedKey=>$relatedVal){
+                    $body["$parent.$relatedKey"] = $relatedVal;
+                }
+            }
+        }
+    }
+
+    if($isRelation) return $body;
+    
+    foreach( $m->details as $detail ){
+        $detailName = getTableOnly($detail);
+        $body[ $detailName ] = [ getSchema( $detailName, $api ) ];
+    }
+
+    return $body;
+}
+
+function createModelRow( $m ){
+    $relatedTable = $m->getTable();
+    if( Str::contains($relatedTable, '.') ){
+        $relatedTable = explode('.', $relatedTable)[1];
+    }
+    
+    $body = [];
+    foreach( $m->columnsFull as $col ){
+        $explodedArr = explode( ":", $col );
+        $key = $explodedArr[0];
+        if(in_array($key, $m->getGuarded())) continue;
+        if(in_array($key, ['created_at','updated_at','deleted_at'])) continue;
+        
+        $dataType = str_replace( ":0", '', substr_replace( $col, "", 0, strlen("$key:") ) );
+
+        $val = null;
+        if(in_array($key, $m->unique)){
+            $exist = $m->select('id',$key)->lastest('id')->first();
+            $val = !$exist? uniqid(): $exist->$key.$exist->id;
+        }else{
+            if(Str::contains($dataType,'date')||Str::contains($dataType,'time')) {
+                $val = \Carbon::now();
+            }elseif( Str::contains($dataType,'int') && Str::endsWith($key, '_id') && method_exists( $m, str_replace('_id', '', $key) ) ){
+                $parent = str_replace('_id', '', $key);                
+                $relatedData = $m->$parent()->getRelated()->first();
+                if($relatedData){
+                    $val = $relatedData->id;
+                }else{
+                    $val = createModelRow($m->$parent()->getRelated())->id;
+                }
+            }elseif( Str::contains($dataType,'int')){
+                $val = rand(1, 100);
+            }elseif( Str::contains($dataType,'str')||Str::contains($dataType,'text')){
+                $val = 'X';
+            }elseif( Str::contains($dataType,'bool') ){
+                $val = true;
+            }else{
+                $val = '1000';
+            }
+        }
+
+        $body[ $key ] = $val;
+    }
+    
+    return $m->create($body);
 }
