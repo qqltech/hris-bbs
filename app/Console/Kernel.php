@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Stringable;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,6 +26,34 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        if( !\Schema::hasTable('default_schedules') ) return;
+        $tasks = \DB::table('default_schedules')->where('status','ACTIVE')->get();
+        foreach($tasks as $task){
+            $every = $task->every;
+            $every_param = $task->every_param;
+            $schedule->call(function ()use($task) {
+                $class = $task->class_name;
+                $func = $task->func_name;
+                $param = @$task->parameter_values?json_decode($task->parameter_values,true):null;
+                getCustom($class)->$func($param);
+            })->before(function ()use($task) {
+                \DB::table('default_schedules')->where('id', $task->id)->update([
+                    'last_executed_at'=>\Carbon::now()
+                ]);
+            })->after(function ()use($task) {
+                \DB::table('default_schedules')->where('id', $task->id)->update([
+                    'end_executed_at'=>\Carbon::now()
+                ]);
+            })->onSuccess(function () {
+                // The task succeeded...
+            })->onFailure(function (Stringable $output)use($task) {
+                \DB::table('default_schedules_failed')->insert([
+                    'schedule_id' => $task->id,
+                    'title' => $task->title,
+                    'note' => $output->toString(),
+                    'created_at'=>\Carbon::now()
+                ]);
+            })->$every( $every_param );
+        }
     }
 }
