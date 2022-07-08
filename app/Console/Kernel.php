@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
         if( !\Schema::hasTable('default_schedules') ) return;
         $tasks = \DB::table('default_schedules')->where('status','ACTIVE')->get();
         foreach($tasks as $task){
+            $daysArr = $task->days?json_decode($task->days, true):[0, 1, 2, 3, 4, 5, 6];
             $every = $task->every;
             $every_param = $task->every_param;
             $schedule->call(function ()use($task) {
@@ -53,7 +54,9 @@ class Kernel extends ConsoleKernel
                     'note' => $output->toString(),
                     'created_at'=>\Carbon::now()
                 ]);
-            })->$every( $every_param );
+            })->$every( $every_param )
+            ->between($task->start_at??'00:00', $task->end_at??'23:59')
+            ->days($daysArr);
         }
     }
 }

@@ -15,7 +15,7 @@ class DefaultSchedulesFailed extends Migration
     {
         Schema::create('default_schedules_failed', function (Blueprint $table) {
             $table->id()->from(1);
-            $table->bigInteger('schedule_id')->comment('{"src":"default_schedules.id"}');
+            $table->bigInteger('schedule_id')->comment('{"fk":"default_schedules.id"}');
             $table->string('title');
             $table->longText('note')->nullable();
             $table->string('status')->nullable()->default('NEW');

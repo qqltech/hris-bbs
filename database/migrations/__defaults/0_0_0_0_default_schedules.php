@@ -21,6 +21,9 @@ class DefaultSchedules extends Migration
             $table->string('class_name');
             $table->string('func_name');
             $table->jsonb('parameter_values')->nullable();
+            $table->jsonb('days')->nullable();
+            $table->string('start_at')->nullable();
+            $table->string('end_at')->nullable();
             $table->text('note')->nullable();
 
             $table->string('status')->nullable()->default('ACTIVE');
