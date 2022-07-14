@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Http\Request;
 
-$router->group(['prefix'=>'operation'], function () use ($router) {
+$router->group(['prefix'=>env('ROUTE_API_PREFIX','operation')], function () use ($router) {
 
     $router->group(['middleware'=>['project','auth']], function () use ($router) {
 

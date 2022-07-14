@@ -64,7 +64,6 @@ $app->router->group([
     require __DIR__.'/../routes/operation.php';
     require __DIR__.'/../routes/public.php';
     require __DIR__.'/../routes/docs.php';
-    require __DIR__.'/../routes/custom.php';
     require __DIR__.'/../routes/operation-lite.php';
 });
 

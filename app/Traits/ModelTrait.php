@@ -193,7 +193,7 @@ trait ModelTrait {
             $columnName = $colArr[0];
             $dataType = $colArr[1];
 
-            if(!in_array( $columnName, array_keys($custom->casts) )){
+            if( app()->request->isMethod('GET') && !in_array( $columnName, array_keys($custom->casts) )){
                 if( \Str::contains($dataType,'boolean') ){
                     $custom->casts[ $columnName ] = 'boolean';
                 }elseif( \Str::contains( $dataType, 'int' ) ){

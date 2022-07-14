@@ -173,16 +173,11 @@ class ApiFixedController extends Controller
                 'message'=>"Maaf Sumber Data tidak tersedia",
                 'resource'=>$modelName
             ]));
-            $this->errors[] ="[UNKNOWN]Model [$modelName] does not exist";
-            $this->isAuthorized=false;
-            return false;
         }
         return true;
     }
     private function is_operation_authorized($modelName, $id = null)
     {
-        // $modelCandidate = "\App\Models\CustomModels\\$modelName";
-        // $model = new $modelCandidate;
         $model = getCustom($modelName);
 
         if( method_exists($model, "getRoles" ) ){
@@ -201,10 +196,6 @@ class ApiFixedController extends Controller
                         'message'=>config('reason')??"Maaf, anda tidak diperkenankan melakukan operasi ini",
                         "resource"=>$modelName
                     ]));
-                    $this->messages[] ="[UNAUTHORIZED]operasi $this->operation di [$modelName] dilarang!";
-                    $this->errors[] ="Maaf, Operasi $this->operation untuk data ini dilarang!";
-                    $this->isAuthorized=false;
-                    return false;
                 }
             }
 
@@ -219,8 +210,6 @@ class ApiFixedController extends Controller
             $operation = $this->operation;
         }
         if( !in_array($operation,["create"]) ){return true;}
-        // $modelCandidate = "\App\Models\CustomModels\\$modelName";
-        // $model = new $modelCandidate;
         $model = getCustom($modelName); 
         $arrayRequired = $model->required;
         if(isset($data[0]) && is_array($data[0])){
@@ -266,8 +255,6 @@ class ApiFixedController extends Controller
             return true;
         }
 
-        // $modelCandidate     = "\App\Models\CustomModels\\$modelName";
-        // $model              = new $modelCandidate;
         $model          = getCustom( $modelName );
         $operationValidator = $operation."Validator";
         $customString       = $operation."ValidatorResponse";
@@ -337,23 +324,6 @@ class ApiFixedController extends Controller
                             "resource"=>$modelName,
                             "line"=>$i+1
                         ]));
-                        foreach($validator->errors()->all() as $error){
-                            $nativeError = $error;                            
-                            // preg_match( '/\.(\d+)\./', $nativeError,  $match );
-                            // if( count($match)>1){
-                            //     $error = str_replace($match[0]," Sub Index: ".($match[1]+1)." ", $nativeError);
-                            // }
-                            $error = str_replace("."," line: ".($i+1).".", $error);
-                            if(method_exists($model, "validationErrorReplacer")){
-                                $error = $model->validationErrorReplacer($error);
-                            }
-                            $formattedError = "[INVALID]".$error."[$modelName] index[$i]";
-                            if( !in_array( $formattedError, $this->errors ) ){
-                                $this->errors[] = $formattedError;
-                            }
-                        }
-                        $this->isAuthorized=false;
-                        return false;
                     }
                 }
                 $isiData = reformatData($isiData,$model);
@@ -378,23 +348,6 @@ class ApiFixedController extends Controller
                         "resource"=>$modelName,
                         "line"=>$i+1
                     ]));
-                    foreach($validator->errors()->all() as $error){
-                        $nativeError = $error;                       
-                        // preg_match( '/\.(\d+)\./', $nativeError,  $match );
-                        // if( count($match)>1){
-                        //     $error = str_replace($match[0]," Sub Index: ".($match[1]+1)." ", $nativeError);
-                        // }
-                        $error = str_replace("."," line: ".($i+1).".", $error); 
-                        if(method_exists($model, "validationErrorReplacer")){
-                            $error = $model->validationErrorReplacer($error);
-                        }
-                        $formattedError = "[INVALID]".$error."[$modelName] index[$i]";
-                        if( !in_array( $formattedError, $this->errors ) ){
-                            $this->errors[] = $formattedError;
-                        }
-                    }
-                    $this->isAuthorized=false;
-                    return false;
                 }
             }
         }else{
@@ -410,14 +363,6 @@ class ApiFixedController extends Controller
                         "errors"=>$validator->errors(),
                         "resource"=>$modelName
                     ]));
-                    foreach($validator->errors()->all() as $error){
-                        if(method_exists($model, "validationErrorReplacer")){
-                            $error = $model->validationErrorReplacer($error);
-                        }
-                        $this->errors[] = "[INVALID]".$error."[$modelName]";
-                    }
-                    $this->isAuthorized=false;
-                    return false;
                 }
             }
             $data = reformatData($data,$model);
@@ -441,14 +386,6 @@ class ApiFixedController extends Controller
                     "errors"=>$validator->errors(),
                     "resource"=>$modelName
                 ]));
-                foreach($validator->errors()->all() as $error){
-                    if(method_exists($model, "validationErrorReplacer")){
-                        $error = $model->validationErrorReplacer($error);
-                    }
-                    $this->errors[] = "[INVALID]".$error."[$modelName]";
-                }
-                $this->isAuthorized=false;
-                return false;
             }
         }
         return true;
@@ -484,11 +421,6 @@ class ApiFixedController extends Controller
                         "errors"=>$validator->errors(),
                         "resource"=>$modelName
                     ]));
-                    foreach($validator->errors()->all() as $error){
-                        $this->errors[] = "[DUPLICATED]".$error."[$modelName] index[$i]";
-                    }
-                    $this->isAuthorized=false;
-                    return false;
                 }
             }
         }else{
@@ -503,11 +435,6 @@ class ApiFixedController extends Controller
                     "errors"=>$validator->errors(),
                     "resource"=>$modelName
                 ]));
-                foreach($validator->errors()->all() as $error){
-                    $this->errors[] = "[DUPLICATED]".$error."[$modelName]";
-                }
-                $this->isAuthorized=false;
-                return false;
             }
         }
         return true;
@@ -571,8 +498,6 @@ class ApiFixedController extends Controller
     {
         if( !in_array($this->operation,["delete"]) ){return true;}
         $modelNameExplode = explode('.', $modelName);
-        // $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$modelName:$modelNameExplode[1]);
-        // $model          = new $modelCandidate;
         $model          = getCustom( (count($modelNameExplode)==1?$modelName:$modelNameExplode[1]) );
         $detailsArray   = $model->details; 
         $heirs          = $model->heirs; 
@@ -604,10 +529,6 @@ class ApiFixedController extends Controller
                                 ],
                                 "resource"=>$modelName
                             ]));
-                            $this->messages[] = "USED: cannot delete id $refId in [$modelName]. It is being used in child $heir";
-                            $this->errors[] = "Cannot delete this resource, It or it's child is being referred in another resource.";
-                            $this->isAuthorized=false;
-                            return false;
                         };
                     }
                 }
@@ -676,8 +597,6 @@ class ApiFixedController extends Controller
     public function createOperation( $modelName, $data, $parentId=null, $parentName=null )
     {
         if(!$this->operationOK){return;}
-        // $modelCandidate = "\App\Models\CustomModels\\$modelName";
-        // $model          = new $modelCandidate;
         $model          = getCustom($modelName);
         $preparedModel = getBasic($modelName);
         $detailsArray   = $model->details;
@@ -787,14 +706,6 @@ class ApiFixedController extends Controller
                                 "errors"=>$validator->errors(),
                                 "resource"=>$modelName
                             ]));
-                            foreach($validator->errors()->all() as $error){
-                                if(method_exists($model, "validationErrorReplacer")){
-                                    $error = $model->validationErrorReplacer($error);
-                                }
-                                $this->errors[] = "[INVALID]".$error."[$modelName]";
-                            }
-                            $this->operationOK=false;
-                            return false;
                         }                    
                         $code= Carbon::now()->format('his');
                         $fileName = sanitizeString($req->$keyName->getClientOriginalName());
@@ -881,8 +792,6 @@ class ApiFixedController extends Controller
             }
         }
         $params=(object)$params;
-        // $modelCandidate = "\App\Models\CustomModels\\$modelName";
-        // $model          = new $modelCandidate;
         $model          = getCustom( $modelName );
         config( [ "parentTable" => $model->getTable() ] );
         $details        = $model->details;
@@ -926,8 +835,6 @@ class ApiFixedController extends Controller
     public function deleteOperation( $modelName, $params=null, $id=null, $fk=null )
     {
         $modelNameExplode = explode('.', $modelName);
-        // $modelCandidate = "\App\Models\CustomModels\\".(count($modelNameExplode)==1?$modelName:$modelNameExplode[1]);
-        // $model          = new $modelCandidate;
         $model          = getCustom( (count($modelNameExplode)==1?$modelName:$modelNameExplode[1]) );
         if( !is_numeric($id) && $model->useEncryption ){
             $id = $model->decrypt( $id );
@@ -941,9 +848,6 @@ class ApiFixedController extends Controller
                 'message'=>"Maaf Data tidak ditemukan untuk dihapus",
                 'resource'=>$modelName
             ]));
-            $this->errors[]="[NOT FOUND]ID $id in model [$modelName] does not exist";
-            $this->operationOK=false;
-            return;
         }
         
         $deleteBeforeEvent = $model->deleteBefore($preparedModel, $preparedModel, $this->requestMeta, $id);        
@@ -1008,8 +912,6 @@ class ApiFixedController extends Controller
     public function updateOperation($modelName, $data=null, $id=null)
     {
         if(!$this->operationOK){return;}
-        // $modelCandidate = "\App\Models\CustomModels\\$modelName";
-        // $model          = new $modelCandidate;
         $model          = getCustom( $modelName );
         if( !is_numeric($id) && $model->useEncryption ){
             $id = $model->decrypt( $id );
@@ -1022,14 +924,6 @@ class ApiFixedController extends Controller
                 'message'=>"Maaf Data tidak ditemukan untuk diupdate",
                 'resource'=>$modelName
             ]));
-            $this->errors[]="[NOT FOUND]ID $id in model [$modelName] does not exist";
-            $this->operationOK=false;
-            if($this->isBackdoor){
-                return [
-                    "status"=>"[NOT FOUND]ID $id in model [$modelName] does not exist"
-                ];
-            }
-            return;
         }
         $additionalData = $this->createAdditionalData($model, $data);
         $eliminatedData = $this->createEliminationData($model, $data);
@@ -1058,14 +952,6 @@ class ApiFixedController extends Controller
                             "errors"=>$validator->errors(),
                             "resource"=>$modelName
                         ]));
-                        foreach($validator->errors()->all() as $error){
-                            if(method_exists($model, "validationErrorReplacer")){
-                                $error = $model->validationErrorReplacer($error);
-                            }
-                            $this->errors[] = "[INVALID]".$error."[$modelName]";
-                        }
-                        $this->operationOK=false;
-                        return false;
                     }                    
                     $code= Carbon::now()->format('his');
                     $fileName = sanitizeString($req->$keyName->getClientOriginalName());
@@ -1078,28 +964,6 @@ class ApiFixedController extends Controller
         }
 
         $finalData  = reformatData($finalData,$preparedModel);
-
-        // if( count($model->fileColumns)>0 ){
-        //     foreach( $finalData as $key => $value ){
-        //         if( $value && in_array($key, $model->fileColumns) ){
-        //             $modelName = getTableOnly( $model->getTable() );
-        //             $field = $key;
-        //             $file = $value;
-        //             $userId = \Auth::user()->id;
-        //             $oldFile = null;
-        //             if( $preparedModel->$key ){
-        //                 $oldFileArr = explode(":::", $preparedModel->$key);
-        //                 $oldFile = end($oldFileArr);
-        //                 if($oldFile == $value){
-        //                     $oldFile = $preparedModel->$key;
-        //                 }else{
-        //                     $oldFile = null;
-        //                 }
-        //             }
-        //             $finalData[$key] = moveFileFromCache( $modelName, $field, $file, $userId, $oldFile );
-        //         }
-        //     }
-        // }
         
         $finalModel = $preparedModel->update($finalData);
         $model->updateAfter($finalModel, $processedData, $this->requestMeta, $id);
@@ -1114,10 +978,8 @@ class ApiFixedController extends Controller
             if( count( $detailArray )>1 ){
                 $detailClass = $detailArray[1];
             }
-            // $modelCandidate = "\App\Models\CustomModels\\$detailClass";
-            // $modelChild = new $modelCandidate;
-            $modelChild          = getCustom( $detailClass );
             
+            $modelChild          = getCustom( $detailClass );            
             $detailIds = [];
             $detailNew = [];
             $detailOld = [];
@@ -1253,80 +1115,58 @@ class ApiFixedController extends Controller
         
         if($this->isAuthorized){
             if($this->customOperation){
-                $function = "custom_".$this->operationId;
+                $function = env('FUNCTION_API_PREFIX', "custom_").$this->operationId;
                 $functionName = $this->operationId;
                 // $modelCandidate = "\App\Models\CustomModels\\$this->parentModelName";
                 // $model = new $modelCandidate;
                 $model = getCustom($modelname);
                 if( !method_exists( $model, $function ) ){
-
                     abort(404, json_encode([
                         'message'=>"Maaf, operasi ini tidak ditemukan",
                         "resource"=>$modelname
                     ]));
-                    $this->messages[] ="[UNKNOWN] function [$functionName] in Model [$this->parentModelName] does not exist";
-                    return response()->json(["messages"=>$this->messages],400);
                 }
                 $result = $model->$function(  $request );
                 return $result;
             }
+
             if( in_array($this->operation, ['read','list']) ){
                 return $this->readOperation($modelname, $this->requestData,$id);
             }
+
+
             DB::beginTransaction();
-            // try{
-                // $modelCandidate = "\App\Models\CustomModels\\$modelname";
-                // $model = new $modelCandidate;
-                $model = getCustom($modelname);
-                
-                if( method_exists($model, $this->operation."AfterTransaction") && $this->operationId!==null ){
-                    $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
+            $model = getCustom($modelname);
+            
+            if( method_exists($model, $this->operation."AfterTransaction") && $this->operationId!==null ){
+                $oldData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];
+            }
+            $function = $this->operation."Operation";
+            if( method_exists($model, $function) ){
+                if( $this->operation=='create' ){
+                    $overrideOperation = $model->$function( $this->originalRequest );
+                }elseif( $this->operation=='update' ){
+                    $overrideOperation = $model->$function( $this->originalRequest, $id );
                 }
-                $function = $this->operation."Operation";
-                if( method_exists($model, $function) ){
-                    if( $this->operation=='create' ){
-                        $overrideOperation = $model->$function( $this->originalRequest );
-                    }elseif( $this->operation=='update' ){
-                        $overrideOperation = $model->$function( $this->originalRequest, $id );
-                    }
-                    if(is_array($overrideOperation)){
-                        return response()->json($overrideOperation,400);
-                    }
-                }else{
-                    $this->$function($this->parentModelName,$this->requestData, $id);
-                    if(!$this->operationOK){
-                        DB::rollback();
-                        return response()->json([
-                            "status"    => "$this->operation data failed",
-                            // "warning"  => $this->messages, 
-                            "success"  => $this->success, 
-                            "errors"  => $this->errors, 
-                            // "request" => $this->requestData,
-                            "id"      => $this->operationId,
-                            "processed_time"=>round(microtime(true)-config("start_time"),5)
-                        ],400);
-                    }
+                if(is_array($overrideOperation)){
+                    return response()->json($overrideOperation,400);
                 }
-            // }catch(Exception $e){
-            //     DB::rollback();
-            //     if( !isJson($e->getMessage()) ){
-            //         return response()->json([
-            //             "status"    => "$this->operation data failed",
-            //             // "warning"  => $this->messages, 
-            //             "success"  => $this->success, 
-            //             "errors"  => $e->getMessage().", File:".$e->getFile().", Line:".$e->getLine(), 
-            //             // "request" => $this->requestData,
-            //             "id"      => $this->operationId,
-            //             "processed_time"=>round(microtime(true)-config("start_time"),5)
-            //         ],400);
-            //     }
-            //     $resp = json_decode( $e->getMessage(), true);
-            //     return response()->json( isset($resp['errors'])?$resp:[
-            //         "errors"=>$resp,
-            //         "processed_time"=>round(microtime(true)-config("start_time"),5),
-            //         "status"    => "$this->operation data failed"
-            //     ] ,400);
-            // }
+            }else{
+                $this->$function($this->parentModelName,$this->requestData, $id);
+                if(!$this->operationOK){
+                    DB::rollback();
+                    return response()->json([
+                        "status"    => "$this->operation data failed",
+                        // "warning"  => $this->messages, 
+                        "success"  => $this->success, 
+                        "errors"  => $this->errors, 
+                        // "request" => $this->requestData,
+                        "id"      => $this->operationId,
+                        "processed_time"=>round(microtime(true)-config("start_time"),5)
+                    ],400);
+                }
+            }
+
             if($this->operationOK){
                 if(method_exists($model, $this->operation."AfterTransaction")){
                     $newData = $this->readOperation( $this->parentModelName, (object)[], $this->operationId )['data'];

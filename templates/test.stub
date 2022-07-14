@@ -8,6 +8,21 @@ class ___class___Test extends TestCase
 {
     use DatabaseTransactions;
 
+    public function testReadingData()
+    {
+        Passport::actingAs(User::first());
+        $payload = [
+            'paginate' => 25
+        ];
+
+        $this->call('GET', '/operation/__table__', $payload);
+
+        $responseArr = json_decode( $this->response->getContent(),true );
+        ff( $responseArr, 'dump data' );
+
+        $this->assertTrue(true);
+    }
+
     public function testCreatingData()
     {
         $user = User::where('username', 'USERNAME')->first();
@@ -17,13 +32,13 @@ class ___class___Test extends TestCase
 
         $payload = __payload__;
 
-        $this->call('POST', '/operation/__resource__', $payload);
+        $this->call('POST', '/operation/__table__', $payload);
 
         $responseArr = json_decode( $this->response->getContent(),true );
-    //  ff( $responseArr, 'dump data' );
+        // ff( $responseArr, 'dump data' );
 
         $this->assertEquals( 200, $this->response->status() );
-    //    $this->seeJsonStructure( ['status'] );
+        // $this->seeJsonStructure( ['status'] );
 
         $this->seeInDatabase('__table__', array_filter($payload, function($dt){
             return !is_array($dt);
