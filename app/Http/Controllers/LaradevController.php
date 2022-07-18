@@ -1260,7 +1260,6 @@ class LaradevController extends Controller
                 '--path' => $file,
                 '--force' => true,
             ]);
-            ff($exitCode);
             $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
             \Cache::forget( 'migration-list' );
         }catch(Exception $e){
