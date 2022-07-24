@@ -311,7 +311,7 @@ trait ModelTrait {
 
     public function custom_upload( $request ){
         $validator = \Validator::make($request->all(), [
-            'file' => "required|file|max:10000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,jpeg,png,bmp,mp4,mp3,mpg,mpeg,mkv,3gp,ods",
+            'file' => "required|file|max:10000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,svg,jpeg,png,bmp,mp4,ogg,flv,mp3,mpg,mpeg,mkv,3gp,ods",
             'field'=> "required|string|".(count($this->fileColumns)>0?"in:".implode(",",$this->fileColumns):"")
         ]);
         if ( $validator->fails()) {
