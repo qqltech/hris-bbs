@@ -4,6 +4,9 @@ namespace App\Traits;
 use  App\Helpers\Cryptor;
 use App\Casts\Upload;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 trait ModelTrait {
     /**
@@ -153,7 +156,7 @@ trait ModelTrait {
             $cacheKey = $cacheOpt[ 'key' ].$p->id;
             $cacheTime = $cacheOpt[ 'time' ];
 
-            return \Cache::remember( $cacheKey, $cacheTime, function()use( $self, $p ){
+            return Cache::remember( $cacheKey, $cacheTime, function()use( $self, $p ){
                 return _customFind($self, $p);
             } );
         }
@@ -167,7 +170,7 @@ trait ModelTrait {
             $cacheOpt = $this->queryCache( $p );
             $cacheKey = $cacheOpt[ 'key' ];
             $cacheTime = $cacheOpt[ 'time' ];
-            return \Cache::remember( $cacheKey, $cacheTime, function()use( $self, $p ){
+            return Cache::remember( $cacheKey, $cacheTime, function()use( $self, $p ){
                 return _customGetData($self, $p);
             } );
         }
@@ -194,13 +197,13 @@ trait ModelTrait {
             $dataType = $colArr[1];
 
             if( app()->request->isMethod('GET') && !in_array( $columnName, array_keys($custom->casts) )){
-                if( \Str::contains($dataType,'boolean') ){
+                if( Str::contains($dataType,'boolean') ){
                     $custom->casts[ $columnName ] = 'boolean';
-                }elseif( \Str::contains( $dataType, 'int' ) ){
+                }elseif( Str::contains( $dataType, 'int' ) ){
                     $custom->casts[ $columnName ] = 'integer';
-                }elseif( \Str::contains( $dataType, 'decimal' ) || \Str::contains( $dataType, 'numeric' ) ){
+                }elseif( Str::contains( $dataType, 'decimal' ) || Str::contains( $dataType, 'numeric' ) ){
                     $custom->casts[ $columnName ] = 'float';
-                }elseif( \Str::contains( $dataType, 'json' ) ){
+                }elseif( Str::contains( $dataType, 'json' ) ){
                     $custom->casts[ $columnName ] = 'array';
                 }
             }
@@ -310,8 +313,8 @@ trait ModelTrait {
     }
 
     public function custom_upload( $request ){
-        $validator = \Validator::make($request->all(), [
-            'file' => "required|file|max:10000|mimes:pdf,doc,docx,xls,xlsx,odt,odf,zip,tar,tar.xz,tar.gz,rar,jpg,svg,jpeg,png,bmp,mp4,ogg,flv,mp3,mpg,mpeg,mkv,3gp,ods",
+        $validator = Validator::make($request->all(), [
+            'file' => "required|file|max:10000|mimetypes:image/bmp,text/csv,image/gif,image/vnd.microsoft.icon,image/jpeg,image/png,image/svg+xml,image/tiff,text/html,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint,application/vnd.rar,application/zip,text/plain,image/webp,application/pdf,audio/wav,audio/webm,audio/mpeg,video/x-msvideo,video/mp4,video/mpeg,video/webm",
             'field'=> "required|string|".(count($this->fileColumns)>0?"in:".implode(",",$this->fileColumns):"")
         ]);
         if ( $validator->fails()) {
