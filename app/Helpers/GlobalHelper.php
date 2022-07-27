@@ -2666,6 +2666,7 @@ function req2( $key = null ) {
     $data = (object)[];
     foreach ($pairs as $pair) {
         $nv = explode("=", $pair);
+        if(count($nv)<2) continue;
         $name = urldecode($nv[0]);
         $value = urldecode($nv[1]);
         $data->$name = $value;
