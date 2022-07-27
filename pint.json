@@ -1,3 +1,11 @@
 {
-  "preset": "laravel"
+  "preset": "laravel",
+  "exclude": [
+    "app_backup",
+    "app/Models/CustomModels",
+    "database/migrations/projects",
+    "database/migrations/alters",
+    "resources/views/projects",
+    "tests"
+  ]
 }

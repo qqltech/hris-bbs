@@ -53,6 +53,72 @@ trait ModelTrait {
     /**
      *  @param object
      */
+    public function scopeFilters( $query )
+    {
+        $filteredCols = (array)req2('filter_%');
+        if(!$filteredCols)  return;
+        $aliases = [];
+        if( method_exists( $this, 'aliases') ){
+            $aliases = $this->aliases();
+        }
+        $table = $this->getTable();
+        $additionalString = getDriver()=="pgsql"?"::text":"";
+        $operator = $filteredCols['filter_operator'] ?? (getDriver()=="pgsql"?"~*":'LIKE');
+        $query->where(function($q) use($filteredCols, $table, $additionalString, $operator, $aliases){
+            foreach( $filteredCols as $key => $val){
+                if( $key == 'filter_operator' ) continue;
+
+                $column = str_replace("filter_", "", $key);
+                $keyAliased = array_search( $column,$aliases ) ;
+                if( $keyAliased ){
+                    $column = $keyAliased;
+                }
+                $column = str_replace("this.", "$table.", $column);
+                if( strtolower($operator) == 'like' ){
+                    $val = "%$val%";
+                }
+                $val = strtolower($val);
+                $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
+                $q->whereRaw( "LOWER($column$additionalString) $operator (?)", [strtolower($val)] );
+            }
+        });
+    }
+
+        /**
+     *  @param object
+     */
+    public function scopeDirectFilters( $query )
+    {
+        $operators = ["is not ", "=", "<> ", "!= ", "> ", ">= ", "< ", "is ", "<=", "not in ", "in ", "like ", "ilike ", "~*"];
+        $filteredCols = (array)req2('if_%');
+        if(!$filteredCols)  return;
+        $table = $this->getTable();
+        $query->where(function($q) use($filteredCols, $table, $operators){
+            foreach( $filteredCols as $key => $val){
+                $key = str_replace("this.", "$table.", $key);
+                $fixedOperator = '=';
+                $valLower = strtolower($val);
+
+                foreach($operators as $operator){
+                    if(Str::startsWith($valLower, $operator )){
+                        $fixedOperator = explode(' ', $valLower )[0];
+                        $val = str_ireplace($fixedOperator,'', $val);
+                        $val = trim($val);
+                        break;
+                    }
+                }
+
+                $column = str_replace("if_", "", $key);
+                $val = strtolower($val);
+                $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
+                $q->where( $column, $fixedOperator, $val );
+            }
+        });
+    }
+
+    /**
+     *  @param object
+     */
     public function scopeNotin( $query )
     {
         if( trim(explode(":", req("notin"))[1]) == '' ) return;

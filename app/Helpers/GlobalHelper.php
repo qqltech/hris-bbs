@@ -1617,9 +1617,9 @@ function _customGetData($model,$params)
     $requestDataArr = (array)req();
     $directFilter = [];
     foreach($requestDataArr as $key => $val){
-        if(Str::startsWith($key, "this_")){
+        if(Str::startsWith($key, "this_") || Str::startsWith($key, "this.")){
             $directFilter[]=$key;
-            $model = $model->where(str_replace("this_","$table.",$key ), $val);
+            $model = $model->where(str_replace(["this_","this."],["$table.", "$table."],$key ), $val);
         }
     }
     if($params->where_raw){
@@ -1658,35 +1658,9 @@ function _customGetData($model,$params)
         $givenScopes[] = 'notin';
     }
     
-    if( req( $className."_filters" ) || ($isParent && req ("filters" )) ){
-        $additionalString = getDriver()=="pgsql"?"::text":"";
-        $currentFilters = req( $className."_filters") ?? req("filters");
-        $filters = explode(",", $currentFilters);
-        $filterOperators = req( $className."_filters_operator") ?? req("filters_operator");
-        $operator = $filterOperators ?? (getDriver()=="pgsql"?"~*":'LIKE');
-        $aliases = [];
-        if( method_exists( $modelExtender, 'aliases') ){
-            $aliases = $modelExtender->aliases();
-        }
-        $isAutoPrefix = req('auto_prefix')===null?true:req('auto_prefix');
-        $isAutoPrefix = $isAutoPrefix==='false'?false:true;
-        $model = $model->where( function($q)use($filters,$aliases,$additionalString,$operator,$table,$isAutoPrefix){
-            foreach($filters as $filter){
-                $filterKeys = explode( "=", $filter);
-                if( count($filterKeys)>2 ){
-                    trigger_error("maaf pencarian tidak boleh mengandung tanda (=)");
-                }
-                $keyFilter = $filterKeys[0];
-                $keyAliased = array_search( $keyFilter,$aliases ) ;
-                if( $keyAliased ){
-                    $keyFilter = $keyAliased;
-                }
-                if( $isAutoPrefix && strpos($keyFilter,".")===false  ){
-                    $keyFilter = "$table.$keyFilter";
-                }
-                $q->whereRaw( "{$keyFilter}$additionalString $operator '{$filterKeys[1]}'");
-            }
-        });
+    if( $isParent ){
+        $givenScopes[] = 'filters';
+        $givenScopes[] = 'directFilters';
     }
     
     if( req("query_name") ){
@@ -2685,6 +2659,33 @@ function removeLog($filename=null){
         return false;
     }
     return File::delete("$path");
+}
+
+function req2( $key = null ) {
+    $pairs = explode("&", !app()->request->isMethod('GET') ? file_get_contents("php://input") : $_SERVER['QUERY_STRING']);
+    $data = (object)[];
+    foreach ($pairs as $pair) {
+        $nv = explode("=", $pair);
+        $name = urldecode($nv[0]);
+        $value = urldecode($nv[1]);
+        $data->$name = $value;
+    }
+    
+    if($key!==null){
+        if( Str::contains($key, '%') ){
+            $key = str_replace( '%', '', $key );
+            $newData = [];
+            foreach((array)$data as $keyArr=>$dt){
+                if( Str::startsWith( $keyArr, $key ) ){
+                    $newData[$keyArr] = $dt;
+                }
+            }
+            $data = (object) $newData;
+        }else{
+            return isset($data->$key)? $data->$key : null;
+        }
+    }
+    return $data;
 }
 
 function req($key=null){
