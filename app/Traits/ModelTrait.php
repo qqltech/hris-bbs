@@ -113,7 +113,6 @@ trait ModelTrait {
                 $column = str_replace("if_", "", $key);
                 $val = strtolower($val);
                 $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
-                $val = $val=='null'? null : $val;
                 $q->where( $column, $fixedOperator, $val );
             }
         });
