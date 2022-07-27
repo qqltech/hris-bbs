@@ -55,6 +55,7 @@ trait ModelTrait {
      */
     public function scopeFilters( $query )
     {
+        if( !app()->request->isMethod('GET') ) return;
         $filteredCols = (array)req2('filter_%');
         if(!$filteredCols)  return;
         $aliases = [];
@@ -89,6 +90,7 @@ trait ModelTrait {
      */
     public function scopeDirectFilters( $query )
     {
+        if( !app()->request->isMethod('GET') ) return;
         $operators = ["is not ", "=", "<> ", "!= ", "> ", ">= ", "< ", "is ", "<=", "not in ", "in ", "like ", "ilike ", "~*"];
         $filteredCols = (array)req2('if_%');
         if(!$filteredCols)  return;
