@@ -1584,7 +1584,7 @@ function _customGetData($model,$params)
                         }
                         $fieldSearching = str_replace( "this.","$table.", $fieldSearching );
                         // if(in_array($fieldSearching,$allColumns)){
-                            $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%$string%'"));
+                            $query->orWhereRaw( "LOWER($fieldSearching$additionalString) LIKE (?)", ["%$string%"]);
                             // $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%?%'"),[$string]); // calon
                         // }
                         // $found = null;
@@ -1604,9 +1604,7 @@ function _customGetData($model,$params)
                             $kolomFixedArr = explode(' as ', strtolower($kolomFixed));
                             $kolomFixed = end($kolomFixedArr);
                         }
-                        
-                        $query->orWhereRaw(DB::raw("LOWER($kolomFixed) LIKE '%$string%'"));
-                        // $query->orWhereRaw(DB::raw("LOWER($column$additionalString) LIKE '%?%'"),[$string]); // calon
+                        $query->orWhereRaw("LOWER($kolomFixed) LIKE (?)", ["%$string%"]);
                     }
                 }
         });

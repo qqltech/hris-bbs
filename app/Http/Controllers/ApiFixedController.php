@@ -262,6 +262,12 @@ class ApiFixedController extends Controller
         
         $arrayValidation    = $model->$operationValidator();
 
+        if( $this->isPatch ){
+            $arrayValidation = array_filter($arrayValidation, function($key){
+                return req($key) ? true : false;
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
         if(isset($model->autoValidator) && $model->autoValidator){
             $requiredFields    = $model->required;
             $datatypeValidator  = array_filter( $model->columnsFull, function($dt)use($arrayValidation){
@@ -1161,7 +1167,7 @@ class ApiFixedController extends Controller
                         "success"  => $this->success, 
                         "errors"  => $this->errors, 
                         // "request" => $this->requestData,
-                        "id"      => $this->operationId,
+                        // "id"      => $this->operationId,
                         "processed_time"=>round(microtime(true)-config("start_time"),5)
                     ],400);
                 }
@@ -1199,7 +1205,7 @@ class ApiFixedController extends Controller
                     "success"  => $this->success, 
                     "errors"  => $this->errors,
                     // "request" => $this->requestData,
-                    "id"      => $this->operationId,
+                    // "id"      => $this->operationId,
                 ];
                 if(method_exists($model, "transformResponse")){
                     $newResponses = $model->transformResponse($responses);
@@ -1207,7 +1213,7 @@ class ApiFixedController extends Controller
                         $responses=$newResponses;
                     }
                 }
-                $responses["processed_time"] = 'e'.round(microtime(true)-config("start_time"),5);
+                $responses["processed_time"] = round(microtime(true)-config("start_time"),5);
                 if(config('files_to_remove')){
                     foreach( config( 'files_to_remove' ) as $path ){
                         if( File::exists( public_path("uploads/$path") ) ){

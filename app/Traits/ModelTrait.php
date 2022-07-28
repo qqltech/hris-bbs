@@ -74,6 +74,11 @@ trait ModelTrait {
                 if( $keyAliased ){
                     $column = $keyAliased;
                 }
+
+                if( !Str::contains($column, '.') ){
+                    $column = "this.$column";  
+                }
+
                 $column = str_replace("this.", "$table.", $column);
                 if( strtolower($operator) == 'like' ){
                     $val = "%$val%";
