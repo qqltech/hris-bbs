@@ -126,6 +126,58 @@ trait ModelTrait {
     /**
      *  @param object
      */
+    public function scopeOrNull( $query )
+    {
+        $columnsArr = explode(',', req('orWhereNull'));
+        $query->orWhere(function($q)use($columnsArr){
+            foreach( $columnsArr as $col ){
+                $q->orWhereNull($col);
+            }
+        });
+    }
+    
+    /**
+     *  @param object
+     */
+    public function scopeNull( $query )
+    {
+        $columnsArr = explode(',', req('whereNull'));
+        $query->where(function($q)use($columnsArr){
+            foreach( $columnsArr as $col ){
+                $q->whereNull($col);
+            }
+        });
+    }
+
+    /**
+     *  @param object
+     */
+    public function scopeOrNotNull( $query )
+    {
+        $columnsArr = explode(',', req('orWhereNotNull'));
+        $query->orWhere(function($q)use($columnsArr){
+            foreach( $columnsArr as $col ){
+                $q->orWhereNotNull($col);
+            }
+        });
+    }
+
+    /**
+     *  @param object
+     */
+    public function scopeNotNull( $query )
+    {
+        $columnsArr = explode(',', req('whereNotNull'));
+        $query->where(function($q)use($columnsArr){
+            foreach( $columnsArr as $col ){
+                $q->whereNotNull($col);
+            }
+        });
+    }
+
+    /**
+     *  @param object
+     */
     public function scopeNotin( $query )
     {
         if( trim(explode(":", req("notin"))[1]) == '' ) return;

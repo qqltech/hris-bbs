@@ -1659,6 +1659,11 @@ function _customGetData($model,$params)
     if( $isParent ){
         $givenScopes[] = 'filters';
         $givenScopes[] = 'directFilters';
+        
+        if(req('whereNull'))  $givenScopes[] = 'null';
+        if(req('orWhereNull'))  $givenScopes[] = 'orNull';
+        if(req('whereNotNull'))  $givenScopes[] = 'notNull';
+        if(req('orWhereNotNull'))  $givenScopes[] = 'orNotNull';
     }
     
     if( req("query_name") ){
