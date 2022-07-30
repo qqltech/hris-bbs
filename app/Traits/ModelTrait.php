@@ -128,20 +128,22 @@ trait ModelTrait {
      */
     public function scopeOrNull( $query )
     {
-        $columnsArr = explode(',', req('orWhereNull'));
+        $table = $this->getTable();
+        $columnsArr = explode(',', str_replace("this.", "$table.", req('orWhereNull')));
         $query->orWhere(function($q)use($columnsArr){
             foreach( $columnsArr as $col ){
                 $q->orWhereNull($col);
             }
         });
     }
-    
+
     /**
      *  @param object
      */
     public function scopeNull( $query )
     {
-        $columnsArr = explode(',', req('whereNull'));
+        $table = $this->getTable();
+        $columnsArr = explode(',', str_replace("this.", "$table.", req('whereNull')));
         $query->where(function($q)use($columnsArr){
             foreach( $columnsArr as $col ){
                 $q->whereNull($col);
@@ -154,7 +156,8 @@ trait ModelTrait {
      */
     public function scopeOrNotNull( $query )
     {
-        $columnsArr = explode(',', req('orWhereNotNull'));
+        $table = $this->getTable();
+        $columnsArr = explode(',', str_replace("this.", "$table.", req('orWhereNotNull')));
         $query->orWhere(function($q)use($columnsArr){
             foreach( $columnsArr as $col ){
                 $q->orWhereNotNull($col);
@@ -167,7 +170,8 @@ trait ModelTrait {
      */
     public function scopeNotNull( $query )
     {
-        $columnsArr = explode(',', req('whereNotNull'));
+        $table = $this->getTable();
+        $columnsArr = explode(',', str_replace("this.", "$table.", req('whereNotNull')));
         $query->where(function($q)use($columnsArr){
             foreach( $columnsArr as $col ){
                 $q->whereNotNull($col);
