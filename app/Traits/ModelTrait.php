@@ -3,6 +3,7 @@
 namespace App\Traits;
 use  App\Helpers\Cryptor;
 use App\Casts\Upload;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +42,53 @@ trait ModelTrait {
     /**
      *  @param object
      */
+    public function scopeSearch( $query, $allColumns )
+    {
+        $string  = strtolower(req('search'));
+        $table = $this->getTable();
+        $searchfield = req('searchfield');
+        $additionalString = getDriver()=="pgsql"?"::text":"";
+
+        $isAutoPrefix = req('auto_prefix')===null?true:req('auto_prefix');
+        $isAutoPrefix = $isAutoPrefix==='false'?false:true;
+        $aliases = [];
+        if( method_exists( $this, 'aliases') ){
+            $aliases = $this->aliases();
+        }
+        $query->where(
+            function ($query)use($allColumns,$string,$additionalString, $searchfield,$table,$isAutoPrefix,$aliases) {
+                if($searchfield!=null){
+                    $searchfieldArray = explode(",", strtolower($searchfield) );
+                    foreach($searchfieldArray as $fieldSearching){
+                        if($isAutoPrefix && strpos($fieldSearching,".")===false){
+                            $fieldSearching = "this.$fieldSearching";
+                        }
+                        $fieldSearching = str_replace( "this.","$table.", $fieldSearching );
+                        $query->orWhereRaw( "LOWER($fieldSearching$additionalString) LIKE '%$string%'");
+                    }
+                }else{
+                    foreach($allColumns as $column){
+                        if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
+                            continue;
+                        }
+                        $kolomFixed = $column.$additionalString;
+                        if(strpos( strtolower($kolomFixed), ' as ' )!==false){
+                            $kolomFixedArr = explode(' as ', strtolower($kolomFixed));
+                            $kolomFixed = end($kolomFixedArr);
+                        }
+                        $keyAliased = array_search( $column,$aliases ) ;
+                        if( $keyAliased ){
+                            $kolomFixed = $keyAliased;
+                        }
+                        $query->orWhereRaw("LOWER($kolomFixed) LIKE '%$string%'");
+                    }
+                }
+        });
+    }
+
+    /**
+     *  @param object
+     */
     public function scopeOrin( $query )
     {
         if( trim(explode(":", req("orin"))[1]) == '' ) return;
@@ -62,10 +110,11 @@ trait ModelTrait {
         if( method_exists( $this, 'aliases') ){
             $aliases = $this->aliases();
         }
-        $table = $this->getTable();
+        $model = $this;
         $additionalString = getDriver()=="pgsql"?"::text":"";
         $operator = $filteredCols['filter_operator'] ?? (getDriver()=="pgsql"?"~*":'LIKE');
-        $query->where(function($q) use($filteredCols, $table, $additionalString, $operator, $aliases){
+        $query->where(function($q) use($filteredCols, $model, $additionalString, $operator, $aliases){
+            $table = $model->getTable();
             foreach( $filteredCols as $key => $val){
                 if( $key == 'filter_operator' ) continue;
 
@@ -76,14 +125,22 @@ trait ModelTrait {
                 }
 
                 if( !Str::contains($column, '.') ){
-                    $column = "this.$column";  
+                    $dataType = getDataType($model, $column);
+                    $column = "this.$column";
+                }else{
+                    $colArr = explode(".", $column);
+                    $dataType = getDataType( getBasic( $colArr[0] ), $colArr[1] );
+                }
+
+                if( in_array($dataType, ['date']) ){
+                    $column = getDriver()=='mysql'?"DATE_FORMAT($column, '%d/%m/%Y')":"to_char($column, 'DD/MM/YYYY')";
                 }
 
                 $column = str_replace("this.", "$table.", $column);
                 if( strtolower($operator) == 'like' ){
                     $val = "%$val%";
                 }
-                $val = strtolower($val);
+                $val = trim(strtolower($val));
                 $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
                 $q->whereRaw( "LOWER($column$additionalString) $operator (?)", [strtolower($val)] );
             }
@@ -108,7 +165,7 @@ trait ModelTrait {
 
                 foreach($operators as $operator){
                     if(Str::startsWith($valLower, $operator )){
-                        $fixedOperator = explode(' ', $valLower )[0];
+                        $fixedOperator = trim(explode(' ', $valLower )[0]);
                         $val = str_ireplace($fixedOperator,'', $val);
                         $val = trim($val);
                         break;
@@ -231,7 +288,7 @@ trait ModelTrait {
                         }
                     }
 
-                    $acceptedParams = array_only( $frontendParamSent, $frontendParams );
+                    $acceptedParams = Arr::only( $frontendParamSent, $frontendParams );
                     if( config( $queryName ) ){
                         $acceptedParams = array_merge( $acceptedParams, config( $queryName ) );
                     }

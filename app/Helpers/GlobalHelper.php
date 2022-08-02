@@ -1566,49 +1566,6 @@ function _customGetData($model,$params)
     if(method_exists($modelExtender, "extendJoin")){
         $model = $modelExtender->extendJoin($model);
     }
-    
-    if($params->search){
-        $searchfield = $params->searchfield;
-        $string  = strtolower($params->search);
-        $additionalString = getDriver()=="pgsql"?"::text":"";
-
-        $isAutoPrefix = req('auto_prefix')===null?true:req('auto_prefix');
-        $isAutoPrefix = $isAutoPrefix==='false'?false:true;
-        $model = $model->where(
-            function ($query)use($allColumns,$string,$additionalString, $searchfield,$table,$isAutoPrefix) {
-                if($searchfield!=null){
-                    $searchfieldArray = explode(",", strtolower($searchfield) );
-                    foreach($searchfieldArray as $fieldSearching){
-                        if($isAutoPrefix && strpos($fieldSearching,".")===false){
-                            $fieldSearching = "this.$fieldSearching";
-                        }
-                        $fieldSearching = str_replace( "this.","$table.", $fieldSearching );
-                        // if(in_array($fieldSearching,$allColumns)){
-                            $query->orWhereRaw( "LOWER($fieldSearching$additionalString) LIKE (?)", ["%$string%"]);
-                            // $query->orWhereRaw(DB::raw("LOWER($fieldSearching$additionalString) LIKE '%?%'"),[$string]); // calon
-                        // }
-                        // $found = null;
-                        // foreach($allColumns as $col){
-                        //     if(strpos($col, $fieldSearching)){
-                        //         $query->orWhereRaw(DB::raw("LOWER($col$additionalString) LIKE '%$string%'"));
-                        //     }
-                        // }
-                    }
-                }else{
-                    foreach($allColumns as $column){
-                        if((strpos($column, '.id') !== false)||(strpos($column, '_id') !== false) ){
-                            continue;
-                        }
-                        $kolomFixed = $column.$additionalString;
-                        if(strpos( strtolower($kolomFixed), ' as ' )!==false){
-                            $kolomFixedArr = explode(' as ', strtolower($kolomFixed));
-                            $kolomFixed = end($kolomFixedArr);
-                        }
-                        $query->orWhereRaw("LOWER($kolomFixed) LIKE (?)", ["%$string%"]);
-                    }
-                }
-        });
-    }
     /**
      * Filter direct params misal this.column:21
      */
@@ -1666,12 +1623,16 @@ function _customGetData($model,$params)
         if(req('orWhereNotNull'))  $givenScopes[] = 'orNotNull';
     }
     
-    if( req("query_name") ){
+    if( req("query_name") && req('query_name')!=='null' ){
         $givenScopes[] = 'queryParam';
     }
     
     if(  req("orin") && strpos(req("orin"),":")!==false ){
         $givenScopes[] = 'orin';
+    }
+
+    if( req('search') && req('search')!=='null' ){
+        $model=$model->search( $allColumns );
     }
 
     if(isset($params->group_by) && $params->group_by!=null){
@@ -2492,11 +2453,18 @@ function Async($class,$func,$args){
     dispatch(new \App\Jobs\Background(get_class($class),$func,$args));
 }
 function getBasic($name){
+    if( Str::contains($name, '.') ){
+        $nameArr = explode(".", $name);
+        $name = end($nameArr);
+    }
     $string = "\App\Models\BasicModels\\$name";
     return class_exists( $string )?new $string:null;
 }
 function getCustom($name){
-
+    if( Str::contains($name, '.') ){
+        $nameArr = explode(".", $name);
+        $name = end($nameArr);
+    }
     if( config("custom_$name") ){
         return config("custom_$name");
     }
@@ -2665,7 +2633,7 @@ function removeLog($filename=null){
 }
 
 function req2( $key = null ) {
-    $pairs = explode("&", !app()->request->isMethod('GET') ? file_get_contents("php://input") : $_SERVER['QUERY_STRING']);
+    $pairs = explode("&", !app()->request->isMethod('GET') ? file_get_contents("php://input") : (@$_SERVER['QUERY_STRING']??@$_SERVER['REQUEST_URI']));
     $data = (object)[];
     foreach ($pairs as $pair) {
         $nv = explode("=", $pair);
