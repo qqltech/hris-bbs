@@ -126,7 +126,7 @@ trait ModelTrait {
 
                 if( !Str::contains($column, '.') ){
                     $dataType = getDataType($model, $column);
-                    $column = "this.$column";
+                    $column = in_array($column, $model->columns)?"this.$column":$column;
                 }else{
                     $colArr = explode(".", $column);
                     if($model=getBasic( $colArr[0])){
