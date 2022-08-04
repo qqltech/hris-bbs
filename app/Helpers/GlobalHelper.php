@@ -2917,7 +2917,46 @@ function getTrackedUser( $userId ){
     return Cache::get($key);
 }
 
+function setTrackedUser( $cacheTime = 0 ){
+    if( $cacheTime<=0 ) return;
+    $userId = \Auth::id();
+    $key = "track-user-$userId";
+    $request = app()->request;
+    $headers = $request->header();
+    unset( $headers['authorization'] );
+    Cache::put( $key, [
+        'ip'=>$request->ip(),
+        'agent' => $request->userAgent(),
+        'last_activity_at'=> Carbon::now()->format('d/m/Y H:i:s'),
+        'last_request_method'=>$request->method(),
+        'last_visited_url'=>$request->url(),
+        'last_visited_payload'=> $request->all(),
+        'headers'=>$headers
+    ], $cacheTime );
+}
+
 function getTrackedRow( $model, $id ){
     $key = "track-$model-$id";
     return Cache::get($key);
+}
+
+function releaseTrackedRow( $model, $id ){
+    $key = "track-$model-$id";
+    return Cache::forget($key);
+}
+
+function setTrackedRow( $model, $id, $cacheTime = 600 ){
+    if( $cacheTime<=0 ) return;
+    $key = "track-$model-$id";
+    $request = app()->request;
+    $headers = $request->header();
+    unset( $headers['authorization'] );
+    Cache::put( $key, [
+        'ip' => $request->ip(),
+        'agent' => $request->userAgent(),
+        'payload' => $request->all(),
+        'at' => Carbon::now()->format('d/m/Y H:i:s'),
+        'headers'=> $headers,
+        'user' => \Auth::user()
+    ], $cacheTime );
 }

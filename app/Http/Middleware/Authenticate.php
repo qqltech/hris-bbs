@@ -44,33 +44,12 @@ class Authenticate
 
         //  cache USER who is requesting, use getTrackedUser( $userId ) to retrieve
         if( ($cacheTime = env("USER_TRACK_CACHE_SECONDS", 0))>0 ){
-            $key = 'track-user-'.(\Auth::user()->id);
-            $headers = $request->header();
-            unset( $headers['authorization'] );
-            Cache::put( $key, [
-                'ip'=>$request->ip(),
-                'agent' => $request->userAgent(),
-                'payload'=> $request->all(),
-                'at'=>\Carbon::now()->format('d/m/Y H:i:s'),
-                'route'=>$request->url(),
-                'headers'=>$headers
-            ], $cacheTime );
+            setTrackedUser( $cacheTime );
         }
 
         //  cache GET /:modelname/:id, use getTrackedRow( $model, $id ) to retrieve
         if( $request->isMethod('GET') && !$request->route('detailmodelname') && ($model=$request->route('modelname')) && ($id=$request->route('id')) && ($cacheTime = env("FIND_TRACK_CACHE_SECONDS", 0))>0){
-            $key = "track-$model-$id";
-            $headers = $request->header();
-            unset( $headers['authorization'] );
-
-            Cache::put( $key, [
-                'ip'=>$request->ip(),
-                'agent' => $request->userAgent(),
-                'payload'=> $request->all(),
-                'at'=>\Carbon::now()->format('d/m/Y H:i:s'),
-                'headers'=>$headers,
-                'user'=>\Auth::user()
-            ], $cacheTime );
+            setTrackedRow( $model, $id, $cacheTime );
         }
 
         return $next($request);
