@@ -14,7 +14,10 @@ use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\ValidationException;
 
 if (! function_exists('append_config')) {
@@ -1654,7 +1657,7 @@ function _customGetData($model,$params)
                 }
             }
         }
-       $model=$model->orderBy(\DB::raw($order),$params->order_type==null?"asc":$params->order_type);
+       $model=$model->orderBy(DB::raw($order),$params->order_type==null?"asc":$params->order_type);
     }
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
     
@@ -2116,7 +2119,7 @@ function sanitizeString( $string, $force_lowercase = true, $anal = false ) {
 }
 function _uploadexcel($model, $request)
 {
-    $data = \Excel::toArray( null,$request->file);
+    $data = Excel::toArray( null,$request->file);
       	$rows = $data[0];
         $headings = $rows[0];
         $forbiddenHeadings = [];
@@ -2140,7 +2143,7 @@ function _uploadexcel($model, $request)
                     $row[$heading] = $array[$col];
                 }
                 array_merge($row,["created_at"=>\Carbon\Carbon::now(),"updated_at"=>\Carbon\Carbon::now() ]);
-                    $validator = \Validator::make($row, $model->importValidator);
+                $validator = Validator::make($row, $model->importValidator);
                   if ( $validator->fails()) {
                       foreach($validator->errors()->all() as $error){
                           $invalidRows[] = "[INVALID]".$error." in row[$baris]";
@@ -2488,7 +2491,7 @@ function isRoute($val){
 
 function getRawData($query){
     try{        	
-        $res = (array)\DB::select("$query limit 1")[0];
+        $res = (array)DB::select("$query limit 1")[0];
         return array_values($res)[0];
     }catch(\Exception $e){
         return null;
@@ -2792,7 +2795,7 @@ function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', 
 }
 
 function getArrayFromExcel( $file, $dateColumns = [] ){
-    $data = \Excel::toArray( null, $file );
+    $data = Excel::toArray( null, $file );
     $rows = $data[0];
     $columns = $rows[0];    // columns
     $bulkData = [];
