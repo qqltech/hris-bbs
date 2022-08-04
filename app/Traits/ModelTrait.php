@@ -129,7 +129,11 @@ trait ModelTrait {
                     $column = "this.$column";
                 }else{
                     $colArr = explode(".", $column);
-                    $dataType = getDataType( getBasic( $colArr[0] ), $colArr[1] );
+                    if($model=getBasic( $colArr[0])){
+                        $dataType = getDataType( $model, $colArr[1] );
+                    }else{
+                        $dataType = 'text';
+                    }
                 }
 
                 if( in_array($dataType, ['date']) ){

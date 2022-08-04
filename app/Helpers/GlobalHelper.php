@@ -12,6 +12,8 @@ use Dotenv\Environment\Adapter\PutenvAdapter;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 
@@ -1623,7 +1625,7 @@ function _customGetData($model,$params)
         if(req('orWhereNotNull'))  $givenScopes[] = 'orNotNull';
     }
     
-    if( req("query_name") && req('query_name')!=='null' ){
+    if( req("query_name") && req('query_name')!=='null' && !app()->request->route('id')){
         $givenScopes[] = 'queryParam';
     }
     
@@ -2744,7 +2746,7 @@ function saveFileToCache( $modelName, $field, $file, $user_id='anonymous', $seco
     $key = $modelName."_".$field."_".$user_id."_".sanitizeString($file->getClientOriginalName());
     $path =  $file->getRealPath();
     $blob = base64_encode(\File::get($path));
-    \Cache::put( $key, $blob, $seconds);
+    Cache::put( $key, $blob, $seconds);
     
     return $key;
 }
@@ -2752,7 +2754,7 @@ function saveFileToCache( $modelName, $field, $file, $user_id='anonymous', $seco
 function pullFileFromCache($modelName, $field, $filename, $user_id='anonymous'){
     $key = $modelName."_".$field."_".$user_id."_".sanitizeString($filename);
 
-    $cacheContent = \Cache::get( $key );
+    $cacheContent = Cache::get( $key );
     if(!$cacheContent){
         return null;
     }
@@ -2908,4 +2910,14 @@ function createModelRow( $m ){
     }
     
     return $m->create($body);
+}
+
+function getTrackedUser( $userId ){
+    $key = "track-user-$userId";
+    return Cache::get($key);
+}
+
+function getTrackedRow( $model, $id ){
+    $key = "track-$model-$id";
+    return Cache::get($key);
 }

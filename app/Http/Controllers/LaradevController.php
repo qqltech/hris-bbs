@@ -45,6 +45,22 @@ class LaradevController extends Controller
         }
     }
 
+    public function cleanProject()
+    {
+        if( ! File::exists($this->modelsPath."/BasicModels") ){
+            File::delete( $this->modelsPath."/BasicModels", 493, true);
+        }
+        if( ! File::exists($this->modelsPath."/CustomModels") ){
+            File::delete( $this->modelsPath."/CustomModels", 493, true);
+        }
+        if( ! File::exists(base_path("database/migrations/projects")) ){
+            File::delete( base_path("database/migrations/projects"), 493, true);
+        }
+        if( ! File::exists(base_path("database/migrations/alters")) ){
+            File::delete( base_path("database/migrations/alters"), 493, true);
+        }
+    }
+
     private function getConnection($conn)
     {
         $conn = (object)$conn;
