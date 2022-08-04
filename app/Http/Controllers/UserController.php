@@ -7,9 +7,10 @@ use App\Models\Defaults\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+use Illuminate\Support\Str;
 use Jenssegers\Agent\Agent;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 class UserController extends Controller
 {
@@ -27,7 +28,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' =>Hash::make($request->password),
-            'remember_token'=>str_random(60)
+            'remember_token'=>Str::random(60)
         ]);
         
         return $local?true:response()->json([
