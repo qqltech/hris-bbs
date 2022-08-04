@@ -13,6 +13,7 @@ use Doctrine\DBAL\Types\Type;
 use App\Helpers\PLSQL as PLSQL;
 use App\Helpers\DBS as DBS;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use App\Models\Defaults\User;
 use Exception;
 use DateTime;
@@ -1590,7 +1591,7 @@ class LaradevController extends Controller
         $final=$request->final;
         $columns = $request->columns;
         $dataNew = array_map(function($dt)use($columns){
-            $dataTemp = array_only($dt,$columns); 
+            $dataTemp = Arr::only($dt,$columns); 
             foreach($dataTemp as $i => $tmp){
                 if($tmp==""||strtolower($tmp)=="null"||$tmp==null){
                     unset($dataTemp[$i]);
@@ -1728,7 +1729,7 @@ class LaradevController extends Controller
 
         $state = $req->statement;
         $isCommit = Str::contains( Str::lower($state), ':commit' );
-        $state = str_replace( ':commit', '', Str::lower($state) );
+        $state = str_ireplace( ':commit', '', $state );
         $stateToLower = Str::lower($state);
         $isNeedTransaction = Str::contains( $stateToLower, "delete from") || Str::contains( $stateToLower, "update ") || Str::contains( $stateToLower, "insert into");
         try{
