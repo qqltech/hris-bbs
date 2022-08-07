@@ -138,9 +138,9 @@ trait ModelTrait {
 
                 $dataType = Str::lower($dataType);
 
-                if( in_array(explode(':',$dataType)[0], ['date']) ){
+                if( in_array($dataType, ['date']) ){
                     $column = getDriver()=='mysql'?"DATE_FORMAT($column, '%d/%m/%Y')":"to_char($column, 'DD/MM/YYYY')";
-                }elseif( in_array(explode(':',$dataType)[0], ['datetime','timestamp']) ){
+                }elseif( in_array($dataType, ['datetime','timestamp']) ){
                     $column = getDriver()=='mysql'?"DATE_FORMAT($column, '%d/%m/%Y %H:%i')":"to_char($column, 'DD/MM/YYYY HH24:MI')";
                 }
 
