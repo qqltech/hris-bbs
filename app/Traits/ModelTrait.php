@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use DateTimeInterface;
 
 trait ModelTrait {
     /**
@@ -22,6 +23,14 @@ trait ModelTrait {
     public $excepts         = [];
     public $createAdditionalData = []; // example: 'field'=>'auth:id'
     public $updateAdditionalData = [];
+
+    /**
+     * Menyesuaikan sesuai timezone saat casts date
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
     /**
      * Untuk keperluan authenticate frontend
