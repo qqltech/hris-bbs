@@ -53,7 +53,7 @@ trait ModelTrait {
      */
     public function scopeSearch( $query, $allColumns )
     {
-        $string  = strtolower(req('search'));
+        $string  = trim(strtolower(req('search')));
         $table = $this->getTable();
         $searchfield = req('searchfield');
         $additionalString = getDriver()=="pgsql"?"::text":"";
@@ -154,6 +154,7 @@ trait ModelTrait {
                 }
 
                 $column = str_replace("this.", "$table.", $column);
+                $val = trim($val);
                 if( strtolower($operator) == 'like' ){
                     $val = "%$val%";
                 }
