@@ -185,6 +185,11 @@ trait ModelTrait {
                 $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
                 if(in_array( Str::lower($fixedOperator), ['between','in', 'not in']) ){
                     $valArr = Str::contains($val, ',') ? explode(",", $val) : explode("~", $val);
+                    if( Str::lower($fixedOperator)=='between' && Str::contains($valArr[0], '/') ){
+                        $valArr = array_map(function($dt){
+                            return \Carbon::createFromFormat(env("FORMAT_DATE_FRONTEND","d/m/Y"), $dt)->format('Y-m-d');
+                        }, $valArr);
+                    }
                     $fixedOperator = str_replace(' ', '', "where$fixedOperator");
                     $q->$fixedOperator( $column, $valArr );
                 }else{
