@@ -185,7 +185,7 @@ trait ModelTrait {
                 $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
                 if(in_array( Str::lower($fixedOperator), ['between','in', 'not in']) ){
                     $valArr = Str::contains($val, ',') ? explode(",", $val) : explode("~", $val);
-                    $fixedOperator = "where$fixedOperator";
+                    $fixedOperator = str_replace(' ', '', "where$fixedOperator");
                     $q->$fixedOperator( $column, $valArr );
                 }else{
                     $q->where( $column, $fixedOperator, $val );
