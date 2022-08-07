@@ -161,7 +161,7 @@ trait ModelTrait {
     public function scopeDirectFilters( $query )
     {
         if( !app()->request->isMethod('GET') ) return;
-        $operators = ["is not ", "=", "<> ", "!= ", "> ", ">= ", "< ", "is ", "<=", "not in ", "in ", "like ", "ilike ", "~*"];
+        $operators = ["is not ", "=", "<> ", "!= ", "> ", ">= ", "< ", "is ", "<=", "not in ", "in ", "like ", "ilike ", "~*", 'between '];
         $filteredCols = (array)req2('if_%');
         if(!$filteredCols)  return;
         $table = $this->getTable();
@@ -173,7 +173,7 @@ trait ModelTrait {
 
                 foreach($operators as $operator){
                     if(Str::startsWith($valLower, $operator )){
-                        $fixedOperator = trim(explode(' ', $valLower )[0]);
+                        $fixedOperator = trim(explode(' ', $valLower, 2 )[0]);
                         $val = str_ireplace($fixedOperator,'', $val);
                         $val = trim($val);
                         break;
@@ -183,7 +183,13 @@ trait ModelTrait {
                 $column = str_replace("if_", "", $key);
                 $val = strtolower($val);
                 $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
-                $q->where( $column, $fixedOperator, $val );
+                if(in_array( Str::lower($fixedOperator), ['between','in', 'not in']) ){
+                    $valArr = Str::contains($val, ',') ? explode(",", $val) : explode("~", $val);
+                    $fixedOperator = "where$fixedOperator";
+                    $q->$fixedOperator( $column, $valArr );
+                }else{
+                    $q->where( $column, $fixedOperator, $val );
+                }
             }
         });
     }
