@@ -54,6 +54,7 @@ trait ModelTrait {
     public function scopeSearch( $query, $allColumns )
     {
         $string  = trim(strtolower(req('search')));
+        $string = str_replace( [ '\\','(',')', "'" ],[ "\'", '\\\\','\(','\)' ], $string);
         $table = $this->getTable();
         $searchfield = req('searchfield');
         $additionalString = getDriver()=="pgsql"?"::text":"";
@@ -159,7 +160,7 @@ trait ModelTrait {
                     $val = "%$val%";
                 }
                 $val = trim(strtolower($val));
-                $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
+                $val = str_replace( [ '\\','(',')', "'" ],[ "\'",'\\\\','\(','\)' ], $val);
                 $q->whereRaw( "LOWER($column$additionalString) $operator (?)", [strtolower($val)] );
             }
         });
@@ -184,15 +185,15 @@ trait ModelTrait {
                 foreach($operators as $operator){
                     if(Str::startsWith($valLower, $operator )){
                         $fixedOperator = trim(explode(' ', $valLower, 2 )[0]);
-                        $val = str_ireplace($fixedOperator,'', $val);
+                        $val = Str::replaceFirst($fixedOperator,'', $val);// str_ireplace($fixedOperator,'', $val);
                         $val = trim($val);
                         break;
                     }
                 }
 
-                $column = str_replace("if_", "", $key);
+                $column = Str::replaceFirst("if_", "", $key);//str_replace("if_", "", $key);
                 $val = strtolower($val);
-                $val = str_replace( [ '\\','(',')' ],[ '\\\\','\(','\)' ], $val);
+                $val = str_replace( [ '\\','(',')', "'" ],[ "\'",'\\\\','\(','\)' ], $val);
                 if(in_array( Str::lower($fixedOperator), ['between','in', 'not in']) ){
                     $valArr = Str::contains($val, ',') ? explode(",", $val) : explode("~", $val);
                     if( Str::lower($fixedOperator)=='between' && Str::contains($valArr[0], '/') ){

@@ -58,6 +58,7 @@ class ApiNativeController extends Controller
 
         if( $r->has('search') && $r->search && $r->search!='null'){
             $searchText = strtolower( $r->search );
+            $searchText = str_replace( [ '\\','(',')', "'" ],[ "\'", '\\\\','\(','\)' ], $searchText);
             $casterString = getDriver()=="pgsql"?"::text":"";
             $cols = \Cache::get("schema_native_$name:$updatedAt")??[];
             $builder->where(function($q)use($cols, $casterString, $searchText){
@@ -69,6 +70,17 @@ class ApiNativeController extends Controller
             });
         }
 
+        if( $r->has('notin') && $r->notin && $r->notin!='null' ){
+            $reqArr = explode(":", $r->notin);
+            if( $idNotIn=$reqArr[1] ){
+                $columnNotIn = $reqArr[0];
+                $builder->where(function($q)use($columnNotIn, $idNotIn){
+                    $col = str_replace("this.","", $columnNotIn);
+                    $q->whereRaw( "$col not in ($idNotIn)" );
+                });
+            }
+        }
+        
         if( $r->has('where') ){
             $builder->whereRaw( $r->where );
         }
