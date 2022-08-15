@@ -2933,7 +2933,7 @@ function setTrackedUser( $cacheTime = 0 ){
         'last_activity_at'=> Carbon::now()->format('d/m/Y H:i:s'),
         'last_request_method'=>$request->method(),
         'last_visited_url'=>$request->url(),
-        'last_visited_payload'=> $request->all(),
+        'last_visited_payload'=> $_REQUEST,
         'headers'=>$headers
     ], $cacheTime );
 }
@@ -2957,7 +2957,7 @@ function setTrackedRow( $model, $id, $cacheTime = 600 ){
     Cache::put( $key, [
         'ip' => $request->ip(),
         'agent' => $request->userAgent(),
-        'payload' => $request->all(),
+        'payload' => $_REQUEST,
         'at' => Carbon::now()->format('d/m/Y H:i:s'),
         'headers'=> $headers,
         'user' => \Auth::user()
