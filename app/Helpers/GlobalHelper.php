@@ -1713,6 +1713,7 @@ function setTrackedRow( $model, $id, $cacheTime = 600 ){
         'user' => Auth::user()
     ], $cacheTime );
 }
+
 function cloneDatabase( $dstDatabase, $isRecreate=false ){
     $host = env('DB_HOST');
     $username = env('DB_USERNAME');
@@ -1730,6 +1731,36 @@ function cloneDatabase( $dstDatabase, $isRecreate=false ){
                 $database, 
                 $sqlPath = "$path/$file");
     exec($command);
+    // --column-statistics=0
+    $command = sprintf('mysql -h %s -u %s -p\'%s\' %s < %s', 
+                $host, 
+                $username, 
+                $password, 
+                $dstDatabase, 
+                $sqlPath);
+    
+    if($isRecreate){
+        $conn=DB::getDoctrineSchemaManager();
+        $conn->dropDatabase($dstDatabase);
+        $conn->createDatabase($dstDatabase);
+    }
+    exec( $command );
+    if( ! File::exists($sqlPath) ){
+        File::delete( $sqlPath );
+    }
+
+    return 'ok';
+}
+
+function cloneDBFromRemoteURL( $sourceURL, $isRecreate=false ){
+    $host = env('DB_HOST');
+    $username = env('DB_USERNAME');
+    $password = env('DB_PASSWORD');
+    $dstDatabase = env('DB_DATABASE');
+    $file = date('Y-m-d') . '-temp-remote.sql';
+    $sqlPath = storage_path("framework/cache/$file");
+    if( !copy($sourceURL, $sqlPath) ) trigger_error('failed to download file');
+
     // --column-statistics=0
     $command = sprintf('mysql -h %s -u %s -p\'%s\' %s < %s', 
                 $host, 
