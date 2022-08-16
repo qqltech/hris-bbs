@@ -2,9 +2,10 @@
 
 namespace App\Console\Commands;
 
-use File;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 /**
  * Class deletePostsCommand
  *
@@ -55,10 +56,11 @@ class BackupCommand extends Command
             }
             File::copyDirectory(resource_path('views/projects'), "$path/resources/views/projects" );
 
-            $schemaManager = \DB::getDoctrineSchemaManager();
+            $schemaManager = DB::getDoctrineSchemaManager();
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
             
             $sqlLineList = $schemaManager->createSchema()->toSql($schemaManager->getDatabasePlatform());
+            if( !getDriver()=='mysql' ) return;
             File::put($schemaSql = "$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
 
             $host = env('DB_HOST');
@@ -68,7 +70,7 @@ class BackupCommand extends Command
             
             $file = date('Y-m-d') . '-dump-' . $database . '.sql';
             // --column-statistics=0
-            $command = sprintf('mysqldump -h %s -u %s -p\'%s\' %s > %s', 
+            $command = sprintf('mysqldump  '.(isMariaDB()?'--column-statistics=0':'').' -h %s -u %s -p\'%s\' %s --routines> %s', 
                         $host, 
                         $username, 
                         $password, 

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use File;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use App\Http\Controllers\LaradevController as Laradev;
 /**
  * Class deletePostsCommand
