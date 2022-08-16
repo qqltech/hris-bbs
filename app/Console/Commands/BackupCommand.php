@@ -59,7 +59,7 @@ class BackupCommand extends Command
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
             
             $sqlLineList = $schemaManager->createSchema()->toSql($schemaManager->getDatabasePlatform());
-            File::put("$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
+            File::put($schemaSql = "$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
 
             $host = env('DB_HOST');
             $username = env('DB_USERNAME');
@@ -73,8 +73,20 @@ class BackupCommand extends Command
                         $username, 
                         $password, 
                         $database, 
-                        "$path/sqldump/$file");
+                        $sqlPath = "$path/sqldump/$file");
             exec($command);
+
+            if( env("BACKUP_CALLBACK") ){
+                $funcArr = explode(".", env("BACKUP_CALLBACK"));
+                $class = getCustom($funcArr[0]);
+                $func = $funcArr[1];
+                return $class->$func([
+                    'path' => $path,
+                    'withUpload' => $withUpload,
+                    'schema_path'=> $schemaSql,
+                    'sql_path'=> $sqlPath
+                ]);
+            }
             
         } catch (Exception $e) {
             $this->error($e->getMessage());
