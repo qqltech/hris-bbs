@@ -1752,5 +1752,6 @@ function cloneDatabase( $dstDatabase, $isRecreate=false ){
 }
 
 function isMariaDB(){
+    return false;
     return Str::contains( Str::lower(DB::select('select version()')[0]->{'version()'}), 'maria');
 }
