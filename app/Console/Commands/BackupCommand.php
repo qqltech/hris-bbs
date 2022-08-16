@@ -70,7 +70,7 @@ class BackupCommand extends Command
             
             $file = date('Y-m-d') . '-dump-' . $database . '.sql';
             // --column-statistics=0
-            $command = sprintf('mysqldump  '.(isMariaDB()?'--column-statistics=0':'').' -h %s -u %s -p\'%s\' %s --routines> %s', 
+            $command = sprintf('mysqldump --routines '.(isMariaDB()?'--column-statistics=0':'').' -h %s -u %s -p\'%s\' %s > %s', 
                         $host, 
                         $username, 
                         $password, 
