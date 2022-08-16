@@ -1,9 +1,10 @@
 <?php
 
 require_once __DIR__.'/../vendor/autoload.php';
-
+$suffixEnvFile = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
+$runtimeEnvFile = ".env.$suffixEnvFile";
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
-    dirname(__DIR__)
+    dirname(__DIR__),file_exists(dirname(__DIR__) . '/' . $runtimeEnvFile) ? $runtimeEnvFile : null
 ))->bootstrap();
 
 $app = new Laravel\Lumen\Application(
