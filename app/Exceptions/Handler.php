@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
+use illuminate\Support\Facades\DB;
 use Throwable;
 use Illuminate\Http\Response;
 class Handler extends ExceptionHandler
@@ -50,7 +53,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $e)
     {
-        \DB::rollback();
+        DB::rollback();
         $rendered = parent::render($request, $e);
         $msg = $this->getFixedMessage($e);
         $responseError = [
@@ -68,10 +71,10 @@ class Handler extends ExceptionHandler
         if( isJson($e->getMessage()) ){
             return json_decode( $e->getMessage(), true );
         }
-        $fileName = explode( (str_contains($e->getFile(), "\\")?"\\":"/"), $e->getFile());
+        $fileName = explode( (Str::contains($e->getFile(), "\\")?"\\":"/"), $e->getFile());
         $stringMsg = $e->getMessage();
         $stringMsg = $stringMsg === null || $stringMsg == ""? "Maybe Server Error" : $stringMsg;
-        // $stringMsg = !str_contains( $stringMsg, "SQLSTATE" ) && ( env("APP_DEBUG",false) || !empty( app()->request->header("Debugger") )) ? $stringMsg : "Maybe Server Error";
+        // $stringMsg = !Str::contains( $stringMsg, "SQLSTATE" ) && ( env("APP_DEBUG",false) || !empty( app()->request->header("Debugger") )) ? $stringMsg : "Maybe Server Error";
         $msg = $stringMsg.(env("APP_DEBUG",false)?" => file: ".str_replace(".php","",end($fileName))." line: ".$e->getLine():"");
         return $msg;
     }

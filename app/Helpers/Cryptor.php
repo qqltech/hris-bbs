@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 use Illuminate\Support\Str;
+use Illuminate\support\Facades\Auth;
 
 /**
  * Class untuk simple generate decrypt dan encryption
@@ -12,8 +13,8 @@ class Cryptor {
     protected $token;
 
     function __construct(){
-         $this->userId = \Auth::check()?\Auth::id():81;
-         $this->token  = \Auth::check()?\Auth::user()->token()->id:Str::replace(':','',env('APP_KEY'));
+         $this->userId = Auth::check()?Auth::id():81;
+         $this->token  = Auth::check()?Auth::user()->token()->id:Str::replace(':','',env('APP_KEY'));
     }
 
     public function encrypt( string|int $id ){

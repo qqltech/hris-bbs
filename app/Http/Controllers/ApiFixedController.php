@@ -2,16 +2,14 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Image;
-use Validator;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Jobs\DefaultActivities;
-use Excel;
+use Illuminate\support\Facades\Auth;
+use Illuminate\support\Facades\Validator;
+use Illuminate\support\Facades\Queue;
 use  App\Helpers\Cryptor;
 
 class ApiFixedController extends Controller
@@ -67,7 +65,7 @@ class ApiFixedController extends Controller
         if($this->isMultipart){
             $this->serializeMultipartData();
         }
-        $this->user        = \Auth::check()?\Auth::user():null;        
+        $this->user        = Auth::check()?Auth::user():null;        
         switch( strtolower($request->method()) ){
             case 'post' :
                 $this->operation = "create";
@@ -565,7 +563,7 @@ class ApiFixedController extends Controller
                     $newData = $model->$function((object)$arrayData);
                 }elseif(strpos($data, 'auth:') !== false){ // operasi untuk mendapatkan auth
                     $authKey = str_replace("auth:", "", $data);
-                    $newData = \Auth::user()->$authKey;
+                    $newData = Auth::user()->$authKey;
                 }elseif(strpos($data, 'request:') !== false){ // operasi untuk mendapatkan auth
                     $arrayDataKey = str_replace("request:", "", $data);
                     $newData = $arrayData[$arrayDataKey];
@@ -1187,7 +1185,7 @@ class ApiFixedController extends Controller
 
                 DB::commit();
                 if(env('DEFAULT_ACTIVITIES',false)){
-                    \Queue::push(new DefaultActivities([
+                    Queue::push(new DefaultActivities([
                         "user_id"       =>  $this->user->id,
                         "table"         =>  $this->parentModelName,
                         "table_id"      =>  $this->operationId,
@@ -1227,7 +1225,7 @@ class ApiFixedController extends Controller
             }else{
                 DB::rollback();
                 if(env('DEFAULT_ACTIVITIES',false)){
-                    \Queue::push(new DefaultActivities([
+                    Queue::push(new DefaultActivities([
                         "user_id"       =>  $this->user->id,
                         "table"         =>  $this->parentModelName,
                         "table_id"      =>  $this->operationId,
@@ -1251,7 +1249,7 @@ class ApiFixedController extends Controller
         }else{
             DB::rollback();
             if(env('DEFAULT_ACTIVITIES',false)){
-                \Queue::push(new DefaultActivities([
+                Queue::push(new DefaultActivities([
                     "user_id"       =>  $this->user->id,
                     "table"         =>  $this->parentModelName,
                     "table_id"      =>  $this->operationId,

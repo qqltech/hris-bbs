@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Helpers;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class untuk generate PLSQL: trigger, views, procedure, materialized views dengan PHP
@@ -134,13 +134,13 @@ class PLSQL {
         DROP FUNCTION IF EXISTS fungsi_".$tableSnake."_".$this->time."_".$this->action."();	
         ";
         try{
-            \DB::unprepared($this->query);
+            DB::unprepared($this->query);
         }catch(\Exception $e){
             $this->query="
                 DROP TRIGGER IF EXISTS ".$tableSnake."_".$this->time."_".$this->action.";
                 DROP FUNCTION IF EXISTS fungsi_".$tableSnake."_".$this->time."_".$this->action."();		
             ";
-            \DB::unprepared($this->query);
+            DB::unprepared($this->query);
             return "mysql trigger/func/view terhapus";
         }
     }
@@ -170,21 +170,21 @@ class PLSQL {
 		}elseif( $this->db == 'pgsql' ){
 			$query = $this->pgsqlCreate();
 		}
-		\DB::unprepared($query);
+		DB::unprepared($query);
 	 }
 
 	public function createView(){
-		\DB::unprepared("
+		DB::unprepared("
 			CREATE OR REPLACE VIEW ".$this->table." AS ".$this->code.";");
 	}
 
 	public function createMaterializedView(){
-		\DB::unprepared("
+		DB::unprepared("
 			CREATE MATERIALIZED VIEW ".$this->table." AS ".$this->code.";");
 	}
 
 	public function index($column, $type="btree"){
-		\DB::unprepared("
+		DB::unprepared("
 			CREATE INDEX ".$this->table."_$column ON $this->table USING $type($column);");
 	}
 }

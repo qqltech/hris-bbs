@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Validator;
-
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 class ApiNativeController extends Controller
 {
     public function index( Request $r, $name, $id = null ){
-        if( \Schema::hasTable($name) ){
+        if( Schema::hasTable($name) ){
             $builder = DB::table( $name );
-            $updatedAt = \Carbon::now()->format('Y-m-d H:i');
+            $updatedAt = Carbon::now()->format('Y-m-d H:i');
         }else{
             $q = DB::table("default_params")
                 ->select("prepared_query", "params","updated_at")
@@ -24,7 +26,7 @@ class ApiNativeController extends Controller
             $params = $q->params;
             $updatedAt = $q->updated_at;
 
-            $builder = new \Staudenmeir\LaravelCte\Query\Builder(\DB::connection());
+            $builder = new \Staudenmeir\LaravelCte\Query\Builder(DB::connection());
 
             $builder->from($name)
                 ->withExpression( $name, $query );
@@ -60,7 +62,7 @@ class ApiNativeController extends Controller
             $searchText = strtolower( $r->search );
             $searchText = str_replace( [ '\\','(',')', "'" ],[ "\'", '\\\\','\(','\)' ], $searchText);
             $casterString = getDriver()=="pgsql"?"::text":"";
-            $cols = \Cache::get("schema_native_$name:$updatedAt")??[];
+            $cols = Cache::get("schema_native_$name:$updatedAt")??[];
             $builder->where(function($q)use($cols, $casterString, $searchText){
                 foreach($cols as $col){
                     if( !in_array($col, ['id']) ){
@@ -90,12 +92,12 @@ class ApiNativeController extends Controller
         }
 
         $data = $builder->paginate($r->has('paginate') ? $r->paginate : 25);
-        $cols = \Cache::get("schema_native_$name:$updatedAt");
+        $cols = Cache::get("schema_native_$name:$updatedAt");
         if( !$cols ){
             $rows = (array)$data->toArray()['data'];
             if( count($rows)>0 ){
                 $row = (array)$rows[0];
-                \Cache::put("schema_native_$name:$updatedAt", array_keys($row), 60*60*30);
+                Cache::put("schema_native_$name:$updatedAt", array_keys($row), 60*60*30);
             }
         }
         return $data;
@@ -106,16 +108,16 @@ class ApiNativeController extends Controller
     public function store( Request $r, $name, $id = null ){
         $array = $r->all();
         if(count($array) !== count($array, COUNT_RECURSIVE)){
-            $now = \Carbon::now();
+            $now = Carbon::now();
             $id = [];
             foreach( $array as $dt ){
-                $id[] = \DB::table($name)->insertGetId( array_merge( $dt,[
+                $id[] = DB::table($name)->insertGetId( array_merge( $dt,[
                     'created_at' => $now
                 ]));
             }
         }else{
-            $id = \DB::table($name)->insertGetId( array_merge( $r->all(),[
-                'created_at' => \Carbon::now()
+            $id = DB::table($name)->insertGetId( array_merge( $r->all(),[
+                'created_at' => Carbon::now()
             ]));
         }
 
@@ -126,8 +128,8 @@ class ApiNativeController extends Controller
     }
 
     public function update( Request $r, $name, $id ){
-        \DB::table($name)->where('id',$id)->update( array_merge( $r->all(),[
-            'updated_at' => \Carbon::now()
+        DB::table($name)->where('id',$id)->update( array_merge( $r->all(),[
+            'updated_at' => Carbon::now()
         ]));
 
         return response()->json([
@@ -136,7 +138,7 @@ class ApiNativeController extends Controller
     }
 
     public function destroy( Request $r, $name, $id ){
-        \DB::table($name)->where('id', $id)->delete();
+        DB::table($name)->where('id', $id)->delete();
 
         return response()->json([
             'message'=>'ok'

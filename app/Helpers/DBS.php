@@ -1,6 +1,7 @@
 <?php
 namespace App\Helpers;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Illuminate\SUpport\Facades\DB;
 
 class DBS extends \Illuminate\Support\Facades\DB {
 	private $vars="";
@@ -26,7 +27,7 @@ class DBS extends \Illuminate\Support\Facades\DB {
 			$merged=[];
 			foreach($query as $row){
 				if(!is_string($row)){
-					$merged[]=str_replace('"',"",str_replace_array('?', $row->getBindings(), $row->toSql()).";\n");
+					$merged[]=str_replace('"',"",Str::replaceArray('?', $row->getBindings(), $row->toSql()).";\n");
 				}else{
 					if( getDriver() == 'pgsql' && strpos(" ".$row, 'UPDATE') == FALSE){
 						$row = str_replace("set "," ",$row);
@@ -38,7 +39,7 @@ class DBS extends \Illuminate\Support\Facades\DB {
 			$query=implode($merged);
 		}else{
 			if(strpos(" ".$query, 'INSERT') == FALSE){
-				$query=str_replace_array('?', $query->getBindings(), $query->toSql()).";";
+				$query=Str::replaceArray('?', $query->getBindings(), $query->toSql()).";";
 			}
 		}
 		if($this->vars !==""){
@@ -105,18 +106,18 @@ class DBS extends \Illuminate\Support\Facades\DB {
 	public static function getTriggers($table){
 		$data = null;
 		if( getDriver() == 'pgsql'){
-			$data = new \Staudenmeir\LaravelCte\Query\Builder(\DB::connection());
+			$data = new \Staudenmeir\LaravelCte\Query\Builder(DB::connection());
 			$data = $data->from("information_schema.triggers")
 			->select("prosrc as action_statement","event_object_table",
 					"action_timing","event_manipulation","trigger_name")
 			->withExpression('mytrigger', 
-					\DB::table('pg_trigger')
+					DB::table('pg_trigger')
 					->join("pg_proc","pg_proc.oid", "=", "pg_trigger.tgfoid")
 					->select("pg_trigger.tgname","pg_proc.prosrc")
 				)
 			->join('mytrigger', 'tgname', '=', 'trigger_name');
 		}elseif( getDriver() == 'mysql'){
-			$data = \DB::table("information_schema.triggers")
+			$data = DB::table("information_schema.triggers")
 			->select("action_statement","event_object_table",
 					"action_timing","event_manipulation","trigger_name");
 			
