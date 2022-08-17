@@ -23,7 +23,7 @@ class Upload implements CastsAttributes
             $prefix = '';
             $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
             if(\File::exists( base_path(".env.$subDomain") ) ){
-                $prefix = "$prefix/";
+                $prefix = "$subDomain/";
             }
             return url("/uploads/$prefix".getTableOnly( $model->getTable() )."/$value");
         }
