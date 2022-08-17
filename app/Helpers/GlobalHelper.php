@@ -1512,7 +1512,7 @@ function saveFileToCache( $modelName, $field, $file, $user_id='anonymous', $seco
 
 function pullFileFromCache($modelName, $field, $filename, $user_id='anonymous'){
     $key = $modelName."_".$field."_".$user_id."_".sanitizeString($filename);
-    
+
     $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
     if(File::exists( base_path(".env.$subDomain") ) ){
         $key = "$subDomain-$key";
@@ -1803,4 +1803,19 @@ function cloneDBFromRemoteURL( $sourceURL, $isRecreate=false ){
 function isMariaDB(){
     return false;
     return Str::contains( Str::lower(DB::select('select version()')[0]->{'version()'}), 'maria');
+}
+
+function gitPull(){
+    $disabled = explode(',', str_replace(" ","",ini_get('disable_functions')) );
+    if(in_array('exec', $disabled)) return false;
+    if( !($gitOrigin = env("GIT_URL",'')) ) return false;
+
+    $path = base_path();
+    exec("cd $path && git pull $gitOrigin", $output, $return);
+
+    return [
+        'output'=>$output,
+        'returned'=>$return
+    ];
+
 }
