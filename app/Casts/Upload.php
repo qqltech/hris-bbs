@@ -25,6 +25,11 @@ class Upload implements CastsAttributes
             if(\File::exists( base_path(".env.$subDomain") ) ){
                 $prefix = "$subDomain/";
             }
+            $fixedPath = "/uploads/$prefix".getTableOnly( $model->getTable() )."/$value";
+            if( !\File::exists( public_path($fixedPath) ) ){
+                return url("/uploads/".getTableOnly( $model->getTable() )."/$value");
+            }
+
             return url("/uploads/$prefix".getTableOnly( $model->getTable() )."/$value");
         }
         $dataArr = explode("/", $value);
