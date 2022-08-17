@@ -1497,6 +1497,12 @@ function getModelNameByLevel( int $level = 1 ){
 
 function saveFileToCache( $modelName, $field, $file, $user_id='anonymous', $seconds = 1800 ){
     $key = $modelName."_".$field."_".$user_id."_".sanitizeString($file->getClientOriginalName());
+    
+    $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
+    if(File::exists( base_path(".env.$subDomain") ) ){
+        $key = "$subDomain-$key";
+    }
+
     $path =  $file->getRealPath();
     $blob = base64_encode(File::get($path));
     Cache::put( $key, $blob, $seconds);
@@ -1506,6 +1512,11 @@ function saveFileToCache( $modelName, $field, $file, $user_id='anonymous', $seco
 
 function pullFileFromCache($modelName, $field, $filename, $user_id='anonymous'){
     $key = $modelName."_".$field."_".$user_id."_".sanitizeString($filename);
+    
+    $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
+    if(File::exists( base_path(".env.$subDomain") ) ){
+        $key = "$subDomain-$key";
+    }
 
     $cacheContent = Cache::get( $key );
     if(!$cacheContent){
@@ -1517,7 +1528,7 @@ function pullFileFromCache($modelName, $field, $filename, $user_id='anonymous'){
 }
 
 function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', $oldFile = null ){
-    $key = $modelName."_".$field."_".$user_id."_".sanitizeString($filename);
+    // $key = $modelName."_".$field."_".$user_id."_".sanitizeString($filename);
     $contents = pullFileFromCache($modelName, $field, $filename, $user_id);
 
     if( !$contents ){
@@ -1530,17 +1541,24 @@ function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', 
     
     $code = Carbon::now()->format('his').crc32(uniqid());
     $fixedFileName = $code.":::".$filename;
-    if(!File::exists(public_path("uploads/$modelName"))){
+
+    $dirPath = "uploads/$modelName";
+    $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
+    if(File::exists( base_path(".env.$subDomain") ) ){
+        $dirPath = "$dirPath/$subDomain";
+    }
+
+    if(!File::exists(public_path( $dirPath ))){
         umask(0000);
-        File::makeDirectory( public_path("uploads/$modelName"), 493, true);
+        File::makeDirectory( public_path( $dirPath ), 493, true);
     }
 
     //  remove old file
-    if( $oldFile && File::exists( public_path("uploads/$modelName/$oldFile") ) ){
-        File::delete( public_path( "uploads/$modelName/$oldFile" ) );
+    if( $oldFile && File::exists( public_path("$dirPath/$oldFile") ) ){
+        File::delete( public_path( "$dirPath/$oldFile" ) );
     }
 
-    $path = File::put(public_path("uploads/$modelName/$fixedFileName"), $contents);
+    File::put(public_path("$dirPath/$fixedFileName"), $contents);
     return $fixedFileName;
 }
 
