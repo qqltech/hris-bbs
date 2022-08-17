@@ -20,7 +20,12 @@ class Upload implements CastsAttributes
             return $value;
         }
         if(app()->request->isMethod('GET')){
-            return url("/uploads/".getTableOnly( $model->getTable() )."/$value");
+            $prefix = '';
+            $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
+            if(\File::exists( base_path(".env.$subDomain") ) ){
+                $prefix = "$prefix/";
+            }
+            return url("/uploads/$prefix".getTableOnly( $model->getTable() )."/$value");
         }
         $dataArr = explode("/", $value);
         return end($dataArr);
