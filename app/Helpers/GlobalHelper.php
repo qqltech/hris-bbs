@@ -1545,7 +1545,7 @@ function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', 
     $dirPath = "uploads/$modelName";
     $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
     if(File::exists( base_path(".env.$subDomain") ) ){
-        $dirPath = "$dirPath/$subDomain";
+        $dirPath = "uploads/$subDomain/$modelName";
     }
 
     if(!File::exists(public_path( $dirPath ))){
