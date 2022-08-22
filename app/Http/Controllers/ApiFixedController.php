@@ -1203,7 +1203,7 @@ class ApiFixedController extends Controller
                     "success"  => $this->success, 
                     "errors"  => $this->errors,
                     // "request" => $this->requestData,
-                    // "id"      => $this->operationId,
+                    "id"      => $this->operationId,
                 ];
                 if(method_exists($model, "transformResponse")){
                     $newResponses = $model->transformResponse($responses);
