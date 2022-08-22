@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f49638446f05781faf5a60495d7c3332",
+    "content-hash": "87091b72230ee8a2daa558bf22ffaae9",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -6126,92 +6126,6 @@
             "time": "2022-04-04T05:15:45+00:00"
         },
         {
-            "name": "picqer/php-barcode-generator",
-            "version": "v2.2.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/picqer/php-barcode-generator.git",
-                "reference": "b98f110cc5a79f723688fb17fd90b9325300d844"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/picqer/php-barcode-generator/zipball/b98f110cc5a79f723688fb17fd90b9325300d844",
-                "reference": "b98f110cc5a79f723688fb17fd90b9325300d844",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "php": "^7.3|^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9.5"
-            },
-            "suggest": {
-                "ext-bcmath": "Barcode IMB (Intelligent Mail Barcode) needs bcmath extension",
-                "ext-gd": "For JPG and PNG generators, GD or Imagick is required",
-                "ext-imagick": "For JPG and PNG generators, GD or Imagick is required"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Picqer\\Barcode\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Nicola Asuni",
-                    "email": "info@tecnick.com",
-                    "homepage": "http://nicolaasuni.tecnick.com"
-                },
-                {
-                    "name": "Casper Bakker",
-                    "email": "info@picqer.com",
-                    "homepage": "https://picqer.com"
-                }
-            ],
-            "description": "An easy to use, non-bloated, barcode generator in PHP. Creates SVG, PNG, JPG and HTML images from the most used 1D barcode standards.",
-            "homepage": "https://github.com/picqer/php-barcode-generator",
-            "keywords": [
-                "CODABAR",
-                "Code11",
-                "Code93",
-                "EAN13",
-                "KIX",
-                "KIXCODE",
-                "MSI",
-                "POSTNET",
-                "Pharma",
-                "Standard 2 of 5",
-                "barcode",
-                "barcode generator",
-                "code128",
-                "code39",
-                "ean",
-                "html",
-                "jpeg",
-                "jpg",
-                "php",
-                "png",
-                "svg",
-                "upc"
-            ],
-            "support": {
-                "issues": "https://github.com/picqer/php-barcode-generator/issues",
-                "source": "https://github.com/picqer/php-barcode-generator/tree/v2.2.4"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/casperbakker",
-                    "type": "github"
-                }
-            ],
-            "time": "2022-07-01T08:27:26+00:00"
-        },
-        {
             "name": "predis/predis",
             "version": "v1.1.10",
             "source": {
@@ -6908,25 +6822,23 @@
         },
         {
             "name": "starlight93/html-pdf-excel",
-            "version": "dev-development",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/starlight93/php-html-pdf-excel.git",
-                "reference": "22210562e663a1bbdd05e8570e797d5e08560a65"
+                "reference": "446da7f2814a2e5367fe7c49620e16fd6645e25e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/starlight93/php-html-pdf-excel/zipball/22210562e663a1bbdd05e8570e797d5e08560a65",
-                "reference": "22210562e663a1bbdd05e8570e797d5e08560a65",
+                "url": "https://api.github.com/repos/starlight93/php-html-pdf-excel/zipball/446da7f2814a2e5367fe7c49620e16fd6645e25e",
+                "reference": "446da7f2814a2e5367fe7c49620e16fd6645e25e",
                 "shasum": ""
             },
             "require": {
                 "mossadal/math-parser": "^1.3",
                 "phpoffice/phpspreadsheet": "^1.21",
-                "picqer/php-barcode-generator": "^2.2",
                 "tecnickcom/tcpdf": "^6.4"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -6946,9 +6858,9 @@
             "description": "lightweight and fast library to render sheet-formatted-template to xlsx, pdf, and html easily. Really easy!",
             "support": {
                 "issues": "https://github.com/starlight93/php-html-pdf-excel/issues",
-                "source": "https://github.com/starlight93/php-html-pdf-excel/tree/development"
+                "source": "https://github.com/starlight93/php-html-pdf-excel/tree/v1.0.0"
             },
-            "time": "2022-05-20T08:58:50+00:00"
+            "time": "2022-08-22T22:37:47+00:00"
         },
         {
             "name": "starlight93/oauth2",
@@ -11832,9 +11744,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "starlight93/html-pdf-excel": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

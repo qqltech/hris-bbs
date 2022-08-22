@@ -24,9 +24,8 @@
         "league/flysystem": "^3.0",
         "maatwebsite/excel": "^3.1",
         "midtrans/midtrans-php": "^2.5",
-        "picqer/php-barcode-generator": "^2.2",
         "predis/predis": "^1.1",
-        "starlight93/html-pdf-excel": "dev-development",
+        "starlight93/html-pdf-excel": "^1.0",
         "starlight93/oauth2": "^1.2",
         "staudenmeir/laravel-cte": "^1.6"
     },
