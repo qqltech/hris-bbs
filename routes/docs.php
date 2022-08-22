@@ -1,5 +1,7 @@
 <?php
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+
 $router->group(['prefix'=>'docs'], function () use ($router) {
     $router->get('/frontend-params', function(){
         if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
@@ -229,5 +231,31 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
             $files = array_values($files);
             return view("defaults.blades", compact("files") );
         }
+    });
+    
+    $router->get('/raw', function(Request $req){
+        if(!$req->has('trait') && !$req->has('helper') && !$req->has('controller') && !$req->has('user')
+            && !$req->has('composer') && !$req->has('app')
+            ) {
+            return response()->json([
+                'helpers', 'traits', 'controllers', 'users', 'composers','apps'
+            ],404);
+        };
+        
+        if($req->has('helper')){
+            $data = File::get( app_path("Helpers/GlobalHelper.php") );
+        }elseif($req->has('trait')){
+            $data = File::get( app_path("Traits/ModelTrait.php") );
+        }elseif($req->has('controller')){
+            $data = File::get( app_path("Http/Controllers/ApiFixedController.php") );
+        }elseif($req->has('user')){
+            $data = File::get( app_path("Http/Controllers/UserController.php") );
+        }elseif($req->has('composer')){
+            $data = File::get( base_path("composer.json") );
+        }elseif($req->has('app')){
+            $data = File::get( base_path("bootstrap/app.php") );
+        }
+
+        return view("defaults.raw", compact('data'));
     });
 });

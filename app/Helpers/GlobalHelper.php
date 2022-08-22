@@ -460,7 +460,8 @@ function _customGetData($model,$params)
             foreach(["create","update","delete","read"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
-                    $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
+                    $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() 
+                    : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
                 }
             }
 
@@ -550,7 +551,8 @@ function _customGetData($model,$params)
             foreach(["create","update","delete","read"] as $akses){
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
-                    $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
+                    $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() 
+                    : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
                 }
             }
             $index++;
@@ -1274,9 +1276,9 @@ function renderpdf( $config,$arrayData,$pageConfig=[],$type="pdf" ){
     }
     return response($response->getBody())
     ->withHeaders([
-        'Content-Type' => $type=='html'?'text/html':'application/pdf',//'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',//'text/html',//'application/pdf',
+        'Content-Type' => $type=='html'?'text/html':'application/pdf',
         'Pragma' => 'public',
-        'Content-Disposition' => "inline; filename=".$pageConfig['title'].".pdf",//"attachment;filename=$judulsaja.xlsx",//'inline; filename="coba.pdf"'', // 
+        'Content-Disposition' => "inline; filename=".$pageConfig['title'].".pdf",
         'Cache-Control'=>'private, must-revalidate, post-check=0, pre-check=0, max-age=1',
         'Last-Modified'=>gmdate('D, d M Y H:i:s').' GMT',
         'Expires'=>'Mon, 26 Jul 1997 05:00:00 GMT'
@@ -1818,4 +1820,30 @@ function gitPull(){
         'returned'=>$return
     ];
 
+}
+
+function isMobile() {
+    return preg_match(
+        "/(android|avantgo|blackberry|bolt|boost|cricket|docomo|fone|hiptop|mini|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", 
+        $_SERVER["HTTP_USER_AGENT"]);
+}
+
+function generateBarcode($text, $tebal=2, $tinggi=48, $warna = 'black', $format='PNG'){
+    if( Str::contains( Str::lower($format), 'png' ) && !is_array($warna) ){
+        $warna = [0,0,0];
+    }
+
+    $barcodeobj = new \TCPDFBarcode($text, 'C128');
+    $func = "getBarcode$format";
+    return $barcodeobj->$func( $tebal, $tinggi, $warna  ) ;
+}
+
+function generateQR($text, $tebal=2, $tinggi=48, $warna = 'black', $format='PNG'){
+    if( Str::contains( Str::lower($format), 'png' ) && !is_array($warna) ){
+        $warna = [0,0,0];
+    }
+
+    $barcodeobj = new \TCPDF2DBarcode($text, 'QRCODE,H');
+    $func = "getBarcode$format";
+    return $barcodeobj->$func( $tebal, $tinggi, $warna  ) ;
 }
