@@ -1849,9 +1849,9 @@ function generateQR($text, $tebal=2, $tinggi=48, $warna = 'black', $format='PNG'
 }
 
 function formatYMD( $dateString ){
-    Carbon::createFromFormat("d/m/Y", $dateString)->format('Y-m-d');
+    return Carbon::createFromFormat("d/m/Y", $dateString)->format('Y-m-d');
 }
 
 function formatDMY( $dateString ){
-    Carbon::createFromFormat("Y-m-d", $dateString)->format('d/m/Y');
+    return Carbon::createFromFormat("Y-m-d", $dateString)->format('d/m/Y');
 }
