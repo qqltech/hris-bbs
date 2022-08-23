@@ -1534,7 +1534,7 @@ function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', 
     $contents = pullFileFromCache($modelName, $field, $filename, $user_id);
 
     if( !$contents ){
-        if(!$oldFile){
+        if(!$oldFile && $filename){
             abort(422, json_encode(['message'=>"File `$filename` tidak ada atau telah melebihi 30 menit, upload ulang dan segera submit"]));
         }else{
             return $oldFile;
