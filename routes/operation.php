@@ -30,8 +30,8 @@ $router->group(['prefix'=>env('ROUTE_API_PREFIX','operation')], function () use 
     });
 
     $router->get('/', function(){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
         return view("defaults.operation");
     });

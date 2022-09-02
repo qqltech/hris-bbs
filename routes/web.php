@@ -16,13 +16,12 @@ $router->get('/verify/{token}', "UserController@verify");
 $router->get('/telegram/{command}','TelegramController@index');
 $router->get('/telegram-webhook','TelegramController@webhook');
 $router->get('/get-updates', "sseController@getUpdate");
-$router->post('/model', "ModelerController@modelFromDB");
-$router->get('/api','NonApiController@resources');
+$router->get('/web/{name}','NonApiController@resources');
 
 $router->group(['middleware' => 'project'], function () use ($router) {
-    $router->get('/', function (Request $request) use ($router) {
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+    $router->get('/', function (Request $request){
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
 
         if( env("LANDING_RESPONSE") ){
@@ -32,9 +31,6 @@ $router->group(['middleware' => 'project'], function () use ($router) {
             return $class->$func($request);
         }
 
-        if( !env("TUTORIAL",false) ){
-            return app()->version();
-        }
         return response()->json(["info"=>"welcome to LARAHAN fast Api Laravel Lumen-based!",
             "data"=>[
                 "version"=>app()->version(),
