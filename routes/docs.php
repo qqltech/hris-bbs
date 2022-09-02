@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\File;
 
 $router->group(['prefix'=>'docs'], function () use ($router) {
     $router->get('/frontend-params', function(){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         $list = DB::table("default_params")->selectRaw("modul,name,note,is_active,params,prepared_query")->orderBy('modul')->get();
         return view("defaults.paramaker-frontend",compact('list'));
     });
@@ -16,9 +17,10 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
     });
 
     $router->get('/frontend', function(){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         try{
             function querySort ($x, $y) {
                 return strcasecmp($x->model, $y->model);
@@ -31,24 +33,27 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         return view("defaults.api",compact('models'));
     });
     $router->get('/simulation', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view("defaults.simulation");
     });
     $router->get('/uploader', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view('defaults.unauthorized')->with('data',[
             'page'=>'halaman uploader',
             'url'=>url("docs/uploader")
         ]);
     });
     $router->post('/uploader', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
             return view('defaults.unauthorized')->with('data',[
                 'page'=>'halaman uploader',
@@ -60,18 +65,20 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         }
     });
     $router->get('/editor', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view('defaults.unauthorized')->with('data',[
             'page'=>'halaman backend',
             'url'=>url("docs/editor")
         ]);
     });
     $router->post('/editor', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
             return view('defaults.unauthorized')->with('data',[
                 'page'=>'halaman backend',
@@ -83,18 +90,20 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         }
     });
     $router->get('/reporting', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view('defaults.unauthorized')->with('data',[
             'page'=>'halaman report template',
             'url'=>url("docs/reporting")
         ]);
     });
     $router->post('/reporting', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         $tables = array_filter(DB::connection()->getDoctrineSchemaManager()->listTableNames(),function($tb){
             return strpos($tb,"report_template")!==false;
         });
@@ -115,18 +124,20 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         }
     });
     $router->get('/backend', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view('defaults.unauthorized')->with('data',[
             'page'=>'halaman backend',
             'url'=>url("docs/backend")
         ]);
     });
     $router->post('/backend', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
             return view('defaults.unauthorized')->with('data',[
                 'page'=>'halaman backend',
@@ -151,9 +162,10 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         }
     });
     $router->get('/documentation', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view("docs.docs");
     });
     
@@ -162,18 +174,20 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
     });
 
     $router->get('/paramaker', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view('defaults.unauthorized')->with('data',[
             'page'=>'halaman template prepared parameter',
             'url'=>url("docs/paramaker")
         ]);
     });
     $router->post('/paramaker', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         if(!Schema::hasTable("default_params")){
             abort(404);
         }
@@ -191,18 +205,20 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
     });
 
     $router->get('/blades', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         return view('defaults.unauthorized')->with('data',[
             'page'=>'halaman backend',
             'url'=>url("docs/blades")
         ]);
     });
     $router->post('/blades', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
+        
         if(!isset($req->password) || $req->password!=env("BACKENDPASSWORD","pulangcepat")){
             return view('defaults.unauthorized')->with('data',[
                 'page'=>'halaman blades',
