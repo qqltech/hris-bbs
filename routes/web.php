@@ -18,17 +18,18 @@ $router->get('/telegram-webhook','TelegramController@webhook');
 $router->get('/get-updates', "sseController@getUpdate");
 $router->get('/web/{name}','NonApiController@resources');
 
-$router->group(['middleware' => 'project'], function () use ($router) {
-    $router->get('/', function (Request $request){
-        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            abort(401);
-        }
+$router->group(['middleware' => 'project'], function (Request $request) use ($router) {
 
-        if( env("LANDING_RESPONSE") ){
-            $funcArr = explode(".", env("LANDING_RESPONSE"));
+    $router->get('/', function (Request $request){
+        if( $landing = env("LANDING_RESPONSE") ){
+            $funcArr = explode(".", $landing);
             $class = getCustom($funcArr[0]);
             $func = $funcArr[1];
             return $class->$func($request);
+        }
+
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
 
         return response()->json(["info"=>"welcome to LARAHAN fast Api Laravel Lumen-based!",

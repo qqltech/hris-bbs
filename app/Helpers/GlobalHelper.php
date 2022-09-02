@@ -1855,3 +1855,11 @@ function formatYMD( $dateString ){
 function formatDMY( $dateString ){
     return Carbon::createFromFormat("Y-m-d", $dateString)->format('d/m/Y');
 }
+
+function getOrigin( $withHttp = false ){
+    $origin = app()->request->header("origin");
+    if(!$withHttp) return $origin;
+
+    $originDomain = Str::replace(['https://','http://'], ['',''], $origin);
+    return $originDomain;
+}
