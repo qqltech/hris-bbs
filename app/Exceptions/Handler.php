@@ -55,10 +55,6 @@ class Handler extends ExceptionHandler
     {
         DB::rollback();
         $rendered = parent::render($request, $e);
-        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return $rendered;
-        }
-        
         $msg = $this->getFixedMessage($e);
         $responseError = [
             'processed_time' => round(microtime(true)-config("start_time"),5),
@@ -71,10 +67,16 @@ class Handler extends ExceptionHandler
         }
         return response()->json($responseError, $rendered->getStatusCode());
     }
+
     private function getFixedMessage($e){
         if( isJson($e->getMessage()) ){
             return json_decode( $e->getMessage(), true );
         }
+        
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return $e->getMessage();
+        }
+
         $fileName = explode( (Str::contains($e->getFile(), "\\")?"\\":"/"), $e->getFile());
         $stringMsg = $e->getMessage();
         $stringMsg = $stringMsg === null || $stringMsg == ""? "Maybe Server Error" : $stringMsg;
