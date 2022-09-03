@@ -18,7 +18,7 @@ $router->get('/telegram-webhook','TelegramController@webhook');
 $router->get('/get-updates', "sseController@getUpdate");
 $router->get('/web/{name}','NonApiController@resources');
 
-$router->group(['middleware' => 'project'], function (Request $request) use ($router) {
+$router->group(['middleware' => 'project'], function () use ($router) {
 
     $router->get('/', function (Request $request){
         if( $landing = env("LANDING_RESPONSE") ){

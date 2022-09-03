@@ -55,6 +55,10 @@ class Handler extends ExceptionHandler
     {
         DB::rollback();
         $rendered = parent::render($request, $e);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            return $rendered;
+        }
+        
         $msg = $this->getFixedMessage($e);
         $responseError = [
             'processed_time' => round(microtime(true)-config("start_time"),5),
