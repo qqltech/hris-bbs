@@ -66,8 +66,8 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
 
     $router->post("/getnotice","LaradevController@getNotice");
     $router->get('/', function(Request $req){
-        if( strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
-            return response()->json("SERVER WAS CLOSED",404);
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
         }
         return view('defaults.unauthorized')->with('data',[
             'page'=>'halaman config',
