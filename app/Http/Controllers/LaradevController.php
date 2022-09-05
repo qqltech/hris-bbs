@@ -8,16 +8,14 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Mail;
-use Doctrine\DBAL\Types\FloatType;
-use Doctrine\DBAL\Types\Type;
 use App\Helpers\PLSQL as PLSQL;
-use App\Helpers\DBS as DBS;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
-use App\Models\Defaults\User;
-use Exception;
+use Illuminate\Support\Facades\Cache;
 use DateTime;
 use Validator;
+use Exception;
+use Carbon\Carbon;
 
 class LaradevController extends Controller
 {
@@ -526,7 +524,7 @@ class LaradevController extends Controller
             File::delete( base_path('database/migrations/projects')."/0_0_0_0_"."$tableName.php" );
         }
         $this->createModels( $request, 'abcdefghijklmnopq' );
-        \Cache::forget('migration-list');
+        Cache::forget('migration-list');
         if(env('GIT_ENABLE', false)){
             $this->git_push(".","<RENAME $tableName -> $request->name>");
         }
@@ -608,7 +606,7 @@ class LaradevController extends Controller
                 $return=null;
                 $phpBin = env('PHPBIN','php');
                 exec("$phpBin -l $tempFile", $output, $return);
-            }catch(\Exception $e){
+            }catch(Exception $e){
                 File::delete($tempFile);
                 // $file = File::put(app()->path()."/Models/CustomModels/$tableName.php", $request->text);
                 trigger_error($e->getMessage());
@@ -997,7 +995,7 @@ class LaradevController extends Controller
 
     public function readMigrationsOrCache(Request $req){
         $self = $this;
-        $migrationLists = \Cache::rememberForever('migration-list', function ()use($self, $req) {
+        $migrationLists = Cache::rememberForever('migration-list', function ()use($self, $req) {
             return $self->readMigrations( $req, null);
         });
 
@@ -1116,7 +1114,7 @@ class LaradevController extends Controller
                     "realfk"=>$fk 
                 ];
             }
-        }catch(\Exception $e){
+        }catch(Exception $e){
             return response()->json(["error"=>$e->getFile()."-".$e->getLine()."-".$e->getMessage()],400);
         }
     }
@@ -1204,7 +1202,7 @@ class LaradevController extends Controller
                 $phpBin = env('PHPBIN','php');
                 exec("cd $basePath && $phpBin $fileExe --filter=$className --testdox-text=testlogs/$className.txt", $output, $return);
                 $fileLogRes = File::get($fileLog);;
-            }catch(\Exeption $e){
+            }catch(Exception $e){
                 return response($e->getMessage(), 400);
             }
             return [ 
@@ -1223,8 +1221,22 @@ class LaradevController extends Controller
             abort(401, "exec PHP cannot be used!, do with CLI");
         }
     }
-    public function doMigrate(Request $req, $table=null){
+    public function doMigrate( Request $req, $table=null )
+    {
+        $now = Carbon::now();
+        $subDomain = getOriginServer();
+        $cacheKey = "log-migration-$subDomain";
         
+        $migrationLogs = Cache::get( $cacheKey )??[];
+        
+        $migrationLogs[ $table ] = [
+            'time' => $now->timestamp,
+            'ts'    => $now->format('Y-m-d H:i:s'),
+            'type'  => $req->has('down') ? 'down':($req->has('alter') ? 'alter' : 'migrate')
+        ];
+
+        Cache::forever( $cacheKey, $migrationLogs );
+
         Schema::disableForeignKeyConstraints();
         File::delete(glob(base_path('database/migrations')."/*.*"));
         $dir = "projects";
@@ -1249,7 +1261,7 @@ class LaradevController extends Controller
                         DROP TRIGGER IF EXISTS $table ON $tableName;
                         DROP FUNCTION IF EXISTS fungsi_"."$table();
                     ");
-                }catch(\Exception $e){}
+                }catch(Exception $e){}
             }
         }
 
@@ -1267,7 +1279,7 @@ class LaradevController extends Controller
                 DB::unprepared("DROP VIEW IF EXISTS $realTable;");
             }
 
-            \Cache::forget('migration-list');
+            Cache::forget('migration-list');
             return "database migration ok, $table was downed successfully";
         }
         
@@ -1278,7 +1290,7 @@ class LaradevController extends Controller
                 '--force' => true,
             ]);
             $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
-            \Cache::forget( 'migration-list' );
+            Cache::forget( 'migration-list' );
         }catch(Exception $e){
             return response()->json(["error"=>$e->getMessage()], 422);
         }
@@ -1315,10 +1327,10 @@ class LaradevController extends Controller
                 }
                 try{
                     DB::unprepared("DROP TABLE IF EXISTS $realTable");
-                }catch(\Exception $e){}
+                }catch(Exception $e){}
                 try{
                     DB::unprepared("DROP VIEW IF EXISTS $realTable;");
-                }catch(\Exception $e){}
+                }catch(Exception $e){}
             }
             if( File::exists( "$this->modelsPath/BasicModels/$table.php") ){
                 File::delete("$this->modelsPath/BasicModels/$table.php" );
@@ -1332,7 +1344,7 @@ class LaradevController extends Controller
             if( File::exists( base_path("database/migrations/alters/0_0_0_0_$table.php") ) ){
                 File::delete( base_path("database/migrations/alters/0_0_0_0_$table.php") );
             }
-        }catch(\Exception $e){
+        }catch(Exception $e){
             return response()->json($e->getMessage(),422);
         }
         
@@ -1340,7 +1352,7 @@ class LaradevController extends Controller
             $this->git_push(".","<DROP $table>");       
         }
         
-        \Cache::forget('migration-list');
+        Cache::forget('migration-list');
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
     }
     public function editAlter(Request $req, $table=null){
@@ -1396,7 +1408,7 @@ class LaradevController extends Controller
             return "update Migrations OK";
         }
         $data = $this->getDirContents( base_path('database/migrations/projects') );
-        \Cache::forget('migration-list');
+        Cache::forget('migration-list');
         if(!$req->has('modul')){
             return response()->json("Maaf modul wajib diisi", 400);
         }
@@ -1572,9 +1584,9 @@ class LaradevController extends Controller
             });
             $insertData = collect($data)->chunk(500);
             foreach($insertData as $chunkedData){
-                \DB::table('temp_uploaders')->insert($chunkedData->toArray());
+                DB::table('temp_uploaders')->insert($chunkedData->toArray());
             }
-        }catch(\Exception $e){
+        }catch(Exception $e){
             DB::rollback();
             return response()->json([
                 'index'=>'entahlah',
@@ -1606,7 +1618,7 @@ class LaradevController extends Controller
                 DB::table($table)->insert($dt);
                 $indexOpt++;
             }
-        }catch(\Exception $e){
+        }catch(Exception $e){
             DB::rollback();
             return response()->json([
                 'index'=>$indexOpt,
@@ -1641,7 +1653,7 @@ class LaradevController extends Controller
       	$git = $gitWrapper->workingCopy(base_path());
         try{
           	$gitWrapper->git('status');
-        }catch(\Exception $e){
+        }catch(Exception $e){
         	$git = $gitWrapper->init(base_path());
             $gitWrapper->git("remote add origin ".env("GIT_URL"));
             $commit = "first time";
@@ -1672,14 +1684,14 @@ class LaradevController extends Controller
         if($id!==null){
             DB::table($request->table)->where('id',$id)->update([
                 'template' => $request->template,
-                'updated_at' => \Carbon::now()
+                'updated_at' => Carbon::now()
             ]);
         }else{
             DB::table($request->table)->insert([
                 'name' => $request->name,
                 'template' => $request->template,
-                'updated_at' => \Carbon::now(),
-                'created_at' => \Carbon::now()
+                'updated_at' => Carbon::now(),
+                'created_at' => Carbon::now()
             ]);
         }
         return DB::table($request->table)->select('name','template','id')->get();;
@@ -1755,7 +1767,7 @@ class LaradevController extends Controller
             }else{
                 $result = DB::select( $state );
             }
-        }catch( \Exception $e ){
+        }catch( Exception $e ){
             DB::rollback();
             return response()->json( $e->getFile().":".$e->getMessage(), 400);
         }

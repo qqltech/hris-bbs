@@ -1,16 +1,6 @@
 <?php
 
-use PhpOption\Option;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Support\Optional;
-use Illuminate\Support\Collection;
-use Dotenv\Environment\DotenvFactory;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\HigherOrderTapProxy;
-use Dotenv\Environment\Adapter\PutenvAdapter;
-use Dotenv\Environment\Adapter\EnvConstAdapter;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -20,8 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 if (! function_exists('table_config')) {
     function table_config($table, $array)
@@ -917,7 +907,7 @@ function _uploadexcel($model, $request)
             }
             DB::table($model->getTable())->insert($bulkData);
 
-        }catch(\Exception $e){
+        }catch(Exception $e){
             DB::rollback();
             return response()->json([$e->getMessage()],400);
         }
@@ -964,7 +954,7 @@ function ff($data,$id=""){
                 'form_params' => $data
             ]
         );
-    }catch(\Exception $e){
+    }catch(Exception $e){
         $client->post(
             "$socketServer/$channel",
             [
@@ -1189,7 +1179,7 @@ function Api(){
 function SendEmail($to,$subject,$template){
     try{
         \Mail::to($to)->send(new \MailTemplate($subject, $template ));         
-    }catch(\Exception $e){
+    }catch(Exception $e){
         return $e->getMessage();
     }
     return true;
@@ -1201,7 +1191,7 @@ function SendEmailAsync($to,$subject,$template){
             "subject"   => $subject,
             "template"  => $template
         ]));
-    }catch(\Exception $e){
+    }catch(Exception $e){
         return $e->getMessage();
     }
     return true;
@@ -1245,7 +1235,7 @@ function getRawData($query){
     try{        	
         $res = (array)DB::select("$query limit 1")[0];
         return array_values($res)[0];
-    }catch(\Exception $e){
+    }catch(Exception $e){
         return null;
     }
 }
@@ -1271,7 +1261,7 @@ function renderpdf( $config,$arrayData,$pageConfig=[],$type="pdf" ){
                 ]
             ],
         );
-    }catch(\Exception $e){
+    }catch(Exception $e){
         return $e->getMessage()." ".$e->getLine();
     }
     return response($response->getBody())
@@ -1308,7 +1298,7 @@ function renderXLS( $config,$arrayData,$pageConfig=[] ){
                 ]
             ],
         );
-    }catch(\Exception $e){
+    }catch(Exception $e){
         return $e->getMessage()." ".$e->getLine();
     }
     
@@ -1453,7 +1443,7 @@ function getCastsParam():array{
                 $casterArr = explode(":", $caster, 2);
                 $casters[$casterArr[0]] = $casterArr[1];
             }
-        }catch(\Exception $e){
+        }catch(Exception $e){
             abort(500,json_encode(["error"=>["casts parameter has wrong format"]]));
         }
     }
@@ -1469,7 +1459,7 @@ function pgsqlParseError( string $msg ):string {
             $errors = explode("ERROR: ",$msg,2);
             $exception = explode("\n",$errors[1],2);
             $msg = $exception[0];
-        }catch(\Exception $e){
+        }catch(Exception $e){
             ff($e->getMessage());
         }
     }
@@ -1585,7 +1575,7 @@ function getArrayFromExcel( $file, $dateColumns = [] ){
             if(in_array($columnName, $dateColumns) ){ //format tanggal INTEGER excel to date y-m-d
                 try{
                     $val = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($array[$col])->format('d/m/Y');                  
-                }catch(\Exception $e){
+                }catch(Exception $e){
                     $val = date('d/m/Y');
                 }
             }
@@ -1862,4 +1852,21 @@ function getOrigin( $withHttp = false ){
 
     $originDomain = Str::replace(['https://','http://'], ['',''], $origin);
     return $originDomain;
+}
+
+function getOriginServer(){
+    return strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
+}
+
+
+function getMigrationLogs(){
+    $sub =  getOriginServer();
+    $data = Cache::get("log-migration-$sub")??[];
+    uasort($data, function($a, $b){
+        if ($a['time'] == $b['time']) {
+            return 0;
+        }
+        return ($a['time'] > $b['time']) ? -1 : 1;
+    });
+    return $data;
 }
