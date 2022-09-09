@@ -63,7 +63,8 @@ class UserController extends Controller
                 return response()->json("username is inactive", 401);
             }
             if (Hash::check($request->password, $user->password)) {
-                $tokenResult = $user->createToken($request->email);
+                $platform = isMobile() ? 'mobile' : 'desktop' ;
+                $tokenResult = $user->createToken( $user->name." ($platform)" );
                 
                 $agent = new Agent();
                 $user->platform = $agent->platform();
@@ -117,7 +118,7 @@ class UserController extends Controller
             return $this->changePasswordAuth($request);
         }
         try{
-            $user = User::find($request->user()->id)->update([
+            User::find($request->user()->id)->update([
                 'password' =>Hash::make($request->password)
             ]);
         }catch(Exception $e){
@@ -146,6 +147,7 @@ class UserController extends Controller
             'message' => 'Successfully updated password!'
         ], 200);
     }
+
     public function verify($token){
         $user = User::where('remember_token', $token)->first();
         if($user){

@@ -2,11 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Defaults\User;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Carbon;
-
 use Starlight93\Oauth2\Passport;
 
 class AuthServiceProvider extends ServiceProvider
@@ -18,9 +15,8 @@ class AuthServiceProvider extends ServiceProvider
     }
     public function boot()
     {
-        Passport::routes();
-        Passport::tokensExpireIn(Carbon::now()->addDays(15));
+        // Passport::routes();
+        Passport::tokensExpireIn(Carbon::now()->addDays( isMobile() ? 180 : 30 ));
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(30));
-
     }
 }

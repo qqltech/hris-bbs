@@ -24,10 +24,10 @@ class PruneRevokedTokens
      */
     public function handle(AccessTokenCreated $event)
     {
-        // Token::where(function($query) use($event){
-        //     $query->where('user_id', $event->userId);
-        //     $query->where('id', '<>', $event->tokenId);
-        //     $query->where('revoked', true);
-        // })->delete();
+        Token::where(function($query) use($event){
+            $query->where('user_id', $event->userId);
+            $query->where('id', '<>', $event->tokenId);
+            $query->where('revoked', true);
+        })->delete();
     }
 }

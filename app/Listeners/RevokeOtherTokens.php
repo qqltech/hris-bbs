@@ -24,12 +24,14 @@ class RevokeOtherTokens
      */
     public function handle(AccessTokenCreated $event)
     {
-        if($event->userId==1){return;}
         if( !(env( "SINGLE_LOGIN", true )) ){
             return;
         }
-        Token::where(function($query) use($event){
+        
+        $platform = isMobile() ? 'mobile' : 'desktop' ;
+        Token::where(function($query) use( $event, $platform ){
             $query->where('user_id', $event->userId);
+            $query->where('name', 'LIKE', "%($platform)" );
             $query->where('id', '<>', $event->tokenId);
         })->update(['revoked' => true]);
     }
