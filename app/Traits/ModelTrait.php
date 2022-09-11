@@ -669,7 +669,7 @@ trait ModelTrait {
         'where', 'selectfield', // 'addselect', 'addjoin'
     ];
     
-    protected function isParamAllowed( string $param )
+    public function isParamAllowed( string $param )
     {
         $finalParams = array_merge( $this->allowedParams, $this->allowedDangerousParams );
         return in_array( Str::lower($param), $finalParams );
