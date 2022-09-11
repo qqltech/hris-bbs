@@ -799,7 +799,6 @@ function _customFind($model, $params)
                 return $parentNameString;
             }
         });
-        
         $fk_child = explode( "=",array_values($fk_child) [ 0 ] )[1];
         $p = (Object)[];
         $p->where_raw   = "$fk_child=$id";
@@ -1379,16 +1378,24 @@ function req2( $key = null, $default = null ) {
             }
             $data = (object) $newData;
         }else{
-            return isset($data->$key)? $data->$key : $default;
+            $val = isset($data->$key)? $data->$key : $default;
+            if( is_string($val) && in_array( Str::lower($val), ['false','true'])){
+                $val=filter_var(Str::lower($val), FILTER_VALIDATE_BOOLEAN);
+            }
+            return $val;
         }
     }
     return $data;
 }
 
 function req($key=null, $default = null){
-    $data = json_decode(json_encode( config('request') ));
+    $data =  config('request')?json_decode(json_encode( config('request') )):app()->request->all();
     if($key){
-        return isset($data->$key)? $data->$key : $default;
+        $val = isset($data->$key)? $data->$key : $default;
+        if( is_string($val) && in_array( Str::lower($val), ['false','true'])){
+            $val=filter_var(Str::lower($val), FILTER_VALIDATE_BOOLEAN);
+        }
+        return $val;
     }
     return $data;
 }
