@@ -327,8 +327,8 @@ function _customGetData($model,$params)
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( req('where') ) ) );
     }
 
-    if( !$isParent && $params->where_raw){
-        $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
+    if( !$isParent && @$params->where_raw){
+        $model = $model->whereRaw(str_replace("this.","$table.",urldecode( @raw) ) );
     }
 
     if( isRoute('read_list_detail') ){
@@ -472,11 +472,9 @@ function _customGetData($model,$params)
                 $detailClass = $detail;
                 if( count($detailArray)>1 ){
                     $detailClass = $detailArray[1];
-                }          
-                // $modelCandidate = "\App\Models\CustomModels\\$detailClass";
-                // $model      = new $modelCandidate;
+                }
+
                 $model      = getCustom($detailClass);
-                $details    = $model->details;
                 $columns    = $model->columns;
                 $fkName     = $pureModel->getTable();
                 if(!in_array($fkName."_id",$columns)){
@@ -493,20 +491,7 @@ function _customGetData($model,$params)
                 }
                 $p = (Object)[];
                 $p->where_raw   = $fkName."=".$currentId;
-                $p->order_by    = null;
-                $p->order_type  = null;
-                $p->order_by_raw= null;
-                $p->search      = null;
-                $p->searchfield = null;
-                $p->selectfield = null;
-                $p->paginate    = null;
-                $p->page        = null;
-                $p->addSelect   = null;
-                $p->addJoin     = null;
-                $p->join        = true;
                 $p->joinMax     = 0;
-                $p->group_by    = null;
-                $p = $model->overrideGetParams($p,null);
                 $p->caller      = $pureModel->getTable();
                 $detailArray = explode('.', $detail);
                 $fixedData[$index][ count($detailArray)==1? $detail : $detailArray[1] ]  = $model->customGet($p);
@@ -801,8 +786,7 @@ function _customFind($model, $params)
         if( count($detailArray)>1 ){
             $detailClass = $detailArray[1];
         }
-        // $modelCandidate = "\App\Models\CustomModels\\$detailClass";
-        // $model          = new $modelCandidate;
+        
         $model      = getCustom($detailClass);
         $fk_child = array_filter($model->joins,function($join)use($pureModel){
             $parentString       = explode("=",$join)[0];
@@ -815,23 +799,11 @@ function _customFind($model, $params)
                 return $parentNameString;
             }
         });
+        
         $fk_child = explode( "=",array_values($fk_child) [ 0 ] )[1];
         $p = (Object)[];
         $p->where_raw   = "$fk_child=$id";
-        $p->order_by    = null;
-        $p->order_type  = null;
-        $p->order_by_raw= null;
-        $p->search      = null;
-        $p->searchfield = null;
-        $p->selectfield = null;
-        $p->paginate    = null;
-        $p->page        = null;
-        $p->addSelect   = null;
-        $p->addJoin     = null;
-        $p->join        = true;
         $p->joinMax     = 0;
-        $p->group_by    = null;
-        $p = $model->overrideGetParams($p);
         $p->caller      = $pureModel->getTable();
         $detailArray = explode('.', $detail);
 

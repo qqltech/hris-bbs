@@ -435,34 +435,6 @@ trait ModelTrait {
         return $this->encrypt( $val );
     }
 
-    function overrideGetParams( object $params, mixed $id=null )
-    {
-        if( $id ){
-            $params->selectfield = $params->selectfield;
-            $params->join        = $params->join;
-            $params->single      = $params->single;
-            $params->addSelect   = null;
-            $params->addJoin     = null;
-            $params->joinMax 	 = $params->joinMax;
-        }else{
-            $params->where_raw   = $params->where_raw;
-            $params->order_by    = $params->order_by;
-            $params->order_type  = $params->order_type;
-            $params->order_by_raw= $params->order_by_raw;
-            $params->search      = $params->search;
-            $params->searchfield = $params->searchfield;
-            $params->selectfield = $params->selectfield;
-            $params->paginate    = $params->paginate;
-            $params->join        = $params->join;
-            $params->addSelect   = null;
-            $params->addJoin     = null;
-            $params->notIn       = @$params->notIn;
-            $params->joinMax 	 = $params->joinMax;
-            $params->group_by    = $params->group_by;
-        }
-        return $params;
-    }
-
     function createRoleCheck()
     {
         return true;

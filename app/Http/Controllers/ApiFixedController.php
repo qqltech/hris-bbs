@@ -799,21 +799,18 @@ class ApiFixedController extends Controller
         $model          = getCustom( $modelName );
         config( [ "parentTable" => $model->getTable() ] );
         
-        $data = (object)$params;
         $p = (Object)[];
         if($id!=null){
             $p->id          = $id;
-            $p->joinMax     = isset($data->joinMax) ? $data->joinMax:0;
-            $overrideParams = $model->overrideGetParams($p,$id);
+            $p->joinMax     = 0;
             return [
-                "data"=>$model->customFind($overrideParams),
+                "data"=>$model->customFind($p),
                 "processed_time"=>round(microtime(true)-config("start_time"),5)
             ];
         }else{
-            $p->joinMax      = isset($data->joinMax) ? $data->joinmax:0;
+            $p->joinMax     = 0;
             $p->caller      = null;
-            $overrideParams = $model->overrideGetParams($p);
-            return $model->customGet($overrideParams);
+            return $model->customGet($p);
         }
     }
     public function deleteOperation( $modelName, $params=null, $id=null, $fk=null )
