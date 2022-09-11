@@ -798,39 +798,19 @@ class ApiFixedController extends Controller
         $params=(object)$params;
         $model          = getCustom( $modelName );
         config( [ "parentTable" => $model->getTable() ] );
-        $details        = $model->details;
-        $columns        = $model->columns;
+        
         $data = (object)$params;
         $p = (Object)[];
         if($id!=null){
-            $p->selectfield = isset($data->selectfield) ? $data->selectfield:null;
-            $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
-            $p->single      = isset($data->single) ? ($data->single=="false"?false:true):false;
             $p->id          = $id;
             $p->joinMax     = isset($data->joinMax) ? $data->joinMax:0;
             $overrideParams = $model->overrideGetParams($p,$id);
             return [
                 "data"=>$model->customFind($overrideParams),
                 "processed_time"=>round(microtime(true)-config("start_time"),5)
-                // "meta"=>config('tables'),
-                // "metaScript"=>method_exists( $model, "metaScript" )?$model->metaScript():null
             ];
         }else{
-            $p->where_raw   = isset($data->where) ? $data->where : null;
-            $p->order_by    = isset($data->orderby) ? $data->orderby:$model->getTable().".id";
-            $p->order_type  = isset($data->ordertype) ? $data->ordertype:"DESC";
-            $p->addselect  = isset($data->addselect) ? urldecode($data->addselect):null;
-            $p->union  = isset($data->union) ? urldecode($data->union):null;
-            $p->order_by_raw= isset($data->orderbyraw) ? $data->orderbyraw:null;
-            $p->search      = isset($data->search) ? $data->search:null;
-            $p->searchfield = isset($data->searchfield) ? $data->searchfield:null;
-            $p->selectfield = isset($data->selectfield) ? urldecode($data->selectfield):null;
-            $p->paginate    = isset($data->paginate) ? $data->paginate:25;
-            $p->page        = isset($data->page) ? $data->page:1;
-            $p->group_by    = isset($data->group_by) ? $data->group_by:null;
             $p->joinMax      = isset($data->joinMax) ? $data->joinmax:0;
-            $p->notIn      = isset($data->notin) ? $data->notin:null;
-            $p->join        = isset($data->join) ? ($data->join=="false"?false:true):true;
             $p->caller      = null;
             $overrideParams = $model->overrideGetParams($p);
             return $model->customGet($overrideParams);

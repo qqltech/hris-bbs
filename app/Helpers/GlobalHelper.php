@@ -173,11 +173,11 @@ function _customGetData($model,$params)
     $allColumns = $fieldSelected;
     $kembar = [];
     $joined = [];
-    $enableJoin = $params->join;
+    $enableJoin = req('join', true);
     if( $isParent ){
-        $enableJoin = req('join') ?? $params->join;
+        $enableJoin = req('join', true);
     }else{
-        $enableJoin = req($className."_join") ?? true;
+        $enableJoin = req2("$className.join", true);
     }
     $enableJoin = is_bool($enableJoin) ? $enableJoin : (strtolower($enableJoin) === 'false' ? false : true);
     if( $enableJoin ){
@@ -258,20 +258,20 @@ function _customGetData($model,$params)
             }
         }
     }
-    if($params->selectfield || ($isParent && req('selectfield')) || req($className."_selectfield")){
-        $rawSelectFields = req($className."_selectfield") ?? req('selectfield') ?? $params->selectfield;
+    if( $isParent && $pureModel->isParamAllowed('selectfield') &&  (($isParent && req('selectfield')) || req2("$className.selectfield") ) ){
+        $rawSelectFields = req2("$className.selectfield") ?? req('selectfield');
         $selectFields = str_replace(["this.","\n","  ","\t"],["$table.","","",""], $rawSelectFields);
         $selectFields = explode(",", $selectFields);
         $fieldSelected= $selectFields;
     }
     
-    if( isset($params->addSelect) && $params->addSelect!=null ){
-        $addSelect = str_replace("this.","$table.",strtolower($params->addSelect));
+    if( $isParent && req('addselect') && $pureModel->isParamAllowed('addselect') ){
+        $addSelect = str_replace("this.","$table.",strtolower(req('addselect')));
         $fieldSelected = array_merge( $fieldSelected, explode(",",$addSelect));
     }
     
-    if( $params->addJoin || ($isParent && req('addjoin')) || req($className."_addjoin") ){
-        $addJoin = req($className."_addjoin") ?? req('addjoin') ?? $params->addJoin;            
+    if( $pureModel->isParamAllowed('addjoin') && ( ($isParent && req('addjoin')) || req2("$className.addjoin")) ){
+        $addJoin = req2("$className.addjoin") ?? req('addjoin');            
         $joiningString = str_replace("this.","$table.",strtolower($addJoin));
         $joins = explode( ",", $joiningString );
         foreach($joins as $join){
@@ -322,7 +322,12 @@ function _customGetData($model,$params)
             $model = $model->where(str_replace(["this_","this."],["$table.", "$table."],$key ), $val);
         }
     }
-    if($params->where_raw){
+
+    if( $isParent && $pureModel->isParamAllowed('where') && req('where') ){
+        $model = $model->whereRaw(str_replace("this.","$table.",urldecode( req('where') ) ) );
+    }
+
+    if( !$isParent && $params->where_raw){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
 
@@ -380,14 +385,14 @@ function _customGetData($model,$params)
         $model=$model->search( $allColumns );
     }
 
-    if(isset($params->group_by) && $params->group_by!=null){
-        $model = $model->groupBy( DB::raw(str_replace("this.", "$table.", urldecode($params->group_by) )) );
+    if( req('group_by' ) ){
+        $model = $model->groupBy( DB::raw(str_replace("this.", "$table.", urldecode(req('group_by') )) ) );
     }
     
-    if($params->order_by_raw){
-        $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($params->order_by_raw) ) );
-    }elseif($params->order_by){
-        $order =  str_replace("this.","$table.", $params->order_by);
+    if( $orderRaw = req('order_by_raw') ){
+        $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($orderRaw ) ) );
+    }elseif( $orderCol = req('order_by', "$table.id")){
+        $order =  str_replace("this.","$table.", $orderCol);
         if( method_exists( $modelExtender, 'aliases') ){
             $aliases = $modelExtender->aliases();
             if(is_array($aliases)){
@@ -397,8 +402,9 @@ function _customGetData($model,$params)
                 }
             }
         }
-       $model=$model->orderBy(DB::raw($order),$params->order_type==null?"asc":$params->order_type);
+       $model=$model->orderBy(DB::raw($order),req('order_type', 'DESC'));
     }
+    
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
     
     $finalObj = (object)[
@@ -408,9 +414,9 @@ function _customGetData($model,$params)
     if(!$params->caller){
        $data = $final->scopes($givenScopes)->final($finalObj);
        if(req('simplest')){
-           $data = $data->simplePaginate($params->paginate,["*"], 'page', $page = $params->page);
+            $data = $data->simplePaginate(req('paginate', 25),["*"], 'page', req('page', 1));
        }else{
-            $data = $data->paginate($params->paginate,["*"], 'page', $page = $params->page);
+            $data = $data->paginate(req('paginate', 25),["*"], 'page', req('page', 1));
        }
     }else{
        $data = $final->scopes($givenScopes)->final($finalObj)->get(); 
@@ -609,7 +615,7 @@ function _customFind($model, $params)
     // }
     $joined=[];
     $allColumns = $fieldSelected;
-    if( $params->join ){
+    if( req('join', true) ){
         $kembar = [];
         foreach( $model->joins as $join ){
             $arrayJoins=explode("=",$join);
@@ -679,20 +685,20 @@ function _customFind($model, $params)
             }
         }
     }
-    if($params->selectfield || req('selectfield')){
-        $rawSelectFields = req('selectfield') ?? $params->selectfield;
+    if(req('selectfield') && $pureModel->isParamAllowed('selectfield')){
+        $rawSelectFields = req('selectfield');
         $selectFields = str_replace(["this.","\n","  ","\t"],["$table.","","",""], $rawSelectFields);
         $selectFields = explode(",", $selectFields);
         $fieldSelected= $selectFields;
     }
     
-    if( isset($params->addSelect) && $params->addSelect!=null ){
-        $addSelect = str_replace("this.","$table.",strtolower($params->addSelect));
+    if( req('addselect') && $pureModel->isParamAllowed('addselect') ){
+        $addSelect = str_replace("this.","$table.",strtolower( req('addselect') ));
         $fieldSelected = array_merge( $fieldSelected, explode(",",$addSelect));
     }
     
-    if( $params->addJoin || req('addjoin') ){
-        $addJoin = req('addjoin') ?? $params->addJoin;
+    if( $pureModel->isParamAllowed('addjoin') || req('addjoin') ){
+        $addJoin = req('addjoin');
         $joiningString = str_replace("this.","$table.",strtolower($addJoin));
         $joins = explode( ",", $joiningString );
         foreach($joins as $join){
@@ -784,7 +790,7 @@ function _customFind($model, $params)
     if(method_exists($modelExtender, "transformRowData") && (!req("transform") || (req("transform") && req("transform")=='true'))){
         $data = $modelExtender->transformRowData($data);
     }
-    if($params->single){
+    if( req('single', false) ){
         return $data;
     }
     
@@ -1379,7 +1385,7 @@ function removeLog($filename=null){
     return File::delete("$path");
 }
 
-function req2( $key = null ) {
+function req2( $key = null, $default = null ) {
     $pairs = explode("&", !app()->request->isMethod('GET') ? file_get_contents("php://input") : (@$_SERVER['QUERY_STRING']??@$_SERVER['REQUEST_URI']));
     $data = (object)[];
     foreach ($pairs as $pair) {
@@ -1401,28 +1407,25 @@ function req2( $key = null ) {
             }
             $data = (object) $newData;
         }else{
-            return isset($data->$key)? $data->$key : null;
+            return isset($data->$key)? $data->$key : $default;
         }
     }
     return $data;
 }
 
-function req($key=null){
-    // if(app()->request->method()=="GET" ){
-    //     $data = (object)config('request');
-    // }else{
-    //     $data = json_decode(file_get_contents('php://input'));
-    // }
+function req($key=null, $default = null){
     $data = json_decode(json_encode( config('request') ));
     if($key){
-        return isset($data->$key)? $data->$key : null;
+        return isset($data->$key)? $data->$key : $default;
     }
     return $data;
 }
+
 function isJson($args) {
     json_decode($args);
     return (json_last_error()===JSON_ERROR_NONE);
 }
+
 function getDriver(){
     return Schema::getConnection()->getDriverName();
 }

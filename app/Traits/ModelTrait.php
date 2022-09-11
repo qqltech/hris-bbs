@@ -684,4 +684,22 @@ trait ModelTrait {
             }
         });        
     }
+
+    protected $allowedParams = [
+        'order_by','order_type', 'order_by_raw',
+        'search', 'searchfield', 'paginate',
+        'page', 'join','group_by', 'simplest', 'single',
+        'notin', 'query_name', 'api_version', 'transform',
+        'filter_operator'
+    ];
+
+    public $allowedDangerousParams = [
+        'where', 'selectfield', // 'addselect', 'addjoin'
+    ];
+    
+    protected function isParamAllowed( string $param )
+    {
+        $finalParams = array_merge( $this->allowedParams, $this->allowedDangerousParams );
+        return in_array( Str::lower($param), $finalParams );
+    }
 }
