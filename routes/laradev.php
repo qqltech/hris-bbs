@@ -43,6 +43,7 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->get('/migrate/{table}', 'LaradevController@doMigrate');
         $router->get('/do-test/{table}', 'LaradevController@doTest');
         $router->get('/queries10rows/{table}', 'LaradevController@queries10rows');
+        $router->get('/truncate/{table}', 'LaradevController@truncate');
         $router->get('/refreshalias/{table}', 'LaradevController@refreshAlias');
 
         $router->post("/uploadlengkapi","LaradevController@uploadLengkapi");
@@ -62,6 +63,10 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
         $router->get("/blades/{filename}","LaradevController@getBladeFile");
         $router->put("/blades/{filename}","LaradevController@saveBladeFile");
         $router->delete("/blades/{filename}","LaradevController@deleteBladeFile");
+        $router->get("/cores", "LaradevController@getCoreFile");
+        $router->get("/cores/{filename}","LaradevController@getCoreFile");
+        $router->put("/cores/{filename}","LaradevController@saveCoreFile");
+        $router->delete("/cores/{filename}","LaradevController@deleteCoreFile");
     });
 
     $router->post("/getnotice","LaradevController@getNotice");
