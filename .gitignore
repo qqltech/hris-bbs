@@ -20,6 +20,7 @@ Homestead.yaml
 local-*.*
 database/*.sqlite
 resources/views/projects/*.blade.php
+app/Cores/*.php
 .phpunit.*.*
 tests
 testlogs/*
