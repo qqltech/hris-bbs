@@ -11,7 +11,7 @@ class ProjectMiddleware
       
       if( env("MIDDLEWARE_RESOLVER") ){
         $funcArr = explode(".", env("MIDDLEWARE_RESOLVER"));
-        $class = getCustom($funcArr[0]);
+        $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
         $func = $funcArr[1];
         return $class->$func($request, $next);
       }

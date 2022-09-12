@@ -151,7 +151,7 @@ class ApiFixedController extends Controller
         if( !class_exists( $modelCandidate ) ){
             if( env('MODEL_RESOLVER') ){
                 $resolvers = explode( ".", env('MODEL_RESOLVER') );
-                $classResolver = getCustom( $resolvers[0] );
+                $classResolver = getCore( $resolvers[0] ) ?? getCustom( $resolvers[0] );
                 $funcResolver = $resolvers[1];
                 if( method_exists($classResolver,$funcResolver)){
                     $realModelName = $classResolver->$funcResolver( $modelName );

@@ -82,7 +82,7 @@ class BackupCommand extends Command
 
             if( env("BACKUP_CALLBACK") ){
                 $funcArr = explode(".", env("BACKUP_CALLBACK"));
-                $class = getCustom($funcArr[0]);
+                $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
                 $func = $funcArr[1];
                 return $class->$func([
                     'path' => $path,
