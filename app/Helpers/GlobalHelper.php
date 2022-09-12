@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
-use Exception;
 
 if (! function_exists('table_config')) {
     function table_config($table, $array)
@@ -326,9 +325,9 @@ function _customGetData($model,$params)
     if( $isParent && $pureModel->isParamAllowed('where') && req('where') ){
         $model = $model->whereRaw(str_replace("this.","$table.",urldecode( req('where') ) ) );
     }
-
-    if( !$isParent && @$params->where_raw){
-        $model = $model->whereRaw(str_replace("this.","$table.",urldecode( @raw) ) );
+    
+    if( @$params->where_raw){
+        $model = $model->whereRaw(str_replace("this.","$table.",urldecode( $params->where_raw) ) );
     }
 
     if( isRoute('read_list_detail') ){
@@ -884,7 +883,7 @@ function _uploadexcel($model, $request)
             }
             DB::table($model->getTable())->insert($bulkData);
 
-        }catch(Exception $e){
+        }catch(\Exception $e){
             DB::rollback();
             return response()->json([$e->getMessage()],400);
         }
@@ -931,7 +930,7 @@ function ff($data,$id=""){
                 'form_params' => $data
             ]
         );
-    }catch(Exception $e){
+    }catch(\Exception $e){
         $client->post(
             "$socketServer/$channel",
             [
@@ -953,7 +952,7 @@ function reformatData($arrayData,$model=null){
             try{
                 $newData = Carbon::createFromFormat($dateFormat, $data)->format('Y-m-d');
                 $arrayData[$key] = $newData;   
-            }catch(Exception $e){
+            }catch(\Exception $e){
                 
             }
         }elseif( str_replace(["null","NULL"," "],["","",""],$data)==''){
@@ -977,7 +976,7 @@ function reformatDataResponse($arrayData){
             try{
                 $newData = Carbon::createFromFormat("Y-m-d", $data)->format($dateFormat);
                 $arrayData[$key] = $newData;
-            }catch(Exception $e){}
+            }catch(\Exception $e){}
         }
     }
     return $arrayData;
@@ -1156,7 +1155,7 @@ function Api(){
 function SendEmail($to,$subject,$template){
     try{
         \Mail::to($to)->send(new \MailTemplate($subject, $template ));         
-    }catch(Exception $e){
+    }catch(\Exception $e){
         return $e->getMessage();
     }
     return true;
@@ -1168,7 +1167,7 @@ function SendEmailAsync($to,$subject,$template){
             "subject"   => $subject,
             "template"  => $template
         ]));
-    }catch(Exception $e){
+    }catch(\Exception $e){
         return $e->getMessage();
     }
     return true;
@@ -1212,7 +1211,7 @@ function getRawData($query){
     try{        	
         $res = (array)DB::select("$query limit 1")[0];
         return array_values($res)[0];
-    }catch(Exception $e){
+    }catch(\Exception $e){
         return null;
     }
 }
@@ -1238,7 +1237,7 @@ function renderpdf( $config,$arrayData,$pageConfig=[],$type="pdf" ){
                 ]
             ],
         );
-    }catch(Exception $e){
+    }catch(\Exception $e){
         return $e->getMessage()." ".$e->getLine();
     }
     return response($response->getBody())
@@ -1275,7 +1274,7 @@ function renderXLS( $config,$arrayData,$pageConfig=[] ){
                 ]
             ],
         );
-    }catch(Exception $e){
+    }catch(\Exception $e){
         return $e->getMessage()." ".$e->getLine();
     }
     
@@ -1425,7 +1424,7 @@ function getCastsParam():array{
                 $casterArr = explode(":", $caster, 2);
                 $casters[$casterArr[0]] = $casterArr[1];
             }
-        }catch(Exception $e){
+        }catch(\Exception $e){
             abort(500,json_encode(["error"=>["casts parameter has wrong format"]]));
         }
     }
@@ -1441,7 +1440,7 @@ function pgsqlParseError( string $msg ):string {
             $errors = explode("ERROR: ",$msg,2);
             $exception = explode("\n",$errors[1],2);
             $msg = $exception[0];
-        }catch(Exception $e){
+        }catch(\Exception $e){
             ff($e->getMessage());
         }
     }
@@ -1557,7 +1556,7 @@ function getArrayFromExcel( $file, $dateColumns = [] ){
             if(in_array($columnName, $dateColumns) ){ //format tanggal INTEGER excel to date y-m-d
                 try{
                     $val = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($array[$col])->format('d/m/Y');                  
-                }catch(Exception $e){
+                }catch(\Exception $e){
                     $val = date('d/m/Y');
                 }
             }
@@ -1797,7 +1796,7 @@ function gitPull(){
 function isMobile() {
     return preg_match(
         "/(android|avantgo|blackberry|bolt|boost|cricket|docomo|fone|hiptop|mini|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", 
-        $_SERVER["HTTP_USER_AGENT"]);
+        @$_SERVER["HTTP_USER_AGENT"]||'');
 }
 
 function generateBarcode($text, $tebal=2, $tinggi=48, $warna = 'black', $format='PNG'){
@@ -1840,7 +1839,6 @@ function getOriginServer(){
     return strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
 }
 
-
 function getMigrationLogs(){
     $sub =  getOriginServer();
     $data = Cache::get("log-migration-$sub")??[];
@@ -1851,4 +1849,9 @@ function getMigrationLogs(){
         return ($a['time'] > $b['time']) ? -1 : 1;
     });
     return $data;
+}
+
+function getCore( $name ){
+    $string = "\App\Cores\\$name";
+    return class_exists( $string )?new $string:null;
 }
