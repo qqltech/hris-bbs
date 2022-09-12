@@ -998,7 +998,9 @@ class LaradevController extends Controller
         $migrationLists = Cache::rememberForever('migration-list', function ()use($self, $req) {
             return $self->readMigrations( $req, null);
         });
-
+        if( !is_array($migrationLists) ){
+            $migrationLists = $self->readMigrations( $req, null);
+        }
 
         $jsFiles = array_filter( scandir( base_path('public/js') ), function($dt) {
             return !in_array($dt,['.','..','README.md']);
@@ -1007,9 +1009,15 @@ class LaradevController extends Controller
         $bladesFiles = array_filter( scandir( base_path('resources/views/projects') ), function($dt) {
             return !in_array($dt,['.','..','readme.md']);
         });
+
+        $coreFiles = array_filter( scandir( app_path('Cores') ), function($dt) {
+            return !in_array($dt,['.','..','README.md']);
+        });
+        
         return array_merge($migrationLists,[
             "js"=> array_values( $jsFiles ),
-            "blades"=> array_values( $bladesFiles )
+            "blades"=> array_values( $bladesFiles ),
+            "cores"=> array_values( $coreFiles )
         ]);
     }
 
@@ -1184,6 +1192,16 @@ class LaradevController extends Controller
 
         return $htmlData;
     }
+
+    public function truncate(Request $req, $table){
+        $model = getCustom( $table );
+        if(!$model->truncatable){
+            return response()->json("$table is not truncatable", 401);
+        }
+        $model->truncate();
+        return "$table has been truncated";
+    }
+
     public function doTest(Request $req, $table=null){
         putenv("APP_ENV=testing");
         $disabled = explode(',', str_replace(" ","",ini_get('disable_functions')) );
@@ -1413,13 +1431,17 @@ class LaradevController extends Controller
             return response()->json("Maaf modul wajib diisi", 400);
         }
 
-        if(Str::endswith($req->modul, '.js')){
-            $path = base_path( public_path("/js/$req->modul") );
-            File::put( public_path("/js/$req->modul"), "//   javascript");
+        if(Str::endswith($req->modul, ".php")){
+            $path = app_path("Cores/$req->modul");
+            $template = File::get( base_path( "templates/core.stub" ) );
+            File::put( $path, Str::replace("__class", explode(".", $req->modul)[0], $template ));
+            return response()->json("pembuatan file core berhasil, silahkan refresh list");
+        }elseif(Str::endswith($req->modul, ".js")){
+            $path = public_path("/js/$req->modul");
+            File::put( $path, "//   javascript");
             return response()->json("pembuatan file javascript berhasil, silahkan refresh list");
-        }
-        if(Str::endswith($req->modul, '.blade')){
-            $path = base_path("resources/views/projects/$req->modul.php");
+        }elseif(Str::endswith($req->modul, ".blade")){
+            $path = resource_path("views/projects/$req->modul.php");
             File::put( $path, "<?php\n // blade php file");
             return response()->json("pembuatan file blade berhasil, silahkan refresh list");
         }
@@ -1499,6 +1521,26 @@ class LaradevController extends Controller
         ],$this->getMigrationFile() ));
         
         return response()->json("pembuatan file migration OK");
+    }
+
+    public function getCoreFile(Request $req, string $filename = null ){
+        if( $filename ){
+            $path = app_path("Cores/$filename.php");
+            return File::get( $path );
+        }
+        return [];
+    }
+
+    public function saveCoreFile(Request $req, string $filename ){
+        $path = app_path("Cores/$filename.php");
+        File::put( $path , $req->text); 
+        return response()->json("core file was saved");
+    }
+
+    public function deleteCoreFile(Request $req, string $filename ){
+        $path = app_path("Cores/$filename.php");
+        File::delete( $path ); 
+        return response()->json("core file was delete");
     }
 
     public function getJsFile(Request $req, string $filename = null ){
