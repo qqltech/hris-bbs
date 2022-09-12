@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use DateTimeInterface;
+use Carbon\Carbon;
 
 trait ModelTrait {
     /**
@@ -23,6 +24,7 @@ trait ModelTrait {
     public $excepts         = [];
     public $createAdditionalData = []; // example: 'field'=>'auth:id'
     public $updateAdditionalData = [];
+    public $truncatable = true;
 
     /**
      * Menyesuaikan sesuai timezone saat casts date
@@ -198,7 +200,7 @@ trait ModelTrait {
                     $valArr = Str::contains($val, ',') ? explode(",", $val) : explode("~", $val);
                     if( Str::lower($fixedOperator)=='between' && Str::contains($valArr[0], '/') ){
                         $valArr = array_map(function($dt){
-                            return \Carbon::createFromFormat(env("FORMAT_DATE_FRONTEND","d/m/Y"), $dt)->format('Y-m-d');
+                            return Carbon::createFromFormat(env("FORMAT_DATE_FRONTEND","d/m/Y"), $dt)->format('Y-m-d');
                         }, $valArr);
                     }
                     $fixedOperator = str_replace(' ', '', "where$fixedOperator");
