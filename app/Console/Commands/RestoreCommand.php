@@ -48,6 +48,7 @@ class RestoreCommand extends Command
             }
 
             File::copyDirectory( "$path/app/Models/CustomModels", app_path('Models/CustomModels') ); // CustomModels
+            File::copyDirectory( "$path/app/Cores", app_path('Cores') ); // CustomModels
             File::copyDirectory( "$path/tests", base_path('tests') ); // tests
             File::copyDirectory( "$path/database/migrations/projects", database_path('migrations/projects') ); //   migrations
             File::copyDirectory( "$path/database/migrations/alters", database_path('migrations/alters') );  //  alters

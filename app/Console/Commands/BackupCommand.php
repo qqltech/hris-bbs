@@ -38,6 +38,7 @@ class BackupCommand extends Command
     {
         $path = $this->option('path')??(env('BACKUP_PATH')?env('BACKUP_PATH'):base_path('app_generated_backup'));
         $withUpload = $this->option('with-upload');
+        $server = getOriginServer()??'SINGLE';
 
         try {
             umask(0000);
@@ -46,6 +47,7 @@ class BackupCommand extends Command
                 File::makeDirectory( $path."/sqldump", 493, true);
             }
             File::copyDirectory(app_path('Models/CustomModels'), "$path/app/Models/CustomModels" );
+            File::copyDirectory(app_path('Cores'), "$path/app/Cores" );
             File::copyDirectory(base_path('tests'), "$path/tests" );
             File::copyDirectory(database_path('migrations/projects'), "$path/database/migrations/projects" );
             File::copyDirectory(database_path('migrations/alters'), "$path/database/migrations/alters" );
@@ -55,12 +57,12 @@ class BackupCommand extends Command
                 File::copyDirectory(public_path('uploads'), "$path/public/uploads" );                
             }
             File::copyDirectory(resource_path('views/projects'), "$path/resources/views/projects" );
+            if( getDriver()!='mysql' ) return  $this->info("project files have been copied to $path successfully on $server");
 
             $schemaManager = DB::getDoctrineSchemaManager();
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
             
             $sqlLineList = $schemaManager->createSchema()->toSql($schemaManager->getDatabasePlatform());
-            if( !getDriver()=='mysql' ) return;
             File::put($schemaSql = "$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
 
             $host = env('DB_HOST');
@@ -95,6 +97,6 @@ class BackupCommand extends Command
             return;
         }
 
-        $this->info("project files have been copied to $path successfully");
+        $this->info("project files have been copied to $path successfully on $server");
     }
 }
