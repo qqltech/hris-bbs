@@ -23,3 +23,5 @@ Perbedaan dengan versi sebelumnya
 
 ## routes/laradev.php
 - password pakai CONFIGPASSWORD
+
+Ada update
