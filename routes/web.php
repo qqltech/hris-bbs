@@ -1,7 +1,5 @@
 <?php
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\File;
 //====================================================================================BASIC
 $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->post('/logout','UserController@logout');
