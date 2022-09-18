@@ -120,4 +120,10 @@ if( !class_exists('BelongsTo') ) {
     return $this;
 });
 
+if( $bootstrap = env("BOOTSTRAP_RESOLVER") ){
+    $funcArr = explode(".", $bootstrap);
+    $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
+    $func = $funcArr[1];
+    return $class->$func( $app );
+}
 return $app;

@@ -19,7 +19,7 @@ $router->get('/web/{name}','NonApiController@resources');
 $router->group(['middleware' => 'project'], function () use ($router) {
 
     $router->get('/', function (Request $request){
-        if( $landing = env("LANDING_RESPONSE") ){
+        if( $landing = env("LANDING_RESOLVER") ){
             $funcArr = explode(".", $landing);
             $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
             $func = $funcArr[1];

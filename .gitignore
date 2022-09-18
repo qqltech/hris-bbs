@@ -6,6 +6,7 @@ Homestead.yaml
 /public/uploads
 /public/models.json
 /public/.htaccess
+/public/app
 .env
 .env.*
 .editorconfig
