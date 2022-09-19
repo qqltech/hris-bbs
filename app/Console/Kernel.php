@@ -18,7 +18,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\BackupCommand::class,
-        \App\Console\Commands\RestoreCommand::class
+        \App\Console\Commands\RestoreCommand::class,
+        \KitLoong\MigrationsGenerator\MigrateGenerateCommand::class
     ];
 
     /**
@@ -29,8 +30,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        if( !Schema::hasTable('default_schedules') ) return;
-        $tasks = DB::table('default_schedules')->where('status','ACTIVE')->get();
+        try{
+            if( !Schema::hasTable('default_schedules') ) return;
+            $tasks = DB::table('default_schedules')->where('status','ACTIVE')->get();
+        }catch(\Exception $e){
+            return;
+        }
         foreach($tasks as $task){
             $daysArr = $task->days?json_decode($task->days, true):[0, 1, 2, 3, 4, 5, 6];
             $every = $task->every;

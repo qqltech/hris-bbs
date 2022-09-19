@@ -46,6 +46,14 @@ class BackupCommand extends Command
                 File::makeDirectory( $path, 493, true);
                 File::makeDirectory( $path."/sqldump", 493, true);
             }
+            File::deleteDirectory( "$path/app/Models/CustomModels" );
+            File::deleteDirectory( "$path/app/Cores" );
+            File::deleteDirectory( "$path/tests" );
+            File::deleteDirectory( "$path/database/migrations/projects" );
+            File::deleteDirectory( "$path/database/migrations/alters" );
+            File::deleteDirectory( "$path/public/js" );
+            File::deleteDirectory( "$path/resources/views/projects" );
+
             File::copyDirectory(app_path('Models/CustomModels'), "$path/app/Models/CustomModels" );
             File::copyDirectory(app_path('Cores'), "$path/app/Cores" );
             File::copyDirectory(base_path('tests'), "$path/tests" );
@@ -53,7 +61,9 @@ class BackupCommand extends Command
             File::copyDirectory(database_path('migrations/alters'), "$path/database/migrations/alters" );
             File::put("$path/env", File::get(base_path('.env')) );
             File::copyDirectory(public_path('js'), "$path/public/js" );
+            
             if($withUpload){
+                File::deleteDirectory("$path/public/uploads");
                 File::copyDirectory(public_path('uploads'), "$path/public/uploads" );                
             }
             File::copyDirectory(resource_path('views/projects'), "$path/resources/views/projects" );
