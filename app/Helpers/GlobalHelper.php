@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 if (! function_exists('table_config')) {
     function table_config($table, $array)
@@ -1854,4 +1855,8 @@ function getMigrationLogs(){
 function getCore( $name ){
     $string = "\App\Cores\\$name";
     return class_exists( $string )?new $string:null;
+}
+
+function debug(){
+    Config::set('app.debug', true);
 }

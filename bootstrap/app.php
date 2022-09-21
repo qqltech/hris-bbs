@@ -85,6 +85,9 @@ if (!class_exists('Excel')) {
 if (!class_exists('Str')) {
     class_alias('Illuminate\Support\Str', 'Str');
 }
+if (!class_exists('Arr')) {
+    class_alias('Illuminate\Support\Arr', 'Arr');
+}
 if (!class_exists('Carbon')) {
     class_alias('Carbon\Carbon', 'Carbon');
 }
@@ -109,7 +112,6 @@ if (!class_exists('Cache')) {
 if( !class_exists('HasMany') ) {
     class_alias('Illuminate\Database\Eloquent\Relations\HasMany', 'HasMany');
 }
-
 if( !class_exists('BelongsTo') ) {
     class_alias('Illuminate\Database\Eloquent\Relations\BelongsTo', 'BelongsTo');
 }

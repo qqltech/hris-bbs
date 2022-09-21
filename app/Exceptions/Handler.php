@@ -80,8 +80,8 @@ class Handler extends ExceptionHandler
         $fileName = explode( (Str::contains($e->getFile(), "\\")?"\\":"/"), $e->getFile());
         $stringMsg = $e->getMessage();
         $stringMsg = $stringMsg === null || $stringMsg == ""? "Maybe Server Error" : $stringMsg;
-        // $stringMsg = !Str::contains( $stringMsg, "SQLSTATE" ) && ( env("APP_DEBUG",false) || !empty( app()->request->header("Debugger") )) ? $stringMsg : "Maybe Server Error";
-        $msg = $stringMsg.(env("APP_DEBUG",false)?" => file: ".str_replace(".php","",end($fileName))." line: ".$e->getLine():"");
+        // $stringMsg = !Str::contains( $stringMsg, "SQLSTATE" ) && ( config('app.debug') || !empty( app()->request->header("Debugger") )) ? $stringMsg : "Maybe Server Error";
+        $msg = $stringMsg.(config('app.debug')?" => file: ".str_replace(".php","",end($fileName))." line: ".$e->getLine():"");
         return $msg;
     }
 }
