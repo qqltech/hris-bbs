@@ -54,7 +54,7 @@ $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 // $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
-if (class_exists(\MigrationsGenerator\MigrationsGeneratorServiceProvider::class)) {
+if (env('AUTOCREATE_MIGRATION') && class_exists(\MigrationsGenerator\MigrationsGeneratorServiceProvider::class)) {
     $app->register(\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
 }
 $app->router->group([
