@@ -13,7 +13,6 @@ class OauthClients extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('oauth_clients');
         Schema::create('oauth_clients', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id')->index()

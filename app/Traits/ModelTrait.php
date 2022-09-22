@@ -25,6 +25,7 @@ trait ModelTrait {
     public $createAdditionalData = []; // example: 'field'=>'auth:id'
     public $updateAdditionalData = [];
     public $truncatable = true;
+    public $generateRoute = true;
 
     /**
      * Menyesuaikan sesuai timezone saat casts date

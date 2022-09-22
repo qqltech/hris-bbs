@@ -13,11 +13,9 @@ class OauthAccessTokens extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('oauth_access_tokens');
         Schema::create('oauth_access_tokens', function (Blueprint $table) {
             $table->string('id', 100)->primary();
-            $table->unsignedInteger('user_id')->index()->nullable()
-            ->comment('{"fk": "false"}');
+            $table->unsignedInteger('user_id')->index()->nullable()->comment('{"fk": "false"}');
             $table->unsignedInteger('client_id');
             $table->string('name')->nullable();
             $table->text('scopes')->nullable();
