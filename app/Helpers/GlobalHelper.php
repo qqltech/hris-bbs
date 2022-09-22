@@ -985,18 +985,18 @@ function reformatDataResponse($arrayData){
 
 function getReportHeader($model,$params=[]){
     $p = (object)array_merge([
-        "where_raw" => null,
-        "order_by" => null,
-        "order_type" => "ASC",
-        "page" => "1",
-        "order_by_raw" => null,
-        "search" => null,
-        "searchfield" => null,
-        "selectfield" => null,
-        "paginate" => 9999,
-        "join" => true,
-        "caller" => null,
-        "joinMax" => 3
+        "where_raw" =>null,
+        "order_by" =>null,
+        "order_type" =>"ASC",
+        "page" =>"1",
+        "order_by_raw" =>null,
+        "search" =>null,
+        "searchfield" =>null,
+        "selectfield" =>null,
+        "paginate" =>9999,
+        "join" =>true,
+        "caller" =>null,
+        "joinMax" =>3
     ], $params);
     return $model->customGet($p);
 }
