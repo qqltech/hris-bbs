@@ -49,8 +49,7 @@
         "files": [
             "app/Helpers/GlobalHelper.php",
             "app/Helpers/DBS.php",
-            "app/Helpers/PLSQL.php",
-            "app/Helpers/Logger.php"
+            "app/Helpers/PLSQL.php"
         ]
     },
     "autoload-dev": {
