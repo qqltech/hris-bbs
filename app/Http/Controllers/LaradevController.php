@@ -315,8 +315,6 @@ class LaradevController extends Controller
                     'triggers'=>\App\Helpers\DBS::getTriggers($table->getName()),
                     'is_view'=>false
                 ];
-                // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-                // .json_encode($table->getComment() ));
             }
             $views = $schemaManager->listViews();
             foreach($views as $view){
@@ -394,7 +392,6 @@ class LaradevController extends Controller
                 'LOG_CHANNEL' => '777',
                 'SINGLE_LOGIN' => 'true',
                 'FORMAT_DATE_FRONTEND' => 'd/m/Y',
-                'DEFAULT_ACTIVITIES' => 'false',
                 'FIREBASE_KEY' => 'xxx',
                 'GIT_ENABLE'=>'false',
                 'GIT_PUSH_START'=>'16:00',
@@ -759,9 +756,6 @@ class LaradevController extends Controller
         $dataCustom = $this->getCustomModel();
         $schema = $this->getFullTables(true);
         
-        // file_get_contents("https://api.telegram.org/bot716800967:AAFOl7tmtnoBHIHD4VV_WfdFfNhfRZz0HGc/sendMessage?chat_id=-345232929&text="
-        // .json_encode( $schema['tables'] ));
-        // return $schema;
         if($request->has('fresh') && $request->fresh=='true'){
             File::delete( File::glob("$this->modelsPath/CustomModels/*.*") );
             File::delete( File::glob("$this->modelsPath/BasicModels/*.*") );
@@ -771,7 +765,6 @@ class LaradevController extends Controller
         
         foreach($schema['tables'] as $key => $table)
         {
-            // file_get_contents('https://api.telegram.org/bot755119387:AAH91EBCA0uXOl8OpJxnwWCBqC-58gm-HAc/sendMessage?chat_id=-382095124&text='.json_encode( $table ));
             $table = (object)$table;
             $tableName = $table->table;
             $className = count(explode('.',$tableName))>1?explode('.',$tableName)[1]:$tableName;

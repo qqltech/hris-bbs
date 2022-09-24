@@ -6,10 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
-use App\Jobs\DefaultActivities;
 use Illuminate\support\Facades\Auth;
 use Illuminate\support\Facades\Validator;
-use Illuminate\support\Facades\Queue;
 use  App\Helpers\Cryptor;
 
 class ApiFixedController extends Controller
@@ -1161,18 +1159,6 @@ class ApiFixedController extends Controller
                 }
 
                 DB::commit();
-                if(env('DEFAULT_ACTIVITIES',false)){
-                    Queue::push(new DefaultActivities([
-                        "user_id"       =>  $this->user->id,
-                        "table"         =>  $this->parentModelName,
-                        "table_id"      =>  $this->operationId,
-                        "action"        =>  $this->operation,
-                        "status"        =>  "success",
-                        "value"         =>  json_encode($this->requestData),
-                        // "error"         =>  null,
-                        // "tambahan"      =>  
-                    ]));
-                }
                 $responses = [
                     // "operation" => $this->operation,
                     "message"    => "$this->operation data berhasil", 
@@ -1201,18 +1187,6 @@ class ApiFixedController extends Controller
                 return response()->json($responses,200);
             }else{
                 DB::rollback();
-                if(env('DEFAULT_ACTIVITIES',false)){
-                    Queue::push(new DefaultActivities([
-                        "user_id"       =>  $this->user->id,
-                        "table"         =>  $this->parentModelName,
-                        "table_id"      =>  $this->operationId,
-                        "action"        =>  $this->operation,
-                        "status"        =>  "failed",
-                        "value"         =>  json_encode($this->requestData),
-                        "error"         =>  json_encode($this->errors),
-                        // "tambahan"      =>  
-                    ]));
-                }
                 return response()->json([
                     "status"    => "$this->operation data gagal",
                     // "warning"   => $this->messages, 
@@ -1225,18 +1199,6 @@ class ApiFixedController extends Controller
             }
         }else{
             DB::rollback();
-            if(env('DEFAULT_ACTIVITIES',false)){
-                Queue::push(new DefaultActivities([
-                    "user_id"       =>  $this->user->id,
-                    "table"         =>  $this->parentModelName,
-                    "table_id"      =>  $this->operationId,
-                    "action"        =>  $this->operation,
-                    "status"        =>  "failed",
-                    "value"         =>  json_encode($this->requestData),
-                    "error"         =>  json_encode($this->errors),
-                    // "tambahan"      =>  
-                ]));
-            }
             return response()->json([
                 "status"    => "$this->operation data failed",
                 // "warning"  => $this->messages, 
