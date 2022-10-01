@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 //====================================================================================BASIC
 $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->post('/logout','UserController@logout');
@@ -24,6 +25,10 @@ $router->group(['middleware' => 'project'], function () use ($router) {
             $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
             $func = $funcArr[1];
             return $class->$func($request);
+        }
+
+        if( File::get( public_path('app/index.html') ) ){
+            return redirect('/app');
         }
 
         if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
