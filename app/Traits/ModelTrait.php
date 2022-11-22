@@ -402,6 +402,7 @@ trait ModelTrait {
      */
     public function getCasts(){
         $custom = getCustom( getTableOnly( $this->getTable() ) );
+        if(!$custom) return [];
         if(!$custom->useEncryption){
             $custom->casts[$custom->getKeyName()] = 'integer';
         }
