@@ -989,16 +989,12 @@ class LaradevController extends Controller
     public function readMigrationsOrCache(Request $req){
         $self = $this;
         
-        $devToken = $req->header('developer-token');
-        $devRole = "owner";
+        $devRole = config('devrole');
         
-        $frontenders = explode(",", env('DEV_FRONTENDERS', ''));
-        $backenders = explode(",", env('DEV_BACKENDERS', ''));
-        $owners = explode(",", env('DEV_OWNERS', 'devganteng0011'));
-        
-        if( in_array($devToken, $frontenders) ){
-            $devRole = 'frontend';
-            $migrationLists = [];
+        if( $devRole == 'frontend' ){
+            $migrationLists = [
+                'models'=>[] 
+            ];
         }else{
             $migrationLists = Cache::rememberForever('migration-list', function ()use($self, $req) {
                 return $self->readMigrations( $req, null);
@@ -1009,8 +1005,7 @@ class LaradevController extends Controller
         }
         
         
-        if( in_array($devToken, $backenders) ){
-            $devRole = 'backend';
+        if( $devRole == 'backend' ){
             $jsFiles = [];
             $bladesFiles = [];
             $coreFiles = [];
@@ -1024,7 +1019,7 @@ class LaradevController extends Controller
                 return !in_array($dt,['.','..','readme.md']);
             });
     
-            $coreFiles = in_array($devToken, $frontenders)?[]:array_filter( scandir( app_path('Cores') ), function($dt) {
+            $coreFiles = $devRole == 'frontend'?[]:array_filter( scandir( app_path('Cores') ), function($dt) {
                 return !in_array($dt,['.','..','README.md']);
             });
         }
@@ -1460,6 +1455,13 @@ class LaradevController extends Controller
             $path = resource_path("views/projects/$req->modul.php");
             File::put( $path, "<?php\n // blade php file");
             return response()->json("pembuatan file blade berhasil, silahkan refresh list");
+        }elseif(Str::endswith($req->modul, ".frontend")){
+            $single = str_replace(".frontend", '', $req->modul);
+            $path = resource_path("views/projects/$single.blade.php");
+            File::put( $path, "<?php\n // blade php file");
+            $pathJS = public_path("/js/$single.js");
+            File::put( $pathJS, "//   javascript");
+            return response()->json("pembuatan file blade & js berhasil, silahkan refresh list");
         }
 
         if(strpos("x".$req->modul, "alias ")!==false && count(explode(" ",$req->modul))==3 ){
