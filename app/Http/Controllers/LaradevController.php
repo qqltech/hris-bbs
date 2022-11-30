@@ -988,29 +988,52 @@ class LaradevController extends Controller
 
     public function readMigrationsOrCache(Request $req){
         $self = $this;
-        $migrationLists = Cache::rememberForever('migration-list', function ()use($self, $req) {
-            return $self->readMigrations( $req, null);
-        });
-        if( !is_array($migrationLists) ){
-            $migrationLists = $self->readMigrations( $req, null);
-        }
-
-        $jsFiles = array_filter( scandir( base_path('public/js') ), function($dt) {
-            return !in_array($dt,['.','..','README.md']);
-        });
         
-        $bladesFiles = array_filter( scandir( base_path('resources/views/projects') ), function($dt) {
-            return !in_array($dt,['.','..','readme.md']);
-        });
-
-        $coreFiles = array_filter( scandir( app_path('Cores') ), function($dt) {
-            return !in_array($dt,['.','..','README.md']);
-        });
+        $devToken = $req->header('developer-token');
+        $devRole = "owner";
+        
+        $frontenders = explode(",", env('DEV_FRONTENDERS', ''));
+        $backenders = explode(",", env('DEV_BACKENDERS', ''));
+        $owners = explode(",", env('DEV_OWNERS', 'devganteng0011'));
+        
+        if( in_array($devToken, $frontenders) ){
+            $devRole = 'frontend';
+            $migrationLists = [];
+        }else{
+            $migrationLists = Cache::rememberForever('migration-list', function ()use($self, $req) {
+                return $self->readMigrations( $req, null);
+            });
+            if( !is_array($migrationLists) ){
+                $migrationLists = $self->readMigrations( $req, null);
+            }
+        }
+        
+        
+        if( in_array($devToken, $backenders) ){
+            $devRole = 'backend';
+            $jsFiles = [];
+            $bladesFiles = [];
+            $coreFiles = [];
+        }else{
+            
+            $jsFiles = array_filter( scandir( base_path('public/js') ), function($dt) {
+                return !in_array($dt,['.','..','README.md']);
+            });
+            
+            $bladesFiles = array_filter( scandir( base_path('resources/views/projects') ), function($dt) {
+                return !in_array($dt,['.','..','readme.md']);
+            });
+    
+            $coreFiles = in_array($devToken, $frontenders)?[]:array_filter( scandir( app_path('Cores') ), function($dt) {
+                return !in_array($dt,['.','..','README.md']);
+            });
+        }
         
         return array_merge($migrationLists,[
             "js"=> array_values( $jsFiles ),
             "blades"=> array_values( $bladesFiles ),
-            "cores"=> array_values( $coreFiles )
+            "cores"=> array_values( $coreFiles ),
+            "role"=> $devRole
         ]);
     }
 
