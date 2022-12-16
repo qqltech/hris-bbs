@@ -506,7 +506,7 @@ trait ModelTrait {
 
     public function custom_upload( $request ){
         $validator = Validator::make($request->all(), [
-            'file' => "required|file|max:10000|mimetypes:image/bmp,text/csv,image/gif,image/vnd.microsoft.icon,image/jpeg,image/png,image/svg+xml,image/tiff,text/html,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint,application/vnd.rar,application/zip,text/plain,image/webp,application/pdf,audio/wav,audio/webm,audio/mpeg,video/x-msvideo,video/mp4,video/mpeg,video/webm,application/octet-stream",
+            'file' => "required|file|max:10000|mimetypes:image/bmp,text/csv,image/gif,image/vnd.microsoft.icon,image/jpeg,image/png,image/svg+xml,image/tiff,text/html,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint,application/vnd.rar,application/zip,text/plain,image/webp,application/pdf,audio/wav,audio/webm,audio/mpeg,video/x-msvideo,video/mp4,video/mpeg,video/webm,application/octet-stream,application/geo+json,application/json",
             'field'=> "required|string|".(count($this->fileColumns)>0?"in:".implode(",",$this->fileColumns):"")
         ]);
         if ( $validator->fails()) {

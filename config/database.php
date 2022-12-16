@@ -104,5 +104,10 @@ return [
         ]
 
     ],
-
+    'dbal' => [
+        'types' => [
+            'geometry' => '\Doctrine\DBAL\Types\StringType',
+            'geography' => '\Doctrine\DBAL\Types\StringType',
+        ]
+    ]
 ];
