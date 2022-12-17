@@ -118,4 +118,6 @@ $router->group(['prefix'=>'laradev'], function () use ($router) {
             "socket_room"=>env('LOG_CHANNEL')
         ]);
     });
+    
+    $router->get("/get-backup", "LaradevController@getBackup");
 });

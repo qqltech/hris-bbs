@@ -1853,4 +1853,45 @@ class LaradevController extends Controller
         }
         return 'backup ok';
     }
+
+    public function getBackup( Request $req ){
+
+        if( !$req->has('key') || $req->key!=env("LARADEVPASSWORD","bismillah") ){
+            return response()->json("unauthorized", 401);
+        }
+
+        $path = env( 'BACKUP_PATH') ?? base_path('app_generated_backup');
+        $timeStamp = 'last';
+        
+        if( ! File::exists( $path ) || $req->has('fresh') ){
+            $timeStamp = date("Y-m-d H:i:s");
+            try{
+                Artisan::call("backup");
+            }catch(Exception $e){
+                return response()->json($e->getMessage(), 422);
+            }
+            sleep(1);
+        }
+
+        $zip_file = storage_path( "temporary_file_backup_$timeStamp.zip" );
+
+        $zip = new \ZipArchive();
+        $zip->open($zip_file, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
+        foreach ($files as $name => $file)
+        {
+            // We're skipping all subfolders
+            if (!$file->isDir()) {
+                $filePath     = $file->getRealPath();
+
+                // extracting filename with substr/strlen
+                $relativePath = substr($filePath, strlen($path) + 1);
+
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+        $zip->close();
+        return response()->download($zip_file)->deleteFileAfterSend(true);
+    }
 }

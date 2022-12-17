@@ -12,7 +12,6 @@ class Laradev
             return response()->json(['status'=>'unauthorized'], 401);
         }
         
-        
         $frontenders = explode(",", env('DEV_FRONTENDERS', ''));
         $backenders = explode(",", env('DEV_BACKENDERS', ''));
         $owners = explode(",", env('DEV_OWNERS', 'devganteng0011'));

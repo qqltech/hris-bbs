@@ -67,28 +67,34 @@ class BackupCommand extends Command
                 File::copyDirectory(public_path('uploads'), "$path/public/uploads" );                
             }
             File::copyDirectory(resource_path('views/projects'), "$path/resources/views/projects" );
-            if( getDriver()!='mysql' ) return  $this->info("project files have been copied to $path successfully on $server");
-
-            $schemaManager = DB::getDoctrineSchemaManager();
-            $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-            
-            $sqlLineList = $schemaManager->createSchema()->toSql($schemaManager->getDatabasePlatform());
-            File::put($schemaSql = "$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
 
             $host = env('DB_HOST');
             $username = env('DB_USERNAME');
             $password = env('DB_PASSWORD');
             $database = env('DB_DATABASE');
-            
+            $port = env('DB_PORT');
             $file = date('Y-m-d') . '-dump-' . $database . '.sql';
-            // --column-statistics=0
-            $command = sprintf('mysqldump --routines '.(isMariaDB()?'--column-statistics=0':'').' -h %s -u %s -p\'%s\' %s > %s', 
-                        $host, 
-                        $username, 
-                        $password, 
-                        $database, 
-                        $sqlPath = "$path/sqldump/$file");
-            exec($command);
+
+            if( getDriver() == 'mysql' ){
+                $schemaManager = DB::getDoctrineSchemaManager();
+                $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+                
+                $sqlLineList = $schemaManager->createSchema()->toSql($schemaManager->getDatabasePlatform());
+                File::put($schemaSql = "$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
+    
+                // --column-statistics=0
+                $command = sprintf('mysqldump --routines '.(isMariaDB()?'--column-statistics=0':'').' -h %s -u %s -p\'%s\' %s > %s', 
+                            $host, 
+                            $username, 
+                            $password, 
+                            $database, 
+                            $sqlPath = "$path/sqldump/$file");
+                exec($command);
+            }elseif( getDriver() == 'pgsql' ){
+                $file = str_replace(".sql", ".tar", $file);
+                $command = sprintf( "pg_dump --no-owner -F t --dbname=postgresql://$username:$password@$host:$port/$database > %s", $sqlPath = "$path/sqldump/$file");
+                exec($command);
+            }
 
             if( env("BACKUP_CALLBACK") ){
                 $funcArr = explode(".", env("BACKUP_CALLBACK"));
