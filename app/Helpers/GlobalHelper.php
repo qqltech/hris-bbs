@@ -1860,3 +1860,9 @@ function getCore( $name ){
 function debug(){
     Config::set('app.debug', true);
 }
+
+function connectTo( array $connArr ){ // 'driver' =>"", 'host' => "", 'port' => "", 'username' => "", 'database'=>'', 'password' => ""
+    $defaultConn = config('database.connections.flying'.$connArr[ 'driver' ] );
+    config(['database.connections.flying'.$connArr[ 'driver' ] => array_merge( $defaultConn, $connArr ) ]);
+    return DB::connection('flying'.$connArr[ 'driver'] );
+}
