@@ -1514,7 +1514,7 @@ function moveFileFromCache($modelName, $field, $filename, $user_id='anonymous', 
     }
     
     $code = Carbon::now()->format('his').crc32(uniqid());
-    $fixedFileName = $code.":::".$filename;
+    $fixedFileName = $code.env("FILE_SEPARATOR", ":::").$filename;
 
     $dirPath = "uploads/$modelName";
     $subDomain = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);

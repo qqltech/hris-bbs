@@ -16,7 +16,7 @@ class Upload implements CastsAttributes
      */
     public function get($model, $key, $value, $attributes)
     {
-        if( !$value || ($value && !\Str::contains($value,":::") )){
+        if( !$value || ($value && !\Str::contains($value,env("FILE_SEPARATOR", ":::")) )){
             return $value;
         }
         if(app()->request->isMethod('GET')){
@@ -56,12 +56,12 @@ class Upload implements CastsAttributes
             $oldFile = null;
             
             if( $model->$key ){
-                if(\Str::contains($value, ":::")){
+                if(\Str::contains($value, env("FILE_SEPARATOR", ":::"))){
                     $valueArr = explode("/", $value);
                     $value = end($valueArr);
                     return $value;
                 }
-                $oldFileArr = explode(":::", $model->$key);
+                $oldFileArr = explode(env("FILE_SEPARATOR", ":::"), $model->$key);
                 $oldFile = end($oldFileArr);
                 $oldFile = $model->$key;
             }
