@@ -86,7 +86,6 @@ class RestoreCommand extends Command
 
             File::copyDirectory( "$path/resources/views/projects", resource_path('views/projects') );   //  views/projects
             umask(0000);
-            (new Laradev)->createModels( new \Illuminate\Http\Request );
 
             $host = env('DB_HOST');
             $username = env('DB_USERNAME');
@@ -115,7 +114,7 @@ class RestoreCommand extends Command
                 $this->info( "migrated_sql:$file" );
             }elseif( $withMigrate && getDriver()=='pgsql' ){
                 $file = str_replace(".sql", ".tar", $file);
-                $command = sprintf( "pg_restore --no-privileges --no-owner --clean --dbname=postgresql://$username:$password@$host:$port/$database %s", $sqlPath = "$path/sqldump/$file");
+                $command = sprintf( "pg_restore --clean --dbname=postgresql://$username:$password@$host:$port/$database %s", $sqlPath = "$path/sqldump/$file");
                 exec($command);
                 $this->info( "migrated_sql:$file" );
             }
@@ -123,6 +122,7 @@ class RestoreCommand extends Command
             if( $isFromUrl ){
                 if (\File::exists($path)) \File::deleteDirectory($path);
             }
+            (new Laradev)->createModels( new \Illuminate\Http\Request );
 
         } catch (Exception $e) {
             return $this->error($e->getMessage());

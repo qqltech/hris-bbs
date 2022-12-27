@@ -92,7 +92,7 @@ class BackupCommand extends Command
                 exec($command);
             }elseif( getDriver() == 'pgsql' ){
                 $file = str_replace(".sql", ".tar", $file);
-                $command = sprintf( "pg_dump --no-owner -F t --dbname=postgresql://$username:$password@$host:$port/$database > %s", $sqlPath = "$path/sqldump/$file");
+                $command = sprintf( "pg_dump --no-owner -F t --dbname=\"postgresql://$username:$password@$host:$port/$database\" > %s", $sqlPath = "$path/sqldump/$file");
                 exec($command);
             }
 
