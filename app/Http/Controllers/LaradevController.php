@@ -954,13 +954,15 @@ class LaradevController extends Controller
                 if (strpos($path, '.php') !== false && count(explode("_",$path))>3) {
                     $path = str_replace($dir,"",$path);
                     $stringku = implode("_",array_slice(explode("_",$path), 4));   
-                    $results[] = $stringku;
+                    if(Str::startsWith($stringku, '0_')) $stringku = Str::replaceFirst('0_','', $stringku);
+					$results[] = $stringku;
                 }
             } else if($value != "." && $value != "..") {
                 $this->getDirContents($path, $results);
                 if (strpos($path, '.php') !== false && count(explode("_",$path))>3) {
                     $path = str_replace($dir,"",$path);
                     $stringku = implode("_",array_slice(explode("_",$path), 4));   
+                    if(Str::startsWith($stringku, '0_')) $stringku = Str::replaceFirst('0_','', $stringku);
                     $results[] = $stringku;
                 }
             }

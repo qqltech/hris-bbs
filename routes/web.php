@@ -27,7 +27,7 @@ $router->group(['middleware' => 'project'], function () use ($router) {
             return $class->$func($request);
         }
 
-        if( File::get( public_path('app/index.html') ) ){
+        if( File::exists( public_path('app/index.html') ) ){
             return redirect('/app');
         }
 
