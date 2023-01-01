@@ -139,13 +139,8 @@ var app = new Vue({
         bodyJson:[],
         bodyArray:[],
         tablesComplete:[],
-        selectedTable:null
-    },
-    computed:{
-        // bodyArr:function(){
-        //     let data = me.bodyJson;
-        //     let newArray = 
-        // }
+        selectedTable:null,
+        tempTable: 'temp_uploaders'
     },
     created(){       
         let me = this;
@@ -213,12 +208,13 @@ var app = new Vue({
                 solid: true
             })
         },
-        async apiUploadWithCreate(){            
-            var tableTempName = await prompt('Nama table temporary:', 'temp_uploaders');
+        async apiUploadWithCreate(){     
+            let me = this;       
+            var tableTempName = await prompt('Nama table temporary:', me.tempTable);
             if( !tableTempName ){
                 return
             }
-            let me = this;
+            me.tempTable = tableTempName
             me.submitApi({
                 url  : "{{url('laradev/uploadwithcreate')}}",
                 data : {
