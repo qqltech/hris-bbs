@@ -1617,7 +1617,6 @@ class LaradevController extends Controller
         return method_exists( $model, "frontendNotice" )?$model->frontendNotice():"tidak ada catatan";
     }
     public function uploadLengkapi(Request $request){
-        $table = $request->table;
         $data = $request->data;
         $dataArray = [];
         foreach($data as $index => $dt){
@@ -1635,19 +1634,28 @@ class LaradevController extends Controller
     public function uploadWithCreate(Request $req){
         DB::disableQueryLog();
         $data = $req->data; 
-        DB::beginTransaction();   
+        $tempTable = @$req->table??'temp_uploaders';
         try{  
-            Schema::dropIfExists('temp_uploaders');
-            Schema::create('temp_uploaders',function (Blueprint $table)use($data) {
+            Schema::dropIfExists($tempTable);
+            Schema::create($tempTable,function (Blueprint $table)use($data) {
                 $table->bigIncrements('_id');
-                foreach( array_keys( end($data) ) as $key ){
-                    $table->text($key)->nullable();
+                foreach( array_keys( $data[0]) as $key ){
+                    $table->text( str_replace(' ', '_', trim(strtolower($key))) )->nullable();
                 }
             });
-            $insertData = collect($data)->chunk(500);
+            
+            DB::beginTransaction();
+            $insertData = collect($data)->map(function($dt){
+                $formattedData = [];
+                foreach( $dt as $k => $v ){
+                    $formattedData[str_replace(' ', '_', trim(strtolower($k)))] = $v;
+                }
+                return $formattedData;
+            })->chunk(500);
             foreach($insertData as $chunkedData){
-                DB::table('temp_uploaders')->insert($chunkedData->toArray());
+                DB::table($tempTable)->insert($chunkedData->toArray());
             }
+            DB::commit();
         }catch(Exception $e){
             DB::rollback();
             return response()->json([
@@ -1655,8 +1663,7 @@ class LaradevController extends Controller
                 'error'=>$e->getMessage()
             ],422);
         }
-        DB::commit();
-        return count($data)." rows inserted successfully in table uploaders, OLAH SENDIRI!!!";
+        return count($data)." rows inserted successfully in table `$tempTable`!";
     }
     public function uploadTest(Request $request){
         DB::disableQueryLog();

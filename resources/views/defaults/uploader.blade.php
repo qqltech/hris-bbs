@@ -36,7 +36,7 @@
                 </v-select>
                 
                 <div class="text-center">
-                    <textarea :disabled="selectedTable===null" rows="8"  class='form-input' style="width:80%;font-size:11px;resize: true;" v-model="excelValue" placeholder="paste excel here" @input="processExcel"></textarea>
+                    <textarea rows="8"  class='form-input' style="width:80%;font-size:11px;resize: true;" v-model="excelValue" placeholder="paste excel here" @input="processExcel"></textarea>
                 </div>
                 <div class="text-center">
                     <b-overlay
@@ -62,7 +62,7 @@
                     </button>
                     <button class="bg-success"
                         style="margin-left: auto;margin-right: auto;margin-top:5px;" :disabled="isLoading" @click="apiUploadWithCreate">
-                        Upload ke table Uploaders(Alt+P)!
+                        Upload ke Temp Table(Alt+P)!
                     </button>
                     
                     <span
@@ -213,13 +213,17 @@ var app = new Vue({
                 solid: true
             })
         },
-        apiUploadWithCreate(){
+        async apiUploadWithCreate(){            
+            var tableTempName = await prompt('Nama table temporary:', 'temp_uploaders');
+            if( !tableTempName ){
+                return
+            }
             let me = this;
             me.submitApi({
                 url  : "{{url('laradev/uploadwithcreate')}}",
                 data : {
                     data:me.bodyJson,
-                    table:me.selectedTable.model 
+                    table: tableTempName
                 }
             },function(response){
                 me.$bvToast.toast( response.data, {
@@ -244,8 +248,7 @@ var app = new Vue({
             me.submitApi({
                 url  : "{{url('laradev/uploadlengkapi')}}",
                 data : {
-                    data:me.bodyArray,
-                    table:me.selectedTable.model 
+                    data:me.bodyArray
                 }
             },function(response){
                 me.bodyArray = response.data;
@@ -268,7 +271,16 @@ var app = new Vue({
             }
         },
         apiUploadTest(final=false){
-            let me = this;
+            const me = this;
+            if(!me.selectedTable){
+                me.$bvToast.toast("Silahkan pilih table dahulu", {
+                    'auto-hide-delay':3000,
+                    title: `Error`,
+                    toaster:'b-toaster-top-full',
+                    variant: 'danger',
+                    solid: true
+                })
+            }
             var url = "{{url('laradev/uploadtest')}}";
             if(me.selectedTable.is_view){
                 url = "{{url('public/')}}/"+me.selectedTable.model+"/upload"

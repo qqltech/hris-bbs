@@ -50,8 +50,9 @@ class RestoreCommand extends Command
 
             $zip = new \ZipArchive();
             if ($zip->open($temp_file) === TRUE) {
-                $path =  tempnam(sys_get_temp_dir(), 'temporary_directory_backup');
-                unlink($path);
+                $path =  env('RESTORE_PATH', tempnam(sys_get_temp_dir(), 'temporary_directory_backup'));
+                $isFromUrl = !env('RESTORE_PATH');
+                if(File::exists($path)) File::deleteDirectory($path);
                 mkdir($path);
                 $zip->extractTo( $path );
                 $zip->close();
@@ -120,7 +121,7 @@ class RestoreCommand extends Command
             }
 
             if( $isFromUrl ){
-                if (\File::exists($path)) \File::deleteDirectory($path);
+                if (File::exists($path)) File::deleteDirectory($path);
             }
             (new Laradev)->createModels( new \Illuminate\Http\Request );
 
