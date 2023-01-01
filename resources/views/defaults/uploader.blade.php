@@ -24,7 +24,7 @@
 <body>
 <div>
     <div id="app">
-        <b-modal v-model="showModal" size="xl" :title="'tekan ALT+A untuk memunculkan menu ini'+(selectedTable&&selectedTable.is_view?' [CUSTOM UPLOAD]':'')" hide-footer>
+        <b-modal v-model="showModal" size="xl" :title="'Pastikan tidak ada rumus dan enter (ganti baris) pada value cell '+(selectedTable&&selectedTable.is_view?' [CUSTOM UPLOAD]':'')" hide-footer>
             <div>
                 <v-select 
                     placeholder="Pilih table yang akan diupload"
