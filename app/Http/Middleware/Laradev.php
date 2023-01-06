@@ -12,6 +12,7 @@ class Laradev
         if ( !$ori && !($devToken=$request->header('developer-token')) && $request->header('laradev')==null || $request->header('laradev')!=env("LARADEVPASSWORD","bismillah") ) {
             return response()->json(['status'=>'unauthorized'], 401);
         }
+        if($ori) $devToken = '';
         
         $frontenders = explode(",", env('DEV_FRONTENDERS', ''));
         $backenders = explode(",", env('DEV_BACKENDERS', ''));
