@@ -8,7 +8,7 @@ class Laradev
 {
     public function handle($request, Closure $next)
     {
-        $ori = $request->header('sec-fetch-site')=='same-site';
+        $ori = ($request->header('sec-fetch-site')??'same-site')=='same-site';
         if ( !$ori && !($devToken=$request->header('developer-token')) && $request->header('laradev')==null || $request->header('laradev')!=env("LARADEVPASSWORD","bismillah") ) {
             return response()->json(['status'=>'unauthorized'], 401);
         }
