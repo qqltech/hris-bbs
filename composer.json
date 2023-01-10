@@ -22,6 +22,7 @@
         "intervention/imagecache": "^2.5",
         "jenssegers/agent": "^2.6",
         "laravel/lumen-framework": "^9.0",
+        "laravel/passport": "^10.4",
         "laravel/socialite": "^5.5",
         "league/flysystem": "^3.0",
         "maatwebsite/excel": "^3.1",
