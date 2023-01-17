@@ -184,12 +184,13 @@ class LaradevController extends Controller
         try{
             $schemaManager = DB::getDoctrineSchemaManager();
             $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-            $data = $schemaManager->listTables();
+            $data = $schemaManager->listTableNames();
             $tables = [];
             $fks = [];
             $cds = [];
             foreach ($data as $table) {
-                if( strpos($table->getname(),"pg_catalog.")!==false || strpos($table->getname(),"information_schema.")!==false ){
+                $table = $schemaManager->listTableDetails($table);
+                if( strpos($table->getName(),"pg_catalog.")!==false || strpos($table->getName(),"information_schema.")!==false || $table->getName()==='spatial_ref_sys' ){
                     continue;
                 }
                 $foreignKeys = [];
@@ -319,7 +320,7 @@ class LaradevController extends Controller
             $views = $schemaManager->listViews();
             foreach($views as $view){
                 
-                if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
+                if( strpos($view->getName(),"pg_catalog.")!==false || strpos($view->getName(),"information_schema.")!==false ){
                     continue;
                 }
                 $columnNames = \Schema::getColumnListing(str_replace('public.','',$view->getName()));
@@ -438,9 +439,10 @@ class LaradevController extends Controller
         }
         $schemaManager = DB::getDoctrineSchemaManager();
         $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-        $tables = $schemaManager->listTables();
+        $tables = $schemaManager->listTableNames();
         $tableNames = [];
         foreach ($tables as $table) {
+            $table = $schemaManager->listTableDetails($table);
             $tableNames[]=$table->getName();
         }
         return $tableNames;
@@ -1046,10 +1048,11 @@ class LaradevController extends Controller
                 $data = $this->getDirContents( base_path('database/migrations/projects') );
                 $schemaManager = DB::getDoctrineSchemaManager();
                 $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-                $tables = $schemaManager->listTables();
+                $tables = $schemaManager->listTableNames();
                 $arrayTables = []; $arrayViews = [];
                 $fk = 0;
                 foreach ($tables as $table) {
+                    $table = $schemaManager->listTableDetails($table);
                     $tableNames = explode('.', $table->getName());
                     if( count($tableNames)>1 ){
                         $tableName=$tableNames[1];
@@ -1066,7 +1069,7 @@ class LaradevController extends Controller
                 }
                 $views = $schemaManager->listViews();
                 foreach ($views as $view) {            
-                    if( strpos($view->getname(),"pg_catalog.")!==false || strpos($view->getname(),"information_schema.")!==false ){
+                    if( strpos($view->getName(),"pg_catalog.")!==false || strpos($view->getName(),"information_schema.")!==false ){
                         continue;
                     }
                     $viewName = str_replace("public.","",$view->getName() );
