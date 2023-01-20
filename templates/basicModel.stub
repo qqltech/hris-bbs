@@ -11,19 +11,14 @@ class __class extends Model
 {   
     use ModelTrait;
 
-    /**
-     * Basic Laravel model properties
-     */
     protected $table    = '__table';
     protected $guarded  = __config_guarded;
     protected $casts    = __config_casts;
     protected $fillable = __config_createable;
 
-    /**
-     * Additional properties
-     */
     public $columns     = __columns;
     public $columnsFull = __columnsFull;
+    public $rules       = __config_rules;
     public $joins       = __joins;
     public $details     = __details;
     public $heirs       = __heirs;
@@ -38,9 +33,6 @@ class __class extends Model
     public $cascade     = __config_cascade;
     public $deleteOnUse = __config_deleteOnUse;
 
-    /**
-     * Basic Laravel model relationship if needed
-     */
     __hasMany
     __hasManyThrough
     __belongsTo

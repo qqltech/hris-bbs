@@ -211,25 +211,13 @@ class LaradevController extends Controller
                 }
                 $columns = [];
                 $columnNames = [];
+                $rulesArr = [];
                 foreach ($table->getColumns() as $column) {
                     foreach($indexes as $key=>$index){
                         if(in_array($column->getName(), $index->getColumns()) && !$index->isPrimary() && $index->isUnique()){
                             $unique[$column->getName()] = "unique:".(  count(explode('.', $table->getName() ) )>1? env("DB_CONNECTION",'').".":"" ).$table->getName().",".$column->getName();
                         }
                     }
-                    $columnNames[] = $column->getName();
-                    $columns[] = [
-                        "name"=>$column->getName(),
-                        "type"=> $column->getType()->getName(),
-                        "length"=> $column->getLength(),
-                        "unsigned"=> $column->getUnsigned(),
-                        "precision"=> $column->getPrecision(),
-                        "scale"=> $column->getScale(),
-                        "fixed"=> $column->getFixed(),
-                        "default"=> $column->getDefault(),
-                        "comment"=> $column->getComment(),
-                        "nullable"=> $column->getNotnull()
-                    ];
                     
                     if( !in_array($column->getName(), ["id","created_at","updated_at"]) &&  $column->getNotnull()){
                         $comment    = $column->getComment();
@@ -246,6 +234,7 @@ class LaradevController extends Controller
                     }
                     $comment    = $column->getComment();
                     $columnName = $column->getName();
+                    $rule = null;
 
                     if($comment!=null && $comment!=""){
                         $comment = json_decode($comment);
@@ -279,6 +268,11 @@ class LaradevController extends Controller
                                 $column->setUnsigned(true);
                             }
                         }
+                        $rule =  @$comment->rules;
+                        if($rule){
+                            $rulesArr[$columnName] = $rule;
+                        }
+
                         if( isset($comment->required) && $comment->required!="false" ){
                             $isRequired = $comment->required;
                             if($isRequired){
@@ -298,6 +292,21 @@ class LaradevController extends Controller
                     //     $fks[ str_replace("_id","",$columnName)][] = $fktemp;
                     //     $cds[ $table->getName() ][]   = $fktemp;                        
                     // }
+                    
+                    $columnNames[] = $column->getName();
+                    $columns[] = [
+                        "name"=>$column->getName(),
+                        "type"=> $column->getType()->getName(),
+                        "length"=> $column->getLength(),
+                        "unsigned"=> $column->getUnsigned(),
+                        "precision"=> $column->getPrecision(),
+                        "scale"=> $column->getScale(),
+                        "fixed"=> $column->getFixed(),
+                        "default"=> $column->getDefault(),
+                        "comment"=> $column->getComment(),
+                        "nullable"=> $column->getNotnull(),
+                        "rules"=>$rule
+                    ];
                 }
                 $fullColumns = $columns;
                 if($toModel){
@@ -312,6 +321,7 @@ class LaradevController extends Controller
                     "values"=>$defaults,
                     "foreign_keys" => $foreignKeys,
                     "required" => $required,
+                    "rules" => $rulesArr,
                     "uniques" => $unique,
                     'triggers'=>\App\Helpers\DBS::getTriggers($table->getName()),
                     'is_view'=>false
@@ -343,6 +353,7 @@ class LaradevController extends Controller
                     "values"=>[],
                     "foreign_keys" => [],
                     "required" => "[]",
+                    "rules" => "[]",
                     "uniques" => [],
                     'triggers'=>[],
                     'is_view'=>true
@@ -771,6 +782,7 @@ class LaradevController extends Controller
             $tableName = $table->table;
             $className = count(explode('.',$tableName))>1?explode('.',$tableName)[1]:$tableName;
             $cfg = (array)$table->config;
+            $cfg['rules'] = $table->rules;
             $configKeys = array_keys($cfg);
             foreach($configKeys as $key){
                 if( !is_array( $cfg[$key] ) ){
@@ -799,7 +811,8 @@ class LaradevController extends Controller
                     'searchable'=> isset($cfg['searchable'])? $cfg['searchable']:array_values(array_filter($table->columns,function($dt){ if($dt!='id'){return $dt;} } )),
                     'deleteable'=> isset($cfg['deleteable'])?($cfg['deleteable']=="false"?false:true):true,
                     'deleteOnUse'=> isset($cfg['deleteOnUse'])?($cfg['deleteOnUse']=="false"?false:true):false,
-                    'casts'     => isset($cfg['casts'])?$cfg['casts']:['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']
+                    'casts'     => isset($cfg['casts'])?$cfg['casts']:['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y'],
+                    'rules'     => isset($cfg['rules'])?$cfg['rules']:[]
                 ]
             ];
             $colsArray = [];
@@ -897,7 +910,7 @@ class LaradevController extends Controller
             $paste = str_replace([
                 "__config_guarded","__config_required","__config_createable",
                 "__config_updateable","__config_searchable","__config_deleteable",
-                "__config_cascade","__config_deleteOnUse","__config_casts", "__config_unique"
+                "__config_cascade","__config_deleteOnUse","__config_casts", "__config_rules", "__config_unique"
             ], [
                 isset($cfg['guarded'])? (!is_array($cfg['guarded'])? "'".$cfg['guarded']."'":'["'.implode('","',$cfg['guarded']).'"]'):"['id']", 
                 isset($cfg['required'])? (!is_array($cfg['required'])? "'".$cfg['required']."'":'["'.implode('","',$cfg['required']).'"]'):$table->required, 
@@ -908,6 +921,7 @@ class LaradevController extends Controller
                 isset($cfg['cascade'])?$cfg['cascade']:"true",
                 isset($cfg['deleteOnUse'])?$cfg['deleteOnUse']:"false",
                 isset($cfg['casts'])?str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($cfg['casts'], JSON_PRETTY_PRINT)):"['created_at'=> 'datetime:d-m-Y','updated_at'=>'datetime:d-m-Y']",
+                isset($cfg['rules'])?str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($cfg['rules'], JSON_PRETTY_PRINT)):"[]",
                 str_replace(["{","}",'":'],["[","\t]",'"=>'],json_encode($table->uniques, JSON_PRETTY_PRINT))
             ],$paste);
 

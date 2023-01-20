@@ -254,6 +254,7 @@ class ApiFixedController extends Controller
         $model          = getCustom( $modelName );
         $operationValidator = $operation."Validator";
         $customString       = $operation."ValidatorResponse";
+        $modelRules         = @$model->rules??[];
         $customResponseValidator = isset($model->$customString) ? $model->$customString : [];
         
         $arrayValidation    = $model->$operationValidator();
@@ -274,7 +275,7 @@ class ApiFixedController extends Controller
                     || in_array($typeData, ["decimal","float","numeric","double","boolean","date","timestamp","datetime","string","text","varchar"] ));
             });
             $autoValidators = [];
-            foreach($datatypeValidator as $idx => $dt ){
+            foreach($datatypeValidator as $dt ){
                 $validString = explode(":",$dt);
                 $payload = strtolower($validString[0]);
                 if( in_array($payload, ['created_at','updated_at']) ){
@@ -300,6 +301,9 @@ class ApiFixedController extends Controller
                         $fieldValidator = str_replace("required","filled",$fieldValidator);
                     }
                     $autoValidators[$payload] = $fieldValidator;
+                }
+                if( @$modelRules[$payload] ){
+                    $autoValidators[$payload] = (@$autoValidators[$payload]? ($autoValidators[$payload]."|".$modelRules[$payload]):$modelRules[$payload] );
                 }
             }
 

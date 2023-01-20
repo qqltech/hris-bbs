@@ -57,7 +57,7 @@ return [
         'string'  => 'String harus berisi lebih besar dari atau setara :value karakter.',
     ],
     'image'                => 'Ini harus berisi sebuah gambar.',
-    'in'                   => 'Pilihan nilai tidak sesuai.',
+    'in'                   => 'Pilihan diperbolehkan: :values',
     'in_array'             => 'Nilai ini tidak ada di :other.',
     'integer'              => 'Ini harus berisi sebuah angka.',
     'ip'                   => 'Ini harus berisi alamat IP yang valid.',
