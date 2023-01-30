@@ -205,7 +205,7 @@ function _customGetData($model,$params)
                 continue;
             }
 
-            if($params->caller && $params->caller==$parent){
+            if($params->caller && $params->caller==$parent && Str::replace('_id','',end( $meArr ))==$params->caller ){
                 continue;                
             }
 
