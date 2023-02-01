@@ -71,13 +71,20 @@ class UserController extends Controller
                 $user->platformversion = $agent->version($agent->platform());
                 $user->browser=$agent->browser();
                 $user->browserversion=$agent->version($agent->browser());
-                return response()->json([
+                $userData = [
                     'access_token' => $tokenResult->token,
-                    'token' =>$tokenResult->accessToken,
-                    'auth' =>$user->auth,
+                    'token' => $tokenResult->accessToken,
+                    'auth' => $user->auth,
                     'token_type' => 'Bearer',
-                    'data'=>$user
-                ]);
+                    'data' => $user
+                ];
+                if( env("RESPONSE_FINALIZER") ){
+                    $funcArr = explode(".", env("RESPONSE_FINALIZER"));
+                    $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
+                    $func = $funcArr[1];
+                    $userData = $class->$func( (array)$userData, 'login' );
+                }
+                return response()->json($userData);
             } else {
                 $response = "Password missmatch";
                 return response($response, 422);
@@ -101,11 +108,18 @@ class UserController extends Controller
     {
         try{
             $agent = new Agent();
-            $request->user()->platform = $agent->platform();
-            $request->user()->platformversion = $agent->version($agent->platform());
-            $request->user()->browser=$agent->browser();
-            $request->user()->browserversion=$agent->version($agent->browser());
-            return response()->json($request->user());
+            $userData = $request->user();
+            $userData->platform = $agent->platform();
+            $userData->platformversion = $agent->version($agent->platform());
+            $userData->browser=$agent->browser();
+            $userData->browserversion=$agent->version($agent->browser());
+            if( env("RESPONSE_FINALIZER") ){
+                $funcArr = explode(".", env("RESPONSE_FINALIZER"));
+                $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
+                $func = $funcArr[1];
+                $userData = $class->$func( $userData->toArray(), 'user' );
+            }
+            return response()->json($userData);
         }catch(Exception $e){
             $response = 'You Need Logged in';
             return response($response, 401);

@@ -784,10 +784,17 @@ class ApiFixedController extends Controller
                 );
                 $model = $model->selectRaw( $selectField );
             }
-            return [
-                "data"=>$model->withoutGlobalScopes()->find($id),
-                "processed_time"=>round(microtime(true)-config("start_time"),5)
+            $data = [
+                "data"=>$model->withoutGlobalScopes()->find($id)
             ];
+            if( env("RESPONSE_FINALIZER") ){
+                $funcArr = explode(".", env("RESPONSE_FINALIZER"));
+                $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
+                $func = $funcArr[1];
+                $data = $class->$func( $data, $modelName );
+            }
+            $data['processed_time'] = round(microtime(true)-config("start_time"),5);
+            return $data;
         }
         foreach($params as $key => $param){
             if(is_array($param)){
@@ -805,10 +812,17 @@ class ApiFixedController extends Controller
         if($id!=null){
             $p->id          = $id;
             $p->joinMax     = 0;
-            return [
-                "data"=>$model->customFind($p),
-                "processed_time"=>round(microtime(true)-config("start_time"),5)
+            $data = [
+                "data"=>$model->customFind($p)
             ];
+            if( env("RESPONSE_FINALIZER") ){
+                $funcArr = explode(".", env("RESPONSE_FINALIZER"));
+                $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
+                $func = $funcArr[1];
+                $data = $class->$func( $data, $modelName );
+            }
+            $data['processed_time'] = round(microtime(true)-config("start_time"),5);
+            return $data;
         }else{
             $p->joinMax     = 0;
             $p->caller      = null;

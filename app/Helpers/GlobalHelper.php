@@ -555,10 +555,16 @@ function _customGetData($model,$params)
             "last_page"=>req('simplest')?null:$data->lastPage(),
             "has_next"=>$data->hasMorePages(),
             "prev"=>$data->previousPageUrl(),
-            "next"=>$data->nextPageUrl(),
-            "processed_time"=>round(microtime(true)-config("start_time"),5)
+            "next"=>$data->nextPageUrl()
         ]);
     }
+    if( env("RESPONSE_FINALIZER") ){
+        $funcArr = explode(".", env("RESPONSE_FINALIZER"));
+        $class = getCore($funcArr[0]) ?? getCustom($funcArr[0]);
+        $func = $funcArr[1];
+        $data = $class->$func( $data, $className );
+    }
+    $data["processed_time"] = round(microtime(true)-config("start_time"),5);
     return $data;
 }
 
