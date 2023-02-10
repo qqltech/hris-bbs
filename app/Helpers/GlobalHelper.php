@@ -423,7 +423,7 @@ function _customGetData($model,$params)
     }
     if( req("transform")==='false' ){
         if(!$params->caller){
-            $addData = collect(['processed_time' => round(microtime(true)-config("start_time"),5)]);
+            // $addData = collect(['processed_time' => round(microtime(true)-config("start_time"),5)]);
             $data = $addData->merge($data);
         }
         return $data;
@@ -564,7 +564,7 @@ function _customGetData($model,$params)
         $func = $funcArr[1];
         $data = $class->$func( $data, $className );
     }
-    $data["processed_time"] = round(microtime(true)-config("start_time"),5);
+    // $data["processed_time"] = round(microtime(true)-config("start_time"),5);
     return $data;
 }
 
