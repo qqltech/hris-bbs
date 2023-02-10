@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\File;
 $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->post('/logout','UserController@logout');
     $router->get('/me', "UserController@user");
+    $router->post('/unlock-screen', "UserController@unlockScreen");
     $router->post('/change-password', "UserController@changePassword");
 });
 $router->post('/login', "UserController@login");

@@ -162,7 +162,8 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function verify($token){
+    public function verify($token)
+    {
         $user = User::where('remember_token', $token)->first();
         if($user){
             $user->update([
@@ -173,6 +174,26 @@ class UserController extends Controller
         }else{
             $template= "Sorry your token is invalid!";
             return view("defaults.email",compact('template'));
+        }
+    }
+    
+    public function unlockScreen(Request $request)
+    {
+        
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),422);
+        }
+        
+        $user = User::find(Auth::user()->id);
+        $password = $request->password;
+
+        if (Hash::check( base64_decode($request->password) , $user->password)) {
+            return [ 'message'=>'unlocked successfully' ];
+        }else{
+            return response()->json(['message'=>'password salah'], 401);
         }
     }
 }
