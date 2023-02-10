@@ -423,7 +423,7 @@ function _customGetData($model,$params)
     }
     if( req("transform")==='false' ){
         if(!$params->caller){
-            // $addData = collect(['processed_time' => round(microtime(true)-config("start_time"),5)]);
+            $addData = collect(['processed_time' => round(microtime(true)-config("start_time"),5)]);
             $data = $addData->merge($data);
         }
         return $data;
@@ -557,6 +557,8 @@ function _customGetData($model,$params)
             "prev"=>$data->previousPageUrl(),
             "next"=>$data->nextPageUrl()
         ]);
+        
+        $data["processed_time"] = round(microtime(true)-config("start_time"),5);
     }
     if( env("RESPONSE_FINALIZER") ){
         $funcArr = explode(".", env("RESPONSE_FINALIZER"));
@@ -564,7 +566,6 @@ function _customGetData($model,$params)
         $func = $funcArr[1];
         $data = $class->$func( $data, $className );
     }
-    // $data["processed_time"] = round(microtime(true)-config("start_time"),5);
     return $data;
 }
 
