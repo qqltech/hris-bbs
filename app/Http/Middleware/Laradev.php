@@ -9,8 +9,7 @@ class Laradev
     public function handle($request, Closure $next)
     {
         $ori = ($request->header('sec-fetch-site')??'same-site')=='same-site';
-        if ( !($devToken=$request->header('developer-token')) && !$ori && 
-$request->header('laradev')==null || $request->header('laradev')!=env("LARADEVPASSWORD","bismillah") ) {
+        if ( !($devToken=$request->header('developer-token')) && !$ori && $request->header('laradev')==null || $request->header('laradev')!=env("LARADEVPASSWORD","bismillah") ) {
             return response()->json(['status'=>'unauthorized'], 401);
         }
         // if($ori) $devToken = '';
