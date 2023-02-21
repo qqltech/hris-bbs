@@ -91,7 +91,7 @@ class ApiNativeController extends Controller
             $builder->selectRaw( $r->selectfield );
         }
 
-        $data = $builder->paginate($r->has('paginate') ? $r->paginate : 25);
+        $data = $builder->simplePaginate($r->has('paginate') ? $r->paginate : 25);
         $cols = Cache::get("schema_native_$name:$updatedAt");
         if( !$cols ){
             $rows = (array)$data->toArray()['data'];
