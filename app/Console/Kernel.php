@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\BackupCommand::class,
         \App\Console\Commands\RestoreCommand::class,
-        \App\Console\Commands\GenerateModelsCommand::class
+        \App\Console\Commands\GenerateModelsCommand::class,
+        \App\Console\Commands\GenerateBasicMigrationsCommand::class
         // \KitLoong\MigrationsGenerator\MigrateGenerateCommand::class
     ];
 

@@ -1,0 +1,22 @@
+  PEMBELI                                                                                                               
+  Nama           PT. ANEKA KARYA UNGGUL                                                                Hal 1    Dari 1  
+  Alamat         G WALK SHOP HOUSES A 1 NO. 08 RT.000 RW.000 ONTAR SAMBIKEREP                                           
+  NPWP           72.331.728.6-604.000                                                                                   
+                                                                                                                        
+                              NOTA RETUR                                                  Nomor    : CNEB-220620-000043
+              ATAS FAKTUR PAJAK NO. 010.006-22.18365767                               Tanggal Faktur Pajak 28-NOV-22    
+  KEPADA PENJUAL                                                                                                           
+  Nama              :    PT. ANEKA KARYA UNGGUL                                                                            
+  Alamat            :    Jl. Panglima Sudirman No. 23-25                                                                   
+  NPWP              :    75.331.728.6-604.000                                                                              
+  S.K. Pengukuhan   :    75.331.728.6-604.000                                      Tanggal Pengukuhan   09-APR-2007        
++----+-------------------------------------------------------+------------+----------------------+---------------------+
+| No |             Nama Barang / Jasa Kena Pajak             |  Kwantum   | Harga Menurut Satuan |     Harga Jual      |
++----+-------------------------------------------------------+------------+----------------------+---------------------+
+| 1  | K MURANO 30.00X30.00                                  |      -1.00 |               20,000 |              20,000 |
++----+-------------------------------------------------------+------------+----------------------+---------------------+
+  Surabaya,     28-NOV-22                        JUMLAH HARGA JUAL                                             3434.00  
+         Pembeli                                 DIKURANGI POTONGAN YANG TELAH DITERIMA                           2.00  
+                                                                                                                        
+                                                 DASAR KENA PAJAK                                                 3434  
+  (                    )                           PPN YANG DIKURANGKAN = 11% x DASAR KENA PAJAK                  1212 
