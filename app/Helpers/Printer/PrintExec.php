@@ -12,18 +12,6 @@ class PrintExec
     function __construct( $isDebug = true ){
         $this->debug = $isDebug;
     }
-    /**
-     * Listing Available Ready-used-Templates
-     */
-    public function getTemplates(){
-        return [
-            "VoucherInvoiceAP"=>\App\PrintLayouts\VoucherInvoiceAP::class,
-            "CreditNote"=>\App\PrintLayouts\CreditNote::class, 
-            "InvoiceAPSupplier"=>\App\PrintLayouts\InvoiceAP::class,
-            "PaymentAP"=>\App\PrintLayouts\PaymentAP::class,
-            "FakturBesar"=>\App\PrintLayouts\FakturBesar::class
-        ];
-    }
 
     public function getTemplatesNonEps()
     {
@@ -37,17 +25,8 @@ class PrintExec
     /**
      * Fungsi untuk printing dengan smart function pembagi halaman otomatis
      */
-    public function print(  $templateKey, $data, $printerName, $maxLines = 32  )
+    public function print(  $templateObj, $data, $printerName, $maxLines = 32  )
     {
-        $templates = $this->getTemplates();
-        $templateKeys = array_keys($templates);
-        if( !in_array($templateKey, $templateKeys) ){
-            trigger_error("Template Print `$templateKey` tidak ada, gunakan fungsi getTemplates() untuk checking");
-        }
-
-        //  PRINTING SIMULATION
-        $templateClass = $templates[ $templateKey ];
-        $templateObj = new $templateClass;
 
         $dataArr = [];
         $mappedDetailIdx = [];
