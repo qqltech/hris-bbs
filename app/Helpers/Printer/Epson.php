@@ -132,7 +132,10 @@ Class Epson
         $printer->close();
         // return 'ok';
         if(config('isPrintingDownload')){
-            return response()->download($file)->deleteFileAfterSend(true);
+            $res = config('printResult')??[];
+            $res[] = $file;
+            config( ['printResult'=>$res] );
+            return "$file,";
         }elseif(config('isPrinting')){
             $processes = ["lpr", "-P", $config['printer'], "-o", "media=Custom.8.5x6in", "-o", "raw", $file];
             $processPrint = new Process($processes);    
