@@ -131,7 +131,7 @@ Class Epson
         $printer->feedForm();
         $printer->close();
         // return 'ok';
-        if(config('isPrintingDownload')){
+        if(config('isPrintingDownload')&&config('isPrinting')){
             $res = config('printResult')??[];
             $res[] = $file;
             config( ['printResult'=>$res] );
