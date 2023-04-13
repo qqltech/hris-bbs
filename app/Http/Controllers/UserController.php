@@ -39,6 +39,7 @@ class UserController extends Controller
 
     public function login(Request $request,$email_verified=false)
     {
+        $email_verified = env('EMAIL_VERIFIED', false);
         $validator = Validator::make($request->all(), [
             'password' => 'required|string'
         ]);
