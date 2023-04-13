@@ -56,7 +56,7 @@ class UserController extends Controller
         if ($user) {
             if($email_verified){
                 if($user->email_verified_at==null){
-                    return response()->json("Please Open your Email and Verify by Clicking the Link!",401);
+                    return response()->json("Please Open your Email or Whatsapp to Verify!",401);
                 }
             }
             if( isset($user->status) && strtolower($user->status)!='active'){
