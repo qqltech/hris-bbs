@@ -99,14 +99,6 @@ class LaradevController extends Controller
         $dbname = "";
         try {
             if($connection!=null){
-                // $connection = [
-                //     'driver'=>'mysql',
-                //     'host'=>'localhost',
-                //     'port'=>'3306',
-                //     'username'=>'root',
-                //     'password'=>'root',
-                //     'database'=>'db'
-                // ];
                 $dbname = $connection['database'];
                 $conn = $this->getConnection($connection);
                 $conn=$conn->getDoctrineSchemaManager();
