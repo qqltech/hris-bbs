@@ -1868,8 +1868,9 @@ function debug(){
     Config::set('app.debug', true);
 }
 
-function connectTo( array $connArr ){ // 'driver' =>"", 'host' => "", 'port' => "", 'username' => "", 'database'=>'', 'password' => ""
+function connectTo( array $connArr, $name=null ){ // 'driver' =>"", 'host' => "", 'port' => "", 'username' => "", 'database'=>'', 'password' => ""
+    $name = $name ?? uniqid();
     $defaultConn = config('database.connections.flying'.$connArr[ 'driver' ] );
-    config(['database.connections.flying'.$connArr[ 'driver' ] => array_merge( $defaultConn, $connArr ) ]);
-    return DB::connection('flying'.$connArr[ 'driver'] );
+    config(["database.connections.flying_$name" => array_merge( $defaultConn, $connArr ) ]);
+    return DB::connection("flying_$name" );
 }
