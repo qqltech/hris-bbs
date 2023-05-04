@@ -1087,7 +1087,7 @@ class LaradevController extends Controller
                 $addedTables = [];
                 foreach($data as $file){
                     if($file==""){continue;};
-                    $stringClass = str_replace([".php","create_","_table"],["","",""], $file);
+                    $stringClass = str_replace([".php"],[""], $file);
                     $modelCandidate = "\App\Models\BasicModels\\$stringClass";
                     $addedTables[] = $stringClass;
                     $models[] =[
@@ -1329,7 +1329,7 @@ class LaradevController extends Controller
                 '--path' => $file,
                 '--force' => true,
             ]);
-            $this->createModels( $req, str_replace(["create_","_table"],["",""],$table) );
+            $this->createModels( $req, $table );
             Cache::forget( 'migration-list' );
         }catch(Exception $e){
             return response()->json(["error"=>$e->getMessage()], 422);
