@@ -15,7 +15,7 @@ class DefaultUsersSocialite extends Migration
     {
         Schema::create('default_users_socialite', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger("user_id")->comment('{"fk":"default_users.id"}');
+            $table->bigInteger("default_users_id")->comment('{"fk":"default_users.id"}');
             $table->string('provider');
             $table->string('username')->nullable();
             $table->string('email')->nullable();
