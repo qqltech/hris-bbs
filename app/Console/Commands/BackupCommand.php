@@ -76,6 +76,7 @@ class BackupCommand extends Command
             $file = date('Y-m-d') . '-dump-' . $database . '.sql';
 
             if( getDriver() == 'mysql' ){
+                $dumpBin = env( 'BACKUP_SQL_BIN', 'mysqldump' );
                 $schemaManager = DB::getDoctrineSchemaManager();
                 $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
                 
@@ -83,7 +84,7 @@ class BackupCommand extends Command
                 File::put($schemaSql = "$path/sqldump/000-database-schema-only.sql", implode(";\n", $sqlLineList) );
     
                 // --column-statistics=0
-                $command = sprintf('mysqldump --routines '.(isMariaDB()?'--column-statistics=0':'').' -h %s -u %s -p\'%s\' %s > %s', 
+                $command = sprintf("$dumpBin --routines ".(isMariaDB()?'--column-statistics=0':'').' -h %s -u %s -p\'%s\' %s > %s', 
                             $host, 
                             $username, 
                             $password, 
@@ -91,8 +92,9 @@ class BackupCommand extends Command
                             $sqlPath = "$path/sqldump/$file");
                 exec($command);
             }elseif( getDriver() == 'pgsql' ){
+                $dumpBin = env( 'BACKUP_SQL_BIN', 'pg_dump' );
                 $file = str_replace(".sql", ".tar", $file);
-                $command = sprintf( "pg_dump --no-owner -F t --dbname=\"postgresql://$username:$password@$host:$port/$database\" > %s", $sqlPath = "$path/sqldump/$file");
+                $command = sprintf( "$dumpBin --no-owner -F t --dbname=\"postgresql://$username:$password@$host:$port/$database\" > %s", $sqlPath = "$path/sqldump/$file");
                 exec($command);
             }
 
