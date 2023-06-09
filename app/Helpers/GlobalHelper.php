@@ -200,6 +200,9 @@ function _customGetData($model,$params)
             
             $meArr = explode( ".", $onMe );
             $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
+            if( $aliasParent==='id' ){
+                $aliasParent = str_replace( $className."_", '', $parent);
+            }
 
             if( !class_exists($parentClassString) ){
                 continue;
@@ -209,7 +212,7 @@ function _customGetData($model,$params)
                 continue;                
             }
 
-            if(req('api_version')!=2){
+            if(getApiVersion()!=2){
                 if( !isset($kembar[$parent]) ){
                     $kembar[$parent] = 1;
                 }else{
@@ -218,7 +221,7 @@ function _customGetData($model,$params)
             }
 
             $parentName = $fullParent;
-            if(req('api_version')!=2 && $kembar[$parent]>1){
+            if(getApiVersion()!=2 && $kembar[$parent]>1){
                 $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
                 // $onParent = str_replace($parent,"tes".$parent.(string)$kembar[$parent],$onParent); //OLD CODE
                 $onParentArray=explode(".",$onParent);
@@ -228,18 +231,18 @@ function _customGetData($model,$params)
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
 
-            if(req('api_version')==2){
+            if(getApiVersion()==2){
                 $parentName = "$fullParent AS $aliasParent";
                 $onParent = str_replace($fullParent,$aliasParent,$onParent);
             }
 
             $model = $model->leftJoin($parentName, $onParent, "=", $onMe);
             $parentClass = new $parentClassString;
-            if( req('api_version') !=2 && $kembar[$parent]>1 ){
+            if( getApiVersion() !=2 && $kembar[$parent]>1 ){
                 $parentName = $parent.(string)$kembar[$parent];
             }
             foreach($parentClass->columns as $column){
-                if( req('api_version')==2 ){
+                if( getApiVersion()==2 ){
                     $colTemp = "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
                 }else{
                     $colTemp = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
@@ -250,7 +253,7 @@ function _customGetData($model,$params)
             }
             
             if($joinMax>0){
-                if(req('api_version')==2){
+                if(getApiVersion()==2){
                     _joinRecursiveAlias($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
                 }else{
                     _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
@@ -628,7 +631,9 @@ function _customFind($model, $params)
 
             $meArr = explode( ".", $onMe );
             $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
-
+            if( $aliasParent==='id' ){
+                $aliasParent = str_replace( $className."_", '', $parent);
+            }
             if( !class_exists($parentClassString) ){
                 continue;
             }
@@ -639,7 +644,7 @@ function _customFind($model, $params)
                 $kembar[$parent] = $kembar[$parent]+1;
             }
             $parentName = $fullParent;
-            if(req('api_version')!=2 && $kembar[$parent]>1){
+            if(getApiVersion()!=2 && $kembar[$parent]>1){
                 $parentName = "$fullParent AS ".$parent.(string)$kembar[$parent];
                 $onParentArray=explode(".",$onParent);
                 if( count( $onParentArray )>2 ){
@@ -648,7 +653,7 @@ function _customFind($model, $params)
                 $onParent = str_replace($parent,$parent.(string)$kembar[$parent],$onParent);
             }
 
-            if(req('api_version')==2){
+            if(getApiVersion()==2){
                 $parentName = "$fullParent AS $aliasParent";
                 $onParent = str_replace($fullParent,$aliasParent,$onParent);
                 // trigger_error(json_encode([$parentName,$onParent,$onMe]));
@@ -656,11 +661,11 @@ function _customFind($model, $params)
 
             $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
             $parentClass = new $parentClassString;
-            if(req('api_version') !=2 && $kembar[$parent]>1){
+            if(getApiVersion() !=2 && $kembar[$parent]>1){
                 $parentName = $parent.(string)$kembar[$parent];
             }
             foreach($parentClass->columns as $column){
-                if( req('api_version')==2 ){
+                if( getApiVersion()==2 ){
                     $colTemp = "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
                 }else{
                     $colTemp = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
@@ -670,7 +675,7 @@ function _customFind($model, $params)
             }
         }
         if($joinMax>0){
-            if(req('api_version')==2){
+            if(getApiVersion()==2){
                 _joinRecursiveAlias($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
             }else{
                 _joinRecursive($joinMax,$kembar,$fieldSelected,$allColumns,$joined,$model,$parent,$params);
@@ -1873,4 +1878,8 @@ function connectTo( array $connArr, $name=null ){ // 'driver' =>"", 'host' => ""
     $defaultConn = config('database.connections.flying'.$connArr[ 'driver' ] );
     config(["database.connections.flying_$name" => array_merge( $defaultConn, $connArr ) ]);
     return DB::connection("flying_$name" );
+}
+
+function getApiVersion(){ // mendapatkan api version untuk response: 1 atau 2
+    return req('api_version') ?? ( env( 'API_VERSION', 1 ) );
 }
