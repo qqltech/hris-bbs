@@ -620,7 +620,7 @@ class ApiFixedController extends Controller
                 $additionalData = $this->createAdditionalData($model, $isiData);
                 $eliminatedData = $this->createEliminationData($model, $isiData);
                 $processedData  = array_merge($eliminatedData, $additionalData);
-                if($parentId!=null){
+                if($parentId && $parentName){
                     $columns    = $model->columns;                   
                     $fkName = $parentName;  
                     $tableSingleArray = explode(".", $parentName);
@@ -671,7 +671,7 @@ class ApiFixedController extends Controller
             $additionalData = $this->createAdditionalData($model, $data);
             $eliminatedData = $this->createEliminationData($model, $data);
             $processedData  = array_merge($eliminatedData, $additionalData);
-            if($parentId!=null){
+            if($parentId && $parentName){
                 $columns    = $model->columns;
                 $fkName     = $parentName;
                 if(!in_array($fkName."_id",$columns)){
@@ -725,7 +725,16 @@ class ApiFixedController extends Controller
             
             $finalData  = reformatData($finalData,$model);
 
+            if( $parentId && !$parentName ){
+                $finalData['id'] = $parentId;
+            }
+
             $finalModel = $preparedModel->create( $finalData );
+
+            if( @$model->extendedTable ){
+                $this->createOperation( $model->extendedTable, $data, $finalModel->id );
+            }
+
             $model->createAfter($finalModel, $data, $this->requestMeta, $finalModel->id);
             $this->operationId=$finalModel->id;
             $this->success[] = "SUCCESS: data created in ".$model->getTable()." new id: $finalModel->id";
@@ -870,6 +879,11 @@ class ApiFixedController extends Controller
         }
 
         $preparedModel->delete();
+        
+        if( @$model->extendedTable ){
+            getBasic( $model->extendedTable )->where('id', $id)->delete();
+        }
+
         $model->deleteAfter($model, $preparedModel, $this->requestMeta, $id);
         
         $this->success[] = "SUCCESS: data deleted in $table id: $id";
@@ -963,6 +977,11 @@ class ApiFixedController extends Controller
         $finalData  = reformatData($finalData,$preparedModel);
         
         $finalModel = $preparedModel->update($finalData);
+        
+        if( @$model->extendedTable ){
+            $this->updateOperation( $model->extendedTable, $data, $id );
+        }
+
         $model->updateAfter($finalModel, $processedData, $this->requestMeta, $id);
         $this->success[] = "SUCCESS: data update in ".$model->getTable()." id: $id";                
         
