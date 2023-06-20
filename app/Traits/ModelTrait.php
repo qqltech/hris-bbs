@@ -179,9 +179,17 @@ trait ModelTrait {
         $filteredCols = (array)req2('if_%');
         if(!$filteredCols)  return;
         $table = $this->getTable();
-        $query->where(function($q) use($filteredCols, $table, $operators){
+        $model = $this;
+
+        $query->where(function($q) use($filteredCols, $table, $operators, $model){
             foreach( $filteredCols as $key => $val){
-                $key = str_replace("this.", "$table.", $key);
+                $column = Str::replaceFirst("if_", "", $key);//str_replace("if_", "", $key);
+
+                if( !Str::contains($column, '.') ){
+                    $column = in_array($column, $model->columns)?"this.$column":$column;
+                }
+
+                $column = str_replace("this.", "$table.", $column);
                 $fixedOperator = '=';
                 $valLower = strtolower($val);
 
@@ -194,7 +202,6 @@ trait ModelTrait {
                     }
                 }
 
-                $column = Str::replaceFirst("if_", "", $key);//str_replace("if_", "", $key);
                 $val = strtolower($val);
                 $val = str_replace( [ '\\','(',')', "'" ],[ "\'",'\\\\','\(','\)' ], $val);
                 if(in_array( Str::lower($fixedOperator), ['between','in', 'not in']) ){

@@ -263,9 +263,11 @@ function _customGetData($model,$params)
     }
     if( $isParent && $pureModel->isParamAllowed('selectfield') &&  (($isParent && req('selectfield')) || req2("$className.selectfield") ) ){
         $rawSelectFields = req2("$className.selectfield") ?? req('selectfield');
-        $selectFields = str_replace(["this.","\n","  ","\t"],["$table.","","",""], $rawSelectFields);
-        $selectFields = explode(",", $selectFields);
-        $fieldSelected= $selectFields;
+        $selectFields = explode(",", $rawSelectFields);
+        $selectFields = array_map(function($d)use($table){
+            return !Str::contains($d, '.')?"$table.$d":str_replace(["this.","\n","  ","\t"], ["$table.","","",""], $d);
+        }, $selectFields);
+        $fieldSelected = $selectFields;
     }
     
     if( $isParent && req('addselect') && $pureModel->isParamAllowed('addselect') ){
@@ -408,6 +410,19 @@ function _customGetData($model,$params)
        $model=$model->orderBy(DB::raw($order),req('order_type', 'DESC'));
     }
     
+    $processedArr = [];
+    foreach($fieldSelected as $idx => $field){
+        if( !Str::contains(strtolower($field), ' as ') ){
+            $tempArr = explode('.', $field);
+            $colName = end($tempArr);
+            if( in_array($colName, $processedArr) ){
+                $fieldSelected[ $idx ] = "$field AS ".'"'.$field.'"';
+            }else{
+                $processedArr[] = end($tempArr);
+            }
+        }
+    }
+
     $final  = $model->select(DB::raw(implode(",",$fieldSelected) ));
     
     $finalObj = (object)[
@@ -460,7 +475,7 @@ function _customGetData($model,$params)
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() 
-                    : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
+                    : $modelExtender->$func( @$row['id'] )], $fixedData[$index]);
                 }
             }
 
@@ -536,7 +551,7 @@ function _customGetData($model,$params)
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() 
-                    : $modelExtender->$func( $row['id'] )], $fixedData[$index]);
+                    : $modelExtender->$func( @$row['id'] )], $fixedData[$index]);
                 }
             }
             $index++;
