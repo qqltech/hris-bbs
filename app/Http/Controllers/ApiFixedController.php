@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\support\Facades\Auth;
 use Illuminate\support\Facades\Validator;
 use  App\Helpers\Cryptor;
+use App\Helpers\Logger;
 
 class ApiFixedController extends Controller
 {
@@ -1172,7 +1173,7 @@ class ApiFixedController extends Controller
                 if(!$this->operationOK){
                     DB::rollback();
                     return response()->json([
-                        "status"    => "$this->operation data failed",
+                        "message"    => "$this->operation data failed",
                         // "warning"  => $this->messages, 
                         "success"  => $this->success, 
                         "errors"  => $this->errors, 
@@ -1224,11 +1225,12 @@ class ApiFixedController extends Controller
                 return response()->json($responses,200);
             }else{
                 DB::rollback();
+                Logger::store($e);
                 return response()->json([
-                    "status"    => "$this->operation data gagal",
+                    "message"    => "$this->operation data gagal",
                     // "warning"   => $this->messages, 
                     "success"   => $this->success, 
-                    "errors"    => $this->errors, 
+                    "errors"  => $e->getMessage().(env("APP_DEBUG",false)?" => file: ".$e->getLine().". line: ".$e->getLine():""),
                     // "request"   => $this->requestData,
                     "id"        => $this->operationId,
                     "processed_time"=>round(microtime(true)-config("start_time"),5)
@@ -1237,7 +1239,7 @@ class ApiFixedController extends Controller
         }else{
             DB::rollback();
             return response()->json([
-                "status"    => "$this->operation data failed",
+                "message"    => "$this->operation tidak diizinkan",
                 // "warning"  => $this->messages, 
                 "success"  => $this->success, 
                 "errors"  => $this->errors, 
