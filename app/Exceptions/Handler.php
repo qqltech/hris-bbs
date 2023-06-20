@@ -12,6 +12,8 @@ use Illuminate\Support\Arr;
 use illuminate\Support\Facades\DB;
 use Throwable;
 use Illuminate\Http\Response;
+use App\Helpers\Logger;
+
 class Handler extends ExceptionHandler
 {
     /**
@@ -24,7 +26,7 @@ class Handler extends ExceptionHandler
         HttpException::class,
         ModelNotFoundException::class,
         ValidationException::class,
-        // \League\OAuth2\Server\Exception\OAuthServerException::class,
+        \League\OAuth2\Server\Exception\OAuthServerException::class,
     ];
 
     /**
@@ -56,6 +58,7 @@ class Handler extends ExceptionHandler
         DB::rollback();
         $rendered = parent::render($request, $e);
         $msg = $this->getFixedMessage($e);
+        Logger::store( $e, $rendered->getStatusCode() );
         $responseError = [
             'processed_time' => round(microtime(true)-config("start_time"),5),
             'code' => $rendered->getStatusCode()
@@ -75,6 +78,14 @@ class Handler extends ExceptionHandler
         
         if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             return $e->getMessage();
+        }
+
+        if( !config('app.debug') ){
+            $classes = explode( '\\', get_class( $e ) );
+            $type = end($classes);
+            if( !in_array( $type, ['HttpException']) ){
+                return "Oops, internal server error.";
+            }
         }
 
         $fileName = explode( (Str::contains($e->getFile(), "\\")?"\\":"/"), $e->getFile());
