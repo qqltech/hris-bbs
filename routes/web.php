@@ -47,7 +47,8 @@ $router->group(['middleware' => 'project'], function () use ($router) {
                 "visualisasi DB" => url("/visual.html"),
                 "simulation" => url("/docs/simulation"),
                 "report templating" => url("/docs/reporting"),
-                "uploader" => url("/docs/uploader")
+                "uploader" => url("/docs/uploader"),
+                "activities" => url("/docs/activities"),
             ]
         ]);
     });

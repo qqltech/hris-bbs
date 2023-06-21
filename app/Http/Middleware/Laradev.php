@@ -21,6 +21,8 @@ class Laradev
         if( !$ori && !in_array($devToken, $frontenders) && !in_array($devToken, $backenders) && !in_array($devToken, $owners) ){
             return response()->json(['status'=>'unauthorized'], 401);
         }
+
+        config(['developer'=> $devToken]);
         if( in_array($devToken, $frontenders) ){
             config(['devrole'=> 'frontend']);
         }elseif( in_array($devToken, $backenders) ){

@@ -274,4 +274,11 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
 
         return view("defaults.raw", compact('data'));
     });
+
+    $router->get('/activities', function(Request $req){
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
+        }
+        return getDeveloperActivities();
+    });
 });

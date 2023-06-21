@@ -1898,3 +1898,31 @@ function connectTo( array $connArr, $name=null ){ // 'driver' =>"", 'host' => ""
 function getApiVersion(){ // mendapatkan api version untuk response: 1 atau 2
     return req('api_version') ?? ( env( 'API_VERSION', 1 ) );
 }
+
+function devTrack( $action, $filename ){ // tracking aktivitas di route laradev
+    $key = "developer_activities";
+    $activities = Cache::get( $key ) ?? [];
+    array_unshift($activities, [
+        'time' => Carbon::now()->format('Y-m-d H:i:s'),
+        'name' => config('developer'),
+        'action' => $action,
+        'file' => $filename
+    ]);
+    
+    Cache::forever( $key, array_slice( $activities, 0, env('DEV_ACTIVITIES_MAX_ROWS', 250), true) );
+}
+
+function getDeveloperActivities( $html=true ){
+    $activities = Cache::get( "developer_activities" );
+    if( !$html ) return $activities;
+    $htmlData = "";
+    
+    foreach( $activities as $idx => $act ){
+        $row="<tr><td style='text-align:center;'>".($idx+1)."</td><td style='text-align:center;'>{$act['time']}</td><td>{$act['name']}</td><td>{$act['action']}</td><td>{$act['file']}</td></tr>";
+        $htmlData.=$row;
+    }
+
+    return "<h3 style='text-align:center'> Dev Activities on ".env('APP_NAME')." until ".(Carbon::now()->format('d/m/Y')).'</h3><table style="width:100%;" border="1" cellpadding=1>
+            <thead style="background:pink;"><th>No</th><th>Time</th><th>Dev Token</th><th>Action</th><th>Relation</th></thead>'.
+            "<tbody>$htmlData</tbody></table>";
+}

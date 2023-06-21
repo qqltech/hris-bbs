@@ -637,6 +637,7 @@ class LaradevController extends Controller
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<SAVE MODEL $tableName>");       
             }
+            devTrack( 'Update API', $tableName );
             return "update Model OK";
         }else{
             return response()->json($output,422);
@@ -1044,7 +1045,7 @@ class LaradevController extends Controller
 
     public function readMigrations(Request $req, $table=null){
         try{
-            if($table!=null){
+            if($table){
                 $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
                 if(!File::exists( $migrationPath )){
                     return response()->json("migration file [$table] tidak ada",400);
@@ -1150,7 +1151,7 @@ class LaradevController extends Controller
     }
 
     public function readAlter(Request $req, $table=null){
-        if( $table!=null ){
+        if( $table ){
             $alterPath = base_path("database/migrations/alters/0_0_0_0_$table.php");
             if(!File::exists( $alterPath )){
                 return str_replace([
@@ -1221,6 +1222,7 @@ class LaradevController extends Controller
             return response()->json("$table is not truncatable", 401);
         }
         $model->truncate();
+        devTrack( 'Truncating', $table );
         return "$table has been truncated";
     }
 
@@ -1320,6 +1322,7 @@ class LaradevController extends Controller
             }
 
             Cache::forget('migration-list');
+            devTrack( 'Migrate Down', $table );
             return "database migration ok, $table was downed successfully";
         }
         
@@ -1341,11 +1344,13 @@ class LaradevController extends Controller
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<ALTER $table>");       
             }
+            devTrack( 'Migrate Alter', $table );
             return "database alter ok, $table model altered successfully";
         }else{
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<MIGRATE $table>");       
             }
+            devTrack( 'Migrate Up', $table );
             return "database migration ok, $table model recreated successfully";
         }
     }
@@ -1393,6 +1398,7 @@ class LaradevController extends Controller
         }
         
         Cache::forget('migration-list');
+        devTrack( 'Delete All Backend', $table );
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
     }
     public function editAlter(Request $req, $table=null){
@@ -1403,12 +1409,14 @@ class LaradevController extends Controller
         if(env('GIT_ENABLE', false)){ 
             $this->git_push(".","<SAVE ALTER $table>");       
         }
+        devTrack( 'Updating Migration Alter', $table );
         return "update Alter OK";
     }
     public function editTest(Request $req, $table=null){
         $table = Str::camel(ucfirst($table));
         $path = base_path("tests/$table"."Test.php");
         File::put($path, $req->text);
+        devTrack( 'Updating Testing', $table );
         return "update Test OK";
     }
     
@@ -1433,7 +1441,7 @@ class LaradevController extends Controller
         return "update Basic Model Alias from $parent OK";
     }
     public function editMigrations(Request $req, $table=null){
-        if($table!=null){
+        if($table){
             $migrationPath = base_path("database/migrations/projects/0_0_0_0_$table.php");
             if(!File::exists( $migrationPath )){
                 return response()->json("migration file [$table] tidak ada",400);
@@ -1445,6 +1453,7 @@ class LaradevController extends Controller
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<SAVE MIGRATION $table>");       
             }
+            devTrack( 'Updating Migration', $table );
             return "update Migrations OK";
         }
         $data = $this->getDirContents( base_path('database/migrations/projects') );
@@ -1563,12 +1572,14 @@ class LaradevController extends Controller
     public function saveCoreFile(Request $req, string $filename ){
         $path = app_path("Cores/$filename.php");
         File::put( $path , $req->text); 
+        devTrack( 'Updating Core', $filename );
         return response()->json("core file was saved");
     }
 
     public function deleteCoreFile(Request $req, string $filename ){
         $path = app_path("Cores/$filename.php");
         File::delete( $path ); 
+        devTrack( 'Deleting Core', $filename );
         return response()->json("core file was delete");
     }
 
@@ -1585,6 +1596,7 @@ class LaradevController extends Controller
 
         $path = public_path("js/$filename.js");
         $file = File::put( $path , $req->text); 
+        devTrack( 'Updating JS', $filename );
         return response()->json("js file was saved");
     }
 
@@ -1592,6 +1604,7 @@ class LaradevController extends Controller
 
         $path = public_path("js/$filename.js");
         $file = File::delete( $path ); 
+        devTrack( 'Deleting JS', $filename );
         return response()->json("js file was delete");
     }
 
@@ -1608,12 +1621,14 @@ class LaradevController extends Controller
 
         $path = base_path("resources/views/projects/$filename.blade.php");
         $file = File::put( $path , $req->text); 
+        devTrack( 'Updating Blade', $filename );
         return response()->json("blade file was saved");
     }
 
     public function deleteBladeFile(Request $req, string $filename ){
         $path = base_path("resources/views/projects/$filename.blade.php");
         $file = File::delete( $path ); 
+        devTrack( 'Deleting Blade', $filename );
         return response()->json("blade file was deleted");
     }
 
