@@ -279,6 +279,36 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
         if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
             abort(401);
         }
+        
+        return view('defaults.unauthorized')->with('data',[
+            'page'=>'halaman dev activities',
+            'url'=>url("docs/activities")
+        ]);
+    });
+
+    $router->post('/activities', function(Request $req){
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
+        }
         return getDeveloperActivities();
+    });
+
+    $router->get('/activities/{id}', function( Request $req, $id ){
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
+        }
+        $activities = Cache::get( "developer_activities" );
+        foreach($activities as $act){
+            if( @$act['id']==$id && @$act['diff'] ){
+                $diff = $act['diff'];
+                $css = url("defaults/diff-table.css");
+                $result = \Jfcherng\Diff\Factory\RendererFactory::make('SideBySide', [
+                    'showHeader'=>false
+                ])->renderArray(json_decode( $diff, true ));
+
+                return "<link rel='stylesheet' href='$css'><p style='font-weight:semibold;'>$id ~ {$act['time']} ~ {$act['action']} ~ {$act['file']}</p>".$result;
+            }
+        }
+        return "detail was not-found";
     });
 });

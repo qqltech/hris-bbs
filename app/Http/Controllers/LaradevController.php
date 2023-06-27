@@ -630,14 +630,11 @@ class LaradevController extends Controller
         }
         if($return===0){
 
-            if( File::exists( "$this->modelsPath/CustomModels/$tableName.php") ){
-                File::delete("$this->modelsPath/CustomModels/$tableName.php" );
-            }
-            $file = File::put("$this->modelsPath/CustomModels/$tableName.php", $request->text );
+            $file = putFileDiff("$this->modelsPath/CustomModels/$tableName.php", $request->text );
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<SAVE MODEL $tableName>");       
             }
-            devTrack( 'Update API', $tableName );
+            devTrack( 'Update API', $tableName, $file );
             return "update Model OK";
         }else{
             return response()->json($output,422);
@@ -1402,14 +1399,11 @@ class LaradevController extends Controller
         return response()->json("Model, Migrations, Table, Trigger terhapus semua");
     }
     public function editAlter(Request $req, $table=null){
-        if( File::exists( base_path("database/migrations/alters/0_0_0_0_$table.php") ) ){
-            File::delete( base_path("database/migrations/alters/0_0_0_0_$table.php") );
-        }
-        File::put( base_path("database/migrations/alters/0_0_0_0_$table.php") , $req->text); 
+        $res = putFileDiff( base_path("database/migrations/alters/0_0_0_0_$table.php") , $req->text); 
         if(env('GIT_ENABLE', false)){ 
             $this->git_push(".","<SAVE ALTER $table>");       
         }
-        devTrack( 'Updating Migration Alter', $table );
+        devTrack( 'Updating Migration Alter', $table, $res );
         return "update Alter OK";
     }
     public function editTest(Request $req, $table=null){
@@ -1446,15 +1440,12 @@ class LaradevController extends Controller
             if(!File::exists( $migrationPath )){
                 return response()->json("migration file [$table] tidak ada",400);
             }
-            if( File::exists( $migrationPath ) ){
-                File::delete( $migrationPath );
-            }
-            $file = File::put( $migrationPath , $req->text); 
+            $file = putFileDiff( $migrationPath , $req->text); 
             if(env('GIT_ENABLE', false)){ 
                 $this->git_push(".","<SAVE MIGRATION $table>");       
             }
-            devTrack( 'Updating Migration', $table );
-            return "update Migrations OK";
+            devTrack( 'Updating Migration', $table, $file );
+            return "update Migration OK";
         }
         $data = $this->getDirContents( base_path('database/migrations/projects') );
         Cache::forget('migration-list');
@@ -1571,8 +1562,8 @@ class LaradevController extends Controller
 
     public function saveCoreFile(Request $req, string $filename ){
         $path = app_path("Cores/$filename.php");
-        File::put( $path , $req->text); 
-        devTrack( 'Updating Core', $filename );
+        $res = putFileDiff( $path , $req->text ); 
+        devTrack( 'Updating Core', $filename, $res );
         return response()->json("core file was saved");
     }
 
@@ -1593,10 +1584,9 @@ class LaradevController extends Controller
     }
 
     public function saveJsFile(Request $req, string $filename ){
-
         $path = public_path("js/$filename.js");
-        $file = File::put( $path , $req->text); 
-        devTrack( 'Updating JS', $filename );
+        $file = putFileDiff( $path , $req->text); 
+        devTrack( 'Updating JS', $filename, $file );
         return response()->json("js file was saved");
     }
 
@@ -1620,8 +1610,8 @@ class LaradevController extends Controller
     public function saveBladeFile(Request $req, string $filename ){
 
         $path = base_path("resources/views/projects/$filename.blade.php");
-        $file = File::put( $path , $req->text); 
-        devTrack( 'Updating Blade', $filename );
+        $file = putFileDiff( $path , $req->text);
+        devTrack( 'Updating Blade', $filename, $file );
         return response()->json("blade file was saved");
     }
 

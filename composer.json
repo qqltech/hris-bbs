@@ -21,6 +21,7 @@
         "intervention/image": "^2.7",
         "intervention/imagecache": "^2.5",
         "jenssegers/agent": "^2.6",
+        "jfcherng/php-diff": "^6.15",
         "laravel/lumen-framework": "^9.0",
         "laravel/passport": "^10.4",
         "laravel/socialite": "^5.5",
