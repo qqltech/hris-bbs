@@ -1955,3 +1955,19 @@ function putFileDiff( $path, $text ) {
     }
     return \Jfcherng\Diff\DiffHelper::calculate( $oldFile, $text, 'Json' );
 }
+
+function random_str_cache( int $length = 5, int $seconds=300, string $value, array $keyspace = [1,2,3,4,5,6,7,8,9,0] ): string 
+{
+    shuffle($keyspace);
+    $code = implode( '', \Arr::random( $keyspace, $length ) );
+
+    while( Cache::has("str_cached_$code") ){
+        $code = random_str_cache($length, $seconds, $keyspace);
+    }
+    Cache::put("str_cached_$code", $value, $seconds=5*60);
+    return $code;
+}
+
+function get_random_str_cache( string $code, bool $isPull=true ){
+    return !$isPull ? Cache::get("str_cached_$code") : Cache::pull("str_cached_$code");
+}
