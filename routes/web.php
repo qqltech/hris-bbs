@@ -8,6 +8,10 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->post('/unlock-screen', "UserController@unlockScreen");
     $router->post('/change-password', "UserController@changePassword");
 });
+$router->post('/reset-password-link','UserController@ResetPasswordLink');
+$router->get('/reset-password-verify/{token}','UserController@ResetPasswordTokenVerify');
+$router->post('/reset-password','UserController@ResetPassword');
+
 $router->post('/login', "UserController@login");
 $router->post('/register', "UserController@register");
 $router->get('/verify/{token}', "UserController@verify");
@@ -53,4 +57,3 @@ $router->group(['middleware' => 'project'], function () use ($router) {
         ]);
     });
 });
-

@@ -197,4 +197,73 @@ class UserController extends Controller
             return response()->json(['message'=>'password salah'], 401);
         }
     }
+
+    public function ResetPasswordLink( Request $request ){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string',
+            'callback' => 'required|string'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),422);
+        }
+        $user = User::where( @$request->column ?? 'email', $request->email )->first();
+        if( !$user ){
+            return response()->json(['message'=>'user tidak ditemukan'], 401);
+        }
+        $token = random_str_cache(25, 600, 'email', [1,2,3,4,5,6,7,8,9,0,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+
+        $res = SendEmail($request->email, env('APP_NAME').': Link Reset Password', 
+            "Hai $user->name, Click link $request->callback/$token untuk reset password anda. <br/>"
+            ."<i>Link ini berlaku hanya 10 menit sejak email ini dikirimkan<br/>"
+            ."Abaikan jika anda tidak merasa ingin melakukan reset password</i>"
+        );
+
+        return response()->json([
+            'message'=>"Link reset password telah dikirim ke $request->email berlaku(expired) 10 menit"
+        ]);
+    }
+    
+    public function ResetPasswordTokenVerify( Request $request, $token ){
+        $account = get_random_str_cache( $token, $isPull=false );
+        if( !$account ){
+            return response()->json([
+                'message'=>"Maaf token tidak dikenali atau mungkin telah expired"
+            ], 401);
+        }
+        return response()->json([
+            'verified' => true,
+            'email' => $account,
+            'url_change_password_post' => url("reset-password")
+        ]);
+    }
+    
+    public function ResetPassword( Request $request ){
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|string',
+            'password' => 'required|string|confirmed'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(),422);
+        }
+        
+        $account = get_random_str_cache( $request->token, $isPull=false );
+        if( !$account ){
+            return response()->json([
+                'message'=>"Maaf token tidak dikenali atau mungkin telah expired"
+            ], 401);
+        }
+
+        $user = User::where( @$request->column ?? 'email', $account )->first();
+        if( !$user ){
+            return response()->json(['message'=>'user tidak ditemukan'], 401);
+        }
+        
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return response()->json([
+            'message'=>"Password telah berhasil diupdate, silahkan login"
+        ]);
+    }
 }
