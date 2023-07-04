@@ -524,7 +524,7 @@ class ApiFixedController extends Controller
                 $modelHeir          = getCustom( (count($heirExplode)==1?$heir:$heirExplode[1]) );
                 $join               = $modelHeir->joins;
                 foreach($join as $relation){
-                    if(strpos($relation,$modelName)!==false){
+                    if(strpos($relation,"$modelName.")!==false){
                         $colArr = explode("=", $relation)[1];
                         $col    = $colArr;
                         $existing = $modelHeir->where($col, $refId )->withoutGlobalScopes()->limit(1)->get();
@@ -900,6 +900,7 @@ class ApiFixedController extends Controller
                 
                 foreach( $dataDetail as $idxDtl => $dtl ){
                     if(!$this->is_model_deletable( $detail, $dtl->id )){
+                        $this->operationOK = false;
                         return;
                     };
 
