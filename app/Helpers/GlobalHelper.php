@@ -1900,6 +1900,7 @@ function getApiVersion(){ // mendapatkan api version untuk response: 1 atau 2
 }
 
 function devTrack( $action, $fileName, $fileDiff=null ){ // tracking aktivitas di route laradev
+    if( gettype($fileDiff)=='string' && $fileDiff=='[]' ) return;
     $key = "developer_activities";
     $activities = Cache::get( $key ) ?? [];
     array_unshift($activities, [
@@ -1919,14 +1920,17 @@ function getDeveloperActivities( $html=true ){
     $activities = Cache::get( "developer_activities" );
     if( !$html ) return $activities;
     $htmlData = "";
+    $count = 0;
     
     foreach( $activities as $idx => $act ){
+        if(@$act['diff']==='[]') continue;
+        $count++;
         $fileUrl = $act['file'];
         if(@$act['diff'] && @$act['id']){
             $fileUrl = "<a href='/docs/activities/{$act['id']}'>{$act['file']}</a>";
         }
         $dev = $act['name'].( @$act['ip'] ? " [ ".$act['ip']." ]":"" );
-        $row="<tr><td style='text-align:center;'>".($idx+1)."</td><td style='text-align:center;'>{$act['time']}</td><td>$dev</td><td>{$act['action']}</td>
+        $row="<tr><td style='text-align:center;'>$count</td><td style='text-align:center;'>{$act['time']}</td><td>$dev</td><td>{$act['action']}</td>
         <td>$fileUrl</td></tr>";
         $htmlData.=$row;
     }
