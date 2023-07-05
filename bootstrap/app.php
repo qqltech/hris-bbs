@@ -1,10 +1,21 @@
 <?php
 
 require_once __DIR__.'/../vendor/autoload.php';
-$suffixEnvFile = strtolower(explode('.', @$_SERVER['HTTP_HOST']??'.')[0]);
-$runtimeEnvFile = ".env.$suffixEnvFile";
+
+$envFile = ".env"; // default .env file
+
+$port = @$_SERVER['SERVER_PORT'];
+if( $port && ( $port!='80' || $port!='443' ) && file_exists( dirname(__DIR__) . '/' . ".env.$port" ) ){
+    $envFile = ".env.$port"; // jika port selain 80 & 443 maka akan mengutamakan .env.{port} jika ada
+}else{
+    $subDomain = strtolower(explode('.', @$_SERVER['HTTP_ENV'] ?? @$_SERVER['HTTP_HOST'] ?? '.')[0]);
+    if( $subDomain && file_exists( dirname(__DIR__) . '/' . ".env.$subDomain" ) ){
+        $envFile = ".env.$subDomain"; // jika membawa header HTTP_ENV atau tidak, maka akan mencoba pakai .env.{subdomain} jika ada
+    }
+}
+
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
-    dirname(__DIR__),file_exists(dirname(__DIR__) . '/' . $runtimeEnvFile) ? $runtimeEnvFile : null
+    dirname(__DIR__), $envFile // dynamic .env file jika diperlukan
 ))->bootstrap();
 
 $app = new Laravel\Lumen\Application(
