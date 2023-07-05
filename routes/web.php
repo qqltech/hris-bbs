@@ -40,20 +40,19 @@ $router->group(['middleware' => 'project'], function () use ($router) {
             abort(401);
         }
 
-        return response()->json(["info"=>"welcome to LARAHAN fast Api Laravel Lumen-based!",
-            "data"=>[
-                "version"=>app()->version(),
-                "documentation" => url("/docs/documentation"),
-                "operation" => url("/operation"),
-                "config" => url("/laradev"),
-                "frontend" => url("/docs/frontend"),
-                "backend" => url("/docs/backend"),
-                "visualisasi DB" => url("/visual.html"),
-                "simulation" => url("/docs/simulation"),
-                "report templating" => url("/docs/reporting"),
-                "uploader" => url("/docs/uploader"),
-                "activities" => url("/docs/activities"),
-            ]
+        return response()->json([
+            "Application"=> env('APP_NAME'),
+            "PHP Version" => phpversion(),
+            "Documentation" => url("/docs/documentation"),
+            // "config" => url("/laradev"),
+            "Endpoint Docs" => url("/docs/frontend"),
+            "Request Simulator" => url("/operation"),
+            "Mini Editor" => url("/docs/backend"),
+            "Database Schema" => url("/visual.html"),
+            // "simulation" => url("/docs/simulation"),
+            "Report Templating" => url("/docs/reporting"),
+            "Data uploader" => url("/docs/uploader"),
+            "Activities" => url("/docs/activities"),
         ]);
     });
 });

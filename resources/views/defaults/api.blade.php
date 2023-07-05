@@ -208,7 +208,7 @@
                                 simplest    : false
                             },
                             basic_response  : arrayData.columns,
-                            real_response  : "Silahkan dicoba di operation atau POSTMAN"
+                            real_response  : "Silahkan dicoba di Request Simulator atau POSTMAN"
                         };
                         
                         codemirror.setOption('mode','javascript');
