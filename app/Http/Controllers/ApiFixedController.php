@@ -814,11 +814,10 @@ class ApiFixedController extends Controller
                 $params[$key] = null;
             }
         }
-        $params=(object)$params;
+        $p=(object)$params;
         $model          = getCustom( $modelName );
         config( [ "parentTable" => $model->getTable() ] );
         
-        $p = (Object)[];
         if($id!=null){
             $p->id          = $id;
             $p->joinMax     = 0;
