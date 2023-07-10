@@ -210,7 +210,7 @@ class UserController extends Controller
         if( !$user ){
             return response()->json(['message'=>'user tidak ditemukan'], 401);
         }
-        $token = random_str_cache(25, 600, 'email', [1,2,3,4,5,6,7,8,9,0,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+        $token = random_str_cache(25, 600, $request->email, [1,2,3,4,5,6,7,8,9,0,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
 
         $res = SendEmail($request->email, env('APP_NAME').': Link Reset Password', 
             "Hai $user->name, Click link $request->callback?token=$token untuk reset password anda. <br/>"
