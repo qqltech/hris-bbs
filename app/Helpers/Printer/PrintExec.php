@@ -105,37 +105,41 @@ class PrintExec
         $pdf->setTitle( 'Load Cost' );
         $pdf->SetAutoPageBreak( true );
 
-        $htmlArr = array_map(function($dt){
-            $value = $dt['data'];
-            return view("projects.{$dt['template']}", compact('value'))->render()."<div style='font-size:20px;'></div>";
-        }, $data);
-
-        $groupings = [];
+        $htmlArr = [];
+        foreach($data as $dt){
+          $value = $dt['data'];
+          $htmlArr[] = view("printers.{$dt['template']}", compact('value'))->render() . "<div style='font-size:20px;'></div>";
+          // trigger_error(gettype(config('printer_end_details')));
+          while( @config('printer_continue_details') ){
+            $htmlArr[]=view("printers.{$dt['template']}", compact('value'))->render() . "<div style='font-size:20px;'></div>";
+          }  
+        }
+        $groupings = @$config['break'] ? $htmlArr : [];
         $placedArr = [];
-
-
-        while( count( $placedArr )<count($htmlArr) ){
-            $pdf->AddPage( @$config['orientation']??'P', @$config['size']??'A4' );
-            $grouped = [];
-            foreach( $htmlArr as $idx => $currentHtml ){
-                if( in_array($idx, $placedArr) ) continue;
-
-                $heightBefore = $pdf->GetY();
-                $pdf->writeHTML($currentHtml, true, false, true, false, '');
-                $heightAfter = $pdf->GetY();
-                if($heightAfter < $heightBefore){
-                    $lastPage = $pdf->getPage();
-                    $pdf->deletePage($lastPage); // rollback
-                    break;
-                }
-                $grouped[] = $currentHtml;
-                $placedArr[] = $idx;
+    
+    
+        while (!@$config['break'] && count($placedArr) < count($htmlArr)) {
+          $pdf->AddPage(@$config['orientation'] ?? 'P', @$config['size'] ?? 'A4');
+          $grouped = [];
+          foreach ($htmlArr as $idx => $currentHtml) {
+            if (in_array($idx, $placedArr)) continue;
+    
+            $heightBefore = $pdf->GetY();
+            $pdf->writeHTML($currentHtml, true, false, true, false, '');
+            $heightAfter = $pdf->GetY();
+            if ($heightAfter < $heightBefore) {
+              $lastPage = $pdf->getPage();
+              $pdf->deletePage($lastPage); // rollback
+              break;
             }
-            
-            $groupings[] = implode($grouped);
-            if( ($lastPage = $pdf->getPage()) ){
-                $pdf->deletePage($lastPage); // rollback
-            }
+            $grouped[] = $currentHtml;
+            $placedArr[] = $idx;
+          }
+    
+          $groupings[] = implode($grouped);
+          if (($lastPage = $pdf->getPage())) {
+            $pdf->deletePage($lastPage); // rollback
+          }
         }
 
         foreach($groupings as $idx => $pg){
@@ -144,6 +148,17 @@ class PrintExec
         }
 
         $filePath = base_path("public/uploads/abc.pdf");
+        if( @$config['no_stream'] ){
+            $filePath = base_path("public/uploads/" . uniqid() . ".pdf");
+            $pdf->Output($filePath, 'F');
+            return response()->download($filePath)->deleteFileAfterSend(true);
+        }
+          
+        if ($this->debug) {
+            $pdf->Output($filePath, 'I');
+            die();
+        }
+
         if($this->debug){
             $pdf->Output($filePath, 'I');
             die();

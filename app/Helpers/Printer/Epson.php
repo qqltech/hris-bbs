@@ -15,8 +15,9 @@ Class Epson
         $connector = new FilePrintConnector($file);
         $printer = new Printer( $connector );
         $printer->lineSpacing(0);
-
-        // $printer->setPageInch(6);
+        if(config('pageSizeInch')){
+            $printer->setPageInch(config('pageSizeInch'));
+        }
         $printer->setCPI(Printer::CPI_3); // text kecil
         // $printer->setPageLines(32);
         // $printer->feedForm();

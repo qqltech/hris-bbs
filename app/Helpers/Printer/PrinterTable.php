@@ -34,7 +34,7 @@ class PrinterTable
             foreach($metaHeaders as $colIdx => $hdr){
                 $col = $hdr['key'] === 'auto' ? (!array_keys($row)?'': ($rowIdx+1) ) : (@$row[$hdr['key']]??'');
                 $content = (string)$col;
-                $colLength = max( $hdr['width'], mb_strlen($hdr['name'], 'UTF-8'));
+                $colLength = max( $hdr['width'], 0);
                 $separatorWrap = @$hdr['separator']??' ';
                 
                 $col = str_replace($separatorWrap,' ',$col);
@@ -65,8 +65,9 @@ class PrinterTable
             $newDataIdx = count($newData);
             foreach( $temp as $tempIdx => $tempVal ){
                 foreach( $tempVal as $colFixIdx => $colFix ){
-                    $hdr = $metaHeaders[$colFixIdx];
-                    $colLength = max( $hdr['width'], mb_strlen($hdr['name'], 'UTF-8'));
+                    $hdr = @$metaHeaders[$colFixIdx];
+                    if(!$hdr) continue;
+                    $colLength = max( $hdr['width'], 0);
                     $padAlign = STR_PAD_RIGHT;
                     if( @$hdr['align']=='center' ){
                         $padAlign = STR_PAD_BOTH;
@@ -88,6 +89,10 @@ class PrinterTable
             $name = str_replace(["\eE","\eF"], ['',''],$dt['name']);
             return str_pad($name, max( $dt['width'], mb_strlen($name, 'UTF-8')), $replacement, $padAlign);
         }, $metaHeaders );
+
+        if( @$metaHeaders[0]['key']==='desc' ){
+            // dd($headers);
+        }
 
         if(!$hideHeader){
             $tbl->setHeaders($headers);
@@ -840,8 +845,11 @@ class PrinterTable
             $return[] = $row_begin
                 . implode($implode_char, $this->_headers[$j]) . $row_end;
         }
-
-        return implode(PHP_EOL, $return).":::header:::";
+        foreach($return as $idx => $ret){
+            if($idx==0) continue;
+            $return[$idx] .= ":::header:::";
+        }
+        return implode(PHP_EOL, $return);
     }
 
     /**
