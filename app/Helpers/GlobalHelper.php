@@ -1968,7 +1968,7 @@ function random_str_cache( int $length = 5, int $seconds=300, string $value, arr
     while( Cache::has("str_cached_$code") ){
         $code = random_str_cache($length, $seconds, $keyspace);
     }
-    Cache::put("str_cached_$code", $value, $seconds=5*60);
+    Cache::put("str_cached_$code", $value, $seconds);
     return $code;
 }
 
