@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Blade;
 
 if (! function_exists('table_config')) {
     function table_config($table, $array)
@@ -705,13 +706,13 @@ function _customFind($model, $params)
     }
     
     if( req('addselect') && $pureModel->isParamAllowed('addselect') ){
-        $addSelect = str_replace("this.","$table.",strtolower( req('addselect') ));
+        $addSelect = str_replace("this.","$table.", req('addselect') );
         $fieldSelected = array_merge( $fieldSelected, explode(",",$addSelect));
     }
     
     if( $pureModel->isParamAllowed('addjoin') || req('addjoin') ){
         $addJoin = req('addjoin');
-        $joiningString = str_replace("this.","$table.",strtolower($addJoin));
+        $joiningString = str_replace("this.","$table.",$addJoin);
         $joins = explode( ",", $joiningString );
         foreach($joins as $join){
             if(strpos( $join, " and ")!==FALSE){
@@ -1974,4 +1975,43 @@ function random_str_cache( int $length = 5, int $seconds=300, string $value, arr
 
 function get_random_str_cache( string $code, bool $isPull=true ){
     return !$isPull ? Cache::get("str_cached_$code") : Cache::pull("str_cached_$code");
+}
+
+function getStringTemplate( string $keyword, bool $isCompress = false ){
+    $req = app()->request;
+    $html = view("projects.$keyword", compact('req'))->render();
+    $jsString = File::exists( public_path("js/$keyword.js") ) ?  File::get( public_path("js/$keyword.js") ) : "";
+    $js = Blade::render( $jsString, [ 'id'=>@$req->id ] );
+
+    $fixedTemplate = "<template>\n$html\n</template>\n<script setup>\n$js\n</script>";
+    if($isCompress){
+        return response( gzcompress( $fixedTemplate, 9) )->withHeaders([
+            'NOPLAIN'=>'yes'
+        ]);
+    }else{
+        return $fixedTemplate;
+    }
+}
+
+function wssNotify( string $type='notify', string $message='' ){
+    $socketServer = env('LOG_SENDER');
+    $clientChannel = env('CLIENT_CHANNEL');
+    if( !$socketServer || !$clientChannel ) return false;
+
+    $url = "$socketServer/$clientChannel";
+    $payloads = [
+        "data"=>[
+            "_type"=> $type,
+            "message"=>[
+                "msg"=> $message
+            ]
+        ]
+    ];
+    
+    try{
+        $client = \Illuminate\Support\Facades\Http::withHeaders([]);
+        return $client->asForm()->post($url, $payloads)->json();
+    }catch(\Exception $e){
+        return false;
+    }
 }
