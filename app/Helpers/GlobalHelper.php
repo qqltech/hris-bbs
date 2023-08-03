@@ -1993,7 +1993,7 @@ function getStringTemplate( string $keyword, bool $isCompress = false ){
     }
 }
 
-function wssNotify( string $type='notify', string $message='' ){
+function wssNotify( string $type='notify', mixed $message=null ){
     $socketServer = env('LOG_SENDER');
     $clientChannel = env('CLIENT_CHANNEL');
     if( !$socketServer || !$clientChannel ) return false;
