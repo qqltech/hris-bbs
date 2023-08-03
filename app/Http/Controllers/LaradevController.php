@@ -1587,11 +1587,7 @@ class LaradevController extends Controller
         $path = public_path("js/$filename.js");
         $file = putFileDiff( $path , $req->text); 
         devTrack( 'Updating JS', $filename, $file );
-        $template = [
-            "filename" => $filename,
-            "template" => getStringTemplate( keyword: $filename, isCompress:false )
-        ];
-        $notified = wssNotify( type: "reload", message: $template );
+        $notified = wssNotify( type: "reload", message: $filename );
         return response()->json( $notified ? $notified : "js file was updated successfully" );
     }
 
@@ -1617,11 +1613,7 @@ class LaradevController extends Controller
         $path = base_path("resources/views/projects/$filename.blade.php");
         $file = putFileDiff( $path , $req->text);
         devTrack( 'Updating Blade', $filename, $file );
-        $template = [
-            "filename" => $filename,
-            "template" => getStringTemplate( keyword: $filename, isCompress:false )
-        ];
-        $notified = wssNotify( type: "reload", message: $template );
+        $notified = wssNotify( type: "reload", message: $filename );
         return response()->json( $notified ? $notified : "blade file was updated successfully" );
     }
 
