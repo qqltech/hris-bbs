@@ -215,10 +215,9 @@
         "Cache-Control" : "no-cache"
     },
     "body": {
-        "where"       : null,
-        "paginate"    : 100,
-        "orderby"     : "id",
-        "ordertype"   : "asc"
+        "paginate"    : 25,
+        "order_by"     : "id",
+        "order_type"   : "asc"
     }
 }
     </textarea>

@@ -58,17 +58,19 @@ class Handler extends ExceptionHandler
         DB::rollback();
         $rendered = parent::render($request, $e);
         $msg = $this->getFixedMessage($e);
-        Logger::store( $e, $rendered->getStatusCode() );
+        $statusCode = $rendered ? $rendered->getStatusCode():500;
+
+        Logger::store( $e, $statusCode );
         $responseError = [
             'processed_time' => round(microtime(true)-config("start_time"),5),
-            'code' => $rendered->getStatusCode()
+            'code' => $statusCode
         ];
         if( is_array($msg) ){
             $responseError = array_merge( $responseError, $msg );
         }else{
             $responseError['message'] = $msg;
         }
-        return response()->json($responseError, $rendered->getStatusCode());
+        return response()->json($responseError, $statusCode);
     }
 
     private function getFixedMessage($e){

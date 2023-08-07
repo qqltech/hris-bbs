@@ -187,10 +187,10 @@
                             parameters_read_list : {
                                 page        : 1,
                                 paginate    : 100,
-                                where       : "column_name1='kata' AND column_name2 ~* 'caridata'",
-                                orderby     : "column_name",
-                                ordertype   : "ASC",
-                                orderbyraw  : "column_name1 ASC,column_name2 DESC",
+                                order_by     : "column_name",
+                                order_type   : "ASC",
+                                order_by_raw  : "column_name1 ASC,column_name2 DESC",
+                                scopes        : "scope1,scope2",
                                 filter_column : "searchText",
                                 filter_column_another : "searchText OTHER",
                                 filter_operator : "~*",
@@ -201,7 +201,8 @@
                                 notin       : "column_name:12,13,99",
                                 addselect   : "column_name1,sum(column) as sumfield",
                                 group_by    : "column_name1,column_name2,column3",
-                                query_name  : "Query Name di /docs/frontend-params"
+                                query_name  : "Query Name di /docs/frontend-params",
+                                where       : "column_name1='kata' AND column_name2 ~* 'caridata'",
                             },
                             parameters_read_single: {
                                 single      : false,
