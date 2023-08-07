@@ -267,27 +267,30 @@
 
 
         <script src="defaults/axios.min.js"></script>
-            <script src="defaults/codemirror.js"></script>
-            <script src="defaults/addon/mode/loadmode.js"></script>
-            <script src="defaults/addon/mode/javascript.js"></script>
-            <script src="defaults/addon/search/searchcursor.js"></script>
-            <script src="defaults/addon/search/search.js"></script>
-            <script src="defaults/addon/dialog/dialog.js"></script>
-            <script src="defaults/addon/edit/matchbrackets.js"></script>
-            <script src="defaults/addon/edit/closebrackets.js"></script>
-            <script src="defaults/addon/comment/comment.js"></script>
-            <script src="defaults/addon/wrap/hardwrap.js"></script>
-            <script src="defaults/addon/fold/foldcode.js"></script>
-            <script src="defaults/addon/fold/brace-fold.js"></script>
-            <script src="defaults/addon/keymaps/sublime.js"></script>
-            <script src="defaults/addon/edit/matchbrackets.js"></script>
-            <script src="defaults/addon/comment/continuecomment.js"></script>
-            <script src="defaults/addon/comment/comment.js"></script>
-            <script src="defaults/addon/lint/jshint.js"></script>
-            <script src="defaults/addon/lint/lint.js"></script>
-            <script src="defaults/addon/lint/javascript-lint.js"></script>
-            <script src="defaults/addon/lint/css-lint.js"></script>
-            <script src="defaults/request.js"></script>
+        <script src="defaults/codemirror.js"></script>
+        <script src="defaults/addon/mode/loadmode.js"></script>
+        <script src="defaults/addon/mode/javascript.js"></script>
+        <script src="defaults/addon/search/searchcursor.js"></script>
+        <script src="defaults/addon/search/search.js"></script>
+        <script src="defaults/addon/dialog/dialog.js"></script>
+        <script src="defaults/addon/edit/matchbrackets.js"></script>
+        <script src="defaults/addon/edit/closebrackets.js"></script>
+        <script src="defaults/addon/comment/comment.js"></script>
+        <script src="defaults/addon/wrap/hardwrap.js"></script>
+        <script src="defaults/addon/fold/foldcode.js"></script>
+        <script src="defaults/addon/fold/brace-fold.js"></script>
+        <script src="defaults/addon/keymaps/sublime.js"></script>
+        <script src="defaults/addon/edit/matchbrackets.js"></script>
+        <script src="defaults/addon/comment/continuecomment.js"></script>
+        <script src="defaults/addon/comment/comment.js"></script>
+        <script src="defaults/addon/lint/jshint.js"></script>
+        <script src="defaults/addon/lint/lint.js"></script>
+        <script src="defaults/addon/lint/javascript-lint.js"></script>
+        <script src="defaults/addon/lint/css-lint.js"></script>
+        <script src="defaults/request.js"></script>
         <script src="defaults/autosize.js"></script>
+        <script>
+            alert("Buka browser console untuk melihat response.")
+        </script>
     </body>
 </html>
