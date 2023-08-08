@@ -1904,6 +1904,24 @@ function devTrack( $action, $fileName, $fileDiff=null ){ // tracking aktivitas d
     if( gettype($fileDiff)=='string' && $fileDiff=='[]' ) return;
     $key = "developer_activities";
     $activities = Cache::get( $key ) ?? [];
+    $foundToday = null;
+    $foundIdx = null;
+    $now = Carbon::now()->format('Y-m-d');
+
+    foreach( $activities as $idx => $act ){
+        if( $act['file']==$fileName && $act['action']==$action && Str::startsWith($act['time'], $now) ){
+            if( $act['name']==config('developer') ){
+                $foundToday = $act;
+                $foundIdx = $idx;
+            }
+            break;
+        }
+    }
+    
+    if( $foundToday ){
+        unset( $activities [ $foundIdx ] );
+    }
+
     array_unshift($activities, [
         'id' => strtotime('now').uniqid(),
         'time' => Carbon::now()->format('Y-m-d H:i:s'),
@@ -1952,11 +1970,25 @@ function getDiff( $oldString='', $newString='' ){
 }
 
 function putFileDiff( $path, $text ) {
+    $now = Carbon::now()->format( 'Y-m-d' );
     $oldFile = File::exists( $path ) ? File::get( $path ): '';
     File::put( $path, $text );
 
     if( !$oldFile || !class_exists('\Jfcherng\Diff\DiffHelper') ){
         return null;
+    }
+    $keyArr = explode('/', $path);
+    $key = end($keyArr);
+    $value = Cache::get( $key );
+    
+    if( !$value || $value['last_update']!= $now || ($value['last_editor']!=config('developer') && $value['last_update']== $now) ){
+        Cache::put( $key, [
+            "last_update" =>  $now,
+            "last_editor" => config('developer'),
+            "content" => $oldFile
+        ], 86400);
+    }else{
+        $oldFile = $value['content'];
     }
     return \Jfcherng\Diff\DiffHelper::calculate( $oldFile, $text, 'Json' );
 }
