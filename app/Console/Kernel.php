@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
         }
         foreach($tasks as $task){
             $daysArr = $task->days?json_decode($task->days, true):[0, 1, 2, 3, 4, 5, 6];
-            $every = $task->every;
+            $every = trim( $task->every );
             $every_param = $task->every_param;
             $schedule->call(function ()use($task) {
                 $class = $task->class_name;
