@@ -10,6 +10,7 @@
   font-size: 13px;
   width: 100%;
   word-break: break-all;
+  zoom:80%;
 }
 .diff-wrapper.diff th {
   font-weight: 700;
