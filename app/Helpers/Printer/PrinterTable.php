@@ -1,5 +1,5 @@
 <?php
-namespace App\Helpers\Printer;
+namespace App\Helpers;
 
 //  Digunakan untuk PRINTING table secara text
 
@@ -32,26 +32,42 @@ class PrinterTable
             $maxRows = 1;
             
             foreach($metaHeaders as $colIdx => $hdr){
+                $headerName = $hdr['name'];
+                $headers = explode("\n", $headerName);
+                $headerLength = max(array_map('strlen', $headers));
+                $colLength = max( $headerLength, $hdr['width'], 0);
+
                 $col = $hdr['key'] === 'auto' ? (!array_keys($row)?'': ($rowIdx+1) ) : (@$row[$hdr['key']]??'');
                 $content = (string)$col;
-                $colLength = max( $hdr['width'], 0);
                 $separatorWrap = @$hdr['separator']??' ';
-                
+                $colToRows = [];
+                $originalCol = $col;
                 $col = str_replace($separatorWrap,' ',$col);
 
-                $colToRows = explode(PHP_EOL, wordwrap( $col, $colLength, $separatorWrap.PHP_EOL) );
-                
+                $colToRows = explode(PHP_EOL, wordwrap( $col, $colLength, PHP_EOL) );
                 $padAlign = STR_PAD_RIGHT;
+                $align = @$hdr['align'] ?? 'left';
                 if( @$hdr['align']=='center' ){
                     $padAlign = STR_PAD_BOTH;
                 }elseif( @$hdr['align']=='right' ){
                     $padAlign = STR_PAD_LEFT;
                 }
+                $lengthParsed = 0;
+                $temp[$colIdx] = array_map(function($idx,$dt)
+                    use($colToRows, $colLength, $padAlign, $replacement, $separatorWrap, $align, $originalCol, &$lengthParsed){
+                        if( $idx!=count($colToRows)-1 ){
+                            $dt = substr($originalCol, $lengthParsed+( $idx == 0 ? 0:1 ), strlen($dt));
+                        }else{
+                            $dt = substr($originalCol, -strlen($dt));
+                        }
+                        
+                        $lengthParsed+=strlen($dt);
+                        if($align==='left' && strlen($dt)>0 && $idx<count($colToRows)-1 ){
+                            $dt .= $separatorWrap;
+                        }
+                        return str_pad($dt, $colLength, $replacement, $padAlign);
+                    }, array_keys($colToRows), array_values($colToRows) );
 
-                $temp[$colIdx] = array_map(function($dt)use($colLength, $padAlign, $replacement, $separatorWrap){
-                    $dt = str_replace(' ',$separatorWrap,$dt);
-                    return str_pad($dt, $colLength, $replacement, $padAlign);
-                }, $colToRows);
                 if( ($tempMax=count($colToRows)) > $maxRows ) {
                     $maxRows = $tempMax;
                 }

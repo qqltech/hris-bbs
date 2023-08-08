@@ -91,7 +91,7 @@ class PrintExec
         $pdf->setHeaderData( [
             'header_callback'=>function($hd){
             },
-            'footer_callback'=>function($ft){
+            'footer_callback' => @$config['no_page'] ? null : function ($ft) {
                 $ft->SetFont('helvetica', 'I', 8);
                 $ft->SetRightMargin(-7);
                 $ft->Cell($w=0, $h=6, $txt='Halaman ' .$ft->getAliasNumPage().'/'.$ft->getAliasNbPages(), $border=0, $ln=false, $align='R', $fill=0, $link='', $stretch=0, $ignore_min_height=false, $calign='T', $valign='M');
@@ -100,11 +100,12 @@ class PrintExec
             }
         ]);
 
-        $pdf->SetMargins($left=4, $top=3,$right=3, $keepmargins=false );
+        $pdf->SetMargins($left = (@$config['margin_left'] ?? 5), $top = (@$config['margin_top'] ?? 5), $right = (@$config['margin_right'] ?? 5), $keepmargins = false);
         // $pdf->PageNo();
-        $pdf->setTitle( 'Load Cost' );
+        $pdf->setTitle( 'Data' );
         $pdf->SetAutoPageBreak( true );
-
+        
+        $pdf->SetFont('FreeSans');
         $htmlArr = [];
         foreach($data as $dt){
           $value = $dt['data'];
@@ -158,12 +159,6 @@ class PrintExec
             $pdf->Output($filePath, 'I');
             die();
         }
-
-        if($this->debug){
-            $pdf->Output($filePath, 'I');
-            die();
-        }
-
         $pdf->Output($filePath, 'F');
         
         $processes = ["lpr", "-P", $printerName, "-o", "media=".$config['size'], "-o", "fit-to-page", $filePath];
