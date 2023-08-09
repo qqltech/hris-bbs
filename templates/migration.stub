@@ -15,6 +15,8 @@ class __class__ extends Migration
 
             $table->string('samplecolumn',100)->nullable();
 
+            // $table->integer('creator_id')->nullable();
+            // $table->integer('last_editor_id')->nullable();
             $table->timestamps();
         });
 

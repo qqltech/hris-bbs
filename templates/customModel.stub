@@ -9,7 +9,10 @@ class __class extends __basicClass
         parent::__construct();
     }
     
-    public $fileColumns    = [];
+    public $fileColumns    = [ /*file_column*/ ];
+
+    //public $createAdditionalData = ["creator_id"=>"auth:id"];
+    //public $updateAdditionalData = ["last_editor_id"=>"auth:id"];
 
     
 }
