@@ -4,7 +4,7 @@
   <link rel="icon" href="favicon.ico">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src="defaults/konva.min.js"></script>
-    
+    <script src="https://unpkg.com/windicss-runtime-dom"></script>
     <title>Database Models</title>
     <style>
       body {
@@ -17,10 +17,37 @@
         overflow: hidden;
         background-color: #ffffff;
       }
+      ul {  
+        list-style-type: none;  
+        font-size: 12.3px;  
+      }
+      li:hover{
+        color: blue;
+      }
     </style>
   </head>
-  <body>
-    <div style="position:fixed;background-color:white;opacity: 0.8;right:5px;top:5px;z-index:91;height: 100vh;overflow-y: scroll;" id="list"></div>
+  <body class="block" hidden>
+    <script>
+      var isListHidden = false
+      function onListClick(){
+        const classList = document.getElementById('list').classList
+        if(isListHidden){
+          classList.remove('max-w-0')
+          classList.add('max-w-1000')
+        }else{
+          classList.remove('max-w-1000')
+          classList.add('max-w-0')
+        }
+        isListHidden = !isListHidden
+      }
+
+      setTimeout(()=>{
+          document.getElementById('list').style.display=''
+      }, 1000)
+    </script>
+    <div 
+      style="position:fixed;user-select:none;right:0px;top:0px;z-index:91;height: 100vh;overflow-y:auto;display:none;" 
+      id="list" class="transition-all duration-400 max-w-1000 border-l bg-white bg-opacity-70 border-opacity-70 hover:bg-opacity-100 border-gray-500"></div>
     <div id="container" style="cursor: default;">
       <div class="konvajs-content" role="presentation" id="konvajscontent" style="position: relative; user-select: none; width: 100vh; height: 100vh;">
             <canvas id="konvacanvas" width="100vh" height="100vh" style="padding: 0px; margin: 0px; border: 0px; background: white; position: absolute; top: 0px; left: 0px; width: 1366px; height: 667px; display: block;"></canvas>
@@ -28,6 +55,9 @@
         </div>
       </div>
     </div>
+    <button onclick="onListClick()" class="rounded-full fixed z-100 bottom-1 right-1 bg-blue-500 hover:bg-blue-600 text-white w-8 h-8 text-sm cursor-pointer">
+      DB
+    </button>
 <script>
 var terpilih;
 var newScale=1;
@@ -117,6 +147,19 @@ var headerHeight    = 30;
 var belongs = [];
 var childs = [];
 var referencings = [];
+function randomValue(max) {
+  return Math.floor(Math.random() * (max + 1));
+}
+
+// Fungsi untuk menghasilkan kode warna hex dengan komponen warna gelap
+function randomDarkHexColor() {
+  const maxDarkValue = 210; // Maksimum nilai untuk komponen warna gelap
+  const red = randomValue(maxDarkValue).toString(16).padStart(2, '0');
+  const green = randomValue(maxDarkValue).toString(16).padStart(2, '0');
+  const blue = randomValue(maxDarkValue).toString(16).padStart(2, '0');
+  return `#${red}${green}${blue}`;
+}
+
 function createTable(data, isReferenced=false, caller=null){
   data['table'] = data['model'];
   let lebar = data.table.length*5.4;
@@ -149,10 +192,10 @@ function createTable(data, isReferenced=false, caller=null){
     var columnText = new Konva.Text({
         y: lastY,
         fontSize: 10,
-        fontFamily: 'Calibri',
+        fontFamily: 'Arial',
         fontStyle:"bold", 
         text: "id",
-        fill: "red",
+        fill: "gray",
         padding: 8,
         align:"right",
         name:"kolom",
@@ -160,7 +203,7 @@ function createTable(data, isReferenced=false, caller=null){
     });
 //==========================================================
     col1.add(columnText);
-    lastY += columnText.height();
+    lastY += (columnText.height()-10);
     if(longText<columnText.width()){
         longText=columnText.width();
     }
@@ -193,11 +236,11 @@ function createTable(data, isReferenced=false, caller=null){
         var columnText = new Konva.Text({
             y: lastY,
             fontSize: 11,
-            fontFamily: 'Calibri',
-            text: data.columns[i].name+(data.config.required.includes(data.columns[i].name)?"*":""),
-            fontStyle:"bold",
-            textDecoration:"underline",
-            fill: data.config.createable.includes(data.columns[i].name)?'green':'red',
+            fontFamily: 'Arial',
+            text: data.columns[i].name,
+            // fontStyle:"bold",
+            // textDecoration:"underline",
+            fill: 'black',//data.config.createable.includes(data.columns[i].name)?'black':'black',
             padding: 8,
             align:"right",
             name: (data.columns[i].table_reference!==undefined)?"kolomForeign":"kolom",
@@ -206,18 +249,34 @@ function createTable(data, isReferenced=false, caller=null){
         });
         if(data.columns[i].table_reference!==undefined){
             // referencings.push({table_reference:data.columns[i].table_reference, column_reference:data.columns[i].column_reference,table_caller:data.table, id:data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name});
-            belongs.push( { color:"#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}) ,
+            belongs.push( { color: randomDarkHexColor() ,
                 id: data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name, parent: data.columns[i].table_reference, position:i+1, 
-                yAxis: lastY+columnText.height()/2
+                yAxis: lastY+(columnText.height()+10)/2
             });
             childs[data.columns[i].table_reference]=childs[data.columns[i].table_reference]===undefined?[]:childs[data.columns[i].table_reference];
             childs[data.columns[i].table_reference].push({id: data.columns[i].table_reference+"_"+data.table+"_"+data.columns[i].name, 
                 parent:data.columns[i].table_reference, child: data.table, position:i+1}) ;
         }
         col1.add(columnText);
-        lastY += columnText.height();
-        if(longText<columnText.width()){
-            longText=columnText.width();
+
+        var reqText = new Konva.Text({
+            y: lastY,
+            x: columnText.width()-15.5,
+            fontSize: 10,
+            fontFamily: 'Arial',
+            fontStyle:"bold", 
+            text: (data.config.required.includes(data.columns[i].name)?"*":""), // reqq
+            fill: "red",
+            padding: 8,
+            align:"right",
+            name:"req_attr"
+        })
+
+        col1.add(reqText);
+
+        lastY += (columnText.height()-10);
+        if(longText<(columnText.width()+2)){
+            longText=(columnText.width()+2);
         }
 
     }
@@ -239,15 +298,16 @@ function createTable(data, isReferenced=false, caller=null){
           y: lastY,
           fontSize: 11,
           fontFamily: 'Courier New',
-          text: "BigInt(PK)",
-          fill: "red",
+          text: "BigInt [PK]",
+          fontStyle: 'bold',
+          // fill: "red",
           // fill: 'black',
           padding: 8,
           align:"right",
           name:"kolom2"
       });
       col2.add(columnText);
-      lastY += columnText.height();
+      lastY += (columnText.height()-10);
       if(longText<columnText.width()){
           longText=columnText.width();
       }
@@ -256,13 +316,26 @@ function createTable(data, isReferenced=false, caller=null){
         if(lastY ==0){
             lastY = col2.getPosition().y;
         }
-        let color = data.config.createable.includes(data.columns[i].name)?'green':'red';
+        
+        let dType = (data.columns[i].type).replace('\\',"");
+        if( [ 'decimal','float','numeric','number','double' ].includes(dType.trim().toLowerCase()) ){
+          dType += (data.columns[i].precision?`,${data.columns[i].precision}`:'')
+                +(data.columns[i].scale?`,${data.columns[i].scale}`:'')
+        }else if( !dType.trim().toLowerCase().includes('date') ){
+          dType += (data.columns[i].length?`,${data.columns[i].length}`:'')
+        }
+
+        let color = '#6b6860';//data.config.createable.includes(data.columns[i].name)?'gray':'gray';
+        // if(){
+        //   color ='#c20606';
+        // }
         var columnText = new Konva.Text({
             // x: col1.getPosition().x+temp,
             y: lastY,
             fontSize: 11,
+            fontStyle: 'italic',
             fontFamily: 'Courier New',
-            text: (data.columns[i].type).replace('\\',"")+" "+(data.columns[i].table_reference!==undefined?"["+data.columns[i].connection+"]":""),
+            text: dType+" "+(data.columns[i].table_reference!==undefined?"["+data.columns[i].connection+"]":""),
             color: '#01040a',
             fill: (data.columns[i].table_reference!==undefined?"orange":color),
             padding: 8,
@@ -276,8 +349,9 @@ function createTable(data, isReferenced=false, caller=null){
                 return
             }
             e.currentTarget.setText( data.columns[i].table_reference )
-            e.currentTarget.setFill("black")
-            e.currentTarget.setFontSize(14);
+            // e.currentTarget.setFill("#01040a")
+            // e.currentTarget.setFontStyle("bold")
+            e.currentTarget.setFontSize(12);
             layer.draw()
           })
           columnText.on('mouseout', function (e) {
@@ -292,7 +366,7 @@ function createTable(data, isReferenced=false, caller=null){
           })
         }
         col2.add(columnText);
-        lastY += columnText.height();
+        lastY += (columnText.height()-10);
         if(longText<columnText.width()){
             longText=columnText.width();
         }
@@ -305,12 +379,12 @@ function createTable(data, isReferenced=false, caller=null){
         // width: lebar,
         fill:"white",
         height: headerHeight ,
-        fontFamily: 'Calibri',
+        fontFamily: 'Arial',
         text: data.table,
         wrap:"char",
         // fill: 'black',
         lineHeight:2,
-        padding: 8,
+        padding: 4,
         align: 'center'
     });
     var color ="#0b79b5";
@@ -321,10 +395,10 @@ function createTable(data, isReferenced=false, caller=null){
         fill: color,
         width: lebar+5 ,
         height: headerText.height() ,
-        shadowColor: 'black',
-        shadowBlur: 10,
-        shadowOffset: [10, 10],
-        shadowOpacity: 0.2,
+        // shadowColor: 'black',
+        // shadowBlur: 10,
+        // shadowOffset: [10, 10],
+        // shadowOpacity: 0.2,
         name:"headerRect"
         // cornerRadius: 10
     });
@@ -336,11 +410,11 @@ function createTable(data, isReferenced=false, caller=null){
         // strokeWidth: 5,
         fill: "#ffff",
         width: lebar+5 ,
-        height: lastY,
-        shadowColor: 'black',
-        shadowBlur: 10,
-        shadowOffset: [10, 10],
-        shadowOpacity: 0.2,
+        height: lastY+6,
+        // shadowColor: 'black',
+        // shadowBlur: 10,
+        // shadowOffset: [10, 10],
+        // shadowOpacity: 1,
         name: "bodyTable"
         // cornerRadius: 10
     });
@@ -365,9 +439,9 @@ function jsonGet(json){
         let list = "";
         json.sort((a, b) => a.model.localeCompare(b.model));
         json.forEach(function(dt){
-          list+=`<li><input type='checkbox' class='tables' id='${dt.model}'>${dt.model}</li>`;
+          list+=`<li><input type='checkbox'  style='cursor:pointer' class='tables' id='${dt.model}'><label style='cursor:pointer' for='${dt.model}'>${dt.model}</label></li>`;
         });
-        doc.innerHTML=`<ul>${list}</ul>`;
+        doc.innerHTML=`<ul class="pr-2 pl-1">${list}</ul>`;
         
         Array.from(document.getElementsByClassName("tables")).forEach(function(table){
           table.addEventListener("change",function(e){
@@ -387,13 +461,14 @@ function jsonGet(json){
               localStorage.checked=JSON.stringify(checked);
               let tbl = stage.find("#"+el);
               let keys = [];
-              tbl[0].find(".kolomForeign").forEach(function(e){
-                keys.push( "connector_"+e.getId());
+              tbl[0].find(".kolomForeign").forEach(function(elem){
+                keys.push( "connector_"+elem.getId());
               });
               let fks = stage.find(".connectors");
-              fks.forEach(function(e){
-                if(e.getId().includes(el) || keys.includes(e.getId()) ){
-                  e.destroy();
+              fks.forEach(function(connector){
+                if(connector.getId().includes(el) || keys.includes(connector.getId()) ){
+                  stage.find('#'+ (connector.getId().replace("connector_","dot_")) ).destroy();
+                  connector.destroy();
                 };
               });
               tbl.destroy();
@@ -411,12 +486,12 @@ function jsonGet(json){
         });
     };
     var xmlhttp = new XMLHttpRequest();
-    var url = "models.json";
+    var url = "models.json?ts="+(Date.parse(new Date()));
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var myArr = JSON.parse(this.responseText);
             jsonGet(myArr);
-            alert("Command:  Alt+enter,  Alt+A,  Alt+S")
+            // alert("Command:  Alt+enter,  Alt+A,  Alt+S")
         }
     };
     xmlhttp.open("GET", url, true);
@@ -487,7 +562,6 @@ function jsonGet(json){
       });      
 
       function drawForeign(keyForeign, parent){
-        var rows = parent.find(".col1")[0].find('Text');
         var index = parent.find(".col1")[0].find("#"+keyForeign)[0].index;
         for(let i=0; i<belongs.length;i++){
 
@@ -500,20 +574,25 @@ function jsonGet(json){
             var dstY = stage.find("#"+belongs[i].parent)[0].getPosition().y + stage.find("#"+belongs[i].parent)[0].find(".headerRect")[0].height() + (stage.find("#"+belongs[i].parent)[0].find(".bodyTable")[0].height()/(stage.find("#"+belongs[i].parent)[0].find(".col1")[0].find("Text").length))*1- (stage.find("#"+belongs[i].parent)[0].find(".bodyTable")[0].height()/(stage.find("#"+belongs[i].parent)[0].find(".col1")[0].find("Text").length))/2 ;
 
             var FixedX;
-
+            
+            let parentHeightY = parent.find(".col1")[0].find("#"+keyForeign)[0].getPosition().y+(parent.find(".col1")[0].find("#"+keyForeign)[0].getHeight()/2);
+            
             if (moveX<dstX){
                 fixedX = moveX + parent.find(".headerRect")[0].width();
-                fixedY = moveY + (parent.find(".bodyTable")[0].height()/rows.length)*(index+1)- (parent.find(".bodyTable")[0].height()/rows.length)/2 +parent.find(".headerRect")[0].height();
+                fixedY = moveY + parentHeightY +parent.find(".headerRect")[0].height();
             }else{
                 dstX = dstX+stage.find("#"+belongs[i].parent)[0].find(".headerRect")[0].width();
                 fixedX = moveX ;
-                fixedY = moveY + (parent.find(".bodyTable")[0].height()/rows.length)*(index+1)- (parent.find(".bodyTable")[0].height()/rows.length)/2 +parent.find(".headerRect")[0].height();
+                fixedY = moveY + parentHeightY +parent.find(".headerRect")[0].height();
             }
+
+            dstY+=8;
+            // fixedY+=10;
 
               stage.find('#dot_'+keyForeign).destroy();
               var circle = new Konva.Circle({
                 x:fixedX-moveX,
-                y:(parent.find(".bodyTable")[0].height()/rows.length)*(index+1)- (parent.find(".bodyTable")[0].height()/rows.length)/2 ,
+                y:parentHeightY,
                 radius: 1,
                 fill: belongs[i].color,
                 stroke: belongs[i].color,

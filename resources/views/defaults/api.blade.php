@@ -1,5 +1,8 @@
 <html style="scroll-behavior: smooth;">
     <head>
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
         <title>FRONTEND - Larahan</title>
         <link rel="icon" href="{{url('favicon.ico')}}">
         <link rel="stylesheet" href="{{url('defaults/request2.css')}}">
