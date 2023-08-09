@@ -53,7 +53,7 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
         $onParent = $arrayJoins[0];
         $onMe = $arrayJoins[1];
         $joined[]=$fullParent;
-        $parentClassString = "\App\Models\BasicModels\\$parent";
+        $parentClassString = "\App\Models\CustomModels\\$parent";
 
         if( !class_exists($parentClassString) ){
             continue;
@@ -78,11 +78,12 @@ function _joinRecursive($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$joined,
         }
         $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
         $parentClass = new $parentClassString;
+        $parentClass->asParent = true;
         if($kembar[$parent]>1){
             $parentName = $parent.(string)$kembar[$parent];
         }
-        foreach($parentClass->columns as $column){
-            $colTemp        = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+        foreach($parentClass->getColumns() as $column){
+            $colTemp        = Str::contains(strtolower($column), ' as ') ? $column : "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
             $fieldSelected[]= $colTemp;
             $allColumns[]   = "$parentName.$column";
         }
@@ -110,7 +111,7 @@ function _joinRecursiveAlias($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$jo
         $onParent = $arrayJoins[0];
         $onMe = $arrayJoins[1];
         $joined[]=$fullParent;
-        $parentClassString = "\App\Models\BasicModels\\$parent";
+        $parentClassString = "\App\Models\CustomModels\\$parent";
 
         $meArr = explode( ".", $onMe );
         $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
@@ -127,9 +128,10 @@ function _joinRecursiveAlias($joinMax,&$kembar,&$fieldSelected,&$allColumns,&$jo
             
         $model = $model->leftJoin($parentName, $onParent, "=", $onMe);
         $parentClass = new $parentClassString;
+        $parentClass->asParent = true;
 
-        foreach($parentClass->columns as $column){
-            $colTemp        = "$aliasParent.$column AS ".'"'.$aliasParent."_".$column.'"';
+        foreach($parentClass->getColumns() as $column){
+            $colTemp        = Str::contains(strtolower($column), ' as ') ? $column : "$aliasParent.$column AS ".'"'.$aliasParent."_".$column.'"';
             $fieldSelected[]= $colTemp;
             $allColumns[]   = "$aliasParent.$column";
         }
@@ -166,10 +168,10 @@ function _customGetData($model,$params)
     // $modelCandidate = "\App\Models\CustomModels\\$table";
     $modelExtender  = new $modelCandidate;
     $fieldSelected=[];
-    $metaColumns = [];
-    foreach($model->columns as $column){
+    // $metaColumns = [];
+    foreach($model->getColumns() as $column){
         $fieldSelected[] = "$table.$column";
-        $metaColumns[$column] = "frontend";
+        // $metaColumns[$column] = "frontend";
     }
     $allColumns = $fieldSelected;
     $kembar = [];
@@ -197,7 +199,7 @@ function _customGetData($model,$params)
             $joined[]=$parent;
             $onParent = $arrayJoins[0];
             $onMe = $arrayJoins[1];
-            $parentClassString = "\App\Models\BasicModels\\$parent";
+            $parentClassString = "\App\Models\CustomModels\\$parent";
             
             $meArr = explode( ".", $onMe );
             $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
@@ -239,14 +241,15 @@ function _customGetData($model,$params)
 
             $model = $model->leftJoin($parentName, $onParent, "=", $onMe);
             $parentClass = new $parentClassString;
+            $parentClass->asParent = true;
             if( getApiVersion() !=2 && $kembar[$parent]>1 ){
                 $parentName = $parent.(string)$kembar[$parent];
             }
-            foreach($parentClass->columns as $column){
+            foreach($parentClass->getColumns() as $column){
                 if( getApiVersion()==2 ){
-                    $colTemp = "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
+                    $colTemp = Str::contains(strtolower($column), ' as ') ? $column : "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
                 }else{
-                    $colTemp = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                    $colTemp = Str::contains(strtolower($column), ' as ') ? $column : "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
                 }
 
                 $fieldSelected[]= $colTemp;
@@ -388,7 +391,7 @@ function _customGetData($model,$params)
     }
 
     if( req('search') && req('search')!=='null' ){
-        $model=$model->search( $allColumns );
+        $model=$model->search( $fieldSelected );
     }
 
     if( req('group_by' ) ){
@@ -494,7 +497,7 @@ function _customGetData($model,$params)
                 }
 
                 $model      = getCustom($detailClass);
-                $columns    = $model->columns;
+                $columns    = $model->getColumns();
                 $fkName     = $pureModel->getTable();
                 if(!in_array($fkName."_id",$columns)){
                     $realJoins = $model->joins;
@@ -612,10 +615,10 @@ function _customFind($model, $params)
     $idToFind = $pureModel->useEncryption ? $pureModel->decrypt($params->id) : $params->id;
     $modelExtender  = new $modelCandidate;
     $fieldSelected=[];
-    $metaColumns=[];
-    foreach($model->columns as $column){
+    // $metaColumns=[];
+    foreach($model->getColumns() as $column){
         $fieldSelected[] = "$table.$column";
-        $metaColumns[$column] = "frontend";
+        // $metaColumns[$column] = "frontend";
     }
     // if(!in_array(class_basename($model),array_keys(config('tables')))){
     //     $func = "metaFields";
@@ -643,7 +646,7 @@ function _customFind($model, $params)
             $joined[]=$parent;
             $onParent = $arrayJoins[0];
             $onMe = $arrayJoins[1];
-            $parentClassString = "\App\Models\BasicModels\\$parent";
+            $parentClassString = "\App\Models\CustomModels\\$parent";
 
             $meArr = explode( ".", $onMe );
             $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
@@ -677,14 +680,15 @@ function _customFind($model, $params)
 
             $model = $model->leftJoin($parentName,$onParent,"=",$onMe);
             $parentClass = new $parentClassString;
+            $parentClass->asParent = true;
             if(getApiVersion() !=2 && $kembar[$parent]>1){
                 $parentName = $parent.(string)$kembar[$parent];
             }
-            foreach($parentClass->columns as $column){
+            foreach($parentClass->getColumns() as $column){
                 if( getApiVersion()==2 ){
-                    $colTemp = "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
+                    $colTemp = Str::contains(strtolower($column), ' as ') ? $column : "$aliasParent.$column AS ".'"'.$aliasParent.".".$column.'"';
                 }else{
-                    $colTemp = "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
+                    $colTemp = Str::contains(strtolower($column), ' as ') ? $column : "$parentName.$column AS ".'"'.$parentName.".".$column.'"';
                 }
                 $fieldSelected[]= $colTemp;
                 $allColumns[]   = "$parentName.$column";
@@ -873,7 +877,7 @@ function _uploadexcel($model, $request)
       	$bulkData = [];
         $invalidRows = [];
         foreach($headings as $col => $heading){
-            if( !in_array($heading,$model->columns) ){
+            if( !in_array($heading,$model->getColumns()) ){
                 $forbiddenHeadings[] = $heading;
             }
         }
@@ -2046,4 +2050,8 @@ function wssNotify( string $type='notify', mixed $message=null ){
     }catch(\Exception $e){
         return false;
     }
+}
+
+function getProcessedTime(){
+    return round(microtime(true)-config("start_time"),5);
 }
