@@ -18,6 +18,7 @@ trait ModelTrait {
     public $fileColumns    = [];
     public $autoValidator  = true;
     public $useEncryption  = false;
+    public $asParent       = false;
 
     public $importValidator = [];   // laravel validation
 
@@ -70,7 +71,7 @@ trait ModelTrait {
         }
         $query->where(
             function ($query)use($allColumns,$string,$additionalString, $searchfield,$table,$isAutoPrefix,$aliases) {
-                if($searchfield!=null){
+                if($searchfield){
                     $searchfieldArray = explode(",", strtolower($searchfield) );
                     foreach($searchfieldArray as $fieldSearching){
                         if($isAutoPrefix && strpos($fieldSearching,".")===false){
@@ -87,7 +88,7 @@ trait ModelTrait {
                         $kolomFixed = $column.$additionalString;
                         if(strpos( strtolower($kolomFixed), ' as ' )!==false){
                             $kolomFixedArr = explode(' as ', strtolower($kolomFixed));
-                            $kolomFixed = end($kolomFixedArr);
+                            $kolomFixed = $kolomFixedArr[0];
                         }
                         $keyAliased = array_search( $column,$aliases ) ;
                         if( $keyAliased ){
@@ -509,6 +510,11 @@ trait ModelTrait {
     function deleteAfter( $model, $arrayData, $metaData, $id=null )
     {
         
+    }
+
+    function getColumns()
+    {
+        return $this->columns;
     }
 
     public function custom_upload( $request ){
