@@ -75,8 +75,6 @@ var gridSembunyi=false;
 window.addEventListener('keydown', function(event){
     if(event.altKey===true && event.key=='Enter'){
         document.getElementById('list').style.display=sembunyi?'block':'none';
-        // document.getElementById('konvajscontent').style.width=sembunyi?'100vh':'100%';
-        // document.getElementById('konvajscontent').style.width=sembunyi?'100vh':'100%';
         sembunyi=!sembunyi;
     };
     if(event.altKey===true && ['s','S'].includes(event.key) ){
@@ -117,28 +115,6 @@ var stage = new Konva.Stage({
 });
 // stage.getContainer().style.backgroundColor = 'white';
 var layer = new Konva.Layer();
-// var gridLayer = new Konva.Layer();
-// var blockSnapSize = 10;
-// var width = window.innerWidth*10;
-// var height = window.innerHeight*10;
-// var padding = blockSnapSize;
-// for (var i = 0; i < width / padding; i++) {
-//   gridLayer.add(new Konva.Line({
-//     points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, height],
-//     stroke: '#ddd',
-//     strokeWidth: 1,
-//   }));
-// }
-
-// gridLayer.add(new Konva.Line({points: [0,0,10,10]}));
-// for (var j = 0; j < height / padding; j++) {
-//   gridLayer.add(new Konva.Line({
-//     points: [0, Math.round(j * padding), width, Math.round(j * padding)],
-//     stroke: '#ddd',
-//     strokeWidth: 0.5,
-//   }));
-// }
-// stage.add(gridLayer);
 //=========================================GROUPING
 
 var tableX  = 20;
@@ -418,10 +394,57 @@ function createTable(data, isReferenced=false, caller=null){
         name: "bodyTable"
         // cornerRadius: 10
     });
+
+
+    const closeBtn = new Konva.Text({
+        fontSize: 12,
+        y: bodyTable.getPosition().y-(headerHeight/2 + 10) ,
+        x: lebar-7,
+        fill:"white",
+        color: 'red',
+        height: headerHeight ,
+        fontStyle:'bold',
+        fontFamily: 'Arial',
+        text: 'x',
+        lineHeight:1,
+        padding: 1,
+        align: 'center',
+        id: 'remove-'+data.table
+    });
+    
+    const closeBtnRect = new Konva.Rect({
+        y: closeBtn.getPosition().y ,
+        x: closeBtn.getPosition().x-2 ,
+        strokeWidth: 0.5,
+        fill: "#d92323",
+        width: 13,
+        height: 13.5,
+        cornerRadius: 10,
+        name: "close-btn-rect"
+    });
+
+    closeBtn.on('mouseover', function (e) {
+      stage.container().style.cursor = 'pointer';
+      closeBtnRect.setFill('red')
+      layer.draw()
+    })
+
+    closeBtn.on('mouseleave', function (e) {
+      stage.container().style.cursor = '';
+      closeBtnRect.setFill('#d92323')
+      layer.draw()
+    })
+
+    closeBtn.on('click', function (e) {
+      document.getElementById( e.currentTarget.getId().replace('remove-','') ).click()
+      layer.draw()
+    })
     //=========================================
 
     Table.add(headerRect);
     Table.add(headerText);
+    Table.add(closeBtnRect)
+    Table.add(closeBtn)
     Table.add(bodyRect);
     // Table.add(bodyText);
     Table.add(bodyTable);
