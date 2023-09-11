@@ -17,10 +17,14 @@ class Exporter {
         // 'size' => 'A4',
     ];
 
-    function __construct( string $name, array $data = null, array $config = null  )
+    function __construct( string $name=null, array $data = null, array $config = null  )
     {
         $this->config = $config;
-        $this->html = view( "projects.$name", compact( 'data' ) );
+        if($name){
+            $this->html = view( "projects.$name", compact( 'data' ) );
+        }elseif($data){
+            $this->html = $this->buildHtml( $data );
+        }
     }
 
     public function toHtml(){
@@ -62,11 +66,34 @@ class Exporter {
 
         $worksheet = $spreadsheet->getActiveSheet();
         $worksheet->getStyle("A:$highestColumn")->getAlignment()->setVertical('center');
-
+        foreach(range('A',$worksheet->getHighestColumn()) as $column) {
+            $worksheet->getColumnDimension($column)->setAutoSize(true);
+        }
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="'.(@$this->config['title']??'Data-exported').'.xlsx"');
         header('Cache-Control: max-age=0');
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         return $writer->save('php://output');
+    }
+
+    public function buildHtml( array $data ){
+        $data = json_decode( json_encode($data), true );
+        $header = "";
+        $headerArr = array_keys( $data[0] );
+
+        foreach( $headerArr as $hd ){
+            $header .= '<td style="border:1px solid black;font-weight:bold;text-align:center;">'.$hd.'</td>';
+        }
+        $header = "<tr>$header</tr>";
+
+        $body = "";
+        foreach( $data as $row ){
+            $tds = "";
+            foreach($headerArr as $tdKey){
+                $tds .= '<td style="border:1px solid black;">'.$row[$tdKey].'</td>';
+            }
+            $body .= "<tr>$tds</tr>";
+        }
+        return '<table width="100%" cellpadding="1.5">'.$header.$body.'</table>';
     }
 }

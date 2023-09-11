@@ -184,6 +184,8 @@ function _customGetData($model,$params)
     }
     $enableJoin = is_bool($enableJoin) ? $enableJoin : (strtolower($enableJoin) === 'false' ? false : true);
     if( $enableJoin ){
+        $unjoins = !$params->caller && req('unjoin')?array_map(Fn($d)=>$d."_id",explode( ',', req('unjoin') ) ):[];
+        $selectFields = !$params->caller && req('selectfield') ? array_map(Fn($d)=>explode(".",$d)[0],array_filter(explode( ',', req('selectfield') ),Fn($d)=>Str::contains($d,".") )):[];
         foreach( $model->joins as $join ){
             $arrayJoins=explode("=",$join);
             $arrayParents=explode(".",$arrayJoins[0]);
@@ -193,26 +195,33 @@ function _customGetData($model,$params)
                 $fullParent = $arrayParents[0].".".$arrayParents[1];
             }else{
                 $parent = $arrayParents[0];
-                $fullParent=$parent;
+                $fullParent = $parent;
             }
-            
+
+            $parentClassString = "\App\Models\CustomModels\\$parent";
+            if( !class_exists($parentClassString) ){
+                continue;
+            }
             $joined[]=$parent;
             $onParent = $arrayJoins[0];
             $onMe = $arrayJoins[1];
-            $parentClassString = "\App\Models\CustomModels\\$parent";
-            
             $meArr = explode( ".", $onMe );
+
+            if( $unjoins && in_array( end( $meArr ), $unjoins ) ){
+                continue;
+            }
+
+            if($params->caller && $params->caller==$parent && Str::replace('_id','',end( $meArr ))==$params->caller ){
+                continue;
+            }
+            
             $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
             if( $aliasParent==='id' ){
                 $aliasParent = str_replace( $className."_", '', $parent);
             }
 
-            if( !class_exists($parentClassString) ){
+            if( $selectFields && !in_array( $aliasParent, $selectFields ) ){
                 continue;
-            }
-
-            if($params->caller && $params->caller==$parent && Str::replace('_id','',end( $meArr ))==$params->caller ){
-                continue;                
             }
 
             if(getApiVersion()!=2){
@@ -402,6 +411,9 @@ function _customGetData($model,$params)
         $model = $model->orderByRaw( str_replace("this.","$table.",urldecode($orderRaw ) ) );
     }elseif( $orderCol = req('order_by', "$table.id")){
         $order =  str_replace("this.","$table.", $orderCol);
+        if( !Str::contains($order, ".") ){
+            $order = "$table.$order";
+        }
         if( method_exists( $modelExtender, 'aliases') ){
             $aliases = $modelExtender->aliases();
             if(is_array($aliases)){
@@ -479,7 +491,7 @@ function _customGetData($model,$params)
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() 
-                    : $modelExtender->$func( @$row['id'] )], $fixedData[$index]);
+                    : $modelExtender->$func( env( 'ENGINE_VERSION',1 )==2 ? $row:@$row['id'] )], $fixedData[$index]);
                 }
             }
 
@@ -555,7 +567,7 @@ function _customGetData($model,$params)
                 $func = $akses."roleCheck";
                 if( method_exists( $modelExtender, $func) ){
                     $fixedData[$index] = array_merge( ["meta_$akses"=>in_array( $akses, ['create','list'] ) ? $modelExtender->$func() 
-                    : $modelExtender->$func( @$row['id'] )], $fixedData[$index]);
+                    : $modelExtender->$func( env( 'ENGINE_VERSION',1 )==2 ? $row:@$row['id'] )], $fixedData[$index]);
                 }
             }
             $index++;
@@ -630,6 +642,8 @@ function _customFind($model, $params)
     $joined=[];
     $allColumns = $fieldSelected;
     if( req('join', true) ){
+        $unjoins = req('unjoin')?array_map(Fn($d)=>$d."_id",explode( ',', req('unjoin') ) ):[];
+        $selectFields = req('selectfield') ? array_map(Fn($d)=>explode(".",$d)[0],array_filter(explode( ',', req('selectfield') ),Fn($d)=>Str::contains($d,".") )):[];
         $kembar = [];
         foreach( $model->joins as $join ){
             $arrayJoins=explode("=",$join);
@@ -643,17 +657,21 @@ function _customFind($model, $params)
                 $fullParent = $parent;
             }
 
+            $parentClassString = "\App\Models\CustomModels\\$parent";
+            if( !class_exists($parentClassString) )continue;
+
             $joined[]=$parent;
             $onParent = $arrayJoins[0];
             $onMe = $arrayJoins[1];
-            $parentClassString = "\App\Models\CustomModels\\$parent";
-
             $meArr = explode( ".", $onMe );
+
+            if( $unjoins && in_array( end( $meArr ), $unjoins ) ) continue;
+            
             $aliasParent = str_replace('_id', env('SUFFIX_PARENT_TABLE',''), end( $meArr ));
             if( $aliasParent==='id' ){
                 $aliasParent = str_replace( $className."_", '', $parent);
             }
-            if( !class_exists($parentClassString) ){
+            if( $selectFields && !in_array( $aliasParent, $selectFields ) ){
                 continue;
             }
 

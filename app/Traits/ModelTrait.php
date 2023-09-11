@@ -452,17 +452,17 @@ trait ModelTrait {
         return true;
     }
 
-    function updateRoleCheck( $id )
+    function updateRoleCheck( $data )
     {
         return true;
     }
 
-    function deleteRoleCheck( $id )
+    function deleteRoleCheck( $data )
     {
         return true;
     }
 
-    function readRoleCheck( $id )
+    function readRoleCheck( $data )
     {
         return true;
     }
