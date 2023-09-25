@@ -20,7 +20,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\BackupCommand::class,
         \App\Console\Commands\RestoreCommand::class,
         \App\Console\Commands\GenerateModelsCommand::class,
-        \App\Console\Commands\GenerateBasicMigrationsCommand::class
+        \App\Console\Commands\GenerateBasicMigrationsCommand::class,
+        \App\Console\Commands\ProjectStartCommand::class
         // \KitLoong\MigrationsGenerator\MigrateGenerateCommand::class
     ];
 

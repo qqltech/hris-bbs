@@ -1,27 +1,21 @@
-Perbedaan dengan versi sebelumnya
+# Laravel Fast-Rest API Development
 
-# Core Files
-- bootstrap/app.php
-- app/Helpers/GlobalHelper.php
-- app/Http/Controllers/ApiFixedController.php
-- app/Http/Controllers/LaradevController.php
-- app/Http/Controllers/UserController.php
-- routes/*
-- config/*
-- Providers/*
-- templates/*
-- resource/views/*
-- public/defaults/*
-- public/visual.html
+## Requirements
+- php 8.0 or more
+- Database: postgresql / mysql / sqlite
+- Laravel/Lumen Min Version: ^9
 
-# Perbedaan dengan Versi 6.x
-## bootstrap/app.php
-- penambahan provider Lumen Generator Service Provider dan Migration Generator
-
-## templates/migration.stub
-- bigIncrements pakai from(1) dan timestamps
-
-## routes/laradev.php
-- password pakai CONFIGPASSWORD
-
-Ada update
+## Step by Step
+- Clone this Repo
+- composer:
+```sh
+composer install
+```
+- copy .env-example to .env
+- connect to your database via .env file
+- customize env key value as you want
+- do artisan command:
+```sh
+php artisan project:start
+```
+- finish and try to access it well
