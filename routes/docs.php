@@ -305,10 +305,43 @@ $router->group(['prefix'=>'docs'], function () use ($router) {
                 $result = \Jfcherng\Diff\Factory\RendererFactory::make('SideBySide', [
                     'showHeader'=>false
                 ])->renderArray(json_decode( $diff, true ));
-
                 return "<link rel='stylesheet' href='$css'><p style='font-weight:semibold;'>$id ~ {$act['time']} ~ {$act['action']} ~ {$act['file']}</p>".$result;
             }
         }
         return "detail was not-found";
     });
+
+    $router->get('/activities/{old}/{id}', function( Request $req, $old, $id ){
+        if( !env("TUTORIAL",false) || strtolower(env("SERVERSTATUS","OPEN"))=='closed'){
+            abort(401);
+        }
+        $activities = Cache::get( "developer_activities" );
+        $type = $old;
+        foreach($activities as $act){
+            $mergeArr = [];
+            if( @$act['id']==$id && @$act['diff'] ){
+                $diff = $act['diff'];
+                $css = url("defaults/diff-table.css");
+                $data = json_decode($diff);
+
+                $data = $data[0];
+                foreach($data as $d){
+                    $mergeArr[] = $d->$type->lines;
+                }
+                
+                // Initialize an empty string to store the result
+                $codeString = '';
+
+                // Loop through the array and concatenate each element to the string
+                foreach ($mergeArr as $lines) {
+                    $codeString .= implode("\n", $lines) . "\n";
+                }
+
+                return formatPHPCode($codeString);
+            }
+        }
+        
+        return "detail was not-found";
+    });
+
 });

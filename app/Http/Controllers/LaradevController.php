@@ -1031,7 +1031,6 @@ class LaradevController extends Controller
                 return !in_array($dt,['.','..','README.md']);
             });
         }
-        
         return array_merge($migrationLists,[
             "js"=> array_values( $jsFiles ),
             "blades"=> array_values( $bladesFiles ),

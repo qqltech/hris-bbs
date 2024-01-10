@@ -1018,7 +1018,7 @@ function reformatDataResponse($arrayData){
     foreach($arrayData as $key=>$data){
         $isDate=false;
         foreach($dataKey as $dateString){
-            if(strpos(strtolower($key),$dateString)!==false && count(explode("-",$data))>2){
+            if(!is_array($data) && strpos(strtolower($key),$dateString)!==false && count(explode("-", $data))>2){
                 $isDate=true;
                 break;
             }
@@ -1976,7 +1976,7 @@ function getDeveloperActivities( $html=true ){
         $htmlData.=$row;
     }
 
-    return "<h3 style='text-align:center'> Dev Activities on ".env('APP_NAME')." until ".(Carbon::now()->format('d/m/Y')).'</h3><table style="width:100%;" border="1" cellpadding=1>
+    return "<h3 style='text-align:center'> (Debug Mode) Dev Activities on ".env('APP_NAME')." until ".(Carbon::now()->format('d/m/Y')).'</h3><table style="width:100%;" border="1" cellpadding=1>
             <thead style="background:pink;"><th>No</th><th>Time</th><th>Developer</th><th>Action</th><th>Relation</th></thead>'.
             "<tbody>$htmlData</tbody></table>";
 }
@@ -1995,7 +1995,6 @@ function putFileDiff( $path, $text ) {
     $now = Carbon::now()->format( 'Y-m-d' );
     $oldFile = File::exists( $path ) ? File::get( $path ): '';
     File::put( $path, $text );
-
     if( !$oldFile || !class_exists('\Jfcherng\Diff\DiffHelper') ){
         return null;
     }
@@ -2072,4 +2071,31 @@ function wssNotify( string $type='notify', mixed $message=null ){
 
 function getProcessedTime(){
     return round(microtime(true)-config("start_time"),5);
+}
+
+function formatPHPCode($code) {
+    $formattedCode = '';
+
+    // Menambahkan indentasi awal
+    $indentation = 0;
+    $lines = explode("\n", $code);
+
+    foreach ($lines as $line) {
+        $trimmedLine = trim($line);
+
+        // Mengurangi indentasi jika menemukan kurung kurawal penutup
+        if (substr($trimmedLine, -1) == '}') {
+            $indentation--;
+        }
+
+        // Menambahkan indentasi dan baris ke dalam kode yang diformat
+        $formattedCode .= str_repeat('    ', $indentation) . $trimmedLine . "\n";
+
+        // Menambahkan indentasi jika menemukan kurung kurawal pembuka
+        if (substr($trimmedLine, -1) == '{') {
+            $indentation++;
+        }
+    }
+
+    return $formattedCode;
 }

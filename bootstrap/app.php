@@ -64,10 +64,14 @@ $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
+$app->register(\Barryvdh\DomPDF\ServiceProvider::class);
 // $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 if (env('AUTOCREATE_MIGRATION') && class_exists(\MigrationsGenerator\MigrationsGeneratorServiceProvider::class)) {
     $app->register(\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
 }
+
+$app->configure('dompdf');
+
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
