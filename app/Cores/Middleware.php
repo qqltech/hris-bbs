@@ -10,7 +10,8 @@ class Middleware
     public function handle( Request $request, Closure $next ) 
     {
         @$modelName = $request->route()[2]['modelname'];
-        @$modelInstance = app("App\\Models\\CustomModels\\$modelName");
+        if(!$modelName) return $next($request);
+        $modelInstance = @app("App\\Models\\CustomModels\\$modelName");
         $user = auth()->user();
         $requestData = $request->all();
    
