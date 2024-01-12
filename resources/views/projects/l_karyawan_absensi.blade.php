@@ -112,7 +112,7 @@
                       params: {
                           single: true,
                           join: false,
-                          where: `this.m_dir_id=${values.m_dir_id ?? 0} AND this.is_active='true'`
+                          where: `this.is_active='true'`
                       }
                   }"
               />
@@ -159,6 +159,8 @@
                 headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
                 params: {
                   simplest:true,
+                  dept_id :  values.m_dept_id ?? null,
+                  where: `this.m_dept_id=${values.m_dept_id ?? 0} AND this.is_active='true'`,
                   searchfield: 'this.nik, this.nama_lengkap, this.nama_depan, this.nama_belakang, m_zona.nama, m_dir.nama, m_divisi.nama, m_dept.nama'
                 }
               }"
