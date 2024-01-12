@@ -2,11 +2,6 @@
 /.idea
 Homestead.json
 Homestead.yaml
-/public/js/*.js
-/public/uploads
-/public/models.json
-/public/.htacces
-/public/app
 .env
 .env.*
 .editorconfig

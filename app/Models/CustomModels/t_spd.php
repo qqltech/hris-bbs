@@ -23,9 +23,16 @@ class t_spd extends \App\Models\BasicModels\t_spd
     public function transformRowData( array $row )
     {
         $approval = generate_approval_log::where('trx_table', 't_spd')->where('trx_id', $row['id']) ->orderBy('created_at', 'desc')->value('action_note');
+        $det_spd_biaya = \DB::table('m_spd_det_biaya')
+            ->leftJoin('m_general', 'm_spd_det_biaya.tipe_id', '=', 'm_general.id')
+            ->where('m_spd_det_biaya.m_spd_id', $row['m_spd_id'])
+            ->select('m_spd_det_biaya.total_biaya', 'm_spd_det_biaya.tipe_id', 'm_spd_det_biaya.keterangan', 'm_general.value as tipe_value')
+            ->get();
+
         return array_merge( $row, [
             'approval_note' => $approval ?? '',
             'nama_pic' => default_users::where('id', $row['pic_id'])->value('name') ?? '',
+            'det_biaya' => @$det_spd_biaya ?? []
         ] );
     }
 
