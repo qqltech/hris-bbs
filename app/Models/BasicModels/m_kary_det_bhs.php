@@ -29,9 +29,15 @@ class m_kary_det_bhs extends Model
     public $detailsHeirs= [];
     public $unique      = [];
     public $required    = ["bhs_dikuasai","nilai_lisan","nilai_tertulis"];
+<<<<<<< HEAD
     public $createable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
     public $updateable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
     public $searchable  = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
+=======
+    public $createable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","level_lisan","level_tertulis"];
+    public $updateable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","level_lisan","level_tertulis"];
+    public $searchable  = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at","level_lisan","level_tertulis"];
+>>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
     public $deleteable  = true;
     public $cascade     = true;
     public $deleteOnUse = false;

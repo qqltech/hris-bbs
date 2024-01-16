@@ -18,6 +18,12 @@ class mkarydetpemb extends Migration
             // $table->bigInteger('bank_id')->comment('{"src":"m_general.id"}')->nullable();
             // $table->string('no_rek',50)->nullable();
             // $table->string('atas_nama_rek')->nullable();
+            $table->bigInteger('metode_id')->comment('{"src":"m_general.id"}')->nullable()->change();
+            $table->bigInteger('tipe_id')->comment('{"src":"m_general.id"}')->nullable()->change();
+            $table->bigInteger('bank_id')->comment('{"src":"m_general.id"}')->nullable()->change();
+            $table->string('no_rek',50)->nullable()->change();
+            $table->string('atas_nama_rek')->nullable()->change();
+            $table->text('desc')->nullable()->nullable()->change();
         });
     }
 }
