@@ -24,11 +24,7 @@ class m_dir extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_dir.m_comp_id","default_users.id=m_dir.creator_id","default_users.id=m_dir.last_editor_id"];
     public $details     = [];
-<<<<<<< HEAD
-    public $heirs       = ["m_divisi","m_dept","m_file","m_general","m_jam_kerja","m_kary","m_kary_det_bhs","m_kary_det_kartu","m_kary_det_kel","default_users","generate_approval","generate_approval_log","m_approval","m_kary_det_org","m_kary_det_pel","m_kary_det_pemb","m_kary_det_pend","m_kary_det_pk","m_kary_det_pres","m_knd_dinas","m_lembur","m_libur_nasional","m_lokasi","m_menu","m_pengguna","m_posisi","m_role","m_role_access","m_role_det","m_spd","m_spd_det_biaya","m_spd_det_transport","m_standart_gaji","m_tunj_kemahalan","m_zona","m_zona_det","t_cuti","t_final_gaji_det","t_grup_kerja","t_hasil_tes","t_jadwal_kerja","t_lembur","t_loker","t_mutasi","t_pelamar","t_perhitungan_gaji","t_potongan","t_riwayat_posisi","t_sgp","t_spd"];
-=======
     public $heirs       = ["default_users","generate_approval","generate_approval_log","m_approval","m_dept","m_file","m_general","m_divisi","m_jam_kerja","m_kary_det_bhs","m_kary_det_kartu","m_kary_det_kel","m_kary_det_org","m_kary_det_pel","m_kary_det_pemb","m_kary_det_pend","m_kary_det_pk","m_kary_det_pres","m_knd_dinas","m_lokasi","m_lembur","m_libur_nasional","m_menu","m_pengguna","m_role_access","m_standart_gaji","m_role","m_role_det","m_spd_det_biaya","m_kary","m_tunj_kemahalan","m_spd_det_transport","m_posisi","m_spd","m_zona","m_zona_det","t_cuti","t_final_gaji_det","t_jadwal_kerja","t_pelamar","t_perhitungan_gaji","t_grup_kerja","t_loker","t_hasil_tes","t_mutasi","t_riwayat_posisi","t_potongan","t_sgp","t_spd","t_lembur"];
->>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
