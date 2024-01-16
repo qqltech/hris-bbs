@@ -97,7 +97,7 @@
               :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
               :value="values.m_zona_id" @input="v=>values.m_zona_id=v"
               :errorText="formErrors.m_zona_id?'failed':''" 
-              label="" placeholder="Pilih Zona"
+              label="" placeholder="Pilih Grade"
               :hints="formErrors.m_zona_id"
               :api="{
                   url: `${store.server.url_backend}/operation/m_zona`,

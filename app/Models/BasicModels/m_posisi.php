@@ -24,7 +24,7 @@ class m_posisi extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_posisi.m_comp_id","m_dir.id=m_posisi.m_dir_id","m_general.id=m_posisi.min_pendidikan_id","m_general.id=m_posisi.tipe_bpjs_id","default_users.id=m_posisi.creator_id","default_users.id=m_posisi.last_editor_id"];
     public $details     = [];
-    public $heirs       = ["t_jadwal_kerja_det","m_kary","t_spd","t_pelamar","m_tunj_kemahalan","m_spd","m_standart_gaji","t_mutasi","t_mutasi"];
+    public $heirs       = ["m_standart_gaji","m_kary","m_tunj_kemahalan","m_spd","t_jadwal_kerja_det","t_pelamar","t_mutasi","t_mutasi","t_spd"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];

@@ -17,30 +17,26 @@ class t_potongan extends Model
     "created_at"=> "datetime:d\/m\/Y H:i",
     "updated_at"=> "datetime:d\/m\/Y H:i"
 	];
-    protected $fillable = ["nomor","m_comp_id","m_dir_id","m_kary_id","no_doc","doc","nilai","keterangan","status","jenis_potongan_id","date_from","date_to","is_all_kary","percentage","is_lunas","creator_id","last_editor_id","status_bayar"];
+    protected $fillable = ["nomor","m_comp_id","m_dir_id","m_kary_id","periode","no_doc","doc","nilai","keterangan","status","creator_id","last_editor_id"];
 
-    public $columns     = ["id","nomor","m_comp_id","m_dir_id","m_kary_id","no_doc","doc","nilai","keterangan","status","jenis_potongan_id","date_from","date_to","is_all_kary","percentage","is_lunas","creator_id","last_editor_id","created_at","updated_at","status_bayar"];
-    public $columnsFull = ["id:bigint","nomor:string:50","m_comp_id:bigint","m_dir_id:bigint","m_kary_id:bigint","no_doc:string:191","doc:string:191","nilai:decimal","keterangan:text","status:string:50","jenis_potongan_id:bigint","date_from:date","date_to:date","is_all_kary:boolean","percentage:decimal","is_lunas:boolean","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime","status_bayar:string:191"];
+    public $columns     = ["id","nomor","m_comp_id","m_dir_id","m_kary_id","periode","no_doc","doc","nilai","keterangan","status","creator_id","last_editor_id","created_at","updated_at"];
+    public $columnsFull = ["id:bigint","nomor:string:50","m_comp_id:bigint","m_dir_id:bigint","m_kary_id:bigint","periode:string:20","no_doc:string:191","doc:string:191","nilai:decimal","keterangan:text","status:string:50","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
     public $rules       = [];
-    public $joins       = ["m_comp.id=t_potongan.m_comp_id","m_dir.id=t_potongan.m_dir_id","m_kary.id=t_potongan.m_kary_id","m_general.id=t_potongan.jenis_potongan_id","default_users.id=t_potongan.creator_id","default_users.id=t_potongan.last_editor_id"];
-    public $details     = ["t_potongan_det_bayar"];
+    public $joins       = ["m_comp.id=t_potongan.m_comp_id","m_dir.id=t_potongan.m_dir_id","m_kary.id=t_potongan.m_kary_id","default_users.id=t_potongan.creator_id","default_users.id=t_potongan.last_editor_id"];
+    public $details     = [];
     public $heirs       = ["t_final_gaji_det_rincian"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = ["m_kary_id","nilai","jenis_potongan_id","date_from","date_to","is_all_kary","percentage","is_lunas"];
-    public $createable  = ["nomor","m_comp_id","m_dir_id","m_kary_id","no_doc","doc","nilai","keterangan","status","jenis_potongan_id","date_from","date_to","is_all_kary","percentage","is_lunas","creator_id","last_editor_id","status_bayar"];
-    public $updateable  = ["nomor","m_comp_id","m_dir_id","m_kary_id","no_doc","doc","nilai","keterangan","status","jenis_potongan_id","date_from","date_to","is_all_kary","percentage","is_lunas","creator_id","last_editor_id","status_bayar"];
-    public $searchable  = ["id","nomor","m_comp_id","m_dir_id","m_kary_id","no_doc","doc","nilai","keterangan","status","jenis_potongan_id","date_from","date_to","is_all_kary","percentage","is_lunas","creator_id","last_editor_id","created_at","updated_at","status_bayar"];
+    public $required    = ["m_kary_id","periode","nilai"];
+    public $createable  = ["nomor","m_comp_id","m_dir_id","m_kary_id","periode","no_doc","doc","nilai","keterangan","status","creator_id","last_editor_id"];
+    public $updateable  = ["nomor","m_comp_id","m_dir_id","m_kary_id","periode","no_doc","doc","nilai","keterangan","status","creator_id","last_editor_id"];
+    public $searchable  = ["id","nomor","m_comp_id","m_dir_id","m_kary_id","periode","no_doc","doc","nilai","keterangan","status","creator_id","last_editor_id","created_at","updated_at"];
     public $deleteable  = true;
     public $cascade     = true;
     public $deleteOnUse = false;
 
     
-    public function t_potongan_det_bayar() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_potongan_det_bayar', 't_potongan_id', 'id');
-    }
     
     
     public function m_comp() :\BelongsTo
@@ -54,10 +50,6 @@ class t_potongan extends Model
     public function m_kary() :\BelongsTo
     {
         return $this->belongsTo('App\Models\BasicModels\m_kary', 'm_kary_id', 'id');
-    }
-    public function jenis_potongan() :\BelongsTo
-    {
-        return $this->belongsTo('App\Models\BasicModels\m_general', 'jenis_potongan_id', 'id');
     }
     public function creator() :\BelongsTo
     {

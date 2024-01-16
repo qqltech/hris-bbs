@@ -24,7 +24,7 @@ class m_knd_dinas extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_knd_dinas.m_comp_id","m_dir.id=m_knd_dinas.m_dir_id","m_lokasi.id=m_knd_dinas.m_lokasi_id","default_users.id=m_knd_dinas.creator_id","default_users.id=m_knd_dinas.last_editor_id"];
     public $details     = [];
-    public $heirs       = ["t_rpd_det","t_spd_det"];
+    public $heirs       = ["t_spd_det","t_rpd_det"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
