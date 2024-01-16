@@ -24,15 +24,7 @@ class m_dept extends Model
     public $rules       = [];
     public $joins       = ["m_dir.id=m_dept.m_dir_id","m_divisi.id=m_dept.m_divisi_id","default_users.id=m_dept.creator_id","default_users.id=m_dept.last_editor_id"];
     public $details     = [];
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public $heirs       = ["m_kary","m_lembur","m_spd","m_standart_gaji","m_tunj_kemahalan","t_final_gaji_det","t_grup_kerja","t_jadwal_kerja","t_loker","t_mutasi","t_mutasi","t_pelamar","t_perhitungan_gaji","t_spd"];
-=======
-    public $heirs       = ["m_lembur","m_standart_gaji","m_kary","m_tunj_kemahalan","m_spd","t_final_gaji_det","t_jadwal_kerja","t_pelamar","t_perhitungan_gaji","t_grup_kerja","t_loker","t_mutasi","t_mutasi","t_spd"];
->>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
-=======
     public $heirs       = ["t_final_gaji_det","m_kary","t_spd","t_grup_kerja","t_pelamar","t_perhitungan_gaji","m_lembur","t_loker","m_tunj_kemahalan","m_spd","t_jadwal_kerja","m_standart_gaji","t_mutasi","t_mutasi"];
->>>>>>> parent of 9488880 (update 16-01-24)
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
