@@ -36,72 +36,7 @@ class t_pelamar extends Model
     public $cascade     = true;
     public $deleteOnUse = false;
 
-    
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public function t_pelamar_det_bhs() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_bhs', 't_pelamar_id', 'id');
-    }
-=======
->>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
-=======
-    public function t_pelamar_det_pres() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pres', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pk() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pk', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pel() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pel', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_peng() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_peng', 't_pelamar_id', 'id');
-    }
->>>>>>> parent of 9488880 (update 16-01-24)
-    public function t_pelamar_det_kartu() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_kartu', 't_pelamar_id', 'id');
-    }
-<<<<<<< HEAD
-    public function t_pelamar_det_org() :\HasMany
-=======
-    public function t_pelamar_det_pend() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pend', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_peng() :\HasMany
->>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_peng', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pel() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pel', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pend() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pend', 't_pelamar_id', 'id');
-    }
-<<<<<<< HEAD
-    public function t_pelamar_det_peng() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_peng', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pk() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pk', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pres() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pres', 't_pelamar_id', 'id');
-    }
-=======
->>>>>>> parent of 9488880 (update 16-01-24)
+  
     public function t_pelamar_det_org() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\t_pelamar_det_org', 't_pelamar_id', 'id');
