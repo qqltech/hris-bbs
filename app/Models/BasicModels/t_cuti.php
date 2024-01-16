@@ -20,7 +20,7 @@ class t_cuti extends Model
     protected $fillable = ["nomor","m_comp_id","m_dir_id","m_kary_id","alasan_id","tipe_cuti_id","date_from","date_to","time_from","time_to","keterangan","status","creator_id","last_editor_id","attachment","interval","interval_min"];
 
     public $columns     = ["id","nomor","m_comp_id","m_dir_id","m_kary_id","alasan_id","tipe_cuti_id","date_from","date_to","time_from","time_to","keterangan","status","creator_id","last_editor_id","created_at","updated_at","attachment","interval","interval_min"];
-    public $columnsFull = ["id:bigint","nomor:string:50","m_comp_id:bigint","m_dir_id:bigint","m_kary_id:bigint","alasan_id:bigint","tipe_cuti_id:bigint","date_from:date","date_to:date","time_from:time","time_to:time","keterangan:text","status:string:50","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime","attachment:string:191","interval:integer","interval_min:integer"];
+    public $columnsFull = ["id:bigint","nomor:string:50","m_comp_id:bigint","m_dir_id:bigint","m_kary_id:bigint","alasan_id:bigint","tipe_cuti_id:bigint","date_from:date","date_to:date","time_from:time","time_to:time","keterangan:text","status:string:50","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime","attachment:string","interval:integer","interval_min:integer"];
     public $rules       = [];
     public $joins       = ["m_comp.id=t_cuti.m_comp_id","m_dir.id=t_cuti.m_dir_id","m_kary.id=t_cuti.m_kary_id","m_general.id=t_cuti.alasan_id","m_general.id=t_cuti.tipe_cuti_id","default_users.id=t_cuti.creator_id","default_users.id=t_cuti.last_editor_id"];
     public $details     = [];

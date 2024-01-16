@@ -24,7 +24,7 @@ class m_zona extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_zona.m_comp_id","m_dir.id=m_zona.m_dir_id","default_users.id=m_zona.creator_id","default_users.id=m_zona.last_editor_id"];
     public $details     = ["m_zona_det"];
-    public $heirs       = ["m_kary","t_spd","t_spd","m_tunj_kemahalan","m_spd","m_standart_gaji"];
+    public $heirs       = ["m_kary","m_spd","m_standart_gaji","m_tunj_kemahalan","t_spd","t_spd"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
