@@ -92,32 +92,6 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
             );
         }
 
-        $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$arrayData['m_kary_id'] ??0]);
-        $data = json_decode($data[0]->employee_attendance);
-
-        if(@$arrayData['tipe_cuti_id']){
-            $tipe = m_general::where('id',$arrayData['tipe_cuti_id'])->pluck('key')->first();
-            if($tipe == '01' && (@$data->sisa_cuti_masa_kerja ?? 0) <= 0){
-                // masa kerja 
-                return [
-                    "errors" => ['Maaf anda tidak memiliki sisa cuti masa kerja berlaku']
-                ];
-            }
-            elseif($tipe == '02' && (@$data->sisa_cuti_reguler ?? 0) <= 0){
-                // tahunan / reguler 
-                return [
-                    "errors" => ['Maaf anda tidak memiliki sisa cuti tahunan berlaku']
-                ];
-            }
-            elseif($tipe == '03' && (@$data->sisa_cuti_p24 ?? 0) <= 0){
-                // P24
-                return [
-                    "errors" => ['Maaf anda tidak memiliki sisa cuti P24 berlaku']
-                ];
-            }
-        }
-
-
         $interval = null;
         $interval_min = null;
 

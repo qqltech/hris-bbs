@@ -28,12 +28,16 @@ class m_kary_det_bhs extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
+<<<<<<< HEAD
     public $required    = ["bhs_dikuasai","nilai_lisan","nilai_tertulis"];
 <<<<<<< HEAD
     public $createable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
     public $updateable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
     public $searchable  = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
 =======
+=======
+    public $required    = ["bhs_dikuasai"];
+>>>>>>> parent of 9488880 (update 16-01-24)
     public $createable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","level_lisan","level_tertulis"];
     public $updateable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","level_lisan","level_tertulis"];
     public $searchable  = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at","level_lisan","level_tertulis"];

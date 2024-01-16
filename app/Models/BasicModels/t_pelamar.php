@@ -24,15 +24,19 @@ class t_pelamar extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=t_pelamar.m_comp_id","m_dir.id=t_pelamar.m_dir_id","m_general.id=t_pelamar.jk_id","default_users.id=t_pelamar.creator_id","default_users.id=t_pelamar.last_editor_id","m_divisi.id=t_pelamar.m_divisi_id","m_dept.id=t_pelamar.m_dept_id","m_posisi.id=t_pelamar.m_posisi_id","t_loker.id=t_pelamar.t_loker_id"];
 <<<<<<< HEAD
+<<<<<<< HEAD
     public $details     = ["t_pelamar_det_bhs","t_pelamar_det_kartu","t_pelamar_det_org","t_pelamar_det_pel","t_pelamar_det_pend","t_pelamar_det_peng","t_pelamar_det_pk","t_pelamar_det_pres"];
 =======
     public $details     = ["t_pelamar_det_kartu","t_pelamar_det_pend","t_pelamar_det_peng","t_pelamar_det_bhs","t_pelamar_det_org","t_pelamar_det_pel","t_pelamar_det_pk","t_pelamar_det_pres"];
 >>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
+=======
+    public $details     = ["t_pelamar_det_pres","t_pelamar_det_pk","t_pelamar_det_pel","t_pelamar_det_peng","t_pelamar_det_kartu","t_pelamar_det_pend","t_pelamar_det_org","t_pelamar_det_bhs"];
+>>>>>>> parent of 9488880 (update 16-01-24)
     public $heirs       = ["m_kary","t_hasil_tes"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = ["nama_pelamar","ktp_no","tanggal","ref","telp","tgl_lahir","salary","deskripsi"];
+    public $required    = ["nama_pelamar","ktp_no","ref","telp","tgl_lahir","salary","deskripsi"];
     public $createable  = ["nomor","m_comp_id","m_dir_id","nama_pelamar","ktp_no","tanggal","ref","telp","jk_id","tgl_lahir","salary","deskripsi","status","creator_id","last_editor_id","m_divisi_id","m_dept_id","m_posisi_id","tempat_lahir","t_loker_id"];
     public $updateable  = ["nomor","m_comp_id","m_dir_id","nama_pelamar","ktp_no","tanggal","ref","telp","jk_id","tgl_lahir","salary","deskripsi","status","creator_id","last_editor_id","m_divisi_id","m_dept_id","m_posisi_id","tempat_lahir","t_loker_id"];
     public $searchable  = ["id","nomor","m_comp_id","m_dir_id","nama_pelamar","ktp_no","tanggal","ref","telp","jk_id","tgl_lahir","salary","deskripsi","status","creator_id","last_editor_id","created_at","updated_at","m_divisi_id","m_dept_id","m_posisi_id","tempat_lahir","t_loker_id"];
@@ -42,12 +46,31 @@ class t_pelamar extends Model
 
     
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function t_pelamar_det_bhs() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\t_pelamar_det_bhs', 't_pelamar_id', 'id');
     }
 =======
 >>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
+=======
+    public function t_pelamar_det_pres() :\HasMany
+    {
+        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pres', 't_pelamar_id', 'id');
+    }
+    public function t_pelamar_det_pk() :\HasMany
+    {
+        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pk', 't_pelamar_id', 'id');
+    }
+    public function t_pelamar_det_pel() :\HasMany
+    {
+        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pel', 't_pelamar_id', 'id');
+    }
+    public function t_pelamar_det_peng() :\HasMany
+    {
+        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_peng', 't_pelamar_id', 'id');
+    }
+>>>>>>> parent of 9488880 (update 16-01-24)
     public function t_pelamar_det_kartu() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\t_pelamar_det_kartu', 't_pelamar_id', 'id');
@@ -72,6 +95,7 @@ class t_pelamar extends Model
     {
         return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pend', 't_pelamar_id', 'id');
     }
+<<<<<<< HEAD
     public function t_pelamar_det_peng() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\t_pelamar_det_peng', 't_pelamar_id', 'id');
@@ -84,21 +108,15 @@ class t_pelamar extends Model
     {
         return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pres', 't_pelamar_id', 'id');
     }
+=======
+>>>>>>> parent of 9488880 (update 16-01-24)
     public function t_pelamar_det_org() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\t_pelamar_det_org', 't_pelamar_id', 'id');
     }
-    public function t_pelamar_det_pel() :\HasMany
+    public function t_pelamar_det_bhs() :\HasMany
     {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pel', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pk() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pk', 't_pelamar_id', 'id');
-    }
-    public function t_pelamar_det_pres() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_pres', 't_pelamar_id', 'id');
+        return $this->hasMany('App\Models\BasicModels\t_pelamar_det_bhs', 't_pelamar_id', 'id');
     }
     
     

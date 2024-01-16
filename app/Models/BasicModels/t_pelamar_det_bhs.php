@@ -17,10 +17,10 @@ class t_pelamar_det_bhs extends Model
     "created_at"=> "datetime:d\/m\/Y H:i",
     "updated_at"=> "datetime:d\/m\/Y H:i"
 	];
-    protected $fillable = ["t_pelamar_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
+    protected $fillable = ["t_pelamar_id","bhs_dikuasai","nilai_lisan","level_lisan","nilai_tertulis","level_tertulis","desc","creator_id","last_editor_id"];
 
-    public $columns     = ["id","t_pelamar_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
-    public $columnsFull = ["id:bigint","t_pelamar_id:bigint","bhs_dikuasai:string:100","nilai_lisan:integer","nilai_tertulis:integer","desc:text","creator_id:integer","last_editor_id:integer","created_at:datetime","updated_at:datetime"];
+    public $columns     = ["id","t_pelamar_id","bhs_dikuasai","nilai_lisan","level_lisan","nilai_tertulis","level_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
+    public $columnsFull = ["id:bigint","t_pelamar_id:bigint","bhs_dikuasai:string:100","nilai_lisan:integer","level_lisan:string:191","nilai_tertulis:integer","level_tertulis:string:191","desc:text","creator_id:integer","last_editor_id:integer","created_at:datetime","updated_at:datetime"];
     public $rules       = [];
     public $joins       = ["t_pelamar.id=t_pelamar_det_bhs.t_pelamar_id"];
     public $details     = [];
@@ -28,10 +28,10 @@ class t_pelamar_det_bhs extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = ["bhs_dikuasai","nilai_lisan","nilai_tertulis"];
-    public $createable  = ["t_pelamar_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
-    public $updateable  = ["t_pelamar_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
-    public $searchable  = ["id","t_pelamar_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
+    public $required    = ["bhs_dikuasai","level_lisan","level_tertulis"];
+    public $createable  = ["t_pelamar_id","bhs_dikuasai","nilai_lisan","level_lisan","nilai_tertulis","level_tertulis","desc","creator_id","last_editor_id"];
+    public $updateable  = ["t_pelamar_id","bhs_dikuasai","nilai_lisan","level_lisan","nilai_tertulis","level_tertulis","desc","creator_id","last_editor_id"];
+    public $searchable  = ["id","t_pelamar_id","bhs_dikuasai","nilai_lisan","level_lisan","nilai_tertulis","level_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
     public $deleteable  = true;
     public $cascade     = true;
     public $deleteOnUse = false;

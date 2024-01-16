@@ -17,11 +17,12 @@ class m_kary extends Model
     "created_at"=> "datetime:d\/m\/Y H:i",
     "updated_at"=> "datetime:d\/m\/Y H:i"
 	];
-    protected $fillable = ["m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","m_standart_gaji_id","periode_gaji_id","ref_id","atasan_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","cuti_p24","cuti_sisa_p24"];
+    protected $fillable = ["m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","m_standart_gaji_id","periode_gaji_id","ref_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","atasan_id","cuti_p24","cuti_sisa_p24"];
 
-    public $columns     = ["id","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","created_at","updated_at","m_standart_gaji_id","periode_gaji_id","ref_id","atasan_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","cuti_p24","cuti_sisa_p24"];
-    public $columnsFull = ["id:bigint","m_comp_id:bigint","m_dir_id:bigint","m_divisi_id:bigint","m_dept_id:bigint","m_zona_id:bigint","grading_id:bigint","costcontre_id:bigint","kode:string:100","m_posisi_id:bigint","m_jam_kerja_id:bigint","kode_presensi:string:100","nik:string:20","nama_depan:string:100","nama_belakang:string:100","nama_lengkap:string:100","nama_panggilan:string:100","jk_id:bigint","tempat_lahir:string:100","tgl_lahir:date","provinsi_id:bigint","kota_id:bigint","kecamatan_id:bigint","kode_pos:string:10","alamat_asli:text","alamat_domisili:text","no_tlp:string:20","no_tlp_lainnya:string:20","no_darurat:string:20","nama_kontak_darurat:string:100","agama_id:bigint","gol_darah_id:bigint","status_nikah_id:bigint","tanggungan_id:bigint","hub_dgn_karyawan:string:100","cuti_jatah_reguler:integer","cuti_sisa_reguler:integer","cuti_panjang:integer","cuti_sisa_panjang:integer","status_kary_id:bigint","lama_kontrak_awal:date","lama_kontrak_akhir:date","tgl_masuk:date","tgl_berhenti:date","alasan_berhenti:text","uk_baju:string:50","uk_celana:string:50","uk_sepatu:string:50","desc:text","is_active:boolean","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime","m_standart_gaji_id:bigint","periode_gaji_id:bigint","ref_id:bigint","atasan_id:bigint","presensi_lokasi_default_id:bigint","exp_date_cuti:date","limit_potong:integer","cuti_p24:decimal","cuti_sisa_p24:decimal"];
+    public $columns     = ["id","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","created_at","updated_at","m_standart_gaji_id","periode_gaji_id","ref_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","atasan_id","cuti_p24","cuti_sisa_p24"];
+    public $columnsFull = ["id:bigint","m_comp_id:bigint","m_dir_id:bigint","m_divisi_id:bigint","m_dept_id:bigint","m_zona_id:bigint","grading_id:bigint","costcontre_id:bigint","kode:string:100","m_posisi_id:bigint","m_jam_kerja_id:bigint","kode_presensi:string:100","nik:string:20","nama_depan:string:100","nama_belakang:string:100","nama_lengkap:string:100","nama_panggilan:string:100","jk_id:bigint","tempat_lahir:string:100","tgl_lahir:date","provinsi_id:bigint","kota_id:bigint","kecamatan_id:bigint","kode_pos:string:10","alamat_asli:text","alamat_domisili:text","no_tlp:string:20","no_tlp_lainnya:string:20","no_darurat:string:20","nama_kontak_darurat:string:100","agama_id:bigint","gol_darah_id:bigint","status_nikah_id:bigint","tanggungan_id:bigint","hub_dgn_karyawan:string:100","cuti_jatah_reguler:integer","cuti_sisa_reguler:integer","cuti_panjang:integer","cuti_sisa_panjang:integer","status_kary_id:bigint","lama_kontrak_awal:date","lama_kontrak_akhir:date","tgl_masuk:date","tgl_berhenti:date","alasan_berhenti:text","uk_baju:string:50","uk_celana:string:50","uk_sepatu:string:50","desc:text","is_active:boolean","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime","m_standart_gaji_id:bigint","periode_gaji_id:bigint","ref_id:bigint","presensi_lokasi_default_id:bigint","exp_date_cuti:date","limit_potong:integer","atasan_id:bigint","cuti_p24:decimal","cuti_sisa_p24:decimal"];
     public $rules       = [];
+<<<<<<< HEAD
     public $joins       = ["m_comp.id=m_kary.m_comp_id","m_dir.id=m_kary.m_dir_id","m_divisi.id=m_kary.m_divisi_id","m_dept.id=m_kary.m_dept_id","m_zona.id=m_kary.m_zona_id","m_general.id=m_kary.grading_id","m_general.id=m_kary.costcontre_id","m_posisi.id=m_kary.m_posisi_id","m_jam_kerja.id=m_kary.m_jam_kerja_id","m_general.id=m_kary.jk_id","m_general.id=m_kary.provinsi_id","m_general.id=m_kary.kota_id","m_general.id=m_kary.kecamatan_id","m_general.id=m_kary.agama_id","m_general.id=m_kary.gol_darah_id","m_general.id=m_kary.status_nikah_id","m_general.id=m_kary.tanggungan_id","m_general.id=m_kary.status_kary_id","default_users.id=m_kary.creator_id","default_users.id=m_kary.last_editor_id","m_standart_gaji.id=m_kary.m_standart_gaji_id","m_general.id=m_kary.periode_gaji_id","t_pelamar.id=m_kary.ref_id","m_kary.id=m_kary.atasan_id","presensi_lokasi.id=m_kary.presensi_lokasi_default_id"];
     public $details     = ["m_kary_det_bhs","m_kary_det_kartu","m_kary_det_kel","m_kary_det_org","m_kary_det_pel","m_kary_det_pemb","m_kary_det_pend","m_kary_det_pk","m_kary_det_pres"];
 <<<<<<< HEAD
@@ -29,25 +30,42 @@ class m_kary extends Model
 =======
     public $heirs       = ["default_users","m_kary","t_cuti","t_final_gaji_det","t_jadwal_kerja_det","t_perhitungan_gaji","t_mutasi","t_riwayat_posisi","t_potongan","t_sgp","t_spd","t_lembur"];
 >>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
+=======
+    public $joins       = ["m_comp.id=m_kary.m_comp_id","m_dir.id=m_kary.m_dir_id","m_divisi.id=m_kary.m_divisi_id","m_dept.id=m_kary.m_dept_id","m_zona.id=m_kary.m_zona_id","m_general.id=m_kary.grading_id","m_general.id=m_kary.costcontre_id","m_posisi.id=m_kary.m_posisi_id","m_jam_kerja.id=m_kary.m_jam_kerja_id","m_general.id=m_kary.jk_id","m_general.id=m_kary.provinsi_id","m_general.id=m_kary.kota_id","m_general.id=m_kary.kecamatan_id","m_general.id=m_kary.agama_id","m_general.id=m_kary.gol_darah_id","m_general.id=m_kary.status_nikah_id","m_general.id=m_kary.tanggungan_id","m_general.id=m_kary.status_kary_id","default_users.id=m_kary.creator_id","default_users.id=m_kary.last_editor_id","m_standart_gaji.id=m_kary.m_standart_gaji_id","m_general.id=m_kary.periode_gaji_id","t_pelamar.id=m_kary.ref_id","presensi_lokasi.id=m_kary.presensi_lokasi_default_id","m_kary.id=m_kary.atasan_id"];
+    public $details     = ["m_kary_det_pel","m_kary_det_kartu","m_kary_det_pemb","m_kary_det_bhs","m_kary_det_pk","m_kary_det_kel","m_kary_det_org","m_kary_det_pend","m_kary_det_pres"];
+    public $heirs       = ["t_jadwal_kerja_det","t_final_gaji_det","t_cuti","m_kary","default_users","t_spd","t_potongan","t_riwayat_posisi","t_perhitungan_gaji","t_lembur","t_sgp","t_mutasi"];
+>>>>>>> parent of 9488880 (update 16-01-24)
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
     public $required    = ["is_active","limit_potong"];
-    public $createable  = ["m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","m_standart_gaji_id","periode_gaji_id","ref_id","atasan_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","cuti_p24","cuti_sisa_p24"];
-    public $updateable  = ["m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","m_standart_gaji_id","periode_gaji_id","ref_id","atasan_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","cuti_p24","cuti_sisa_p24"];
-    public $searchable  = ["id","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","created_at","updated_at","m_standart_gaji_id","periode_gaji_id","ref_id","atasan_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","cuti_p24","cuti_sisa_p24"];
+    public $createable  = ["m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","m_standart_gaji_id","periode_gaji_id","ref_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","atasan_id","cuti_p24","cuti_sisa_p24"];
+    public $updateable  = ["m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","m_standart_gaji_id","periode_gaji_id","ref_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","atasan_id","cuti_p24","cuti_sisa_p24"];
+    public $searchable  = ["id","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","m_zona_id","grading_id","costcontre_id","kode","m_posisi_id","m_jam_kerja_id","kode_presensi","nik","nama_depan","nama_belakang","nama_lengkap","nama_panggilan","jk_id","tempat_lahir","tgl_lahir","provinsi_id","kota_id","kecamatan_id","kode_pos","alamat_asli","alamat_domisili","no_tlp","no_tlp_lainnya","no_darurat","nama_kontak_darurat","agama_id","gol_darah_id","status_nikah_id","tanggungan_id","hub_dgn_karyawan","cuti_jatah_reguler","cuti_sisa_reguler","cuti_panjang","cuti_sisa_panjang","status_kary_id","lama_kontrak_awal","lama_kontrak_akhir","tgl_masuk","tgl_berhenti","alasan_berhenti","uk_baju","uk_celana","uk_sepatu","desc","is_active","creator_id","last_editor_id","created_at","updated_at","m_standart_gaji_id","periode_gaji_id","ref_id","presensi_lokasi_default_id","exp_date_cuti","limit_potong","atasan_id","cuti_p24","cuti_sisa_p24"];
     public $deleteable  = true;
     public $cascade     = true;
     public $deleteOnUse = false;
 
     
-    public function m_kary_det_bhs() :\HasMany
+    public function m_kary_det_pel() :\HasMany
     {
-        return $this->hasMany('App\Models\BasicModels\m_kary_det_bhs', 'm_kary_id', 'id');
+        return $this->hasMany('App\Models\BasicModels\m_kary_det_pel', 'm_kary_id', 'id');
     }
     public function m_kary_det_kartu() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\m_kary_det_kartu', 'm_kary_id', 'id');
+    }
+    public function m_kary_det_pemb() :\HasMany
+    {
+        return $this->hasMany('App\Models\BasicModels\m_kary_det_pemb', 'm_kary_id', 'id');
+    }
+    public function m_kary_det_bhs() :\HasMany
+    {
+        return $this->hasMany('App\Models\BasicModels\m_kary_det_bhs', 'm_kary_id', 'id');
+    }
+    public function m_kary_det_pk() :\HasMany
+    {
+        return $this->hasMany('App\Models\BasicModels\m_kary_det_pk', 'm_kary_id', 'id');
     }
     public function m_kary_det_kel() :\HasMany
     {
@@ -57,21 +75,9 @@ class m_kary extends Model
     {
         return $this->hasMany('App\Models\BasicModels\m_kary_det_org', 'm_kary_id', 'id');
     }
-    public function m_kary_det_pel() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\m_kary_det_pel', 'm_kary_id', 'id');
-    }
-    public function m_kary_det_pemb() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\m_kary_det_pemb', 'm_kary_id', 'id');
-    }
     public function m_kary_det_pend() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\m_kary_det_pend', 'm_kary_id', 'id');
-    }
-    public function m_kary_det_pk() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\m_kary_det_pk', 'm_kary_id', 'id');
     }
     public function m_kary_det_pres() :\HasMany
     {
@@ -171,12 +177,12 @@ class m_kary extends Model
     {
         return $this->belongsTo('App\Models\BasicModels\t_pelamar', 'ref_id', 'id');
     }
-    public function atasan() :\BelongsTo
-    {
-        return $this->belongsTo('App\Models\BasicModels\m_kary', 'atasan_id', 'id');
-    }
     public function presensi_lokasi_default() :\BelongsTo
     {
         return $this->belongsTo('App\Models\BasicModels\presensi_lokasi', 'presensi_lokasi_default_id', 'id');
+    }
+    public function atasan() :\BelongsTo
+    {
+        return $this->belongsTo('App\Models\BasicModels\m_kary', 'atasan_id', 'id');
     }
 }
