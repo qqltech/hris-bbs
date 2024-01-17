@@ -17,10 +17,10 @@ class m_kary_det_bhs extends Model
     "created_at"=> "datetime:d\/m\/Y H:i",
     "updated_at"=> "datetime:d\/m\/Y H:i"
 	];
-    protected $fillable = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
+    protected $fillable = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","level_lisan","level_tertulis"];
 
-    public $columns     = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
-    public $columnsFull = ["id:bigint","m_kary_id:bigint","m_comp_id:bigint","m_dir_id:bigint","bhs_dikuasai:string:100","nilai_lisan:integer","nilai_tertulis:integer","desc:text","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
+    public $columns     = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at","level_lisan","level_tertulis"];
+    public $columnsFull = ["id:bigint","m_kary_id:bigint","m_comp_id:bigint","m_dir_id:bigint","bhs_dikuasai:string:100","nilai_lisan:integer","nilai_tertulis:integer","desc:text","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime","level_lisan:string:191","level_tertulis:string:191"];
     public $rules       = [];
     public $joins       = ["m_kary.id=m_kary_det_bhs.m_kary_id","m_comp.id=m_kary_det_bhs.m_comp_id","m_dir.id=m_kary_det_bhs.m_dir_id","default_users.id=m_kary_det_bhs.creator_id","default_users.id=m_kary_det_bhs.last_editor_id"];
     public $details     = [];
@@ -28,20 +28,10 @@ class m_kary_det_bhs extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-<<<<<<< HEAD
-    public $required    = ["bhs_dikuasai","nilai_lisan","nilai_tertulis"];
-<<<<<<< HEAD
-    public $createable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
-    public $updateable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id"];
-    public $searchable  = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at"];
-=======
-=======
-    public $required    = ["bhs_dikuasai"];
->>>>>>> parent of 9488880 (update 16-01-24)
+    public $required    = [""];
     public $createable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","level_lisan","level_tertulis"];
     public $updateable  = ["m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","level_lisan","level_tertulis"];
     public $searchable  = ["id","m_kary_id","m_comp_id","m_dir_id","bhs_dikuasai","nilai_lisan","nilai_tertulis","desc","creator_id","last_editor_id","created_at","updated_at","level_lisan","level_tertulis"];
->>>>>>> 948888082c55682e4f2fa49dea57e435c4a70be9
     public $deleteable  = true;
     public $cascade     = true;
     public $deleteOnUse = false;
