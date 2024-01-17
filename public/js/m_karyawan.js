@@ -784,6 +784,7 @@ async function onSave() {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         // console.log(values.m_kary_det_kartu.length)
         if(isCreating || values.m_kary_det_kartu.length === 0){
+
           values.m_kary_det_kartu = [{
             ktp_no: values.ktp_no,
             ktp_foto: tempKTP,
@@ -803,20 +804,21 @@ async function onSave() {
             is_active: true
           }]
         }else{   
+          console.log(values.m_kary_det_kartu)
           values.m_kary_det_kartu[0].ktp_no = values.ktp_no
-          if(initialValues.m_kary_det_kartu[0].ktp_foto !== tempKTP){
+          if(initialValues.m_kary_det_kartu[0]?.ktp_foto !== tempKTP){
             values.m_kary_det_kartu[0].ktp_foto = tempKTP
           }
-          if(initialValues.m_kary_det_kartu[0].pas_foto !== tempPasfoto){
+          if(initialValues.m_kary_det_kartu[0]?.pas_foto !== tempPasfoto){
             values.m_kary_det_kartu[0].pas_foto = tempPasfoto
           }
           values.m_kary_det_kartu[0].kk_no = values.kk_no
-          if(initialValues.m_kary_det_kartu[0].kk_foto !== tempKK){
+          if(initialValues.m_kary_det_kartu[0]?.kk_foto !== tempKK){
             values.m_kary_det_kartu[0].kk_foto = tempKK
           }
           values.m_kary_det_kartu[0].npwp_no = values.npwp_no
           values.m_kary_det_kartu[0].npwp_tgl_berlaku = values.npwp_tgl_berlaku
-          if(initialValues.m_kary_det_kartu[0].npwp_foto !== tempNPWP){
+          if(initialValues.m_kary_det_kartu[0]?.npwp_foto !== tempNPWP){
             values.m_kary_det_kartu[0].npwp_foto = tempNPWP
           }
           values.m_kary_det_kartu[0].bpjs_tipe_id = values.bpjs_tipe_id
@@ -839,6 +841,7 @@ async function onSave() {
           body: JSON.stringify(values)
         })
         if (!res.ok) {
+          // values.m_kary_det_kartu = []
           if ([400, 422].includes(res.status)) {
             const responseJson = await res.json()
             formErrors.value = responseJson.errors || {}

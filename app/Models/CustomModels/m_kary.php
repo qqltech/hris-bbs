@@ -367,7 +367,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
         if(!$data){
             $data = $this->defaultDataDiri();
         }else{
-            $det_kartu = m_kary_det_kartu::with(['bpjs_tipe'])->where('m_kary_id', @$id_kary ?? 0)->first();
+            $det_kartu = m_kary_det_kartu::where('m_kary_id', @$id_kary ?? 0)->first();
             $det_pemb = m_kary_det_pemb::with(['periode_gaji', 'metode', 'tipe' , 'bank'])->where('m_kary_id', @$id_kary ?? 0)->first();
             if($det_kartu){
                 $data['ktp_no'] = $det_kartu->ktp_no ?? null;
@@ -379,7 +379,6 @@ class m_kary extends \App\Models\BasicModels\m_kary
                 $data['npwp_foto'] = $det_kartu->npwp_foto ?? null;
                 $data['npwp_tgl_berlaku'] = $det_kartu->npwp_tgl_berlaku ?? null;
                 $data['bpjs_tipe_id'] = $det_kartu->bpjs_tipe_id ?? null;
-                $data['bpjs_tipe'] = $det_kartu->bpjs_tipe->value ?? null;
                 $data['bpjs_no'] = $det_kartu->bpjs_no ?? null;
                 $data['bpjs_no_kesehatan'] = $det_kartu->bpjs_no_kesehatan ?? null;
                 $data['bpjs_no_ketenagakerjaan'] = $det_kartu->bpjs_no_ketenagakerjaan ?? null;
@@ -525,8 +524,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
                 ]);
             }
             if($createHeader){
-                $check = m_kary_det_kartu::where('m_kary_id', $id_kary)->first();
-                $check_pemb = m_kary_det_pemb::where('m_kary_id', $id_kary)->first();
+                 $check = m_kary_det_kartu::where('m_kary_id', $id_kary)->first();
 
                 $file = $req->file('ktp_foto');
                 $fileName_ktp = $this->uploadFile($file);
@@ -552,29 +550,34 @@ class m_kary extends \App\Models\BasicModels\m_kary
                 $fileName_berkas = $this->uploadFile($file);
                 // if(!$fileName_berkas) return $this->helper->customResponse('Upload berkas lain tidak valid, silahkan melakukan upload ulang file', 422);
                 if($check){
-                    // dd($req->all());
-                   $update = \DB::table('m_kary_det_kartu')
+                    \DB::table('m_kary_det_kartu')
                         ->where('m_kary_id', $id_kary)
                         ->update([
                         "m_kary_id" => $id_kary,
-                        "ktp_no" => $req->ktp_no ?? $check->ktp_no,
+                        "ktp_no" => $req->ktp_no ?? null,
                         "ktp_foto" => $fileName_ktp ?? $check->ktp_foto,
                         "pas_foto" => $fileName_pas ?? $check->pas_foto,
-                        "kk_no" => $req->kk_no ?? $check->kk_no,
+                        "kk_no" => $req->kk_no ?? null,
                         "kk_foto" => $fileName_kk ?? $check->kk_foto,
-                        "npwp_no" => $req->npwp_no ?? $check->npwp_no,
+                        "npwp_no" => $req->npwp_no ?? null,
                         "npwp_foto" => $fileName_npwp ?? $check->npwp_foto,
-                        "npwp_tgl_berlaku" => $req->npwp_tgl_berlaku ?? $check->npwp_tgl_berlaku,
-                        "bpjs_tipe_id" => $req->bpjs_tipe_id ?? $check->bpjs_tipe_id,
-                        "bpjs_no" => $req->bpjs_no ?? $check->bpjs_no,
-                        "bpjs_no_kesehatan" => $req->bpjs_no_kesehatan ?? $check->bpjs_no_kesehatan,
-                        "bpjs_no_ketenagakerjaan" => $req->bpjs_no_ketenagakerjaan ?? $check->bpjs_no_ketenagakerjaan,
+                        "npwp_tgl_berlaku" => $req->npwp_tgl_berlaku ?? null,
+                        "bpjs_tipe_id" => $req->bpjs_tipe_id ?? null,
+                        "bpjs_no" => $req->bpjs_no ?? null,
                         "bpjs_foto" => $fileName_bpjs ?? $check->bpjs_foto,
                         "berkas_lain" => $fileName_berkas ?? $check->berkas_lain,
-                        "desc_file" => $req->desc_file ?? $check->desc_file,
-                    ]);
+                        "desc_file" => $req->desc_file ?? null,
+                    ]);             
+                    \DB::table('m_kary_det_pemb')
+                        ->where('m_kary_id', $id_kary)
+                        ->update([
+                            'bank_id' => @$req->bank_id,
+                            'no_rek' => @$req->no_rek,
+                            'atas_nama_rek' => @$req->atas_nama_rek
+                        ]);
                 }else{
-                       $insert = \DB::table('m_kary_det_kartu')->insert([
+                    if($req->file('ktp_foto')){
+                        \DB::table('m_kary_det_kartu')->insert([
                             "m_kary_id" => $id_kary,
                             "ktp_no" => @$req->ktp_no,
                             "ktp_foto" => @$fileName_ktp,
@@ -586,13 +589,13 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             "npwp_tgl_berlaku" => @$req->npwp_tgl_berlaku,
                             "bpjs_tipe_id" => @$req->bpjs_tipe_id,
                             "bpjs_no" => @$req->bpjs_no,
-                            "bpjs_no_kesehatan" => @$req->bpjs_no_kesehatan,
-                            "bpjs_no_ketenagakerjaan" => @$req->bpjs_no_ketenagakerjaan ,
                             "bpjs_foto" => @$fileName_bpjs,
                             "berkas_lain" => @$fileName_berkas,
                             "desc_file" => @$req->desc_file
                         ]);
+                    }
                 }
+/*<<<<<<< HEAD*/
                 if($check_pemb){
                     \DB::table('m_kary_det_pemb')
                         ->where('m_kary_id', $id_kary)
@@ -615,10 +618,14 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             'atas_nama_rek' => @$req->atas_nama_rek,
                             'desc' => @$req->desc
                     ]);
-                }       
-            }
-           
-            \DB::commit();
+                }
+/*       
+=======
+>>>>>>> 9801edb8aa1b87cbdd96c45a13d5a6acdabdcbc0
+            
+ */          
+        }    
+	\DB::commit();
         }catch(\Exception $e){
             \DB::rollback();
             return $this->helper->responseCatch($e);

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @php
   $req = app()->request;
   $tipe = $req->tipe_report;
@@ -176,3 +177,7 @@ td.text-right {
   @else
 
   @endif
+=======
+<?php
+ // blade php file
+>>>>>>> 9801edb8aa1b87cbdd96c45a13d5a6acdabdcbc0
