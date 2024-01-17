@@ -14,7 +14,7 @@
           <div class="col-span-2">
             <label class="font-semibold">Tipe Report</label>
               <FieldSelect 
-                :bind="{ readonly: !actionText }" 
+                :bind="{ readonly: !actionText, clearable: false }" 
                 class="w-full py-2 !mt-0"
                 :value="values.tipe_report" 
                 :errorText="formErrors.tipe_report ? 'failed' : ''"
@@ -88,7 +88,7 @@
                   }" />
               </div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
+          <!-- <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="font-semibold">Divisi</label>
                 <FieldSelect 
@@ -145,7 +145,7 @@
                   }"
               />
             </div>
-          </div>
+          </div> -->
           <div>
             <label class="font-semibold">Karyawan</label>
             <FieldPopup
@@ -160,7 +160,6 @@
                 params: {
                   simplest:true,
                   dept_id :  values.m_dept_id ?? null,
-                  where: `this.m_dept_id=${values.m_dept_id ?? 0} AND this.is_active='true'`,
                   searchfield: 'this.nik, this.nama_lengkap, this.nama_depan, this.nama_belakang, m_zona.nama, m_dir.nama, m_divisi.nama, m_dept.nama'
                 }
               }"

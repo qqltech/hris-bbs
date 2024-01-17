@@ -56,12 +56,6 @@ class default_users extends \App\Models\BasicModels\default_users
             $model['m_kary.cuti_sisa_p24'] = $data->sisa_cuti_p24 ?? 0;
             $model['info_cuti'] = $data;
             
-        }else{
-            $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$model['m_kary_id'] ??0]);
-            $data = json_decode($data[0]->employee_attendance);
-            $model['m_kary.cuti_sisa_panjang'] = $data->sisa_cuti_reguler;
-            $model['m_kary.cuti_sisa_reguler'] = $data->sisa_cuti_masa_kerja;
-            $model['m_kary.cuti_sisa_p24'] = $data->sisa_cuti_p24;
         }
     }
 
