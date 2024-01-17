@@ -3,9 +3,9 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class trpd extends Migration
+class defaulterrorlogs extends Migration
 {
-    protected $tableName = "t_rpd";
+    protected $tableName = "default_error_logs";
     
     public function up()
     {
@@ -13,8 +13,6 @@ class trpd extends Migration
             //$table->string('_existColumnName_')->change();
             //$table->string('_columnName_');
             //$table->dropColumn([ ]);
-            // $table->decimal('total_biaya_spd',22,2)->nullable()->change();
-            $table->bigInteger('t_spd_id')->comment('{"src":"t_spd.id"}')->nullable()->change();
         });
     }
 }

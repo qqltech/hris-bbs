@@ -23,7 +23,7 @@ class t_final_gaji extends Model
     public $columnsFull = ["id:bigint","nomor:string:50","m_comp_id:bigint","periode_awal:date","periode_akhir:date","total_pengeluaran_gaji:decimal","desc:text","status:string:50","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
     public $rules       = [];
     public $joins       = ["m_comp.id=t_final_gaji.m_comp_id","default_users.id=t_final_gaji.creator_id","default_users.id=t_final_gaji.last_editor_id"];
-    public $details     = ["t_final_gaji_det","t_potongan_det_bayar"];
+    public $details     = ["t_final_gaji_det"];
     public $heirs       = [];
     public $detailsChild= ["t_final_gaji_det_rincian"];
     public $detailsHeirs= [];
@@ -40,10 +40,6 @@ class t_final_gaji extends Model
     public function t_final_gaji_det() :\HasMany
     {
         return $this->hasMany('App\Models\BasicModels\t_final_gaji_det', 't_final_gaji_id', 'id');
-    }
-    public function t_potongan_det_bayar() :\HasMany
-    {
-        return $this->hasMany('App\Models\BasicModels\t_potongan_det_bayar', 't_final_gaji_id', 'id');
     }
     
     

@@ -524,7 +524,9 @@ class m_kary extends \App\Models\BasicModels\m_kary
                 ]);
             }
             if($createHeader){
-                 $check = m_kary_det_kartu::where('m_kary_id', $id_kary)->first();
+                $check = m_kary_det_kartu::where('m_kary_id', $id_kary)->first();
+                $check_pemb = m_kary_det_pemb::where('m_kary_id', $id_kary)->first();
+
 
                 $file = $req->file('ktp_foto');
                 $fileName_ktp = $this->uploadFile($file);
@@ -564,19 +566,13 @@ class m_kary extends \App\Models\BasicModels\m_kary
                         "npwp_tgl_berlaku" => $req->npwp_tgl_berlaku ?? null,
                         "bpjs_tipe_id" => $req->bpjs_tipe_id ?? null,
                         "bpjs_no" => $req->bpjs_no ?? null,
+                        "bpjs_no_kesehatan" => $req->bpjs_no_kesehatan ?? $check->bpjs_no_kesehatan,
+                        "bpjs_no_ketenagakerjaan" => $req->bpjs_no_ketenagakerjaan ?? $check->bpjs_no_ketenagakerjaan,
                         "bpjs_foto" => $fileName_bpjs ?? $check->bpjs_foto,
                         "berkas_lain" => $fileName_berkas ?? $check->berkas_lain,
                         "desc_file" => $req->desc_file ?? null,
                     ]);             
-                    \DB::table('m_kary_det_pemb')
-                        ->where('m_kary_id', $id_kary)
-                        ->update([
-                            'bank_id' => @$req->bank_id,
-                            'no_rek' => @$req->no_rek,
-                            'atas_nama_rek' => @$req->atas_nama_rek
-                        ]);
                 }else{
-                    if($req->file('ktp_foto')){
                         \DB::table('m_kary_det_kartu')->insert([
                             "m_kary_id" => $id_kary,
                             "ktp_no" => @$req->ktp_no,
@@ -589,13 +585,18 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             "npwp_tgl_berlaku" => @$req->npwp_tgl_berlaku,
                             "bpjs_tipe_id" => @$req->bpjs_tipe_id,
                             "bpjs_no" => @$req->bpjs_no,
+                            "bpjs_no_kesehatan" => @$req->bpjs_no_kesehatan,
+                            "bpjs_no_ketenagakerjaan" => @$req->bpjs_no_ketenagakerjaan ,
                             "bpjs_foto" => @$fileName_bpjs,
                             "berkas_lain" => @$fileName_berkas,
                             "desc_file" => @$req->desc_file
                         ]);
-                    }
                 }
+<<<<<<< HEAD
 /*<<<<<<< HEAD*/
+=======
+
+>>>>>>> 5038a51950c47701982b3d08616959c7dacdc9f3
                 if($check_pemb){
                     \DB::table('m_kary_det_pemb')
                         ->where('m_kary_id', $id_kary)
@@ -613,11 +614,12 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             'periode_gaji_id' => @$req->periode_gaji_id ?? 362,
                             'metode_id' => @$req->metode_id ?? 0,
                             'tipe_id' => @$req->tipe_id ?? 956,
-                            'bank_id' => @$req->bank_id,
-                            'no_rek' => @$req->no_rek,
-                            'atas_nama_rek' => @$req->atas_nama_rek,
+                            'bank_id' => @$req->bank_id ?? 0,
+                            'no_rek' => @$req->no_rek ?? 0,
+                            'atas_nama_rek' => @$req->atas_nama_rek ?? 0,
                             'desc' => @$req->desc
                     ]);
+<<<<<<< HEAD
                 }
 /*       
 =======
@@ -626,6 +628,12 @@ class m_kary extends \App\Models\BasicModels\m_kary
  */          
         }    
 	\DB::commit();
+=======
+                }       
+            }
+           
+            \DB::commit();
+>>>>>>> 5038a51950c47701982b3d08616959c7dacdc9f3
         }catch(\Exception $e){
             \DB::rollback();
             return $this->helper->responseCatch($e);
