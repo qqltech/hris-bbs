@@ -24,7 +24,7 @@ class m_kary extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_kary.m_comp_id","m_dir.id=m_kary.m_dir_id","m_divisi.id=m_kary.m_divisi_id","m_dept.id=m_kary.m_dept_id","m_zona.id=m_kary.m_zona_id","m_general.id=m_kary.grading_id","m_general.id=m_kary.costcontre_id","m_posisi.id=m_kary.m_posisi_id","m_jam_kerja.id=m_kary.m_jam_kerja_id","m_general.id=m_kary.jk_id","m_general.id=m_kary.provinsi_id","m_general.id=m_kary.kota_id","m_general.id=m_kary.kecamatan_id","m_general.id=m_kary.agama_id","m_general.id=m_kary.gol_darah_id","m_general.id=m_kary.status_nikah_id","m_general.id=m_kary.tanggungan_id","m_general.id=m_kary.status_kary_id","default_users.id=m_kary.creator_id","default_users.id=m_kary.last_editor_id","m_standart_gaji.id=m_kary.m_standart_gaji_id","m_general.id=m_kary.periode_gaji_id","t_pelamar.id=m_kary.ref_id","m_kary.id=m_kary.atasan_id","presensi_lokasi.id=m_kary.presensi_lokasi_default_id"];
     public $details     = ["m_kary_det_bhs","m_kary_det_kartu","m_kary_det_kel","m_kary_det_org","m_kary_det_pel","m_kary_det_pemb","m_kary_det_pend","m_kary_det_pk","m_kary_det_pres"];
-    public $heirs       = ["default_users","m_kary","t_cuti","t_final_gaji_det","t_jadwal_kerja_det","t_perhitungan_gaji","t_mutasi","t_riwayat_posisi","t_potongan","t_sgp","t_spd","t_lembur"];
+    public $heirs       = ["m_kary","default_users","t_cuti","t_final_gaji_det","t_jadwal_kerja_det","t_mutasi","t_lembur","t_perhitungan_gaji","t_potongan","t_riwayat_posisi","t_sgp","t_spd"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];

@@ -145,6 +145,7 @@ class generate_approval extends \App\Models\BasicModels\generate_approval
                 $mappedTrx->doc = $data->trx->doc;
                 $mappedTrx->keterangan = $data->trx->keterangan;
                 $mappedTrx->status = $data->trx->status;
+                $mappedTrx->nama_pic = default_users::where('id', $data->trx->pic_id)->value('name');
                 $mappedTrx->interval_min = t_lembur::where('id', $data->approval->trx_id)->value('interval_min');
             }
             $data->trx = $mappedTrx;

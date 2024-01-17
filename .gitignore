@@ -1,4 +1,4 @@
-/public/uploads/*
+/public/uploads
 /vendor
 /.idea
 Homestead.json
