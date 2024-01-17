@@ -124,7 +124,7 @@ td.text-right {
       @foreach($rekaps as $detRekap)
           <span style="width:100%;text-align:center;font-weight:bold;"> {{$periode . '-' . sprintf("%02d", ($key1+1))}} </span><br/>
         @php
-            $data = json_decode($detRekap->att_report);
+            $data = @json_decode($detRekap->att_report) ?? [];
         @endphp
          
           

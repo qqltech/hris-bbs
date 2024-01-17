@@ -38,7 +38,7 @@
 
   const values = reactive({
     tipe: 'HTML',
-    tipe_report : null,
+    tipe_report : 'Rekap',
     periode_from : tempYear+'-'+tempMonth,
     periode_to : tempYear+'-'+tempMonth,
     periode : tempYear+'-'+tempMonth,
@@ -103,6 +103,9 @@
     
     if(values.tipe_report){
       tempGet.push(`tipe_report=${values.tipe_report}`)
+    }
+    if(values.m_kary_id){
+      tempGet.push(`kary_id=${values.m_kary_id}`)
     }
     if(values.m_divisi_id){
       tempGet.push(`m_divisi_id=${values.m_divisi_id}`)

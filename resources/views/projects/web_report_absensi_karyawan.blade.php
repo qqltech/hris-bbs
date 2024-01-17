@@ -1,7 +1,7 @@
 @php
   $req = app()->request;
   $tipe = $req->tipe_report;
-  $kary = $req->m_kary_id;
+  $kary = $req->kary_id;
 
 
   $rekap = [];
@@ -22,12 +22,15 @@
                             all_days_of_month ,
                             date_to_idn,
                             day_name_idn,
-                            'type',
+                            'type', type,
+                            'presentase', presentase,
+                            'attend', attend,
+                            'cuti', cuti,
+                            'alpha', alpha,
                             employee_attendance(all_days_of_month,?) absen
                     from generate_monthly_report(?)
       ", [$kary, $range_bulan[$i].'-01']);
     }
-    dd($rekap);
   }
   if($tipe === 'Detail')
   {
@@ -46,7 +49,7 @@
               )) AS att_report
               FROM get_employee_attendance_report(?,?,?)
               WHERE m_kary_id = ? 
-          ", [ $periode . '-' . sprintf("%02d", $day), $req->m_divisi_id, $req->m_dept_id, $req->m_kary_id ]);
+          ", [ $periode . '-' . sprintf("%02d", $day), $req->m_divisi_id, $req->m_dept_id, $kary ]);
       }
   }
 @endphp
@@ -85,33 +88,20 @@ td.text-right {
         <tr>
           <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">Hari</th>
           <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">Tanggal</th>
-          <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">Hadir</th>
-          <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">Izin/Sakit/Cuti</th>
-          <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">Tidak Hadir</th>
-          <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">Karyawan Aktif</th>
-          <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">Presentase</th>
+          <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;">TIpe</th>
         </tr>
       </thead>
       <tbody>
         @foreach($rekap as $rekaps)
           @foreach($rekaps as $detRekap)
-            @php
-                $data = json_decode($detRekap->absen);
-            @endphp
-            @foreach($data as $i => $datas)
               @php 
-                $presentase = round($datas->presentase);
+                $bg_class = $detRekap->type == 'Hari Libur' ? 'bg-gray-500 text-white' : ( $detRekap->type == 'Cuti Bersama' ? 'bg-red-200' : '');
               @endphp
                 <tr class="{{ $bg_class }}">
-                    <td class="text-left border-1 border-gray-500 px-3">{{ $datas->day_name_idn }}</td>
-                    <td class="text-left border-1 border-gray-500 px-3">{{ $datas->all_days_of_month }}</td>
-                    <td class="text-right border-1 border-gray-500 px-3">{{ $datas->attend }}</td>
-                    <td class="text-right border-1 border-gray-500 px-3">{{ $datas->cuti }}</td>
-                    <td class="text-right border-1 border-gray-500 px-3">{{ $datas->alpha }}</td>
-                    <td class="text-right border-1 border-gray-500 px-3">{{ $datas->total_kary }}</td>
-                    <td class="text-right border-1 border-gray-500 px-3">{{ $presentase }}%</td>
+                    <td class="text-left border-1 border-gray-500 px-3">{{ $detRekap->day_name_idn }}</td>
+                    <td class="text-left border-1 border-gray-500 px-3">{{ $detRekap->all_days_of_month }}</td>
+                    <td class="text-right border-1 border-gray-500 px-3">{{ $detRekap->type }}</td>
                 </tr>
-            @endforeach
           @endforeach
         @endforeach
       </tbody>
@@ -121,6 +111,7 @@ td.text-right {
       @foreach($rekaps as $detRekap)
           <span style="width:100%;text-align:center;font-weight:bold;"> {{$periode . '-' . sprintf("%02d", ($key1+1))}} </span><br/>
         @php
+            dd($rekap);
             $data = json_decode($detRekap->att_report);
         @endphp
          

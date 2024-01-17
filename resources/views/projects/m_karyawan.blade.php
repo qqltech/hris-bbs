@@ -789,80 +789,78 @@
           <div class="col-span-8 md:col-span-6">
           </div>
           <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Jatah Cuti Reguler<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                :value="values.cuti_jatah_reguler" label="" placeholder="Tuliskan Jatah Cuti Reguler" :errorText="formErrors.cuti_jatah_reguler?'failed':''"
-                @input="v=>values.cuti_jatah_reguler=v" :hints="formErrors.cuti_jatah_reguler" :check="false"
-              />
+            <div class="grid grid-cols-12 items-center gap-2 ">
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Jatah Cuti Tahunan<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.cuti_reguler" label="" placeholder="Tuliskan Jatah Cuti Reguler" :errorText="formErrors.cuti_reguler?'failed':''"
+                  @input="v=>values.cuti_reguler=v" :hints="formErrors.cuti_reguler" :check="false"
+                />
+              </div>
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Sisa Cuti Tahunan<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.sisa_cuti_reguler" label="" placeholder="Tuliskan Sisa Jatah Cuti Reguler" :errorText="formErrors.sisa_cuti_reguler?'failed':''"
+                  @input="v=>values.sisa_cuti_reguler=v" :hints="formErrors.sisa_cuti_reguler" :check="false"
+                />
+              </div>
             </div>
           </div>
           <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Sisa Cuti Reguler<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                :value="values.cuti_sisa_reguler" label="" placeholder="Tuliskan Sisa Jatah Cuti Reguler" :errorText="formErrors.cuti_sisa_reguler?'failed':''"
-                @input="v=>values.cuti_sisa_reguler=v" :hints="formErrors.cuti_sisa_reguler" :check="false"
-              />
+            <div class="grid grid-cols-12 items-center gap-2 ">
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Jatah Cuti Masa Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.cuti_masa_kerja" label="" :errorText="formErrors.cuti_masa_kerja?'failed':''"
+                  @input="v=>values.cuti_masa_kerja=v" :hints="formErrors.cuti_masa_kerja" :check="false"
+                />
+              </div>
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Sisa Cuti Masa Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.sisa_cuti_masa_kerja" label="" :errorText="formErrors.sisa_cuti_masa_kerja?'failed':''"
+                  @input="v=>values.sisa_cuti_masa_kerja=v" :hints="formErrors.sisa_cuti_masa_kerja" :check="false"
+                />
+              </div>
             </div>
           </div>
           <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Jatah Cuti Masa Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
-                :value="values.cuti_panjang" label="" placeholder="Tuliskan Jatah Cuti Panjang" :errorText="formErrors.cuti_panjang?'failed':''"
-                @input="v=>values.cuti_panjang=v" :hints="formErrors.cuti_panjang" :check="false"
-              />
+            <div class="grid grid-cols-12 items-center gap-2 ">
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Jatah Cuti P24<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.cuti_p24" label="" :errorText="formErrors.cuti_p24?'failed':''"
+                  @input="v=>values.cuti_p24=v" :hints="formErrors.cuti_p24" :check="false"
+                />
+              </div>
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Sisa Cuti P24<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.cuti_p24_terpakai" label="" :errorText="formErrors.cuti_p24_terpakai?'failed':''"
+                  @input="v=>values.cuti_p24_terpakai=v" :hints="formErrors.cuti_p24_terpakai" :check="false"
+                />
+              </div>
             </div>
-          </div>
+          </div>     
           <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Sisa Cuti Masa Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                :value="values.cuti_sisa_panjang" label="" placeholder="Tuliskan Sisa Jatah Cuti Panjang" :errorText="formErrors.cuti_sisa_panjang?'failed':''"
-                @input="v=>values.cuti_sisa_panjang=v" :hints="formErrors.cuti_sisa_panjang" :check="false"
-              />
+            <div class="grid grid-cols-12 items-center gap-2 ">
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Tanggal Masuk Kerja<label class="text-red-500 space-x-0 pl-0">*</label></label>
+                <FieldX :bind="{ readonly: !actionText, disabled:!actionText }" type="date" class="col-span-12 !mt-0 w-full"
+                  :value="values.tgl_masuk" label="" :errorText="formErrors.tgl_masuk?'failed':''"
+                  @input="v=>values.tgl_masuk=v" :hints="formErrors.tgl_masuk" :check="false"
+                />
+              </div>
+              <div class="grid grid-cols-12 col-span-6 gap-y-2">
+                <label class="col-span-12">Tanggal Berhenti Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true, disabled: true }" type="date" class="col-span-12 !mt-0 w-full"
+                  :value="values.tgl_berhenti" label="" :errorText="formErrors.tgl_berhenti?'failed':''"
+                  @input="v=>values.tgl_berhenti=v" :hints="formErrors.tgl_berhenti" :check="false"
+                />
+              </div>
             </div>
-          </div>
-
-                    <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">P24<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                :value="values.cuti_p24" label="" placeholder="" :errorText="formErrors.cuti_p24?'failed':''"
-                @input="v=>values.cuti_p24=v" :hints="formErrors.cuti_p24" :check="false"
-              />
-            </div>
-          </div>
-
-                    <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Sisa P24<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                :value="values.cuti_sisa_p24" label="" placeholder="" :errorText="formErrors.cuti_sisa_p24?'failed':''"
-                @input="v=>values.cuti_sisa_p24=v" :hints="formErrors.cuti_sisa_p24" :check="false"
-              />
-            </div>
-            
-          </div>
-          <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Tanggal Masuk Kerja<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText, disabled:!actionText }" type="date" class="col-span-12 !mt-0 w-full"
-                :value="values.tgl_masuk" label="" :errorText="formErrors.tgl_masuk?'failed':''"
-                @input="v=>values.tgl_masuk=v" :hints="formErrors.tgl_masuk" :check="false"
-              />
-            </div>
-          </div>
-          <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Tanggal Berhenti Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: true, disabled: true }" type="date" class="col-span-12 !mt-0 w-full"
-                :value="values.tgl_berhenti" label="" :errorText="formErrors.tgl_berhenti?'failed':''"
-                @input="v=>values.tgl_berhenti=v" :hints="formErrors.tgl_berhenti" :check="false"
-              />
-            </div>
-          </div>
+          </div>   
+          
           <!-- <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-y-2">
               <label class="col-span-12">Expired Cuti<label class="text-red-500 space-x-0 pl-0"></label></label>

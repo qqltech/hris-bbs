@@ -40,6 +40,18 @@ class m_kary extends \App\Models\BasicModels\m_kary
     }
     
 
+    public function transformRowData( array $row )
+    {
+        $object = [];
+        if(app()->request->detail){
+            $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$model['id'] ??0]);
+            $data = json_decode($data[0]->employee_attendance);
+            $object['info_cuti'] = $data;
+        }
+        return array_merge( $row, $object );
+    }
+    
+
     private function generateNik($compId, $dirId, $divisiId, $posisiId)
     {
         $currentDateTime = \Carbon\Carbon::now();;
@@ -596,7 +608,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             'm_comp_id' => @$req->m_comp_id,
                             'm_dir_id' => @$req->m_dir_id,
                             'periode_gaji_id' => @$req->periode_gaji_id ?? 362,
-                            'metode_id' => @$req->metode_id,
+                            'metode_id' => @$req->metode_id ?? 0,
                             'tipe_id' => @$req->tipe_id ?? 956,
                             'bank_id' => @$req->bank_id,
                             'no_rek' => @$req->no_rek,

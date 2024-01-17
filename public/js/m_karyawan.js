@@ -54,7 +54,7 @@ const setStandartGaji = async () => {
     if (!res.ok) throw new Error("Failed when trying to read data")
     const resultJson = await res.json()
     const data = resultJson.data
-    values.m_standart_gaji_id = data[0].id
+    values.m_standart_gaji_id = data[0]?.id
   }
   
 }
@@ -62,10 +62,12 @@ const setStandartGaji = async () => {
 const values = reactive({
   is_active: 1,
   direktorat: store.user.data?.direktorat,
-  cuti_jatah_reguler: 12,
-  cuti_sisa_reguler: 7,
-  cuti_panjang:20,
-  cuti_sisa_panjang:12,
+  cuti_p24: 0,
+  cuti_reguler: 0,
+  cuti_masa_kerja:0,
+  cuti_p24_terpakai:0,
+  sisa_cuti_reguler:0,
+  sisa_cuti_masa_kerja:0,
 
 })
 
@@ -139,7 +141,7 @@ onBeforeMount(async () => {
       const dataURL = `${store.server.url_backend}/operation${endpointApi}/${editedId}`
       isRequesting.value = true
 
-      const params = { join: false, transform: false }
+      const params = { join: false, transform: false, detail: true }
       const fixedParams = new URLSearchParams(params)
       const res = await fetch(dataURL + '?' + fixedParams, {
         headers: {
@@ -274,6 +276,14 @@ onBeforeMount(async () => {
         item._id = ++_idPel
         detailPelatihan.value.push(item)
       })
+      if(initialValues.info_cuti){
+        for (let key in initialValues.info_cuti) {
+            if (initialValues.info_cuti.hasOwnProperty(key) && initialValues.info_cuti[key] === null) {
+                initialValues.info_cuti[key] = 0;
+            }
+        }
+      }
+      initialValues = {...initialValues, ...initialValues.info_cuti}
     } catch (err) {
       isBadForm.value = true
       swal.fire({
@@ -849,6 +859,7 @@ async function onSave() {
 }
 
 //  @else----------------------- LANDING
+console.log(route.path)
 const landing = reactive({
   actions: [
     {
@@ -916,6 +927,14 @@ const landing = reactive({
       class: 'bg-gray-600 text-light-100',
       click(row) {
         router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
+      }
+    },
+    {
+      icon: 'database',
+      title: "Adjusment Cuti",
+      class: 'bg-yellow-600 text-light-100',
+      click(row) {
+        router.replace(`/adj_cuti/${row.id}?action=Adjusment&`+tsId)
       }
     }
   ],
