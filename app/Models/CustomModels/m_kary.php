@@ -615,6 +615,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             'atas_nama_rek' => @$req->atas_nama_rek ?? 0,
                             'desc' => @$req->desc
                     ]);
+    
                 }       
             }
            

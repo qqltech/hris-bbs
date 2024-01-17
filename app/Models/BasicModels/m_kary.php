@@ -163,7 +163,7 @@ class m_kary extends Model
     {
         return $this->belongsTo('App\Models\BasicModels\m_general', 'periode_gaji_id', 'id');
     }
-    public function ref() :\BelongsTo
+	    public function ref() :\BelongsTo
     {
         return $this->belongsTo('App\Models\BasicModels\t_pelamar', 'ref_id', 'id');
     }

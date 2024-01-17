@@ -144,12 +144,15 @@ class default_users extends \App\Models\BasicModels\default_users
         try{
               $hasher = app()->make("hash");
             foreach($kary as $k) {
-                $this->create([
-                    'username' => $k->kode,
-                    'email' => $k->kode."@sjg.com",
-                    'password' => $hasher->make($k->kode),
-                    'm_kary_id' => $k->id
-                ]);
+                if($k->kode){
+                    $this->create([
+                        'username' => $k->kode,
+                        'email' => $k->kode."@sjg.com",
+                        'password' => $hasher->make($k->kode),
+                        'm_kary_id' => $k->id
+                    ]);
+
+                }
             }
             \DB::commit();
         }catch(\Exception $e) {
