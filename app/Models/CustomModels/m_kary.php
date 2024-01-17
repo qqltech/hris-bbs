@@ -592,11 +592,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             "desc_file" => @$req->desc_file
                         ]);
                 }
-<<<<<<< HEAD
-/*<<<<<<< HEAD*/
-=======
 
->>>>>>> 5038a51950c47701982b3d08616959c7dacdc9f3
                 if($check_pemb){
                     \DB::table('m_kary_det_pemb')
                         ->where('m_kary_id', $id_kary)
@@ -619,21 +615,11 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             'atas_nama_rek' => @$req->atas_nama_rek ?? 0,
                             'desc' => @$req->desc
                     ]);
-<<<<<<< HEAD
-                }
-/*       
-=======
->>>>>>> 9801edb8aa1b87cbdd96c45a13d5a6acdabdcbc0
-            
- */          
-        }    
-	\DB::commit();
-=======
+    
                 }       
             }
            
             \DB::commit();
->>>>>>> 5038a51950c47701982b3d08616959c7dacdc9f3
         }catch(\Exception $e){
             \DB::rollback();
             return $this->helper->responseCatch($e);

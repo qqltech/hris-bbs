@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 5038a51950c47701982b3d08616959c7dacdc9f3
 @php
   $req = app()->request;
   $tipe = $req->tipe_report;
@@ -180,10 +176,3 @@ td.text-right {
   @else
 
   @endif
-<<<<<<< HEAD
-=======
-<?php
- // blade php file
->>>>>>> 9801edb8aa1b87cbdd96c45a13d5a6acdabdcbc0
-=======
->>>>>>> 5038a51950c47701982b3d08616959c7dacdc9f3
