@@ -24,7 +24,7 @@ class m_lokasi extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_lokasi.m_comp_id","m_dir.id=m_lokasi.m_dir_id","default_users.id=m_lokasi.creator_id","default_users.id=m_lokasi.last_editor_id"];
     public $details     = [];
-    public $heirs       = ["t_spd","m_zona_det","m_knd_dinas"];
+    public $heirs       = ["m_knd_dinas","m_zona_det","t_spd"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
