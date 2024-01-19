@@ -24,7 +24,7 @@ class generate_num_type extends Model
     public $rules       = [];
     public $joins       = ["generate_num_type.id=generate_num_type.ref_id","default_users.id=generate_num_type.creator_id","default_users.id=generate_num_type.last_editor_id"];
     public $details     = [];
-    public $heirs       = ["generate_num_det","generate_num_type"];
+    public $heirs       = ["generate_num_type","generate_num_det"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];

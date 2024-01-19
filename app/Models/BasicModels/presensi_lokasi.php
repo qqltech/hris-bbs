@@ -22,7 +22,7 @@ class presensi_lokasi extends Model
     public $columns     = ["id","comp_id","default_user_id","nama","lat","long","is_active","creator_id","last_editor_id","created_at","updated_at"];
     public $columnsFull = ["id:bigint","comp_id:bigint","default_user_id:bigint","nama:string:191","lat:float","long:float","is_active:boolean","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
     public $rules       = [];
-    public $joins       = ["m_company.id=presensi_lokasi.comp_id","default_users.id=presensi_lokasi.default_user_id","default_users.id=presensi_lokasi.creator_id","default_users.id=presensi_lokasi.last_editor_id"];
+    public $joins       = ["m_comp.id=presensi_lokasi.comp_id","default_users.id=presensi_lokasi.default_user_id","default_users.id=presensi_lokasi.creator_id","default_users.id=presensi_lokasi.last_editor_id"];
     public $details     = [];
     public $heirs       = ["m_kary"];
     public $detailsChild= [];
@@ -41,7 +41,7 @@ class presensi_lokasi extends Model
     
     public function comp() :\BelongsTo
     {
-        return $this->belongsTo('App\Models\BasicModels\m_company', 'comp_id', 'id');
+        return $this->belongsTo('App\Models\BasicModels\m_comp', 'comp_id', 'id');
     }
     public function default_user() :\BelongsTo
     {

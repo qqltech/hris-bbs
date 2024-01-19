@@ -28,7 +28,7 @@ class t_pelamar_det_org extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = [""];
+    public $required    = ["nama","tahun","kota_id","posisi"];
     public $createable  = ["t_pelamar_id","nama","tahun","jenis_org_id","kota_id","posisi","desc","creator_id","last_editor_id"];
     public $updateable  = ["t_pelamar_id","nama","tahun","jenis_org_id","kota_id","posisi","desc","creator_id","last_editor_id"];
     public $searchable  = ["id","t_pelamar_id","nama","tahun","jenis_org_id","kota_id","posisi","desc","creator_id","last_editor_id","created_at","updated_at"];

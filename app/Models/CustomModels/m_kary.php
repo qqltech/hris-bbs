@@ -44,7 +44,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
     {
         $object = [];
         if(app()->request->detail){
-            $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$model['id'] ??0]);
+            $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$row['id'] ??0]);
             $data = json_decode($data[0]->employee_attendance);
             $object['info_cuti'] = $data;
         }

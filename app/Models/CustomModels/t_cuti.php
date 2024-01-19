@@ -14,7 +14,7 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
     }
 
     public $fileColumns = [
-        /*file_column*/
+        'attachment'
     ];
 
     public $createAdditionalData = ["creator_id" => "auth:id"];
