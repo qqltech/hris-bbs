@@ -413,8 +413,8 @@ class m_kary extends \App\Models\BasicModels\m_kary
 
     public function custom_data_diri_update($req)
     {
-        \DB::beginTransaction();
         try{
+            \DB::beginTransaction();
             $id_kary = default_users::where('id',auth()->user()->id)->pluck('m_kary_id')->first();
             $kar = m_kary::where('id',$id_kary)->first();
             if(!$kar) {
@@ -523,6 +523,9 @@ class m_kary extends \App\Models\BasicModels\m_kary
                     "desc" => $req->desc ?? $kar->desc ?? null
                 ]);
             }
+            \DB::commit();
+
+            
             if($createHeader){
                 $check = m_kary_det_kartu::where('m_kary_id', $id_kary)->first();
                 $check_pemb = m_kary_det_pemb::where('m_kary_id', $id_kary)->first();
@@ -551,7 +554,9 @@ class m_kary extends \App\Models\BasicModels\m_kary
                 $file = $req->file('berkas_lain');
                 $fileName_berkas = $this->uploadFile($file);
                 // if(!$fileName_berkas) return $this->helper->customResponse('Upload berkas lain tidak valid, silahkan melakukan upload ulang file', 422);
+                \DB::beginTransaction();
                 if($check){
+
                     \DB::table('m_kary_det_kartu')
                         ->where('m_kary_id', $id_kary)
                         ->update([
@@ -592,7 +597,9 @@ class m_kary extends \App\Models\BasicModels\m_kary
                             "desc_file" => @$req->desc_file
                         ]);
                 }
+                \DB::commit();
 
+                \DB::beginTransaction();
                 if($check_pemb){
                     \DB::table('m_kary_det_pemb')
                         ->where('m_kary_id', $id_kary)
@@ -617,9 +624,9 @@ class m_kary extends \App\Models\BasicModels\m_kary
                     ]);
     
                 }       
+                \DB::commit();
             }
            
-            \DB::commit();
         }catch(\Exception $e){
             \DB::rollback();
             return $this->helper->responseCatch($e);

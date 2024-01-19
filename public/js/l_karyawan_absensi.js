@@ -39,30 +39,33 @@
   const values = reactive({
     tipe: 'HTML',
     tipe_report : 'Rekap',
-    periode_from : tempYear+'-'+tempMonth,
-    periode_to : tempYear+'-'+tempMonth,
     periode : tempYear+'-'+tempMonth,
   })
 
   const resetValuesPeriode = () => {
-    values.periode_from = tempYear+'-'+tempMonth
-    values.periode_to = tempYear+'-'+tempMonth
     values.periode = tempYear+'-'+tempMonth
   }
 
   const onGenerate = async () => {
-    console.log(values)
+    
+    if(values.tipe_report == 'Detail' ){
+      swal.fire({
+        icon: 'error',
+        text: 'Maaf fitur belum tersedia!',
+      })
+      return
+    }
+    if(values.tipe_report == 'Detail' && !values.m_kary_id){
+      swal.fire({
+        icon: 'error',
+        text: 'Harap Memilih Karyawan Terlebih Dahulu!',
+      })
+      return
+    }
     if(values.tipe === null || values.tipe_report === null){
       swal.fire({
         icon: 'error',
         text: 'Harap Memilih Tipe Export dan Tipe Report Dahulu!',
-      })
-      return
-    }
-    if(values.tipe_report === 'Rekap' && (values.periode_from === null || values.periode_to === null )){
-      swal.fire({
-        icon: 'error',
-        text: 'Harap Memilih Periode Dahulu!',
       })
       return
     }
@@ -82,23 +85,10 @@
         tempGet.push(`export=pdf`)
       }
     }
-    if(values.tipe_report === 'Rekap')
-    {
-      if(values.periode_from){
-        let tempDay = values.periode_from.split('/')[0]
-        tempGet.push(`periode_from=${tempDay}`)
-      }
-      if(values.periode_to){
-        let tempDay2 = values.periode_to.split('/')[0]
-        tempGet.push(`periode_to=${tempDay2}`)
-      }
-    }
-    if(values.tipe_report === 'Detail')
-    {
-      if(values.periode){
-        let tempDay = values.periode.split('/')[0]
-        tempGet.push(`periode=${tempDay}`)
-      }
+  
+    if(values.periode){
+      let tempDay = values.periode.split('/')[0]
+      tempGet.push(`periode=${tempDay}`)
     }
     
     if(values.tipe_report){
@@ -117,9 +107,9 @@
     const paramsGet = tempGet.join("&")
     if(values.tipe?.toLowerCase() !== 'html'){
       exportHtml.value = false
-      window.open(`${store.server.url_backend}/web/report_absensi` + '?' + paramsGet)
+      window.open(`${store.server.url_backend}/web/report_absensi_karyawan` + '?' + paramsGet)
     }else{
-      await fetch(`${store.server.url_backend}/web/report_absensi` + '?' + paramsGet, {
+      await fetch(`${store.server.url_backend}/web/report_absensi_karyawan` + '?' + paramsGet, {
         headers: {
             'Content-Type': 'html',
           },
