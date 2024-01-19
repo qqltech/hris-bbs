@@ -28,7 +28,7 @@ class t_pelamar_det_pend extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = ["tingkat_id","nama_sekolah","tahun_masuk","tahun_lulus","kota_id","nilai","jurusan","is_pend_terakhir","is_active"];
+    public $required    = ["tingkat_id","nama_sekolah","tahun_masuk","tahun_lulus","kota_id","nilai","jurusan","is_pend_terakhir","ijazah_no","is_active"];
     public $createable  = ["t_pelamar_id","tingkat_id","nama_sekolah","tahun_masuk","tahun_lulus","kota_id","nilai","jurusan","is_pend_terakhir","ijazah_no","ijazah_foto","keterangan","is_active","creator_id","last_editor_id"];
     public $updateable  = ["t_pelamar_id","tingkat_id","nama_sekolah","tahun_masuk","tahun_lulus","kota_id","nilai","jurusan","is_pend_terakhir","ijazah_no","ijazah_foto","keterangan","is_active","creator_id","last_editor_id"];
     public $searchable  = ["id","t_pelamar_id","tingkat_id","nama_sekolah","tahun_masuk","tahun_lulus","kota_id","nilai","jurusan","is_pend_terakhir","ijazah_no","ijazah_foto","keterangan","is_active","creator_id","last_editor_id","created_at","updated_at"];

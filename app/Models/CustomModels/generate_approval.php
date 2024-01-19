@@ -122,6 +122,7 @@ class generate_approval extends \App\Models\BasicModels\generate_approval
                 $mappedTrx->status = $data->trx->status;
                 $mappedTrx->interval = t_cuti::where('id', $data->approval->trx_id)->value('interval');
                 $mappedTrx->interval_min = t_cuti::where('id', $data->approval->trx_id)->value('interval_min');
+                $mappedTrx->attachment = $data->trx->attachment;
                 $mappedTrx->cuti_sisa_panjang = $datas->sisa_cuti_reguler ?? 0;
                 $mappedTrx->cuti_sisa_reguler = $datas->sisa_cuti_masa_kerja ?? 0;
                 $mappedTrx->cuti_sisa_p24 = $datas->sisa_cuti_p24 ?? 0;

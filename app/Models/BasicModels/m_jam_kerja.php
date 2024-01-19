@@ -24,7 +24,7 @@ class m_jam_kerja extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_jam_kerja.m_comp_id","m_dir.id=m_jam_kerja.m_dir_id","m_general.id=m_jam_kerja.tipe_jam_kerja_id","default_users.id=m_jam_kerja.creator_id","default_users.id=m_jam_kerja.last_editor_id"];
     public $details     = [];
-    public $heirs       = ["m_kary","t_jadwal_kerja_det"];
+    public $heirs       = ["t_jadwal_kerja_det","m_kary"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];

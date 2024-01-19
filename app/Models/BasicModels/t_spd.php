@@ -28,7 +28,7 @@ class t_spd extends Model
     public $detailsChild= [];
     public $detailsHeirs= ["t_rpd_det"];
     public $unique      = [];
-    public $required    = ["m_divisi_id","m_dept_id","m_posisi_id","tanggal","tgl_acara_awal","tgl_acara_akhir","jenis_spd_id","m_zona_asal_id","m_zona_tujuan_id","m_lokasi_tujuan_id","pic_id","total_biaya","is_kend_dinas"];
+    public $required    = ["m_divisi_id","m_dept_id","m_posisi_id","tanggal","tgl_acara_awal","tgl_acara_akhir","jenis_spd_id","m_zona_asal_id","m_zona_tujuan_id","m_lokasi_tujuan_id","total_biaya","is_kend_dinas"];
     public $createable  = ["nomor","m_comp_id","m_spd_id","m_dir_id","m_divisi_id","m_dept_id","m_posisi_id","tanggal","tgl_acara_awal","tgl_acara_akhir","jenis_spd_id","m_zona_asal_id","m_zona_tujuan_id","m_lokasi_tujuan_id","m_kary_id","pic_id","total_biaya","kegiatan","keterangan","status","creator_id","last_editor_id","is_kend_dinas","interval","catatan_kend"];
     public $updateable  = ["nomor","m_comp_id","m_spd_id","m_dir_id","m_divisi_id","m_dept_id","m_posisi_id","tanggal","tgl_acara_awal","tgl_acara_akhir","jenis_spd_id","m_zona_asal_id","m_zona_tujuan_id","m_lokasi_tujuan_id","m_kary_id","pic_id","total_biaya","kegiatan","keterangan","status","creator_id","last_editor_id","is_kend_dinas","interval","catatan_kend"];
     public $searchable  = ["id","nomor","m_comp_id","m_spd_id","m_dir_id","m_divisi_id","m_dept_id","m_posisi_id","tanggal","tgl_acara_awal","tgl_acara_akhir","jenis_spd_id","m_zona_asal_id","m_zona_tujuan_id","m_lokasi_tujuan_id","m_kary_id","pic_id","total_biaya","kegiatan","keterangan","status","creator_id","last_editor_id","created_at","updated_at","is_kend_dinas","interval","catatan_kend"];
