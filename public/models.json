@@ -2484,7 +2484,7 @@
                 "fixed": false,
                 "default": null,
                 "comment": "{\"src\":\"m_general.id\"}",
-                "nullable": true,
+                "nullable": false,
                 "rules": null
             },
             {
@@ -2641,7 +2641,6 @@
             ],
             "hidden": [],
             "required": [
-                "tipe_spd_id",
                 "is_kendaraan_dinas"
             ],
             "createable": [
@@ -18212,7 +18211,7 @@
                 "fixed": false,
                 "default": null,
                 "comment": "{\"src\":\"t_spd.id\"}",
-                "nullable": true,
+                "nullable": false,
                 "rules": null
             },
             {
@@ -18238,7 +18237,7 @@
                 "fixed": false,
                 "default": null,
                 "comment": null,
-                "nullable": true,
+                "nullable": false,
                 "rules": null
             },
             {
@@ -18354,10 +18353,7 @@
                 "id"
             ],
             "hidden": [],
-            "required": [
-                "t_spd_id",
-                "total_biaya_selisih"
-            ],
+            "required": [],
             "createable": [
                 "nomor",
                 "m_comp_id",

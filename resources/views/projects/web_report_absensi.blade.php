@@ -52,14 +52,15 @@
       }
   }
 @endphp
-<span style="width:100%;text-align:center;font-weight:bold;"> Absensi Karyawan </span><br/>
+<span style="width:100%;text-align:center;font-weight:bold;">Laporan Absensi Karyawan ({{$tipe}})</span><br>
+<span style="width:100%;text-align:center;font-weight:bold; font-size: 10pt !important"> Periode {{$req->periode}}</span><br>
+@if(!$req->export == 'xls')
 <style>
-
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
-  font-size: 8px;
+  font-size: 6px;
 }
 
 th {
@@ -77,8 +78,8 @@ td .cursor-pointer {
 td.text-right {
   text-align: right;
 }
-
 </style>
+@endif
 
 <br/>
   @if($tipe === 'Rekap')
@@ -126,22 +127,20 @@ td.text-right {
         @php
             $data = @json_decode($detRekap->att_report) ?? [];
         @endphp
-         
-          
           <table class="table-auto w-full">
             <thead class="bg-[#c6c6c6]">
               <tr>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[5%]" style="background-color: #c6c6c6;">No</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[10%]" style="background-color: #c6c6c6;">NIK</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[25%]" style="background-color: #c6c6c6;">Nama</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[27%]" style="background-color: #c6c6c6;">Departemen</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[10%]" style="background-color: #c6c6c6;">Status</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6;">Waktu Checkin</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6;">Lokasi Checkin</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6;">Onscope Checkin</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6;">Waktu Checkout</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6;">Lokasi Checkout</th>
-                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6;">Onscope Checkout</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[5%]" style="background-color: #c6c6c6; font-size: 9pt !important">No</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[10%]" style="background-color: #c6c6c6; font-size: 9pt !important">NIK</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[25%]" style="background-color: #c6c6c6; font-size: 9pt !important">Nama</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[27%]" style="background-color: #c6c6c6; font-size: 9pt !important">Departemen</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[10%]" style="background-color: #c6c6c6; font-size: 9pt !important">Status</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6; font-size: 9pt !important">Waktu Checkin</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6; font-size: 9pt !important">Lokasi Checkin</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6; font-size: 9pt !important">Onscope Checkin</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6; font-size: 9pt !important">Waktu Checkout</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6; font-size: 9pt !important">Lokasi Checkout</th>
+                <th class="border-1 border-gray-500 px-3 py-1 w-[12%]" style="background-color: #c6c6c6; font-size: 9pt !important">Onscope Checkout</th>
               </tr>
             </thead>
             <tbody>
@@ -150,29 +149,29 @@ td.text-right {
                   $bg_class = $datas->absensi->status == 'NOT ATTEND' ? 'bg-red-200' : ($key % 2 === 0 ? 'bg-gray-200' :'');
                 @endphp
                    <tr class="{{ $bg_class }}">
-                        <td class="text-left border-1 border-gray-500 px-3">{{ $key+1 }}</td>
-                        <td class="text-left border-1 border-gray-500 px-3">{{ $datas->kode }}</td>
-                        <td class="text-left border-1 border-gray-500 px-3">{{ $datas->nama_lengkap }}</td>
-                        <td class="text-left border-1 border-gray-500 px-3">{{ $datas->dept }}</td>
-                        <td class="text-left border-1 border-gray-500 px-3">{{ $datas->absensi->status }}</td>
-                        <td class="text-left border-1 border-gray-500 px-3">
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">{{ $key+1 }}</td>
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">{{ $datas->kode }}</td>
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">{{ $datas->nama_lengkap }}</td>
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">{{ $datas->dept }}</td>
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">{{ $datas->absensi->status }}</td>
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">
                             <div class="flex items-center">
                                 <icon  class="mx-1" class="" fa="map-marker-alt"/> {{ optional($datas->absensi)->checkin_time ?: '' }}
                             </div>
                         </td>
-                        <td class="text-left border-1 border-gray-500 px-3"> Lat :{{ optional($datas->absensi)->checkin_lat ?: '' }} <br> Long : {{ optional($datas->absensi)->checkin_long ?: '' }}</td>
-                        <td class="text-left border-1 border-gray-500 px-3">
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important"> Lat :{{ optional($datas->absensi)->checkin_lat ?: '' }} <br> Long : {{ optional($datas->absensi)->checkin_long ?: '' }}</td>
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">
                           @if(isset($datas->absensi->checkin_region))
                               {{ $datas->absensi->checkin_region === 'Out Scope' ? 'Tidak' : 'Iya' }}
                           @endif
                         </td>
-                        <td class="text-left border-1 border-gray-500 px-3">
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">
                             <div class="flex items-center">
                                 <icon class="mx-1" class="" fa="map-marker-alt"/> {{ optional($datas->absensi)->checkout_time ?: '' }}
                             </div>
                         </td>
-                        <td class="text-left border-1 border-gray-500 px-3"> Lat :{{ optional($datas->absensi)->checkout_lat ?: '' }} <br> Long : {{ optional($datas->absensi)->checkout_long ?: '' }}</td>
-                        <td class="text-left border-1 border-gray-500 px-3">
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important"> Lat :{{ optional($datas->absensi)->checkout_lat ?: '' }} <br> Long : {{ optional($datas->absensi)->checkout_long ?: '' }}</td>
+                        <td class="text-left border-1 border-gray-500 px-3" style="font-size: 9pt !important">
                           @if(isset($datas->absensi->checkout_region))
                               {{ $datas->absensi->checkout_region === 'Out Scope' ? 'Tidak' : 'Iya' }}
                           @endif

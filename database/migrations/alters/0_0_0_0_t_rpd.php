@@ -14,6 +14,9 @@ class trpd extends Migration
             //$table->string('_columnName_');
             //$table->dropColumn([ ]);
             // $table->decimal('total_biaya_spd',22,2)->nullable()->change();
+            $table->decimal('total_biaya_spd',22,2)->nullable()->change();
+            $table->decimal('total_biaya_selisih',22,2)->nullable()->change();
+            $table->decimal('pengambilan_spd',22,2)->nullable()->change();
             $table->bigInteger('t_spd_id')->comment('{"src":"t_spd.id"}')->nullable()->change();
         });
     }

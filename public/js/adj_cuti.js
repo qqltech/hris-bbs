@@ -15,6 +15,7 @@ const currentMenu = store.currentMenu
 const apiTable = ref(null)
 const formErrors = ref({})
 const tsId = `ts=`+(Date.parse(new Date()))
+const readValue = ref(true)
 const adjKary = ref(route.query.action?.toLowerCase() === 'adjusment' ? true : false)
 
 // ------------------------------ PERSIAPAN
@@ -27,13 +28,16 @@ onBeforeMount(()=>{
 //  @if( $id )------------------- VALUES FORM ! PENTING JANGAN DIHAPUS
 
 let initialValues = {}
+let tempInfo = {}
 const changedValues = []
+const informasiCuti = reactive({})
 
 const values = reactive({
   date: new Date().toLocaleDateString('en-GB'),
 })
 
 const infoCuti = async (id) => {
+  tempInfo = {}
   const dataURL = `${store.server.url_backend}/operation/m_kary/${id}`
   const params = { join: true, transform: false, detail: true }
   const fixedParams = new URLSearchParams(params)
@@ -53,29 +57,55 @@ const infoCuti = async (id) => {
           }
       }
     }
+  tempInfo = {...tempInfo, ...tempValues.info_cuti}
+  Object.assign(informasiCuti,tempValues.info_cuti)
   Object.assign(values, tempValues.info_cuti)
   console.log(values)
   adjKary.value = true
 }
 
 const changeSisaCuti = async (data,value)=>{
-  console.log(parseInt(values.sisa_cuti_masa_kerja)+18)
-  parseInt(value)
-  if(data===15516){
-    values.sisa_cuti_masa_kerja = value > 0 ? parseInt(values.sisa_cuti_masa_kerja) + value : parseInt(values.sisa_cuti_masa_kerja) - value
-  }else if(data===15434){
-    values.cuti_p24_terpakai = value > 0 ? parseInt(values.cuti_p24_terpakai) + value : parseInt(values.cuti_p24_terpakai) - value
-  }else if(data===15433){
-    values.sisa_cuti_reguler = value > 0 ? parseInt(values.sisa_cuti_reguler) + value : parseInt(values.sisa_cuti_reguler) - value
+  console.log(data,'fiq')
+  parseInt(value??0)
+  if(data === '01'){
+    informasiCuti.sisa_cuti_p24 = tempInfo.sisa_cuti_p24
+    informasiCuti.sisa_cuti_reguler = tempInfo.sisa_cuti_reguler
+    informasiCuti.sisa_cuti_masa_kerja = tempInfo.sisa_cuti_masa_kerja +(value)
+  }else if(data === '03'){
+    informasiCuti.sisa_cuti_masa_kerja = tempInfo.sisa_cuti_masa_kerja
+    informasiCuti.sisa_cuti_reguler = tempInfo.sisa_cuti_reguler
+    informasiCuti.sisa_cuti_p24 = tempInfo.sisa_cuti_p24+(value)
+  }else if(data === '02'){
+    informasiCuti.sisa_cuti_masa_kerja = tempInfo.sisa_cuti_masa_kerja
+    informasiCuti.sisa_cuti_p24 = tempInfo.sisa_cuti_p24
+    informasiCuti.sisa_cuti_reguler = tempInfo.sisa_cuti_reguler+(value)
   }
 }
 
+const setNullInfoCuti = (v)=> {
+  if(v === '01'){
+    informasiCuti.sisa_cuti_p24 = tempInfo.sisa_cuti_p24
+    informasiCuti.sisa_cuti_reguler = tempInfo.sisa_cuti_reguler
+  }else if(v === '03'){
+    informasiCuti.sisa_cuti_masa_kerja = tempInfo.sisa_cuti_masa_kerja
+    informasiCuti.sisa_cuti_reguler = tempInfo.sisa_cuti_reguler
+  }else if(v === '02'){
+    informasiCuti.sisa_cuti_masa_kerja = tempInfo.sisa_cuti_masa_kerja
+    informasiCuti.sisa_cuti_p24 = tempInfo.sisa_cuti_p24
+  }
+  if(values.value!==null){
+    values.value=null
+  }
+}
 onBeforeMount(async () => {
   console.log(adjKary.value)
     //  READ DATA
     
   if (isRead) {
     try {
+      if(actionText.value === undefined){
+        readValue.value = true
+      }
     isRequesting.value = true
       const editedId = route.params.id
       const dataURL = adjKary.value === true ? `${store.server.url_backend}/operation/m_kary/${editedId}` : `${store.server.url_backend}/operation${endpointApi}/${editedId}`
@@ -98,7 +128,11 @@ onBeforeMount(async () => {
           }
         }
         initialValues = {...initialValues, ...initialValues.info_cuti}
-        initialValues.m_kary_id = initialValues.id
+        if(adjKary.value === true){        
+          initialValues.m_kary_id = initialValues.id
+        }
+        initialValues.tipe_key = initialValues['tipe_cuti.key']
+        infoCuti(initialValues.m_kary_id)
     } catch (err) {
       isBadForm.value = true
       swal.fire({
@@ -143,6 +177,11 @@ async function onSave() {
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true
          values.is_active = values.is_active ? 1 : 0
+        for (const key in informasiCuti) {
+          if (informasiCuti[key] < 0) {
+            throw(`Data Tidak Boleh Kurang Dari 0`)
+          } 
+        }
         const res = await fetch(dataURL, {
           method: isCreating ? 'POST' : 'PUT',
           headers: {
@@ -269,14 +308,14 @@ const landing = reactive({
     cellClass: ['justify-left', 'bg-gray-50', 'border-r', '!border-gray-200']
   },
   {
-    field: 'nomor',
-    headerName: 'Nomor',
+    field: 'date',
+    headerName: 'Tanggal',
     filter: true,
     sortable: true,
     flex: 1,
     filter: 'ColFilter',
     resizable: true,
-    cellClass: ['border-r', '!border-gray-200', 'justify-start']
+    cellClass: ['border-r', '!border-gray-200', 'justify-left']
   },
   {
     field: 'm_kary.nama_depan',
@@ -307,8 +346,7 @@ const landing = reactive({
     cellClass: ['border-r', '!border-gray-200', 'justify-left']
   },
   {
-    field: 'date',
-    headerName: 'Tanggal',
+    field: 'keterangan',
     filter: true,
     sortable: true,
     flex: 1,

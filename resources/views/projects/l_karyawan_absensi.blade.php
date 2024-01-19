@@ -49,32 +49,7 @@
             />
           </div>
           <div class="grid grid-cols-2 gap-2">
-              <div v-show="values.tipe_report === 'Rekap' || !values.tipe_report">
-                  <label class="font-semibold">Periode
-                      <label class="text-red-500 space-x-0 pl-0"></label>
-                  </label>
-                  <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
-                    class="w-full py-2 !mt-0"
-                    :value="values.periode_from" 
-                    :check="false" 
-                    type="month" 
-                    label=""
-                    @input="(v)=>{
-                      values.periode_from = v
-                    }" />
-              </div>
-              <div v-show="values.tipe_report === 'Rekap' || !values.tipe_report">
-                  <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
-                    class="w-full py-2 !mt-5"
-                    :value="values.periode_to" 
-                    :check="false" 
-                    type="month" 
-                    label=""
-                    @input="(v)=>{
-                      values.periode_to = v
-                    }" />
-              </div>
-              <div class="col-span-2" v-show="values.tipe_report === 'Detail'">
+              <div class="col-span-2">
                   <label class="font-semibold">Periode
                   </label>
                   <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
@@ -88,7 +63,7 @@
                   }" />
               </div>
           </div>
-          <!-- <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="font-semibold">Divisi</label>
                 <FieldSelect 
@@ -145,7 +120,7 @@
                   }"
               />
             </div>
-          </div> -->
+          </div>
           <div>
             <label class="font-semibold">Karyawan</label>
             <FieldPopup
@@ -153,14 +128,14 @@
               :value="values.m_kary_id" @input="(v)=>values.m_kary_id=v"
               :errorText="formErrors.m_kary_id?'failed':''" 
               :hints="formErrors.m_kary_id" 
-              valueField="id" displayField="nik"
+              valueField="id" displayField="nama_lengkap"
               :api="{
                 url: `${store.server.url_backend}/operation/m_kary`,
                 headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
                 params: {
                   simplest:true,
                   dept_id :  values.m_dept_id ?? null,
-                  searchfield: 'this.nik, this.nama_lengkap, this.nama_depan, this.nama_belakang, m_zona.nama, m_dir.nama, m_divisi.nama, m_dept.nama'
+                  searchfield: 'this.kode, this.nama_lengkap, this.nama_depan, this.nama_belakang, m_zona.nama, m_dir.nama, m_divisi.nama, m_dept.nama'
                 }
               }"
               placeholder="Pilih NIK Karyawan" label="" :check="false" 
@@ -173,7 +148,7 @@
               },
               {
                 flex: 1,
-                field: 'nik',
+                field: 'kode',
                 wrapText:true,
                 sortable: false, resizable: true, filter: 'ColFilter',
                 cellClass: ['border-r', '!border-gray-200', 'justify-end']

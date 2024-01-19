@@ -38,7 +38,7 @@
 
   const values = reactive({
     tipe: 'HTML',
-    tipe_report : null,
+    tipe_report : 'Rekap',
     periode_from : tempYear+'-'+tempMonth,
     periode_to : tempYear+'-'+tempMonth,
     periode : tempYear+'-'+tempMonth,
