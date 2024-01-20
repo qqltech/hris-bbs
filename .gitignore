@@ -1,3 +1,5 @@
+/app/Models/BasicModels
+/public/models.json
 /public/uploads
 /vendor
 /.idea
