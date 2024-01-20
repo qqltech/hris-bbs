@@ -10,6 +10,8 @@ class trpddet extends Migration
     public function up()
     {
         Schema::table($this->tableName, function (Blueprint $table) {
+            $table->bigInteger('tipe_spd_id')->comment('{"src":"m_general.id"}')->nullable()->change();
+            $table->decimal('biaya',22,2)->nullable()->change();
             $table->bigInteger('t_spd_det_id')->nullable()->change();
             $table->decimal('biaya',22,2)->nullable()->change();
         });
