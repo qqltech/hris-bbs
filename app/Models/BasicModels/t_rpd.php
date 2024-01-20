@@ -28,11 +28,7 @@ class t_rpd extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-<<<<<<< HEAD
-    public $required    = ["t_spd_id","total_biaya_spd","total_biaya_selisih"];
-=======
-    public $required    = [""];
->>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
+    public $required    = [""]
     public $createable  = ["nomor","m_comp_id","t_spd_id","total_biaya_spd","total_biaya_selisih","pengambilan_spd","keterangan","status","creator_id","last_editor_id"];
     public $updateable  = ["nomor","m_comp_id","t_spd_id","total_biaya_spd","total_biaya_selisih","pengambilan_spd","keterangan","status","creator_id","last_editor_id"];
     public $searchable  = ["id","nomor","m_comp_id","t_spd_id","total_biaya_spd","total_biaya_selisih","pengambilan_spd","keterangan","status","creator_id","last_editor_id","created_at","updated_at"];

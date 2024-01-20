@@ -635,12 +635,6 @@
             "m_spd_det_biaya",
             "m_spd_det_transport",
             "m_standart_gaji",
-<<<<<<< HEAD
-            "m_tunj_kemahalan",
-            "m_zona",
-            "m_zona_det",
-            "t_cuti",
-=======
             "t_mutasi",
             "m_kary_det_pres",
             "m_jarak_kota"
@@ -20371,12 +20365,7 @@
                 "scale": 0,
                 "fixed": false,
                 "default": null,
-<<<<<<< HEAD
-                "comment": "{\"src\":\"default_users.id\"}",
-=======
                 "comment": "{\"src\":\"t_spd.id\"}",
-<<<<<<< HEAD
->>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
                 "nullable": false,
                 "rules": null
             },
@@ -21252,21 +21241,7 @@
                 "id"
             ],
             "hidden": [],
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "required": [
-                "m_kary_id",
-                "periode",
-                "total_gaji",
-                "total_tax",
-                "netto"
-            ],
-=======
             "required": [],
->>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
-=======
-            "required": [],
->>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
             "createable": [
                 "t_final_gaji_id",
                 "t_perhitungan_gaji_id",

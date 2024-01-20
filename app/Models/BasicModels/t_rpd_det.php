@@ -28,11 +28,7 @@ class t_rpd_det extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-<<<<<<< HEAD
-    public $required    = ["is_kendaraan_dinas"]
-=======
-    public $required    = ["is_kendaraan_dinas"];
->>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
+    public $required    = ["is_kendaraan_dinas"
     public $createable  = ["t_rpd_id","t_spd_det_id","tipe_spd_id","biaya","biaya_realisasi","detail_transport","m_knd_dinas_id","is_kendaraan_dinas","catatan_realisasi","creator_id","last_editor_id"];
     public $updateable  = ["t_rpd_id","t_spd_det_id","tipe_spd_id","biaya","biaya_realisasi","detail_transport","m_knd_dinas_id","is_kendaraan_dinas","catatan_realisasi","creator_id","last_editor_id"];
     public $searchable  = ["id","t_rpd_id","t_spd_det_id","tipe_spd_id","biaya","biaya_realisasi","detail_transport","m_knd_dinas_id","is_kendaraan_dinas","catatan_realisasi","creator_id","last_editor_id","created_at","updated_at"];
