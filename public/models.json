@@ -20375,6 +20375,7 @@
                 "comment": "{\"src\":\"default_users.id\"}",
 =======
                 "comment": "{\"src\":\"t_spd.id\"}",
+<<<<<<< HEAD
 >>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
                 "nullable": false,
                 "rules": null
@@ -20509,6 +20510,9 @@
                 "default": null,
                 "comment": null,
                 "nullable": true,
+=======
+                "nullable": false,
+>>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
                 "rules": null
             },
             {
@@ -21126,7 +21130,7 @@
                 "fixed": false,
                 "default": null,
                 "comment": null,
-                "nullable": true,
+                "nullable": false,
                 "rules": null
             },
             {
@@ -21249,6 +21253,7 @@
             ],
             "hidden": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "required": [
                 "m_kary_id",
                 "periode",
@@ -21256,6 +21261,9 @@
                 "total_tax",
                 "netto"
             ],
+=======
+            "required": [],
+>>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
 =======
             "required": [],
 >>>>>>> 635c7235cdd48815e3da259ac030f0f80a3e8fba
