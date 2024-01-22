@@ -53,7 +53,7 @@
   }
 @endphp
 <span style="width:100%;text-align:center;font-weight:bold;">Laporan Absensi Karyawan ({{$tipe}})</span><br>
-<span style="width:100%;text-align:center;font-weight:bold; font-size: 10pt !important"> Periode {{$req->periode}}</span><br>
+<span style="width:100%;text-align:center;font-weight:bold; font-size: 10pt !important"> Periode {{@$periode ?? ($periode_from. '-' .$periode_to)}}</span><br>
 @if(!$req->export == 'xls')
 <style>
 table {

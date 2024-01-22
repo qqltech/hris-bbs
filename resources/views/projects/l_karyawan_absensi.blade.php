@@ -25,7 +25,7 @@
                 :hints="formErrors.tipe_report" 
                 :check="false"
                 label=""
-                :options="['Rekap','Detail']"
+                :options="['Laporan Absensi Karyawan Rekap','Laporan Absensi Karyawan Detail','Laporan Sisa Cuti Karyawan']"
                 placeholder="Pilih Tipe Report Absensi"
                 valueField="key" 
                 displayField="key"
@@ -63,7 +63,7 @@
                   }" />
               </div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-2" v-if="values.tipe_report != 'Laporan Absensi Karyawan Detail'">
             <div>
               <label class="font-semibold">Divisi</label>
                 <FieldSelect 
