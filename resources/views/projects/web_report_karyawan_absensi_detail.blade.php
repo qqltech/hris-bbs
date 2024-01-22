@@ -30,7 +30,7 @@
               <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ $dt->type }}</td>
               <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ @json_decode($dt->absensi)->status }}</td>
               <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ @json_decode($dt->absensi)->checkin_time }}</td>
-              <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ @json_decode($dt->absensi)->checkout_out }}</td>
+              <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ @json_decode($dt->absensi)->checkout_time }}</td>
             </tr>
         @endforeach
       </tbody>
