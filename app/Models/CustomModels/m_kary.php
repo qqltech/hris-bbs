@@ -367,7 +367,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
         if(!$data){
             $data = $this->defaultDataDiri();
         }else{
-            $det_kartu = m_kary_det_kartu::where('m_kary_id', @$id_kary ?? 0)->first();
+            $det_kartu = m_kary_det_kartu::with(['bpjs_tipe'])->where('m_kary_id', @$id_kary ?? 0)->first();
             $det_pemb = m_kary_det_pemb::with(['periode_gaji', 'metode', 'tipe' , 'bank'])->where('m_kary_id', @$id_kary ?? 0)->first();
             if($det_kartu){
                 $data['ktp_no'] = $det_kartu->ktp_no ?? null;
@@ -378,6 +378,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
                 $data['npwp_no'] = $det_kartu->npwp_no ?? null;
                 $data['npwp_foto'] = $det_kartu->npwp_foto ?? null;
                 $data['npwp_tgl_berlaku'] = $det_kartu->npwp_tgl_berlaku ?? null;
+                $data['bpjs_tipe'] = $det_kartu->bpjs_tipe->value ?? null;
                 $data['bpjs_tipe_id'] = $det_kartu->bpjs_tipe_id ?? null;
                 $data['bpjs_no'] = $det_kartu->bpjs_no ?? null;
                 $data['bpjs_no_kesehatan'] = $det_kartu->bpjs_no_kesehatan ?? null;

@@ -18,6 +18,8 @@
   const activeTabIndex = ref(0)
   const tsId = `ts=`+(Date.parse(new Date()))
 
+  const file_report = ref('')
+
   // ------------------------------ PERSIAPAN
   onBeforeMount(()=>{
     document.title = 'Laporan Absensi'
@@ -38,7 +40,7 @@
 
   const values = reactive({
     tipe: 'HTML',
-    tipe_report : 'Rekap',
+    tipe_report : 'Laporan Absensi Karyawan Rekap',
     periode : tempYear+'-'+tempMonth,
   })
 
@@ -47,15 +49,18 @@
   }
 
   const onGenerate = async () => {
-    
-    if(values.tipe_report == 'Detail' ){
-      swal.fire({
-        icon: 'error',
-        text: 'Maaf fitur belum tersedia!',
-      })
-      return
+
+    if(values.tipe_report == 'Laporan Absensi Karyawan Rekap'){
+      file_report.value = 'report_karyawan_absensi_rekap'
     }
-    if(values.tipe_report == 'Detail' && !values.m_kary_id){
+    if(values.tipe_report == 'Laporan Absensi Karyawan Detail'){
+      file_report.value = 'report_karyawan_absensi_detail'
+    }
+    if(values.tipe_report == 'Laporan Sisa Cuti Karyawan'){
+      file_report.value = 'report_sisa_cuti_karyawan'
+    }
+    
+    if(values.tipe_report == 'Laporan Absensi Karyawan Detail' && !values.m_kary_id){
       swal.fire({
         icon: 'error',
         text: 'Harap Memilih Karyawan Terlebih Dahulu!',
@@ -69,7 +74,7 @@
       })
       return
     }
-    if(values.tipe_report === 'Detail' && (values.periode === null)){
+    if(values.tipe_report === 'Laporan Absensi Karyawan Detail' && (values.periode === null)){
       swal.fire({
         icon: 'error',
         text: 'Harap Memilih Periode Dahulu!',
@@ -107,9 +112,9 @@
     const paramsGet = tempGet.join("&")
     if(values.tipe?.toLowerCase() !== 'html'){
       exportHtml.value = false
-      window.open(`${store.server.url_backend}/web/report_absensi_karyawan` + '?' + paramsGet)
+      window.open(`${store.server.url_backend}/web/${file_report.value}` + '?' + paramsGet)
     }else{
-      await fetch(`${store.server.url_backend}/web/report_absensi_karyawan` + '?' + paramsGet, {
+      await fetch(`${store.server.url_backend}/web/${file_report.value}` + '?' + paramsGet, {
         headers: {
             'Content-Type': 'html',
           },

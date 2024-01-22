@@ -38,7 +38,7 @@ class NonApiController extends Controller
                 return $writer->save('php://output');
             }
         }catch(\Exception $e){
-            if( \Str::contains( strtolowr( @$e->getMessage()??''),' maaf') ){
+            if( \Str::contains( strtolower( @$e->getMessage()??''),' maaf') ){
                 return explode('(View',$e->getMessage())[0];
             }
         }
