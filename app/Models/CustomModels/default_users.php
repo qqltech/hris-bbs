@@ -188,4 +188,8 @@ class default_users extends \App\Models\BasicModels\default_users
         $kary_id = default_users::where('id', auth()->user()->id)->pluck('m_kary_id')->first();
         return $model->whereRaw("default_users.id = ? or default_users.m_kary_id in (select k.id from default_users u join m_kary k on k.id = u.m_kary_id where k.atasan_id = ?)", [auth()->user()->id ?? 0, $kary_id]);
     }
+
+    public function public_phpinfo(){
+        return phpinfo();
+    }
 }
