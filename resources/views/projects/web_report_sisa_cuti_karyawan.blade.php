@@ -23,14 +23,15 @@
         ]);
   
 @endphp
-<h4 style="font-weight:bold; font-size: 10pt">{{ $tipe . ' - Periode : '.$periode_asli}}</h4><br/>
-<span style="font-weight:bold; font-style: italic; font-size: 8pt"> LK     : Lama Kerja</span><br/>
-<span style="font-weight:bold; font-style: italic; font-size: 8pt"> CMK     : Cuti Masa Kerja</span><br/>
-<span style="font-weight:bold; font-style: italic; font-size: 8pt"> CMK (-) : Sisa Cuti Masa Kerja</span><br/>
-<span style="font-weight:bold; font-style: italic; font-size: 8pt"> CTH     : Cuti Tahunan</span><br/>
-<span style="font-weight:bold; font-style: italic; font-size: 8pt"> CTH (-) : Sisa Cuti Tahunan</span><br/>
-<span style="font-weight:bold; font-style: italic; font-size: 8pt"> CP24    : P24</span><br/>
-<span style="font-weight:bold; font-style: italic; font-size: 8pt"> CP24 (-) : Sisa P24</span><br/>
+<h4 style="font-weight:bold; font-size: 10pt">{{ $tipe }}</h4>
+<h4 style="font-weight:bold; font-size: 10pt; margin-top: -15px">{{ 'Periode : '.$periode_asli}}</h4>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt"> LK     : Lama Kerja</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CMK     : Cuti Masa Kerja</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CMK (-) : Sisa Cuti Masa Kerja</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CTH     : Cuti Tahunan</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CTH (-) : Sisa Cuti Tahunan</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CP24    : P24</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CP24 (-) : Sisa P24</i><br/>
 <br/>
 <table v-else >
   <thead>
@@ -39,14 +40,14 @@
       <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Karyawan</th>
       <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Divisi</th>
       <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Departemen</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Tgl Masuk</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">LK</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">CMK</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">CMK (-)</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">CTH</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">CTH (-)</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">CP2</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">CP24 (-)</th>
+      <th style="border:0.5px solid black; padding: 2px; width: 80px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Tgl Masuk</th>
+      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">LK</th>
+      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CMK</th>
+      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CMK (-)</th>
+      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CTH</th>
+      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CTH (-)</th>
+      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CP2</th>
+      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CP24 (-)</th>
     </tr>
   </thead>
   <tbody>
