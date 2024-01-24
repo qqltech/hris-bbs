@@ -136,6 +136,7 @@ class generate_approval extends \App\Models\BasicModels\generate_approval
                 $mappedTrx->total_biaya_selisih = $data->trx->total_biaya_selisih;
                 $mappedTrx->keterangan = $data->trx->keterangan;
                 $mappedTrx->status = $data->trx->status;
+                // $mappedTrx->t_rpd_det = \DB::select('t_rpd_det')->where('t_rpd_id', $data->approval->trx_id)->get() ?? [];
             }
             else{
                 $mappedTrx->nomor = $data->trx->nomor;

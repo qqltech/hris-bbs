@@ -28,7 +28,7 @@ class m_kary_det_pemb extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = ["periode_gaji_id","metode_id","tipe_id","bank_id","no_rek","atas_nama_rek"];
+    public $required    = ["periode_gaji_id"];
     public $createable  = ["m_kary_id","m_comp_id","m_dir_id","periode_gaji_id","metode_id","tipe_id","bank_id","no_rek","atas_nama_rek","desc","creator_id","last_editor_id"];
     public $updateable  = ["m_kary_id","m_comp_id","m_dir_id","periode_gaji_id","metode_id","tipe_id","bank_id","no_rek","atas_nama_rek","desc","creator_id","last_editor_id"];
     public $searchable  = ["id","m_kary_id","m_comp_id","m_dir_id","periode_gaji_id","metode_id","tipe_id","bank_id","no_rek","atas_nama_rek","desc","creator_id","last_editor_id","created_at","updated_at"];

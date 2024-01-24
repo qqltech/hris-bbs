@@ -70,25 +70,25 @@
           and mp.id = coalesce(?, mp.id)
   ", [ $h->id ?? 0, $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id ]);
       @endphp
-      <table width="100%" style="font-size:8px;" cellpadding="1">
+      <table width="100%" style="font-size:8px;" cellpadding="5">
         <thead style="font-weight:semibold;">
           <tr style="">
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">No</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Tanggal</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">No Pelamar</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">KTP</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Nama Pelamar</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">No Telp</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Pend Terakhir</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Jenis Kelamin</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">TTL</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Direktorat</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Divisi</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Departemen</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Posisi</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Gaji Min</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Deskripsi</td>
-            <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Status</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">No</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Tanggal</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">No Pelamar</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">KTP</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Nama Pelamar</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">No Telp</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Pend Terakhir</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Jenis Kelamin</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">TTL</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Direktorat</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Divisi</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Departemen</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Posisi</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Gaji Min</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Deskripsi</td>
+            <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">Status</td>
           </tr>
         </thead>
         <tbody>
