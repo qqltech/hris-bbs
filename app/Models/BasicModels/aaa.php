@@ -17,10 +17,10 @@ class aaa extends Model
     "created_at"=> "datetime:d\/m\/Y H:i",
     "updated_at"=> "datetime:d\/m\/Y H:i"
 	];
-    protected $fillable = ["samplecolumn","hey"];
+    protected $fillable = ["seq","hey"];
 
-    public $columns     = ["id","samplecolumn","created_at","updated_at","hey"];
-    public $columnsFull = ["id:bigint","samplecolumn:string:100","created_at:datetime","updated_at:datetime","hey:string:191"];
+    public $columns     = ["id","seq","hey"];
+    public $columnsFull = ["id:bigint","seq:string:191","hey:string:191"];
     public $rules       = [];
     public $joins       = [];
     public $details     = [];
@@ -28,10 +28,10 @@ class aaa extends Model
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = ["hey"];
-    public $createable  = ["samplecolumn","hey"];
-    public $updateable  = ["samplecolumn","hey"];
-    public $searchable  = ["id","samplecolumn","created_at","updated_at","hey"];
+    public $required    = ["seq","hey"];
+    public $createable  = ["seq","hey"];
+    public $updateable  = ["seq","hey"];
+    public $searchable  = ["id","seq","hey"];
     public $deleteable  = true;
     public $cascade     = true;
     public $deleteOnUse = false;

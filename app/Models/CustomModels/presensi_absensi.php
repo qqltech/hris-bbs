@@ -262,4 +262,39 @@ class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
             return $model->whereBetween('tanggal',[req('date_from'),req('date_to')])->where('default_user_id', auth()->user()->id ?? 0);
         }
     }
+
+    public function custom_get_absen($req)
+    {
+        $periode = ($req->periode ?? date('Y-m')).'-1';
+        $user_id = auth()->user()->id;
+
+        $data = \DB::select("
+            select * from employee_attendance_detail(?, ?);
+        ", [$periode,$user_id ?? 0]);
+
+        // transform object for mobile
+        foreach($data as $dt){
+            $dt->status = @json_decode($dt->absensi)->status ?? null;
+            $dt->tanggal = @json_decode($dt->absensi)->tanggal ?? null;
+            $dt->catatan_in = @json_decode($dt->absensi)->catatan_in ?? null;
+            $dt->catatan_out = @json_decode($dt->absensi)->catatan_out ?? null;
+            $dt->checkin_lat = @json_decode($dt->absensi)->checkin_lat ?? null;
+            $dt->checkin_foto = @json_decode($dt->absensi)->checkin_foto ? url('').'/'.@json_decode($dt->absensi)->checkin_foto : null;
+            $dt->checkin_long = @json_decode($dt->absensi)->checkin_long ?? null;
+            $dt->checkin_time = @json_decode($dt->absensi)->checkin_time ?? null;
+            $dt->checkout_lat = @json_decode($dt->absensi)->checkout_lat ?? null;
+            $dt->checkout_foto = @json_decode($dt->absensi)->checkout_foto ? url('').'/'.@json_decode($dt->absensi)->checkout_foto : null;
+            $dt->checkout_long = @json_decode($dt->absensi)->checkout_long ?? null;
+            $dt->checkout_time = @json_decode($dt->absensi)->checkout_time ?? null;
+            $dt->checkin_region = @json_decode($dt->absensi)->checkin_region ?? null;
+            $dt->checkin_address = @json_decode($dt->absensi)->checkin_address ?? null;
+            $dt->checkout_region = @json_decode($dt->absensi)->checkout_region ?? null;
+            $dt->checkin_on_scope = @json_decode($dt->absensi)->checkin_on_scope ?? null;
+            $dt->checkout_address = @json_decode($dt->absensi)->checkout_address ?? null;
+            $dt->checkout_on_scope = @json_decode($dt->absensi)->checkout_on_scope ?? null;
+            $dt->presensi_absensi_id = @json_decode($dt->absensi)->presensi_absensi_id ?? null;
+        }
+
+        return $this->helper->customResponse("OK", 200, $data);
+    }
 }

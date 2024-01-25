@@ -25,46 +25,46 @@
 @endphp
 <h4 style="font-weight:bold; font-size: 10pt">{{ $tipe }}</h4>
 <h4 style="font-weight:bold; font-size: 10pt; margin-top: -15px">{{ 'Periode : '.$periode_asli}}</h4>
-<i style="font-weight:bold; font-style: italic; font-size: 8pt"> LK     : Lama Kerja</i><br/>
-<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CMK     : Cuti Masa Kerja</i><br/>
-<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CMK (-) : Sisa Cuti Masa Kerja</i><br/>
-<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CTH     : Cuti Tahunan</i><br/>
-<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CTH (-) : Sisa Cuti Tahunan</i><br/>
-<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CP24    : P24</i><br/>
-<i style="font-weight:bold; font-style: italic; font-size: 8pt"> CP24 (-) : Sisa P24</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt;"> LK     : Lama Kerja</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt;"> CMK     : Cuti Masa Kerja</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt;"> CMK (-) : Sisa Cuti Masa Kerja</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt;"> CTH     : Cuti Tahunan</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt;"> CTH (-) : Sisa Cuti Tahunan</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt;"> CP24    : P24</i><br/>
+<i style="font-weight:bold; font-style: italic; font-size: 8pt;"> CP24 (-) : Sisa P24</i><br/>
 <br/>
-<table v-else >
+<table width="100%" style="border-collapse: collapse;" cellpadding="3">
   <thead>
     <tr>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">NIK</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Karyawan</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Divisi</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Departemen</th>
-      <th style="border:0.5px solid black; padding: 2px; width: 80px; font-size: 9pt; border-collapse: collapse; background-color: #c6c6c6;">Tgl Masuk</th>
-      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">LK</th>
-      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CMK</th>
-      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CMK (-)</th>
-      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CTH</th>
-      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CTH (-)</th>
-      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CP2</th>
-      <th style="border:0.5px solid black; padding: 2px; border-collapse: collapse; background-color: #c6c6c6;">CP24 (-)</th>
+      <th style="border:0.5px solid black; font-size: 9pt; background-color: #c6c6c6; width: 10%; ">NIK</th>
+      <th style="border:0.5px solid black; font-size: 9pt; background-color: #c6c6c6; width: 20%;">Karyawan</th>
+      <!-- <th style="border:0.5px solid black; font-size: 9pt; background-color: #c6c6c6; width: 14%;">Divisi</th> -->
+      <th style="border:0.5px solid black; font-size: 9pt; background-color: #c6c6c6; width: 25%;">Departemen</th>
+      <th style="border:0.5px solid black; font-size: 9pt; background-color: #c6c6c6;">Tgl Masuk</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">LK</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CMK</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CMK (-)</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CTH</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CTH (-)</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CP24</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CP24 (-)</th>
     </tr>
   </thead>
   <tbody>
     @foreach($data as $dt)
         <tr>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ $dt->kode }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ $dt->nama_lengkap }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ $dt->div }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ $dt->dept }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse;">{{ $dt->tgl_masuk }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; text-align: right">{{ @json_decode($dt->absen)->masa_kerja ?? 0 }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; text-align: right">{{ @json_decode($dt->absen)->cuti_masa_kerja ?? 0 }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; text-align: right">{{ @json_decode($dt->absen)->sisa_cuti_masa_kerja ?? 0 }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; text-align: right">{{ @json_decode($dt->absen)->cuti_reguler ?? 0 }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; text-align: right">{{ @json_decode($dt->absen)->sisa_cuti_reguler ?? 0 }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; text-align: right">{{ @json_decode($dt->absen)->cuti_p24 ?? 0 }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 9pt; border-collapse: collapse; text-align: right">{{ @json_decode($dt->absen)->sisa_cuti_p24 ?? 0 }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; width: 10%;">{{ $dt->kode }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; width: 20%;">{{ $dt->nama_lengkap }}</td>
+          <!-- <td style="border:0.5px solid black; font-size: 9pt; width: 14%;">{{ $dt->div }}</td> -->
+          <td style="border:0.5px solid black; font-size: 9pt; width: 25%;">{{ $dt->dept }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: center;">{{ $dt->tgl_masuk }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: right; width: 5%;">{{ @json_decode($dt->absen)->masa_kerja ?? 0 }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: right; width: 5%;">{{ @json_decode($dt->absen)->cuti_masa_kerja ?? 0 }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: right; width: 5%;">{{ @json_decode($dt->absen)->sisa_cuti_masa_kerja ?? 0 }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: right; width: 5%;">{{ @json_decode($dt->absen)->cuti_reguler ?? 0 }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: right; width: 5%;">{{ @json_decode($dt->absen)->sisa_cuti_reguler ?? 0 }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: right; width: 5%;">{{ @json_decode($dt->absen)->cuti_p24 ?? 0 }}</td>
+          <td style="border:0.5px solid black; font-size: 9pt; text-align: right; width: 5%;">{{ @json_decode($dt->absen)->sisa_cuti_p24 ?? 0 }}</td>
         </tr>
     @endforeach
   </tbody>

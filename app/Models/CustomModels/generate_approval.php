@@ -131,11 +131,32 @@ class generate_approval extends \App\Models\BasicModels\generate_approval
             }
             elseif($data->approval->trx_table === 't_rpd')
             {
+                $t_spd = t_spd::leftJoin('m_divisi', 't_spd.m_divisi_id', '=', 'm_divisi.id')
+                    ->leftJoin('m_dept', 't_spd.m_dept_id', '=', 'm_dept.id')
+                    ->leftJoin('m_lokasi', 't_spd.m_lokasi_tujuan_id', '=', 'm_lokasi.id')
+                    ->leftJoin('default_users', 't_spd.m_kary_id', '=', 'default_users.m_kary_id')
+                    ->select('t_spd.*', 'm_divisi.nama as nama_divisi', 'm_dept.nama as nama_dept', 'm_lokasi.nama as lokasi_tujuan', 'default_users.name')
+                    ->where('t_spd.id', $data->trx->t_spd_id)
+                    ->first();
+                $pic = m_kary::where('id', $t_spd->m_kary_id)->value('nama_lengkap');
                 $mappedTrx->nomor = $data->trx->nomor;
                 $mappedTrx->total_biaya_spd = $data->trx->total_biaya_spd;
                 $mappedTrx->total_biaya_selisih = $data->trx->total_biaya_selisih;
                 $mappedTrx->keterangan = $data->trx->keterangan;
                 $mappedTrx->status = $data->trx->status;
+                $mappedTrx->tgl_acara_awal = @$t_spd->tgl_acara_awal ?? null;
+                $mappedTrx->tgl_acara_akhir = @$t_spd->tgl_acara_akhir ?? null; 
+                $mappedTrx->nama_divisi = @$t_spd->nama_divisi ?? null;
+                $mappedTrx->nama_dept = @$t_spd->nama_dept ?? null;
+                $mappedTrx->lokasi_tujuan = @$t_spd->lokasi_tujuan ?? null;
+                $mappedTrx->pic = @$pic ?? @$t_spd->name ?? null;
+                $mappedTrx->interval = @$t_spd->interval ?? 0;
+                $mappedTrx->kegiatan = @$t_spd->kegiatan ?? null;
+                $mappedTrx->catatan_kend = @$t_spd->catatan_kend ?? null;
+                $mappedTrx->t_rpd_det = t_rpd_det::leftJoin('m_general', 't_rpd_det.tipe_spd_id', '=', 'm_general.id')
+                                        ->select('t_rpd_det.*', 'm_general.value as tipe_spd')
+                                        ->where('t_rpd_det.t_rpd_id', $data->approval->trx_id)
+                                        ->get() ?? [];
             }
             else{
                 $mappedTrx->nomor = $data->trx->nomor;
