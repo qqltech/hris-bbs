@@ -19,12 +19,9 @@
 
       <!-- HEADER START -->
       <div class="flex flex-col items-start mb-2 pb-4">
-          <h2 v-if="!is_approval" class="font-sans text-xl flex justify-left font-bold">
-            {{actionText==='Edit'?'Ubah':actionText}} Realisasi Perjalanan Dinas
-          </h2>
-          <h2 v-else class="font-sans text-xl flex justify-left font-bold">
-            Notifikasi Approval Realisasi Perjalanan Dinas
-          </h2>
+        <h1 class="text-[24px] mb-[15px] font-bold">
+          Form Realisasi Perjalanan Dinas
+        </h1>
       </div>
       <!-- HEADER END -->
 
@@ -494,16 +491,109 @@
           </table>
       </div>
       
-      <div class="flex flex-row justify-end space-x-[20px] mt-[5em]">
+      <div class="grid grid-cols-2 mt-6">
+        <div v-show="route.query.is_approval"> 
+          <table class=" w-[100%] my-3 border">
+            <tr class="border">
+              <td class="border px-2 py-1 font-semibold">Nomor</td>
+              <td class="border px-2 py-1">{{ values.approval?.nomor ?? '-' }}</td>
+            </tr>
+            <tr class="border">
+              <td class="border px-2 py-1 font-semibold">Tanggal</td>
+              <td class="border px-2 py-1">{{ values.approval?.created_at ?? '-' }}</td>
+            </tr>
+            <tr class="border">
+              <td class="border px-2 py-1 font-semibold">Pemohon</td>
+              <td class="border px-2 py-1">{{ values.approval?.creator ?? '-' }}</td>
+            </tr>
+            <tr class="border">
+              <td class="border px-2 py-1 font-semibold">Status</td>
+              <td class="border px-2 py-1">{{ values.approval?.status ?? '-' }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class=""> 
+          <table class=" w-[100%] my-3 ">
+              <tr>
+              <td class=" px-2 py-1">
+                <button
+                  v-show="route.query.is_approval"
+                  @click="openModal(values?.trx?.id ?? 0)" 
+                  class="hover:text-blue-500">
+                  <icon fa="table" size="sm"/>
+                  Log Approval
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      
+      <div v-show="modalOpen" class="fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-overlay fixed inset-0 bg-black opacity-50">
+        </div>
+        <div class="modal-container bg-white  w-[70%] mx-auto rounded shadow-lg z-50 overflow-y-auto">
+          <div class="modal-content py-4 text-left px-6">
+            <!-- Modal Header -->
+            <div class="modal-header flex items-center justify-between flex-wrap">
+              <div class="flex items-center">
+                <h3 class="text-xl font-semibold ml-2">Log Approval <span v-if="!dataLog.items.length" class="!text-red-600"> | Belum ada log approval</span></h3>
+              </div>
+            </div>
+            <!-- Modal Body -->
+            <div v-if="dataLog.items.length" class="modal-body">
+              <table class="w-[100%] my-3 border">
+                <thead>
+                  <tr class="border">
+                    <td class="border px-2 py-1 font-medium ">Urutan</td>
+                    <td class="border px-2 py-1 font-medium ">Nomor Transaksi</td>
+                    <td class="border px-2 py-1 font-medium ">Tipe Aksi</td>
+                    <td class="border px-2 py-1 font-medium ">Tanggal Aksi </td>
+                    <td class="border px-2 py-1 font-medium ">User Aksi</td>
+                    <td class="border px-2 py-1 font-medium ">Catatan</td>
+                  </tr>
+                </thead>
+                <tr class="border" v-for="d,i in dataLog.items" :key="i">
+                  <td class="border px-2 py-1">{{ i+1 }}</td>
+                  <td class="border px-2 py-1">{{ d.trx_nomor ?? '-' }}</td>
+                  <td class="border px-2 py-1">{{ d.action_type ?? '-' }}</td>
+                  <td class="border px-2 py-1">{{ d.action_at ?? '-' }}</td>
+                  <td class="border px-2 py-1">{{ d.action_user ?? '-' }}</td>
+                  <td class="border px-2 py-1">{{ d.action_note ?? '-' }}</td>
+                </tr>
+              </table>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer flex justify-end mt-2">
+              <button @click="closeModal" class="modal-button bg-yellow-500 hover:bg-yellow-600 text-white font-semibold ml-2 px-2 py-1 rounded-sm">
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-show="route.query.is_approval" class="w-1/2 mt-6">
+          <label class="col-span-12 font-semibold">Catatan Approval<label class="text-red-500 space-x-0 pl-0"></label></label>
+          <FieldX :bind="{ readonly: false }" class="w-full py-2 !mt-0" :value="values.catatan"
+            :errorText="formErrors.catatan?'failed':''" @input="v=>values.catatan=v" :hints="formErrors.catatan"
+            :check="false" label="" placeholder="Tuliskan catatan" />
+        </div>
+      <div class="flex flex-row justify-end space-x-[20px] mt-[1em]">
+            <button v-show="route.query.is_approval" class="mx-1 bg-green-500 text-white hover:bg-green-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('approve')">
+              Approve
+            </button>
+            <button v-show="route.query.is_approval" class="mx-1 bg-rose-500 text-white hover:bg-rose-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('reject')">
+              Reject
+            </button>
+            <button v-show="route.query.is_approval" class="mx-1 bg-amber-500 text-white hover:bg-amber-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('revise')">
+              Revise
+            </button>
             <button @click="onBack" class="bg-[#EF4444] hover:bg-[#ed3232] text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Kembali
-          </button>
-          <button v-show="route.query.action?.toLowerCase() === 'verifikasi'" @click="posted" class="bg-orange-500 hover:bg-orange-600 text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Posted
-          </button>
-          <button v-show="actionText" @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Simpan
-          </button>
+              Kembali
+            </button>
+            <button v-show="actionText" @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[36.5px] py-[12px] rounded-[6px] ">
+              Simpan
+            </button>
       </div>
       <!-- FORM END -->
     </div>

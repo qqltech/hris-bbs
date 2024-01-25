@@ -298,4 +298,11 @@ class t_spd extends \App\Models\BasicModels\t_spd
         $data = $this->helper->approvalLog($conf);
         return response($data);
     }
+
+    public function scopeForREPD($model)
+    {
+        return $model->whereRaw("
+            upper(t_spd.status) = 'APPROVED' and t_spd.id not in(select r.t_spd_id from t_rpd r where upper(r.status) = 'APPROVED')
+        ");
+    }
 }

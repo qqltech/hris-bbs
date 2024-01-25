@@ -98,7 +98,105 @@ class t_rpd extends \App\Models\BasicModels\t_rpd
         }
     }
 
- 
+    public function custom_send_approval()
+    {
+        if (app()->request->header("Source") == "mobile") {
+             $app = $this->createAppTicket(req("id"));
+            if (!$app) {
+                return $this->helper->customResponse(
+                    "Terjadi kesalahan, coba kembali nanti",
+                    400
+                );
+            }
+
+            $spd = t_rpd::find(req("id"));
+            if ($spd) {
+                $spd->update([
+                    "status" => "IN APPROVAL",
+                ]);
+            }
+            return $this->helper->customResponse(
+                "Permintaan approval berhasil dibuat"
+            );
+        }else{
+            $spd = t_rpd::find(req("id"));
+            if ($spd) {
+                $spd->update([
+                    "status" => "APPROVED",
+                ]);
+            }
+            return $this->helper->customResponse(
+                "Approved !"
+            );
+        }
+
     
+    }
+
+    public function custom_progress($req)
+    {
+        \DB::beginTransaction();
+
+        try {
+            $conf = [
+                "app_id" => $req->id,
+                "app_type" => $req->type, // APPROVED, REVISED, REJECTED,
+                "app_note" => $req->note, // alasan approve
+            ];
+
+            $datas = generate_approval::where('id', $req->id)->first();
+            $cek = $this->where('id', $datas['trx_id'])->first();
+            if($cek['status'] === 'REJECTED' || $cek['status'] === 'REVISED'){
+                return $this->helper->customResponse('errors', '422',"Data Sudah Dalam Status Rejected atau Revised , Harap Ulangi atau Perbaiki Pengajuan");
+            }
+
+            $app = $this->helper->approvalProgress($conf);
+            if ($app->status) {
+                $data = $this->find($app->trx_id);
+                if ($app->finish) {
+                    $data->update([
+                        "status" => $req->type,
+                    ]);
+                } else {
+                    if($req->type != 'APPROVED'){                        
+                        $data->update([
+                            "status" => $req->type,
+                        ]);
+                    }else{
+                        $data->update([
+                            "status" => 'IN APPROVAL',
+                        ]);
+                    }
+                }
+            }
+
+            \DB::commit();
+
+            return $this->helper->customResponse("Proses approval berhasil");
+        } catch (\Exception $e) {
+            \DB::rollback();
+
+            return $this->helper->responseCatch($e);
+
+        }
+    }
+
+ 
+    public function custom_detail($req)
+    {
+        $id = $req->id ?? 66;
+        $data = $this->helper->approvalDetail($id);
+        return $this->helper->customResponse("OK", 200, $data);
+    }
+
+    public function custom_log($req)
+    {
+        $conf = [
+            "trx_id" => $req->id ?? 0,
+            "trx_table" => $this->getTable(),
+        ];
+        $data = $this->helper->approvalLog($conf);
+        return response($data);
+    }
     
 }
