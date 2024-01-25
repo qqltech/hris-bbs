@@ -46,7 +46,7 @@
       <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CMK (-)</th>
       <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CTH</th>
       <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CTH (-)</th>
-      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CP2</th>
+      <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CP24</th>
       <th style="border:0.5px solid black; background-color: #c6c6c6; font-size: 9pt; width: 5%;">CP24 (-)</th>
     </tr>
   </thead>
