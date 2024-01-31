@@ -14,7 +14,7 @@ class presensiappversion extends Migration
             $table->id()->from(1);
             $table->bigInteger('comp_id')->comment('{"src":"m_company.id"}')->default(1)->nullable();
             $table->string('version');
-            $table->string('note');
+            $table->text('note');
             $table->string('link');
             $table->string('type');
             $table->boolean('is_active')->default(1);

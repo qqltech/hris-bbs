@@ -17,6 +17,12 @@ const currentMenu = store.currentMenu
 const apiTable = ref(null)
 const formErrors = ref({})
 const tsId = `ts=`+(Date.parse(new Date()))
+let trx_dtl = reactive({items: []})
+let detailKey = ref(0)
+let modalOpen = ref(false)
+let detailIdxSelected = ref(0)
+let trx_dtl_sub = reactive({items: []})
+let _id = ref(0) 
 
 // ------------------------------ PERSIAPAN
 const endpointApi = '/t_jadwal_kerja'
@@ -27,90 +33,9 @@ onBeforeMount(()=>{
 //  @if( $id )------------------- VALUES FORM ! PENTING JANGAN DIHAPUS
 let initialValues = {}
 const changedValues = []
-const modal = ref(false)
-const groupKerja = ref([])
-let values = reactive({
-  m_comp_id : 1,
-  nomor:'',
-  group_kerja: '',
-})
 
-
-
-const onOpenGK = () => {
-  modal.value = !modal.value
-}
-
-const selectGK = (data) => {
-  values.m_comp_id = data.m_comp_id
-  values.group_kerja = data.nomor
-  values.m_dir = data["m_dir.nama"]
-  values.m_dept = data["m_dept.nama"]
-  values.m_divisi = data["m_divisi.nama"]
-  values.m_dir_id = data["m_dir.id"]
-  values.m_dept_id = data["m_dept.id"]
-  values.m_divisi_id = data["m_dir.id"]
-  values.t_grup_kerja_id = data.id
-  modal.value = false
-  groupKerja.selected = true
-  }
-  
-  const deleteJKD = (index) => {
-  
-    const data = values.t_jadwal_kerja_det.filter((e, i) => {
-
-     if(i !== index) return e
-    })
-
-    values.t_jadwal_kerja_det = data
-  }
-
-  const onGenerate = async () => {
-    const res = await fetch(`${store.server.url_backend}/operation/t_jadwal_kerja/generate?grup_kerja_id=${values.t_grup_kerja_id}`,{  
-    headers: {
-          'Content-Type': 'Application/json',
-          Authorization: `${store.user.token_type} ${store.user.token}`
-        },
-      })
-
-    const result = await res.json()
-    console.log(result.data)
-    values.t_jadwal_kerja_det = []
-    values.t_jadwal_kerja_det = result.data
-  }
-
-
-const fetchGroupKerja = async () => {
-  
-      const params = { join: false, transform: false }
-      const fixedParams = new URLSearchParams(params)
-  const res = await fetch(`${store.server.url_backend}/operation/t_grup_kerja`,{  
-    headers: {
-          'Content-Type': 'Application/json',
-          Authorization: `${store.user.token_type} ${store.user.token}`
-        },
-      })
-
-  const result = await res.json()
-  const data = result.data
-  console.log(data)
-  groupKerja.value = data.map(item => {
-    if(item.status){
-      item.status = 'Active'
-    }else {
-      item.status = 'InActive'
-    }
-    return {
-      ...item,
-      selected: false
-    }
-  })
-
-
-}
-
-onBeforeMount( () => {
-   fetchGroupKerja()
+const values = reactive({
+   status: 'DRAFT',
 })
 
 onBeforeMount(async () => {
@@ -121,7 +46,7 @@ onBeforeMount(async () => {
       const dataURL = `${store.server.url_backend}/operation${endpointApi}/${editedId}`
       isRequesting.value = true
 
-      const params = { join: false, transform: false }
+      const params = { join: true }
       const fixedParams = new URLSearchParams(params)
       const res = await fetch(dataURL + '?' + fixedParams, {
         headers: {
@@ -132,6 +57,7 @@ onBeforeMount(async () => {
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
       initialValues = resultJson.data
+      trx_dtl.items = resultJson.data?.t_jadwal_kerja_det_hari
     } catch (err) {
       isBadForm.value = true
       swal.fire({
@@ -149,42 +75,212 @@ onBeforeMount(async () => {
   for (const key in initialValues) {
     values[key] = initialValues[key]
   }
-  console.log(initialValues,'values awal')
-  values.m_comp_id = initialValues.m_comp_id
-  values.group_kerja = initialValues.nomor
-  values.m_dir = initialValues["m_dir.nama"]
-  values.m_dept = initialValues["m_dept.nama"]
-  values.m_divisi = initialValues["m_divisi.nama"]
-  values.m_dir_id = initialValues["m_dir.id"]
-  values.m_dept_id = initialValues["m_dept.id"]
-  values.m_divisi_id = initialValues["m_dir.id"]
-  values.t_grup_kerja_id = initialValues.id
+
+  values?.generate_num_det.forEach((v,i)=>{
+    v._id = i++
+  })
 })
-
-
-
-var bln = [];
-var Bulan = [
-  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-];
-for (let nama = 1; nama <= 12; nama++) {
-  bln.push(Bulan[nama - 1]);
+function log(v){
+  console.log(v)
+}
+async function generate(status = false) {
+  // if(!values.tipe_jam_kerja_id){
+  //   swal.fire({
+  //     icon: 'warning',
+  //     text: `Pilih tipe jam kerja terlebih dahulu`
+  //   })
+  //   return
+  // }
+  if(status){
+    swal.fire({
+      icon: 'warning',
+      text: 'Reset Detail?',
+      showDenyButton: true
+    }).then((res) => {
+      if (res.isConfirmed) {
+        trx_dtl.items = []
+        getJamKerjaDefault()
+      }
+    })
+  }else{
+    getJamKerjaDefault()
+  }
 }
 
-var periode = [];
-for (let prd = 1; prd <= 500; prd++){
-  periode.push(prd.toString())
+
+async function getJamKerjaDefault() {
+  try {
+    const response = await fetch(`${store.server.url_backend}/operation/t_jadwal_kerja/get_jam_kerja_default`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'Application/json',
+        Authorization: `${store.user.token_type} ${store.user.token}`
+      },
+
+      // ajarane sopo get ngirim body
+      // body: JSON.stringify({
+      //   where: `this.is_active='true' AND this.m_zona_id=${zonaId} AND this.grading_id=${gradingId}`,
+      // })
+    });
+
+    if (!response.ok) {
+      throw new Error('Coba kembali nanti');
+    }
+
+    const data = await response.json();
+      
+    let jamKerja = data?.data;
+      
+      trx_dtl.items = [
+        {
+          day : 'Senin',
+          day_num : 1,
+          m_jam_kerja_id: jamKerja?.id,
+          tipe_hari: 'KERJA',
+          waktu_mulai: jamKerja?.waktu_mulai,
+          waktu_akhir: jamKerja?.waktu_akhir,
+          
+        },
+        {
+          day : 'Selasa',
+          day_num : 2,
+          m_jam_kerja_id: jamKerja?.id,
+          tipe_hari: 'KERJA',
+          waktu_mulai: jamKerja?.waktu_mulai,
+          waktu_akhir: jamKerja?.waktu_akhir,
+        },
+        {
+          day : 'Rabu',
+          day_num : 3,
+          m_jam_kerja_id: jamKerja?.id,
+          tipe_hari: 'KERJA',
+          waktu_mulai: jamKerja?.waktu_mulai,
+          waktu_akhir: jamKerja?.waktu_akhir,
+        },
+        {
+          day : 'Kamis',
+          day_num : 4,
+          m_jam_kerja_id: jamKerja?.id,
+          tipe_hari: 'KERJA',
+          waktu_mulai: jamKerja?.waktu_mulai,
+          waktu_akhir: jamKerja?.waktu_akhir,
+        },
+        {
+          day : 'Jumat',
+          day_num : 5,
+          m_jam_kerja_id: jamKerja?.id,
+          tipe_hari: 'KERJA',
+          waktu_mulai: jamKerja?.waktu_mulai,
+          waktu_akhir: jamKerja?.waktu_akhir,
+        },
+        {
+          day : 'Sabtu',
+          day_num : 6,
+          m_jam_kerja_id: jamKerja?.id,
+          tipe_hari: 'KERJA',
+          waktu_mulai: jamKerja?.waktu_mulai,
+          waktu_akhir: jamKerja?.waktu_akhir,
+        },
+        {
+          day : 'Minggu',
+          day_num : 7,
+          m_jam_kerja_id: jamKerja?.id,
+          tipe_hari: 'LIBUR',
+          waktu_mulai: jamKerja?.waktu_mulai,      
+          waktu_akhir: jamKerja?.waktu_akhir,      
+        }  
+      ]
+
+    console.log(trx_dtl.items)
+  } catch (error) {
+    console.error('Error fetching tunjangan kemahalan:', error);
+
+  }
 }
 
-var scp = [];
-for (let tahun = 2000; tahun <= 2100; tahun++) {
-  scp.push(tahun.toString());
+function moveUp(idx){
+  if(idx <= 0) return
+  
+  // Remove the element from the old index
+  const removedElement = trx_dtl.items.splice(idx, 1)[0]
+
+  const newIndex = idx-1
+  // Insert the element at the new index
+  trx_dtl.items.splice(newIndex, 0, removedElement)
+}
+function moveDown(idx){
+  if(idx >= (trx_dtl.items.length-1)) return
+  
+  // Remove the element from the old index
+  const removedElement = trx_dtl.items.splice(idx, 1)[0]
+
+  const newIndex = idx+1
+  // Insert the element at the new index
+  trx_dtl.items.splice(newIndex, 0, removedElement)
 }
 
+function addRow() {
+  const newItem = { 
+    _id: ++_id.value,
+  }
+  trx_dtl.items.push(newItem)
+}
 
+function openSub(i) {
+  trx_dtl_sub.items = []
+  total_sub.value = 0
+  total_sub_text.value = 0
+  modalOpen.value = true
+  detailIdxSelected.value = i
+  trx_dtl_sub.items = trx_dtl.items[i]['m_spd_det_transport'] ?? []
+}
 
+function addRowSub(i) {
+  const newItem = { 
+    _id: ++_id.value,
+    zona_tujuan_id: null,
+    jenis_transport_id: null,
+    nama_transport: null,
+    biaya_transport: null,
+    keterangan: null
+  }
+  trx_dtl_sub.items.push(newItem)
+}
 
+const total_sub = ref(0)
+const total_sub_text = ref(0)
+function countSub() {
+  const total = trx_dtl_sub.items.reduce((acm, item) => {
+    return acm + item.biaya_transport;
+  }, 0);
+  total_sub.value = total
+  total_sub_text.value = total.toLocaleString('id-ID', {
+    style: 'currency',
+    currency: 'IDR'
+  });
+}
+function deleteAll(item) {
+  swal.fire({
+    icon: 'warning',
+    text: 'Hapus semua detail susunan?',
+    showDenyButton: true
+  }).then((res) => {
+    if (res.isConfirmed) {
+      trx_dtl.items = []
+    }
+  })
+}
+function deleteDetail(item) {
+  swal.fire({
+    icon: 'warning',
+    text: 'Hapus baris ini?',
+    showDenyButton: true
+  }).then((res) => {
+    if (res.isConfirmed) {
+      trx_dtl.items = trx_dtl.items.filter((e) => e._id != item._id)
+    }
+  })
+}
 
 function onBack() {
   let isChanged = false
@@ -200,15 +296,11 @@ function onBack() {
     return
   }
 
-  swal.fire({
-    icon: 'warning',
-    text: 'Buang semua perubahan dan kembali ke list data?',
-    showDenyButton: true
-  }).then((res) => {
-    if (res.isConfirmed) {
       router.replace('/' + modulPath)
-    }
-  })
+}
+
+function move() {
+   router.replace('/t_jadwal_kerja_det/'+route.params.id)
 }
 
 function onReset() {
@@ -225,20 +317,21 @@ function onReset() {
   })
 }
 
-function onSave() {
-  // values.tags = JSON.stringify(values.tags)
-  swal.fire({
-    icon: 'warning',
-    text: 'Save data?',
-    showDenyButton: true
-  }).then(async (res) => {
-    if (res.isConfirmed) {
+async function onSave() {
+  let next = true
+  if(!trx_dtl.items.length) 
+    return swal.fire({
+      icon: 'warning',
+      text: `Detail tidak boleh kosong`
+    })
+  if(!next) return
+
+  trx_dtl.items.forEach((v,i)=>{
+    v.seq = i+1
+  })
+  // merging detail data
+  values['t_jadwal_kerja_det_hari'] = trx_dtl.items
       try {
-        if(values.status){
-          values.status = 'Active'
-        }else {
-          values.status = 'InActive'
-        }
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true
@@ -254,9 +347,9 @@ function onSave() {
           if ([400, 422].includes(res.status)) {
             const responseJson = await res.json()
             formErrors.value = responseJson.errors || {}
-            throw new Error(responseJson.message || "Failed when trying to post data")
+            throw (responseJson.errors.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
           } else {
-            throw new Error("Failed when trying to post data")
+            throw ("Failed when trying to post data")
           }
         }
         router.replace('/' + modulPath + '?reload='+(Date.parse(new Date())))
@@ -268,18 +361,17 @@ function onSave() {
         })
       }
       isRequesting.value = false
-    }
-  })
 }
 
 //  @else----------------------- LANDING
+
 const landing = reactive({
   actions: [
     {
       icon: 'trash',
       class: 'bg-red-600 text-light-100',
       title: "Hapus",
-      // show: () => store.user.data.username==='developer',
+      show: (row) => row.status?.toUpperCase() !== 'POSTED',
       click(row) {
         swal.fire({
           icon: 'warning',
@@ -298,7 +390,15 @@ const landing = reactive({
                   Authorization: `${store.user.token_type} ${store.user.token}`
                 }
               })
-              if (!res.ok) throw new Error("Failed when trying to remove data")
+              if (!res.ok) {
+                if ([400, 422].includes(res.status)) {
+                  const responseJson = await res.json()
+                  formErrors.value = responseJson.errors || {}
+                  throw new Error(responseJson.message || "Failed when trying to post data")
+                } else {
+                  throw new Error("Failed when trying to post data")
+                }
+              }
               apiTable.value.reload()
               // const resultJson = await res.json()
             } catch (err) {
@@ -326,7 +426,7 @@ const landing = reactive({
       icon: 'edit',
       title: "Edit",
       class: 'bg-blue-600 text-light-100',
-      // show: (row) => (currentMenu?.can_update)||store.user.data.username==='developer',
+      show: (row) => row.status?.toUpperCase() !== 'POSTED',
       click(row) {
         router.push(`${route.path}/${row.id}?action=Edit&`+tsId)
       }
@@ -338,6 +438,55 @@ const landing = reactive({
       click(row) {
         router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
       }
+    },
+      {
+      icon: 'location-arrow',
+      title: "Post Data",
+      class: 'bg-rose-700 rounded-lg text-white',
+      show: (row) => row.status?.toUpperCase() === 'DRAFT' ,
+      async click(row) {
+        swal.fire({
+          icon: 'warning',
+          text: 'Post Data?',
+          iconColor: '#1469AE',
+          confirmButtonColor: '#1469AE',
+
+          showDenyButton: true
+        }).then(async (res) => {
+          if (res.isConfirmed) {
+            try {
+              const dataURL = `${store.server.url_backend}/operation/t_jadwal_kerja/post`
+              isRequesting.value = true
+              const res = await fetch(dataURL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'Application/json',
+                  Authorization: `${store.user.token_type} ${store.user.token}`
+                },
+                body: JSON.stringify({ id: row.id })
+              })
+              if (!res.ok) {
+                if ([400, 422].includes(res.status)) {
+                  const responseJson = await res.json()
+                  formErrors.value = responseJson.errors || {}
+                  throw new Error(responseJson.message || "Failed when trying to post data")
+                } else {
+                  throw new Error("Failed when trying to post data")
+                }
+              }
+              apiTable.value.reload()
+              // const resultJson = await res.json()
+            } catch (err) {
+              isBadForm.value = true
+              swal.fire({
+                icon: 'error',
+                text: err
+              })
+            }
+            isRequesting.value = false
+          }
+        })
+      }
     }
   ],
   api: {
@@ -348,7 +497,7 @@ const landing = reactive({
     },
     params: {
       simplest: true,
-      searchfield:`m_dir.nama, m_divisi.nama, m_dept.nama, t_grup_kerja.nomor, this.keterangan, this.is_active`
+      searchfield:'this.id, this.nama, this.is_active',
     },
     onsuccess(response) {
       response.page = response.current_page
@@ -366,65 +515,47 @@ const landing = reactive({
     cellClass: ['justify-center', 'bg-gray-50', 'border-r', '!border-gray-200']
   },
   {
-    headerName: 'Nomor',
     field: 'nomor',
     filter: true,
     sortable: true,
     flex:1,
     filter: 'ColFilter',
     resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center']
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
   },
   {
-    headerName: 'Direktorat',
-    field: 'm_dir.nama',
+    headerName: 'Tipe Jam Kerja',
+    field: 'tipe_jam_kerja.value',
     filter: true,
     sortable: true,
     flex:1,
     filter: 'ColFilter',
     resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center']
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
   },
   {
-    headerName: 'Divisi',
-    field: 'm_divisi.nama',
-    filter: true,
-    sortable: true,
-    flex:1,
-    filter: 'ColFilter',
-    resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center']
-  },
-  {
-    headerName: 'Departement',
-    field: 'm_dept.nama',
-    filter: true,
-    sortable: true,
-    filter: 'ColFilter',
-    resizable: true,
-    flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center']
-  },
-  {
-    headerName: 'Group Kerja',
-    field: 't_grup_kerja.nomor',
-    filter: true,
-    sortable: true,
-    filter: 'ColFilter',
-    resizable: true,
-    flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center']
-  },
-  {
-    headerName: 'Keterangan',
     field: 'keterangan',
     filter: true,
     sortable: true,
+    flex:1,
+    filter: 'ColFilter',
+    resizable: true,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
+  },
+  {
+    field: 'status',
+    filter: true,
+    sortable: true,
     filter: 'ColFilter',
     resizable: true,
     flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center']
-  }  ]
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
+    cellRenderer: ({ value }) => {
+    return value === 'POSTED'
+      ? `<span class="text-green-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">POSTED</span>`
+      : `<span class="text-gray-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">DRAFT</span>`
+    }
+  }]
 })
 onActivated(() => {
   //  reload table api landing

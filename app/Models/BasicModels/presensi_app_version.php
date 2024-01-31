@@ -20,7 +20,7 @@ class presensi_app_version extends Model
     protected $fillable = ["comp_id","version","note","link","type","is_active","creator_id","last_editor_id"];
 
     public $columns     = ["id","comp_id","version","note","link","type","is_active","creator_id","last_editor_id","created_at","updated_at"];
-    public $columnsFull = ["id:bigint","comp_id:bigint","version:string:191","note:string:191","link:string:191","type:string:191","is_active:boolean","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
+    public $columnsFull = ["id:bigint","comp_id:bigint","version:string:191","note:text","link:string:191","type:string:191","is_active:boolean","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
     public $rules       = [];
     public $joins       = ["m_company.id=presensi_app_version.comp_id","default_users.id=presensi_app_version.creator_id","default_users.id=presensi_app_version.last_editor_id"];
     public $details     = [];

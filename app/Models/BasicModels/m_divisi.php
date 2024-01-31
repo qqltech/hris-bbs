@@ -24,7 +24,7 @@ class m_divisi extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=m_divisi.m_comp_id","m_dir.id=m_divisi.m_dir_id","default_users.id=m_divisi.creator_id","default_users.id=m_divisi.last_editor_id"];
     public $details     = [];
-    public $heirs       = ["t_final_gaji_det","m_kary","t_spd","t_grup_kerja","t_pelamar","t_perhitungan_gaji","m_dept","m_lembur","m_tunj_kemahalan","m_spd","t_jadwal_kerja","m_standart_gaji","t_mutasi","t_mutasi"];
+    public $heirs       = ["t_final_gaji_det","m_kary","t_spd","t_jadwal_kerja","t_grup_kerja","t_pelamar","t_perhitungan_gaji","m_dept","m_lembur","t_jadwal_kerja_det","m_tunj_kemahalan","m_spd","m_standart_gaji","t_mutasi","t_mutasi"];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];

@@ -759,16 +759,18 @@ async function onSave() {
         
         values.nama_lengkap = values.nama_depan + ' ' +values.nama_belakang
         values.m_kary_det_pres = detailPrestasi.value
-        values.m_kary_det_pemb = [{
-          periode_gaji_id: values.periode_gaji_id,
-          metode_id: values.metode_id,
-          tipe_id: values.tipe_id,
-          bank_id: values.bank_id,
-          no_rek: values.no_rek,
-          atas_nama_rek: values.atas_nama_rek,
-          desc: values.desc,
-          is_active: true,
-        }]
+        if(values.periode_gaji_id){
+          values.m_kary_det_pemb = [{
+            periode_gaji_id: values.periode_gaji_id,
+            metode_id: values.metode_id,
+            tipe_id: values.tipe_id,
+            bank_id: values.bank_id,
+            no_rek: values.no_rek,
+            atas_nama_rek: values.atas_nama_rek,
+            desc: values.desc,
+            is_active: values.periode_gaji_idtrue,
+          }]
+        }
         // if(detailKeluarga.value.length === 0){
         //   throw ("Tab Keluarga Tidak Boleh Kosong")
         // }

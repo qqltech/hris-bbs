@@ -232,6 +232,34 @@
           </div>
           <div v-if="!isProfile" class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-y-2">
+              <label class="col-span-12">Tipe Jam Kerja<label class="text-red-500 space-x-0 pl-0">*</label></label>
+              <FieldSelect
+                  :bind="{ disabled: !actionText, clearable:false }" 
+                  class="col-span-12 !mt-0 w-full"
+                  :value="values.tipe_jam_kerja_id" 
+                  @input="v => values.tipe_jam_kerja_id = v"
+                  :errorText="formErrors.tipe_jam_kerja_id ? 'failed' : ''" 
+                  label="" 
+                  placeholder="Pilih Standart Gaji"
+                  :hints="formErrors.tipe_jam_kerja_id"
+                  :api="{
+                      url: `${store.server.url_backend}/operation/m_general`,
+                      headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
+                      params: {
+                        where:`this.group='TIPEJAM' AND this.is_active='true'`,
+                        join:true, 
+                        selectfield: 'this.id, this.code, this.value, this.is_active'
+                      }
+                  }"
+                  valueField="id" 
+                  displayField="value" 
+                  :check="false"
+              />
+            </div>
+          </div>
+        
+          <div v-if="!isProfile" class="col-span-8 md:col-span-6">
+            <div class="grid grid-cols-12 items-center gap-y-2">
               <label class="col-span-12">Costcentre<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
                 :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
@@ -252,27 +280,27 @@
             </div>
           </div>
           <div v-if="!isProfile" class="col-span-8 md:col-span-6">
-              <div class="grid grid-cols-12 items-center gap-y-2">
-              <label class="col-span-12">Kode Presensi<label class="text-red-500 space-x-0 pl-0">*</label></label>
+            <div class="grid grid-cols-12 items-center gap-y-2">
+              <label class="col-span-12">Jadwal Kerja<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldPopup
                 :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
-                :value="values.m_jam_kerja_id" @input="(v)=>values.m_jam_kerja_id=v"
-                :errorText="formErrors.m_jam_kerja_id?'failed':''" 
-                :hints="formErrors.m_jam_kerja_id" 
+                :value="values.t_jadwal_kerja_id" @input="(v)=>values.t_jadwal_kerja_id=v"
+                :errorText="formErrors.t_jadwal_kerja_id?'failed':''" 
+                :hints="formErrors.t_jadwal_kerja_id" 
                 @update:valueFull="(objVal)=>{
-                  values.kode_presensi = objVal.kode
+                  values.t_jadwal_kerja_id = objVal.id
                 }"
-                valueField="id" displayField="kode"
+                valueField="id" displayField="nomor"
                 :api="{
-                  url: `${store.server.url_backend}/operation/m_jam_kerja`,
+                  url: `${store.server.url_backend}/operation/t_jadwal_kerja`,
                   headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
                   params: {
                     simplest:true,
-                    where: `this.is_active = 'true'`,
-                    searchfield:'this.id, this.kode, this.desc',
+                    where: `this.status = 'POSTED'`,
+                    searchfield:'this.id, this.nomor, this.keterangan',
                   }
                 }"
-                placeholder="Pilih Kode Presensi" label="" :check="false" 
+                placeholder="Pilih Jadwal Kerja" label="" :check="false" 
                 :columns="[{
                   headerName: 'No',
                   valueGetter:(p)=>p.node.rowIndex + 1,
@@ -282,14 +310,13 @@
                 },
                 {
                   flex: 1,
-                  field: 'kode',
+                  field: 'nomor',
                   sortable: false, resizable: true, filter: 'ColFilter',
                   cellClass: ['border-r', '!border-gray-200', 'justify-center']
                 },
                 {
                   flex: 1,
-                  headerName: 'Keterangan',
-                  field: 'desc',
+                  field: 'keterangan',
                   sortable: false, resizable: true, filter: 'ColFilter', wrapText: true,
                   cellClass: ['border-r', '!border-gray-200', 'justify-center']
                 }
@@ -312,8 +339,8 @@
               />
             </div>
           </div>
-          <div class="col-span-8 md:col-span-6">
-          </div>
+          <!-- <div class="col-span-8 md:col-span-6">
+          </div> -->
           <!-- NOT PROFILE -->
           <h2 class="font-bold text-[18px] col-span-8 md:col-span-6">Data Karyawan</h2>
           <div class="col-span-8 md:col-span-6">
@@ -321,9 +348,9 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-y-2">
               <label class="col-span-12">NIK<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                :value="values.nik" label="" placeholder="Masukan Nomor Induk Karyawan" :errorText="formErrors.nik?'failed':''"
-                @input="v=>values.nik=v" :hints="formErrors.nik" :check="false"
+              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+                :value="values.kode" label="" placeholder="Masukan Nomor Induk Karyawan" :errorText="formErrors.kode?'failed':''"
+                @input="v=>values.kode=v" :hints="formErrors.kode" :check="false"
               />
             </div>
           </div>
