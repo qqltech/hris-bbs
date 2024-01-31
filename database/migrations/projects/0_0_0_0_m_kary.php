@@ -69,11 +69,14 @@ class mkary extends Migration
 
             $table->bigInteger('presensi_lokasi_default_id')->comment('{"src":"presensi_lokasi.id"}')->nullable();
             $table->date('exp_date_cuti')->nullable();
-            $table->integer('limit_potong')->default(7);
+            $table->integer('limit_potong')->default(7)->nullable();
             $table->bigInteger('atasan_id')->comment('{"src":"m_kary.id"}')->nullable();
 
             $table->decimal('cuti_p24',10,0)->defaut(120)->nullable();
             $table->decimal('cuti_sisa_p24',10,0)->defaut(120)->nullable();
+
+            $table->bigInteger('tipe_jam_kerja_id')->comment('{"src":"m_general.id"}')->nullable();
+            $table->bigInteger('t_jadwal_kerja_id')->comment('{"src":"m_general.id"}')->nullable();
         });
 
         table_config($this->tableName, [

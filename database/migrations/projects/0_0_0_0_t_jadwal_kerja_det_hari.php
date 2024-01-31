@@ -4,24 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class tjadwalkerja extends Migration
+class tjadwalkerjadethari extends Migration
 {
-    protected $tableName = "t_jadwal_kerja";
+    protected $tableName = "t_jadwal_kerja_det_hari";
 
     public function up()
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
-            $table->string('nomor',50)->nullable();
-            $table->bigInteger('m_comp_id')->comment('{"src":"m_comp.id"}')->default(1)->nullable();
-            $table->bigInteger('m_dir_id')->comment('{"src":"m_dir.id"}')->nullable();
-            $table->bigInteger('m_divisi_id')->comment('{"src":"m_divisi.id"}')->nullable();
-            $table->bigInteger('m_dept_id')->comment('{"src":"m_dept.id"}')->nullable();
-            $table->bigInteger('tipe_jam_kerja_id')->comment('{"src":"m_general.id"}')->nullable();
-            $table->text('keterangan')->nullable();
-            $table->string('status',50)->default('DRAFT')->nullable();
-            $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
-            $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();
+            $table->bigInteger('t_jadwal_kerja_id')->comment('{"fk":"t_jadwal_kerja.id"}')->nullable();
+            $table->string('day');
+            $table->string('tipe_hari');
+            $table->date('tanggal')->nullable();
+            $table->integer('day_num');
+            $table->bigInteger('m_jam_kerja_id')->comment('{"src":"m_jam_kerja.id"}')->nullable();
+            $table->time('waktu_mulai');
+            $table->time('waktu_akhir');
             $table->timestamps();
         });
 

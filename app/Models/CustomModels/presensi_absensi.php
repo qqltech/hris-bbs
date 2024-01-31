@@ -266,11 +266,11 @@ class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
     public function custom_get_absen($req)
     {
         $periode = ($req->periode ?? date('Y-m')).'-1';
-        $user_id = auth()->user()->id;
+        $m_kary_id = auth()->user()->m_kary_id;
 
         $data = \DB::select("
             select * from employee_attendance_detail(?, ?);
-        ", [$periode,$user_id ?? 0]);
+        ", [$periode,$m_kary_id ?? 0]);
 
         // transform object for mobile
         foreach($data as $dt){
