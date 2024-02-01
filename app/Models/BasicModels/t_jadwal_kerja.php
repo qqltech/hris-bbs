@@ -17,29 +17,29 @@ class t_jadwal_kerja extends Model
     "created_at"=> "datetime:d\/m\/Y H:i",
     "updated_at"=> "datetime:d\/m\/Y H:i"
 	];
-    protected $fillable = ["nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","t_grup_kerja_id","keterangan","status","creator_id","last_editor_id"];
+    protected $fillable = ["nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","tipe_jam_kerja_id","keterangan","status","creator_id","last_editor_id"];
 
-    public $columns     = ["id","nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","t_grup_kerja_id","keterangan","status","creator_id","last_editor_id","created_at","updated_at"];
-    public $columnsFull = ["id:bigint","nomor:string:50","m_comp_id:bigint","m_dir_id:bigint","m_divisi_id:bigint","m_dept_id:bigint","t_grup_kerja_id:bigint","keterangan:text","status:string:50","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
+    public $columns     = ["id","nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","tipe_jam_kerja_id","keterangan","status","creator_id","last_editor_id","created_at","updated_at"];
+    public $columnsFull = ["id:bigint","nomor:string:50","m_comp_id:bigint","m_dir_id:bigint","m_divisi_id:bigint","m_dept_id:bigint","tipe_jam_kerja_id:bigint","keterangan:text","status:string:50","creator_id:bigint","last_editor_id:bigint","created_at:datetime","updated_at:datetime"];
     public $rules       = [];
-    public $joins       = ["m_comp.id=t_jadwal_kerja.m_comp_id","m_dir.id=t_jadwal_kerja.m_dir_id","m_divisi.id=t_jadwal_kerja.m_divisi_id","m_dept.id=t_jadwal_kerja.m_dept_id","t_grup_kerja.id=t_jadwal_kerja.t_grup_kerja_id","default_users.id=t_jadwal_kerja.creator_id","default_users.id=t_jadwal_kerja.last_editor_id"];
-    public $details     = ["t_jadwal_kerja_det"];
-    public $heirs       = [];
-    public $detailsChild= [];
+    public $joins       = ["m_comp.id=t_jadwal_kerja.m_comp_id","m_dir.id=t_jadwal_kerja.m_dir_id","m_divisi.id=t_jadwal_kerja.m_divisi_id","m_dept.id=t_jadwal_kerja.m_dept_id","m_general.id=t_jadwal_kerja.tipe_jam_kerja_id","default_users.id=t_jadwal_kerja.creator_id","default_users.id=t_jadwal_kerja.last_editor_id"];
+    public $details     = ["t_jadwal_kerja_det_hari"];
+    public $heirs       = ["t_jadwal_kerja_det"];
+    public $detailsChild= ["t_jadwal_kerja_det"];
     public $detailsHeirs= [];
     public $unique      = [];
-    public $required    = ["m_divisi_id","m_dept_id","t_grup_kerja_id"];
-    public $createable  = ["nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","t_grup_kerja_id","keterangan","status","creator_id","last_editor_id"];
-    public $updateable  = ["nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","t_grup_kerja_id","keterangan","status","creator_id","last_editor_id"];
-    public $searchable  = ["id","nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","t_grup_kerja_id","keterangan","status","creator_id","last_editor_id","created_at","updated_at"];
+    public $required    = [""];
+    public $createable  = ["nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","tipe_jam_kerja_id","keterangan","status","creator_id","last_editor_id"];
+    public $updateable  = ["nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","tipe_jam_kerja_id","keterangan","status","creator_id","last_editor_id"];
+    public $searchable  = ["id","nomor","m_comp_id","m_dir_id","m_divisi_id","m_dept_id","tipe_jam_kerja_id","keterangan","status","creator_id","last_editor_id","created_at","updated_at"];
     public $deleteable  = true;
     public $cascade     = true;
     public $deleteOnUse = false;
 
     
-    public function t_jadwal_kerja_det() :\HasMany
+    public function t_jadwal_kerja_det_hari() :\HasMany
     {
-        return $this->hasMany('App\Models\BasicModels\t_jadwal_kerja_det', 't_jadwal_kerja_id', 'id');
+        return $this->hasMany('App\Models\BasicModels\t_jadwal_kerja_det_hari', 't_jadwal_kerja_id', 'id');
     }
     
     
@@ -59,9 +59,9 @@ class t_jadwal_kerja extends Model
     {
         return $this->belongsTo('App\Models\BasicModels\m_dept', 'm_dept_id', 'id');
     }
-    public function t_grup_kerja() :\BelongsTo
+    public function tipe_jam_kerja() :\BelongsTo
     {
-        return $this->belongsTo('App\Models\BasicModels\t_grup_kerja', 't_grup_kerja_id', 'id');
+        return $this->belongsTo('App\Models\BasicModels\m_general', 'tipe_jam_kerja_id', 'id');
     }
     public function creator() :\BelongsTo
     {

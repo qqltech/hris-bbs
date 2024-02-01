@@ -24,7 +24,7 @@ class t_grup_kerja extends Model
     public $rules       = [];
     public $joins       = ["m_comp.id=t_grup_kerja.m_comp_id","m_dir.id=t_grup_kerja.m_dir_id","m_divisi.id=t_grup_kerja.m_divisi_id","m_dept.id=t_grup_kerja.m_dept_id","default_users.id=t_grup_kerja.creator_id","default_users.id=t_grup_kerja.last_editor_id"];
     public $details     = [];
-    public $heirs       = ["t_jadwal_kerja"];
+    public $heirs       = [];
     public $detailsChild= [];
     public $detailsHeirs= [];
     public $unique      = [];

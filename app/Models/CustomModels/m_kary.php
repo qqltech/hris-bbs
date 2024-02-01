@@ -22,7 +22,7 @@ class m_kary extends \App\Models\BasicModels\m_kary
     public function createBefore($model, $arrayData, $metaData, $id = null)
     {
         $newArrayData = array_merge($arrayData, [
-            "kode" => $this->helper->generateNomor("KODE KARYAWAN"),
+            "kode" => @$arrayData['kode'] ?? $this->helper->generateNomor("KODE KARYAWAN"),
             "comp_id" => auth()->user()->m_comp_id ?? 0,
         ]);
         return [

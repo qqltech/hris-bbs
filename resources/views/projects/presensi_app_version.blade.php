@@ -50,6 +50,7 @@
             @input="v=>values.note=v"
             :hints="formErrors.note"
             label=""
+            type="textarea"
             placeholder="Masukan Note"
             :check="false" />
         </div>

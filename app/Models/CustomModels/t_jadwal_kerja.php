@@ -76,4 +76,68 @@ class t_jadwal_kerja extends \App\Models\BasicModels\t_jadwal_kerja
 
         return $this->helper->customResponse('OK', 200, $data);
     }
+
+    public function custom_get_jam_kerja_default()
+    {
+        $data = \DB::table('m_jam_kerja as k')->join('m_general as g','g.id','k.tipe_jam_kerja_id')
+            ->whereRaw("lower(g.value) = 'office'")->selectRaw('k.*')->first();
+        return $this->helper->customResponse('OK', 200, $data, true);
+    }
+
+     public function custom_post($request)
+    {
+        try {
+            // Begin a database transaction
+            \DB::beginTransaction();
+
+            $data = $this->find($request->id);
+            if (!$data) {
+                return response()->json(
+                    ["error" => "Data tidak ditemukan."],
+                    404
+                );
+            }
+
+            $update = $data->update([
+                "status" => "POSTED",
+            ]);
+
+            \DB::commit();
+        } catch (\Exception $e) {
+            // Handle exception, log error messages, etc.
+
+            // Rollback the transaction in case of any exception
+            \DB::rollBack();
+
+            return response()->json(
+                ["error" => "Terjadi kesalahan: " . $e->getMessage()],
+                500
+            );
+        }
+    }
+
+    public function custom_generate_det_kary($req)
+    {
+        $data = m_kary::selectRaw("m_kary.id m_kary_id, m_kary.nama_lengkap, d.nama \"m_dept.nama\", dv.nama \"m_divisi.nama\",m_kary.m_dir_id,m_kary.m_divisi_id,m_kary.m_dept_id")
+            ->join('m_dept as d','d.id','m_kary.m_dept_id')
+            ->join('m_divisi as dv','dv.id','m_kary.m_divisi_id')
+            ->where('m_kary.is_active', true)
+            ->get();
+        return $this->helper->customResponse('OK', 200, $data);
+    }
+
+    public function custom_post_det_kary($req)
+    {
+        try {
+            \DB::beginTransaction();
+                
+            \DB::commit();
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return response()->json(
+                ["error" => "Terjadi kesalahan: " . $e->getMessage()],
+                500
+            );
+        }
+    }
 }

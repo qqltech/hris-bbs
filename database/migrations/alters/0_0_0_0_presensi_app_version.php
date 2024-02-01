@@ -3,17 +3,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class mkary extends Migration
+class presensiappversion extends Migration
 {
-    protected $tableName = "m_kary";
+    protected $tableName = "presensi_app_version";
     
     public function up()
     {
         Schema::table($this->tableName, function (Blueprint $table) {
             //$table->string('_existColumnName_')->change();
             //$table->string('_columnName_');
-            // $table->dropColumn(['m_comp_id;nama_lengkap;kode;nik;tgl_masuk']);
-            $table->integer('limit_potong')->default(7)->nullable()->change();
+            //$table->dropColumn([ ]);
+            $table->text('note')->change();
         });
     }
 }

@@ -12,12 +12,12 @@ class tjadwalkerjadet extends Migration
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
-            $table->bigInteger('t_jadwal_kerja_id')->comment('{"fk":"t_jadwal_kerja.id"}')->nullable();
-            $table->date('tanggal')->nullable();
+            $table->bigInteger('t_jadwal_kerja_det_hari_id')->comment('{"fk":"t_jadwal_kerja_det_hari.id"}')->nullable();
+            $table->bigInteger('t_jadwal_kerja_id')->comment('{"src":"t_jadwal_kerja.id"}')->nullable();
+            $table->bigInteger('m_dir_id')->comment('{"src":"m_dir.id"}')->nullable();
+            $table->bigInteger('m_divisi_id')->comment('{"src":"m_divisi.id"}')->nullable();
+            $table->bigInteger('m_dept_id')->comment('{"src":"m_dept.id"}')->nullable();
             $table->bigInteger('m_kary_id')->comment('{"src":"m_kary.id"}');
-            $table->bigInteger('m_posisi_id')->comment('{"src":"m_posisi.id"}');
-            $table->bigInteger('m_jam_kerja_id')->comment('{"src":"m_jam_kerja.id"}');
-            $table->string('status',50)->nullable();
             $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->timestamps();
