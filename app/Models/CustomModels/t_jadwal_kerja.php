@@ -98,9 +98,17 @@ class t_jadwal_kerja extends \App\Models\BasicModels\t_jadwal_kerja
                 );
             }
 
+            $tipe_jam_kerja = m_general::where('id',$data->tipe_jam_kerja_id)->pluck('value')->first();
+
             $update = $data->update([
                 "status" => "POSTED",
             ]);
+
+            if(strtolower($tipe_jam_kerja) == 'office'){
+                $update = $this->where('id', '!=' ,$request->id)->where('tipe_jam_kerja_id',$data->tipe_jam_kerja_id)->update([
+                    "status" => "EXPIRED",
+                ]);
+            }
 
             \DB::commit();
         } catch (\Exception $e) {
