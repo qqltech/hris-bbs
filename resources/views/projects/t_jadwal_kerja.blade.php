@@ -131,7 +131,7 @@
               <td class="text-center px-1 border border-gray-200">
                 <FieldSelect
                   class="w-full !mt-0"
-                  :bind="{ disabled: !actionText || values.tipe_jam_kerja?.toLowerCase() == 'office' ? true : false, clearable:false }"
+                  :bind="{ disabled: !actionText, clearable:false }"
                   :value="trx_dtl.items[i].m_jam_kerja_id" 
                   :check="false"
                   @input="(v)=>{
@@ -159,7 +159,7 @@
                   fa-icon="search" :check="true" />
               </td>
               <td class="text-center px-1 border border-gray-200">   
-                <FieldX :bind="{ readonly: true }" class="w-full py-2 !mt-0"
+                <FieldX :bind="{ readonly: !actionText }" class="w-full py-2 !mt-0"
                     :value="trx_dtl.items[i].waktu_mulai ?? ''" 
                     @input="v=>trx_dtl.items[i].waktu_mulai=v" 
                     :check="false"
@@ -169,7 +169,7 @@
                 />
               </td>
               <td class="text-center px-1 border border-gray-200">   
-                <FieldX :bind="{ readonly: true }" class="w-full py-2 !mt-0"
+                <FieldX :bind="{ readonly: !actionText }" class="w-full py-2 !mt-0"
                     :value="trx_dtl.items[i].waktu_akhir ?? ''" 
                     @input="v=>trx_dtl.items[i].waktu_akhir=v" 
                     :check="false"

@@ -101,7 +101,7 @@ function mapView(i){
   let data = tabs.value[i]?.t_jadwal_kerja_det ?? []
   
   data.forEach((v)=>{
-    v.nama_lengkap = v['m_kary.nama_lengkap']
+    v.nama_lengkap = v['m_kary.nama_lengkap'] ?? v.nama_lengkap
   })
   dataActive.items = data
 }

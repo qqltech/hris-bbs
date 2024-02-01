@@ -371,7 +371,7 @@ const landing = reactive({
       icon: 'trash',
       class: 'bg-red-600 text-light-100',
       title: "Hapus",
-      show: (row) => row.status?.toUpperCase() !== 'POSTED',
+      show: (row) => row.status?.toUpperCase() == 'DRAFT',
       click(row) {
         swal.fire({
           icon: 'warning',
@@ -426,7 +426,7 @@ const landing = reactive({
       icon: 'edit',
       title: "Edit",
       class: 'bg-blue-600 text-light-100',
-      show: (row) => row.status?.toUpperCase() !== 'POSTED',
+      show: (row) => row.status?.toUpperCase() == 'DRAFT',
       click(row) {
         router.push(`${route.path}/${row.id}?action=Edit&`+tsId)
       }
@@ -551,9 +551,11 @@ const landing = reactive({
     flex:1,
     cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
     cellRenderer: ({ value }) => {
-    return value === 'POSTED'
-      ? `<span class="text-green-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">POSTED</span>`
-      : `<span class="text-gray-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">DRAFT</span>`
+      let color = 'gray'
+      color = value == 'POSTED' ? 'green' : (value == 'EXPIRED' ? 'red' : 'gray')
+      return value === 'POSTED'
+        ? `<span class="text-${color}-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">${value}</span>`
+        : `<span class="text-${color}-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">${value}</span>`
     }
   }]
 })
