@@ -178,7 +178,7 @@ async function onSave() {
         isRequesting.value = true
          values.is_active = values.is_active ? 1 : 0
         for (const key in informasiCuti) {
-          if (informasiCuti[key] < 0) {
+          if (informasiCuti[key] != null && informasiCuti[key] != undefined && informasiCuti[key] < 0) {
             throw(`Data Tidak Boleh Kurang Dari 0`)
           } 
         }

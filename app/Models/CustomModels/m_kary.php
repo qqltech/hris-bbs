@@ -47,10 +47,14 @@ class m_kary extends \App\Models\BasicModels\m_kary
             $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$row['id'] ??0]);
             $data = json_decode($data[0]->employee_attendance);
             $object['info_cuti'] = $data;
+
+            $jadwal_kerja = \DB::table('t_jadwal_kerja as t')->selectRaw("t.*")->join('m_general as g','g.id','t.tipe_jam_kerja_id')->where('t.tipe_jam_kerja_id', $row['tipe_jam_kerja_id'])
+                ->where('status','POSTED')->first();
+            $object['jadwal_kerja'] = $jadwal_kerja;
         }
+        $object['nomor_ktp'] = \DB::table('m_kary_det_kartu')->where('m_kary_id', $row['id'] ?? 0)->value('ktp_no') ?? null ;
         return array_merge( $row, $object );
     }
-    
 
     private function generateNik($compId, $dirId, $divisiId, $posisiId)
     {

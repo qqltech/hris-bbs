@@ -162,7 +162,7 @@
                 </div>
             </ButtonMultiSelect>
             <button @click="generate(true)" type="button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold ml-2 px-2 py-1 rounded flex items-center justify-center">
-                <icon fa="bolt" size="sm mr-0.5"/> Generate Semua Karyawan
+                <icon fa="bolt" size="sm mr-0.5"/> Generate Karyawan Shift
             </button>
             
             

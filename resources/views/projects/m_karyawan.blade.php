@@ -139,6 +139,7 @@
                 :value="values.m_posisi_id" @input="v=>values.m_posisi_id=v"
                 @update:valueFull="(items)=>{
                   values.m_standart_gaji_id = null
+                  $log('ikiposisi')
                 }"
                 :errorText="formErrors.m_posisi_id?'failed':''" 
                 label="" placeholder="Pilih Posisi"
@@ -221,7 +222,7 @@
                       headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
                       params: {
                           simplest: true,
-                          where: `this.is_active='true'`
+                          where: `this.is_active='true' AND this.m_zona_id = ${values.m_zona_id ?? 0} AND this.grading_id = ${values.grading_id ?? 0}`
                       }
                   }"
                   valueField="id" 
@@ -240,7 +241,8 @@
                   @input="v => values.tipe_jam_kerja_id = v"
                   :errorText="formErrors.tipe_jam_kerja_id ? 'failed' : ''" 
                   label="" 
-                  placeholder="Pilih Standart Gaji"
+                  @update:valueFull="changeTipeJamKerja"
+                  placeholder="Pilih Tipe Jam Kerja"
                   :hints="formErrors.tipe_jam_kerja_id"
                   :api="{
                       url: `${store.server.url_backend}/operation/m_general`,
@@ -280,17 +282,17 @@
             </div>
           </div>
           <div v-if="!isProfile" class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center gap-y-2">
+            <div v-if="values['tipe_jam_kerja.value'] == 'OFFICE'" class="grid grid-cols-12 items-center gap-y-2">
               <label class="col-span-12">Jadwal Kerja<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldPopup
-                :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+                :bind="{ readonly: true }" class="col-span-12 !mt-0 w-full"
                 :value="values.t_jadwal_kerja_id" @input="(v)=>values.t_jadwal_kerja_id=v"
                 :errorText="formErrors.t_jadwal_kerja_id?'failed':''" 
                 :hints="formErrors.t_jadwal_kerja_id" 
-                @update:valueFull="(objVal)=>{
-                  values.t_jadwal_kerja_id = objVal.id
-                }"
                 valueField="id" displayField="nomor"
+                @update:valueFull="(objVal)=>{  
+                  values.t_jadwal_kerja_ket = objVal.keterangan
+                }"
                 :api="{
                   url: `${store.server.url_backend}/operation/t_jadwal_kerja`,
                   headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
@@ -322,8 +324,8 @@
                 }
                 ]"
               />
-              
             </div>
+              <i class="mt-2">{{values.t_jadwal_kerja_ket}}</i>
           </div>
           <div v-if="!isProfile" class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-y-2">

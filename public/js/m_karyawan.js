@@ -43,7 +43,6 @@ let tempPasfoto = ''
 
 const setStandartGaji = async () => {
   if(values.m_zona_id && values.grading_id){
-    console.log('masuk')
     const fixedParams = new URLSearchParams({where: `this.m_zona_id=${values.m_zona_id ?? 0} AND this.grading_id=${values.grading_id ?? 0}`})
     const res = await fetch(`${store.server.url_backend}/operation/m_standart_gaji` + '?' + fixedParams, {
       headers: {
@@ -54,6 +53,7 @@ const setStandartGaji = async () => {
     if (!res.ok) throw new Error("Failed when trying to read data")
     const resultJson = await res.json()
     const data = resultJson.data
+    console.log(data,'halo')
     values.m_standart_gaji_id = data[0]?.id
   }
   
@@ -141,7 +141,7 @@ onBeforeMount(async () => {
       const dataURL = `${store.server.url_backend}/operation${endpointApi}/${editedId}`
       isRequesting.value = true
 
-      const params = { join: false, transform: false, detail: true }
+      const params = { transform: false, detail: true }
       const fixedParams = new URLSearchParams(params)
       const res = await fetch(dataURL + '?' + fixedParams, {
         headers: {
@@ -154,6 +154,9 @@ onBeforeMount(async () => {
       initialValues = resultJson.data
       if(initialValues.is_active){
         initialValues.is_active = 'true' ? initialValues.is_active = 1 : initialValues.is_active = 0
+      }
+      if(initialValues['tipe_jam_kerja.value'] == 'OFFICE'){
+        getJadwalKerjaOffice()
       }
       initialValues['m_kary_det_pend']?.forEach(async (item) => {
         const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.tingkat_id}`,  {
@@ -170,8 +173,6 @@ onBeforeMount(async () => {
         item.is_pend_terakhir ? item.is_pend_terakhir = 1 : item.is_pend_terakhir = 0
         detailPendidikan.value.push(item)
       })
-      // console.log("cok",detailPendidikan.value)
-      // console.log(detailPendidikan.value)
       initialValues['m_kary_det_bhs']?.forEach((item) => {
         item._id = ++_idBhs
         detailBahasa.value.push(item)
@@ -220,6 +221,7 @@ onBeforeMount(async () => {
         item._id = ++_idKel
         detailKeluarga.value.push(item)
       })
+      
       initialValues['m_kary_det_pk']?.forEach((item) => {
         item._id = ++_idPk
         detailPengalaman.value.push(item)
@@ -301,7 +303,6 @@ onBeforeMount(async () => {
   for (const key in initialValues) {
     values[key] = initialValues[key]
   }
-  console.log(values)
   if(values.m_kary_det_pemb?.length > 0){
     values.periode_gaji_id = values.m_kary_det_pemb[0].periode_gaji_id
     values.metode_id = values.m_kary_det_pemb[0].metode_id
@@ -334,6 +335,49 @@ onBeforeMount(async () => {
     tempKK = values.m_kary_det_kartu[0].kk_foto
   }
 })
+
+async function getJadwalKerjaOffice() {
+  try {
+    const response = await fetch(`${store.server.url_backend}/operation/t_jadwal_kerja/get_jadwal_office`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'Application/json',
+        Authorization: `${store.user.token_type} ${store.user.token}`
+      },
+
+      // ajarane sopo get ngirim body
+      // body: JSON.stringify({
+      //   where: `this.is_active='true' AND this.m_zona_id=${zonaId} AND this.grading_id=${gradingId}`,
+      // })
+    });
+
+    if (!response.ok) {
+      throw new Error('Coba kembali nanti');
+    }
+
+    const data = await response.json();
+    console.log(data)
+    console.log(data?.data?.id)
+    values.t_jadwal_kerja_id = data?.data?.id
+    values.t_jadwal_kerja_ket = data?.data?.keterangan
+   } catch (error) {
+    console.error('Error fetching tunjangan kemahalan:', error);
+
+  }
+}
+const changeTipeJamKerja = (v) => {
+  console.log(v)
+  console.log("OK", v.value)
+  values['tipe_jam_kerja.value'] = v.value
+  if(v.value?.toLowerCase() == 'office'){
+    if(initialValues.jadwal_kerja?.id){
+      values.t_jadwal_kerja_id = initialValues.jadwal_kerja?.id
+    }else{
+      getJadwalKerjaOffice()
+    }
+    
+  }
+}
 
 // preview image
 const refPasFoto = ref()
@@ -511,31 +555,7 @@ const addPendidikan = async () => {
 // Keluarga
 let _idKel = 0
 const detailKeluarga = ref([])
-// const gambarKK = ref(null)
-// async function imgKK(e){
-//   const file = e.target.files
-//   if(file[0]){
-//     const maxAllowedSize = 1 * 1024 * 1024;
-//     if (file[0].size >= maxAllowedSize) {
-//       swal.fire({
-//         icon: 'error',
-//         text: 'Error: File terlalu besar, max 1MB'
-//       })
-//       e.target.value = null
-//       return
-//     }
-//     valuesKeluarga.kk = file[0].name
-//     var formData = new FormData()
-//     formData.append('file', file[0])
-//       const res = await fetch(`${store.server.url_backend}/operation/m_karyawan_kel/upload` + '?' + `field=kk`, {
-//         method: 'POST',
-//         headers: {
-//           Authorization: `${store.user.token_type} ${store.user.token}`
-//         },
-//         body: formData
-//       })
-//   }
-// }
+
 const addKeluarga = async () => {
   var tempObj = {}
   valuesKeluarga._id = ++_idKel
@@ -979,7 +999,7 @@ const landing = reactive({
     cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
   },
   {
-    field: 'nik',
+    field: 'nomor_ktp',
     headerName:'No KTP',
     filter: true,
     sortable: true,

@@ -91,6 +91,7 @@ async function nikChange(id) {
     values.departemen = result.data['m_dept.nama']
     values.name = result.data?.nama_lengkap
     values.username = result.data?.nik
+    values.kode = result.data?.nik
     if(!isRead){
       values.password = "12345"
       values.password_confirm = "12345"
