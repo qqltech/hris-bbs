@@ -156,7 +156,7 @@ async function generate() {
   // }
     swal.fire({
       icon: 'warning',
-      text: 'Generate semua karyawan, proses ini akan memkan waktu lebih lama?',
+      text: 'Generate semua karyawan, proses ini akan memakan waktu lebih lama?',
       showDenyButton: true
     }).then((res) => {
       if (res.isConfirmed) {

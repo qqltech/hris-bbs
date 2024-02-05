@@ -96,7 +96,7 @@
         <div class="flex mt-2 justify-end">
           <h3 class="font-semibold text-right">Detail Hari</h4><br>
           <div class="content-end flex">
-            <button  v-show="route.params.id" @click="move" type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold ml-2 px-2 py-1 rounded flex items-center justify-center">
+            <button  v-show="isRead && values.tipe_jam_kerja != 'OFFICE'" @click="move" type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold ml-2 px-2 py-1 rounded flex items-center justify-center">
               <icon fa="tools" size="sm mr-0.5"/> Sesuaikan Jadwal Karyawan
             </button>
             <button v-if="actionText" @click="generate(true)" type="button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold ml-2 px-2 py-1 rounded flex items-center justify-cente">

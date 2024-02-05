@@ -84,6 +84,13 @@ class t_jadwal_kerja extends \App\Models\BasicModels\t_jadwal_kerja
         return $this->helper->customResponse('OK', 200, $data, true);
     }
 
+     public function custom_get_jadwal_office($req)
+    {
+        $data = \DB::table('t_jadwal_kerja as t')->selectRaw("t.*")->join('m_general as g','g.id','t.tipe_jam_kerja_id')->where('g.value','OFFICE')
+                ->where('status','POSTED')->first();
+        return $this->helper->customResponse('OK', 200, $data, true);
+    }
+
      public function custom_post($request)
     {
         try {
@@ -127,8 +134,10 @@ class t_jadwal_kerja extends \App\Models\BasicModels\t_jadwal_kerja
     public function custom_generate_det_kary($req)
     {
         $data = m_kary::selectRaw("m_kary.id m_kary_id, m_kary.nama_lengkap, d.nama \"m_dept.nama\", dv.nama \"m_divisi.nama\",m_kary.m_dir_id,m_kary.m_divisi_id,m_kary.m_dept_id")
-            ->join('m_dept as d','d.id','m_kary.m_dept_id')
-            ->join('m_divisi as dv','dv.id','m_kary.m_divisi_id')
+            ->leftJoin('m_dept as d','d.id','m_kary.m_dept_id')
+            ->leftJoin('m_divisi as dv','dv.id','m_kary.m_divisi_id')
+            ->join('m_general as g','g.id','m_kary.tipe_jam_kerja_id')
+            ->where('g.value','!=','OFFICE')
             ->where('m_kary.is_active', true)
             ->get();
         return $this->helper->customResponse('OK', 200, $data);

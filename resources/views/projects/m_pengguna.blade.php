@@ -49,19 +49,20 @@
           />
         </div>
         <div>
-          <label class="font-semibold">kode <label class="text-red-500 space-x-0 pl-0"></label></label>
+          <label class="font-semibold">Kode <label class="text-red-500 space-x-0 pl-0"></label></label>
           <FieldX :bind="{ readonly: true }" class="w-full py-2 !mt-0"
               :value="values.kode" :errorname="formErrors.kode?'failed':''"
               @input="v=>values.kode=v" :hints="formErrors.kode" 
               :check="false"
               placeholder="Auto Generate"
+              label=""
           />
         </div>
         <div>
           <label class="font-semibold">NIK <label class="text-red-500 space-x-0 pl-0"></label></label>
           <FieldPopup 
               class="p-0 m-0 !mt-[9px]"
-              valueField="id" displayField="nik"
+              valueField="id" displayField="nomor_ktp"
               @input="nikChange"
               :value="values.m_kary_id" @input="(v)=>values.m_kary_id=v"
               :api="{
@@ -89,7 +90,14 @@
               {
                 flex: 1,
                 field: 'nik',
-                headerName:  'NIK',
+                headerName:  'Kode',
+                sortable: false, resizable: true, filter: 'ColFilter',
+                cellClass: ['border-r', '!border-gray-200', 'justify-center']
+              },
+              {
+                flex: 1,
+                field: 'nomor_ktp',
+                headerName: 'No KTP',
                 sortable: false, resizable: true, filter: 'ColFilter',
                 cellClass: ['border-r', '!border-gray-200', 'justify-center']
               },
