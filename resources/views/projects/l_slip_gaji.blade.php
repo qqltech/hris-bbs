@@ -174,7 +174,7 @@
         <!-- ACTION BUTTON START -->
         <div class="overflow-x-auto mt-6 mb-4 px-4" v-show="exportHtml">
           <hr>
-          <div id="exportTable">
+          <div id="exportTable" class="w-[200%] mt-6">
           </div>
         </div>
       </div>

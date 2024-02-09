@@ -46,10 +46,6 @@ const values = reactive({
 
 const removeDetail = (detailItem) => {
   dataActive.items = dataActive.items.filter((e) => e.id != detailItem.id)
-
-  const idxExc = tabs.value.findIndex(a => a.day_num == (activeTabIndex.value));
-  const adjIdx = idxExc !== -1 ? idxExc : 0;
-  tabs.value[adjIdx]['t_jadwal_kerja_det'] = dataActive.items
 }
 
 onBeforeMount(async () => {
@@ -141,21 +137,23 @@ const onDetailAdd = (rows) => {
       t_jadwal_kerja_id: route.params.id
     }
   })
-
-  // filter id karyawan yg sudah ada dalam detail
-  const mappedIds = mapped.map(e => e.m_kary_id);
-  const filteredMapped = mapped.filter(e => !dataActive.items.some(item => item.m_kary_id === e.m_kary_id));
-
-  // gabungkan array detail
-  dataActive.items = dataActive.items.concat(filteredMapped);
-
-  // inject dalam object utama
+  dataActive.items = mapped
   const idxExc = tabs.value.findIndex(a => a.day_num == (activeTabIndex.value));
   const adjIdx = idxExc !== -1 ? idxExc : 0;
   tabs.value[adjIdx]['t_jadwal_kerja_det'] = dataActive.items
 }
 
+function log(v){
+  console.log(v)
+}
 async function generate() {
+  // if(!values.tipe_jam_kerja_id){
+  //   swal.fire({
+  //     icon: 'warning',
+  //     text: `Pilih tipe jam kerja terlebih dahulu`
+  //   })
+  //   return
+  // }
     swal.fire({
       icon: 'warning',
       text: 'Generate semua karyawan, proses ini akan memakan waktu lebih lama?',
@@ -227,16 +225,10 @@ async function generate_det_kary() {
       }
     })
 
-    // filter id karyawan yg sudah ada dalam detail
-    const mappedIds = mapped.map(e => e.m_kary_id);
-    const filteredMapped = mapped.filter(e => !dataActive.items.some(item => item.m_kary_id === e.m_kary_id));
-
-    // gabungkan array detail
-    dataActive.items = dataActive.items.concat(filteredMapped);
-
+    dataActive.items = mapped
     const idxExc = tabs.value.findIndex(a => a.day_num == (activeTabIndex.value));
     const adjIdx = idxExc !== -1 ? idxExc : 0;
-    tabs.value[adjIdx]['t_jadwal_kerja_det'] = dataActive.items
+    tabs.value[adjIdx]['t_jadwal_kerja_det'] = mapped
 
   } catch (error) {
     console.error('Error fetching all kary:', error);
@@ -264,9 +256,8 @@ function onReset() {
 
 async function onSave() {
   try {
-    values.t_jadwal_kerja_det = tabs.value
     const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
-    const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}?from=setting_jadwal`
+    const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
     isRequesting.value = true
     const res = await fetch(dataURL, {
       method: 'PUT',
@@ -293,10 +284,6 @@ async function onSave() {
     })
   }
   isRequesting.value = false
-  swal.fire({
-    icon: 'success',
-    text: "Data berhasil disimpan"
-  })
 }
 
 //  @else----------------------- LANDING

@@ -5,7 +5,7 @@
     <div class="flex flex-col border rounded shadow-sm px-6 py-6 <md:w-full w-full bg-white">
       <div class="mb-4">
         <h1 class="text-[24px] mb-4 font-bold">
-          Laporan Jadwal Kerja
+          Laporan Slip Gaji
         </h1>
         <hr>
       </div>
@@ -64,7 +64,7 @@
         <!-- ACTION BUTTON START -->
         <div class="overflow-x-auto mt-6 mb-4 px-4" v-show="exportHtml">
           <hr>
-          <div id="exportTable" class="w-[100%] mt-4">
+          <div id="exportTable" class="w-[200%] mt-6">
           </div>
         </div>
       </div>
