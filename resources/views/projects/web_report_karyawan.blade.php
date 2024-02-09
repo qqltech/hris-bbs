@@ -18,7 +18,7 @@
 @endphp
 <span style="width:100%;text-align:center;font-weight:bold;"> Karyawan Aktif </span><br/>
 <br/>
-<table width="100%" style="font-size:6px;" cellpadding="3">
+<table width="100%" style="font-size: 8px;" cellpadding="2">
   <thead style="font-weight:semibold;">
     <tr style="">
       <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">No</td>

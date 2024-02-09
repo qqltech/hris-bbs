@@ -22,44 +22,71 @@
                 :hints="formErrors.tipe" 
                 :check="false"
                 label=""
-                :options="['Excel','PDF','HTML']"
+                :options="['Excel','HTML']"
                 placeholder="Pilih Tipe Export"
                 valueField="key" 
                 displayField="key"
             />
           </div>
-          <div class="grid grid-cols-2 gap-2">
-              <div>
-                  <label class="font-semibold">Periode
-                      <label class="text-red-500 space-x-0 pl-0"></label>
-                  </label>
-                  <FieldX 
-                      type="date"
-                      :bind="{ readonly: false }" 
-                      class="w-full py-2 !mt-0" 
-                      :value="values.periode_from" 
-                      label="" 
-                      placeholder="DD/MM/YY" 
-                      :errorText="formErrors.periode_from?'failed':''"
-                      @input="v=>values.periode_from=v" 
-                      :hints="formErrors.periode_from" 
-                      :check="false"
-                  />
-              </div>
-              <div>
-                  <FieldX 
-                      type="date"
-                      :bind="{ readonly: false }" 
-                      class="w-full py-2 !mt-5" 
-                      :value="values.periode_to" 
-                      label="" 
-                      placeholder="DD/MM/YY" 
-                      :errorText="formErrors.periode_to?'failed':''"
-                      @input="v=>values.periode_to=v" 
-                      :hints="formErrors.periode_to"  
-                      :check="false"
-                  />
-              </div>
+          <div >
+            <label class="font-semibold">Pilih Final Gaji</label>
+            <FieldPopup
+            :value="values.f_id" 
+            :errorText="formErrors.f_id ? 'failed' : ''"
+            @input="v => values.f_id = v" 
+            :hints="formErrors.f_id" 
+            class="w-full py-2 !mt-0"
+            valueField="id" 
+            displayField="nomor"
+            :api="{
+                url: `${store.server.url_backend}/operation/t_final_gaji`,
+                headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
+                params: {
+                  simplest:true,
+                  searchfield: 'this.desc, this.nomor, this.periode_awal, this.periode_akhir'
+                }
+              }"
+              placeholder="" label="" :check="false" 
+              :columns="[{
+                headerName: 'No',
+                valueGetter:(p)=>p.node.rowIndex + 1,
+                width: 60,
+                sortable: false, resizable: false, filter: false,
+                cellClass: ['justify-center', 'bg-gray-50']
+              },
+              {
+                flex: 1,
+                field: 'nomor',
+                wrapText:true,
+                sortable: false, resizable: true, filter: 'ColFilter',
+                cellClass: ['border-r', '!border-gray-200', 'justify-end']
+              },
+              {
+                flex: 1,
+                field: 'desc',
+                wrapText:true,
+                headerName: 'Nama Karyawan',
+                sortable: false, resizable: true, filter: 'ColFilter',
+                cellClass: ['border-r', '!border-gray-200', 'justify-start']
+              },
+              {
+                flex: 1,
+                field: 'periode_awal',
+                wrapText:true,
+                headerName: 'Periode Awal',
+                sortable: false, resizable: true, filter: 'ColFilter',
+                cellClass: ['border-r', '!border-gray-200', 'justify-start']
+              },
+              {
+                flex: 1,
+                wrapText:true,
+                field: 'periode_akhir',
+                headerName: 'Periode Akhir',
+                sortable: false, resizable: true, filter: 'ColFilter',
+                cellClass: ['border-r', '!border-gray-200', 'justify-start']
+              },
+              ]"
+          />
           </div>
           <div>
             <label class="font-semibold">Direktorat</label>
@@ -187,7 +214,7 @@
         <!-- ACTION BUTTON START -->
         <div class="overflow-x-auto mt-6 mb-4 px-4" v-show="exportHtml">
           <hr>
-          <div id="exportTable" class="w-[200%] mt-6">
+          <div id="exportTable">
           </div>
         </div>
       </div>

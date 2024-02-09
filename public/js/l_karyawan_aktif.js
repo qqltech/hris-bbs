@@ -78,14 +78,6 @@
         exportHtml.value = true
         const tempDiv = document.createElement('div')
         tempDiv.innerHTML = html
-        const firstSpanElement = tempDiv.querySelector('span:first-of-type');
-        if (firstSpanElement) {
-          firstSpanElement.style.fontSize = '22px'
-        }
-        const tableElement = tempDiv.querySelector('table')
-        if (tableElement) {
-          tableElement.style.fontSize = '14px'
-        }
         const targetDiv = document.getElementById('exportTable')
         targetDiv.innerHTML = ''
         targetDiv.appendChild(tempDiv)

@@ -2,7 +2,10 @@
 <div class="bg-white p-3 rounded-xl h-[570px]">
   <TableApi ref='apiTable' :api="landing.api" :columns="landing.columns" :actions="landing.actions">
     <template #header>
-      <RouterLink v-if="currentMenu?.can_create||true||store.user.data.username==='developer'" :to="$route.path+'/create?'+(Date.parse(new Date()))" class="bg-green-500 text-white hover:bg-green-600 rounded-[6px] py-2 px-[12.5px]">
+      <button @click="openReport" class="bg-blue-500 text-white hover:bg-blue-600 rounded-sm py-1 px-[6px]">
+        <icon fa="book" />Laporan Jadwal Kerja
+      </button>
+      <RouterLink v-if="currentMenu?.can_create||true||store.user.data.username==='developer'" :to="$route.path+'/create?'+(Date.parse(new Date()))" class="bg-green-500 text-white hover:bg-green-600 rounded-sm py-1 px-[6px]">
         <icon fa="plus" />
         Tambah Data
       </RouterLink>
@@ -15,10 +18,10 @@
 <div class="flex flex-col gap-y-3">
   <div class="flex gap-x-4 px-2">
     <div class="flex flex-col border rounded shadow-sm px-6 py-6 <md:w-full w-full bg-white">
-      <div class="mb-4">
+      <div class="mb-1 flex">
+        <button @click="onBack" title="Kembali" class="mr-2 mt-[-8px]"><Icon fa="arrow-left"/></button>
         <h1 class="text-[24px] mb-4 font-bold">
-          Jadwal Kerja   
-        </h1>
+          Jadwal Kerja  
         <hr>
       </div>
       
@@ -142,7 +145,7 @@
                     trx_dtl.items[i].waktu_mulai=v.waktu_mulai
                     trx_dtl.items[i].waktu_akhir=v.waktu_akhir
                   }"
-                  displayField="kode"
+                  displayField="desc"
                   valueField="id"
                   :api="{
                       url: `${store.server.url_backend}/operation/m_jam_kerja`,
@@ -151,7 +154,7 @@
                         Authorization: `${store.user.token_type} ${store.user.token}`
                       },
                       params: {
-                        selectfield: 'waktu_mulai,waktu_akhir,this.id,this.kode',
+                        selectfield: 'waktu_mulai,waktu_akhir,this.id,this.desc',
                         where:`this.is_active='true' and this.tipe_jam_kerja_id=${values.tipe_jam_kerja_id ?? 0}`,
                         transform:false,
                       }
@@ -163,7 +166,7 @@
                     :value="trx_dtl.items[i].waktu_mulai ?? ''" 
                     @input="v=>trx_dtl.items[i].waktu_mulai=v" 
                     :check="false"
-                    type="text"
+                    type="time"
                     label=""
                     placeholder=""
                 />
@@ -173,7 +176,7 @@
                     :value="trx_dtl.items[i].waktu_akhir ?? ''" 
                     @input="v=>trx_dtl.items[i].waktu_akhir=v" 
                     :check="false"
-                    type="text"
+                    type="time"
                     label=""
                     placeholder=""
                 />
@@ -183,11 +186,8 @@
         </table>
         <!-- ACTION BUTTON START -->
         <div class="flex flex-row justify-end space-x-[20px] mt-[5em]">
-          <button @click="onBack" class="bg-[#EF4444] hover:bg-[#ed3232] text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Kembali
-          </button>
-          <button v-show="actionText" @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Simpan
+          <button @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[12px] py-[8px] rounded-md ">
+            <Icon fa="save"/> Simpan
           </button>
         </div>
     </div>
