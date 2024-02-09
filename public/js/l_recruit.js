@@ -93,6 +93,25 @@
         exportHtml.value = true
         const tempDiv = document.createElement('div')
         tempDiv.innerHTML = html
+        const firstSpanElement = tempDiv.querySelector('span:first-of-type');
+        if (firstSpanElement) {
+          firstSpanElement.style.fontSize = '22px'
+        }
+        const tableElements = tempDiv.querySelectorAll('table')
+        if (tableElements) {
+          tableElements.forEach(items => {
+            items.style.fontSize = '14px'
+          });
+        }
+        const targetTable = tempDiv.querySelectorAll('#ketTabel')
+        if(targetTable){
+          targetTable.forEach(items=>{
+            const firstColumn = items.querySelector('td:first-child')
+            if (firstColumn) {
+              firstColumn.style.width = '5%'
+            }
+          })
+        }
         const targetDiv = document.getElementById('exportTable')
         targetDiv.innerHTML = ''
         targetDiv.appendChild(tempDiv)

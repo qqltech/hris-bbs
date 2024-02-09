@@ -14,7 +14,7 @@ $raw = \DB::select("
                     WHERE 
                       k.is_active = true and k.m_dept_id is not null; ", [ $periode, $req->m_kary_id ]);
 @endphp
-<span style=" width:100%;text-align:center;font-weight:bold;"> Laporan Gaji Karyawan </span><br/>
+<span style=" width:100%;text-align:center;font-weight:bold;"> Rekapitulasi Gaji </span><br/>
 
 @php
   $periode = date('d-m-Y', strtotime($periode));
@@ -22,7 +22,7 @@ $raw = \DB::select("
 
   <span style="width:100%;text-align:center; font-size:10pt"> {{ $periode }} </span><br/>
   <br/>
-  <table width="100%" style="font-size:10px;" cellpadding="1">
+  <table width="100%" style="font-size:8px;" cellpadding="1">
     <thead style="font-weight:semibold;">
       <tr style="">
         <td

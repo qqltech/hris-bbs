@@ -38,14 +38,7 @@
     if(values.tipe === null){
       swal.fire({
         icon: 'error',
-        text: 'Pilih tipe export dulu!',
-      })
-      return
-    }
-    if(!values.tipe_jam_kerja_id){
-      swal.fire({
-        icon: 'error',
-        text: 'Pilih jam kerja dahulu',
+        text: 'Harap Memilih Tipe Export Dahulu!',
       })
       return
     }
@@ -59,7 +52,7 @@
         tempGet.push(`export=pdf`)
       }
     }
-    if(values.tipe_jam_kerja_id){
+    if(values.f_id){
       tempGet.push(`tipe_jam_kerja_id=${values.tipe_jam_kerja_id}`)
     }
     const paramsGet = tempGet.join("&")
@@ -77,7 +70,25 @@
         exportHtml.value = true
         const tempDiv = document.createElement('div')
         tempDiv.innerHTML = html
-       
+        const firstSpanElement = tempDiv.querySelector('span:first-of-type');
+        if (firstSpanElement) {
+          firstSpanElement.style.fontSize = '22px'
+        }
+        const firstTable = tempDiv.querySelector('table:first-of-type');
+        if (firstTable) {
+          firstTable.style.width = '50%'
+        }
+        const tdElements = tempDiv.querySelectorAll('td');
+        tdElements.forEach((td) => {
+          const tablesInsideTd = td.querySelectorAll('table');
+          tablesInsideTd.forEach((table) => {
+            table.style.fontSize = '16px'
+          });
+        });
+        const lastTable = tempDiv.querySelector('#lastTable');
+        if (lastTable) {
+          lastTable.style.fontSize = '12px'
+        }
         const targetDiv = document.getElementById('exportTable')
         targetDiv.innerHTML = ''
         targetDiv.appendChild(tempDiv)

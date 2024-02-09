@@ -83,7 +83,7 @@ td.text-right {
 
 <br/>
   @if($tipe === 'Rekap')
-    <table v-else class="table-auto w-full" style="border-collapse: collapse;font-size: 8pt !important" cellpadding="2">
+    <table v-else class="table-auto w-full" style="border-collapse: collapse;font-size: 7pt !important" cellpadding="3">
       <thead class="bg-[#c6c6c6]">
         <tr>
           <th class="border-1 border-gray-500 px-3 py-1" style="background-color: #c6c6c6;border:0.5px solid black; width: 10%;">Hari</th>

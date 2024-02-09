@@ -1,7 +1,7 @@
 @php
   $req = app()->request;
-  $periode_from = $req->periode_from ?? date('Y-m').'-01';
-  $periode_to = $req->periode_to ?? date('Y-m-d');
+  $periode_from = $req->periode_from ?? '2023-01-01';
+  $periode_to = $req->periode_to ?? '2023-12-30';
   $raw = \DB::select("
     select 
     ts.tgl, ts.nomor,ts.keterangan,ts.status,ts.no_dokumen, k.nik, k.nama_lengkap, kd.nama dir, kdi.nama div, kde.nama dept, mg.value tipe_sgp  
@@ -23,7 +23,7 @@
 @endphp
 <span style="width:100%;text-align:center; font-size:10pt"> {{ $periode_from }} - {{ $periode_to }}</span><br/>
 <br/>
-<table width="100%" style="font-size:10px;" cellpadding="2">
+<table width="100%" style="font-size:8px;" cellpadding="9">
   <thead style="font-weight:semibold;">
     <tr style="">
       <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">No</td>

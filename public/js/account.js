@@ -111,23 +111,18 @@ function onReset() {
 
 async function onSave() {
   //values.tags = JSON.stringify(values.tags)
-      let data = {
-        username: values.username,
-        email: values.email,
-        password: values.password,
-        password_confirm: values.password_confirm,
-      }
       try {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
-        const dataURL = `${store.server.url_backend}/operation${endpointApi}/reset_password`
+        const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + store.user.data.id)}`
         isRequesting.value = true
+        values.is_active = values.is_active ? 1 : 0
         const res = await fetch(dataURL, {
-          method: 'POST',
+          method: isCreating ? 'POST' : 'PUT',
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(values)
         })
         if (!res.ok) {
           if ([400, 422].includes(res.status)) {

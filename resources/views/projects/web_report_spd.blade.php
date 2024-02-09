@@ -1,7 +1,7 @@
 @php
   $req = app()->request;
-  $periode_from = $req->periode_from ?? date('Y-m').'-01';
-  $periode_to = $req->periode_to ?? date('Y-m-d');
+  $periode_from = $req->periode_from ?? '2023-01-01';
+  $periode_to = $req->periode_to ?? '2023-12-30';
   $raw = \DB::select("
     select t.nomor, kd.nama dir, d.nama div, dp.nama dept, 
     coalesce(j.value, '-') jenis_spd, t.tanggal, t.tgl_acara_awal, t.tgl_acara_akhir , za.nama zona_asal, zt.nama zona_tujuan,
@@ -16,7 +16,7 @@
     left join m_zona zt on zt.id = t.m_zona_tujuan_id 
     left join m_lokasi l on l.id = t.m_lokasi_tujuan_id 
     left join default_users u on u.id = t.pic_id 
-    where upper(t.status) = 'APPROVED' and t.tanggal >= ? and t.tanggal <= ? and kd.id = coalesce(?,kd.id) and d.id = coalesce(?,d.id) and dp.id = coalesce(?,dp.id)
+    where t.status = 'APPROVED' and t.tanggal BETWEEN ? and ? and kd.id = coalesce(?,kd.id) and d.id = coalesce(?,d.id) and dp.id = coalesce(?,dp.id)
   ", [ $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id ]);
 @endphp
 <span style="width:100%;text-align:center;font-weight:bold;"> Perjalanan Dinas </span><br/>
@@ -26,7 +26,7 @@
 @endphp
 <span style="width:100%;text-align:center; font-size:10pt"> {{ $periode_from }} - {{ $periode_to }}</span><br/>
 <br/>
-<table width="100%" style="font-size: 8px;" cellpadding="2">
+<table width="100%" style="font-size:8px;" cellpadding="7">
   <thead style="font-weight:semibold;">
     <tr style="">
       <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">No</td>

@@ -1,8 +1,6 @@
 @php
 $req = app()->request;
 
-$f_id = $req->f_id;
-
 $raw = \DB::select("
 select
 k.nik, k.jk_id, k.nama_lengkap, kd.nama dir, kdi.nama divisi, kde.nama dept, fd.total_gaji, fd.total_tax, fd.netto,
@@ -13,8 +11,8 @@ join m_kary k on k.id = fd.m_kary_id
 left join m_dir kd on kd.id = fd.m_kary_dir_id
 left join m_divisi kdi on kdi.id = fd.m_kary_divisi_id
 left join m_dept kde on kde.id = fd.m_kary_dept_id
-where f.status = 'POSTED' and f.id = ?
-", [$f_id ?? 0]);
+where f.status = 'POSTED'
+");
 
 $totalGaji = 0;
 
@@ -25,33 +23,67 @@ foreach ($raw as $row) {
     $totalGaji += $row->netto;
 }
 @endphp
-@if(!count($raw))
-  <i>data fianal gaji tidak ditemukan</i>
-@else
-  <table width="100%">
-    <tbody>
-      <tr>
-        <td>P</td>
-        <td>{{ $raw[0]->created_at}}</td>
-        <td>{{ $rekeningFrom[0]->value }}</td>
-        <td>{{count($raw)}}</td>
-        <td>{{$totalGaji}}</td>
+  <table width="100%" style="font-size:8px;" cellpadding="1">
+    <thead style="font-weight:semibold;">
+            <tr style="">
+        <td
+          style=" font-weight: bold; line-height: 20px;text-align:center "
+          >
+          P</td>
+        <td
+          style=" font-weight: bold; line-height: 20px;text-align:center; "
+          >
+          {{ $raw[0]->created_at}}</td>
+        <td
+          style=" font-weight: bold; line-height: 20px;text-align:center; "
+          >
+          {{ $rekeningFrom[0]->value }} </td>
+        <td
+          style=" font-weight: bold; line-height: 20px;text-align:center; "
+          >
+          {{count($raw)}}</td>
+        <td
+          style=" font-weight: bold; line-height: 20px;text-align:center; "
+          >
+          {{$totalGaji}}</td>
       </tr>
       @foreach($raw as $i => $d)      
-        <tr>
-          <td>{{$d->nik}}</td>
-          <td>{{ $d->nama_lengkap}}</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td>IDR</td>
-          <td>{{ $d->netto}}</td>
-          <td>{{$d->desc}}</td>
-          <td>{{ ($d->jk_id === 346) ? 'IBU' : 'BPK'}}</td>
-          <td>MANDIRI</td>
-          <td>MADIUN</td>
+        <tr style="">
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+            >
+            {{$d->nik}}</td>
+
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+            >
+            {{ $d->nama_lengkap}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+            >
+            IDR</td>
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+            >
+            {{ $d->netto}}</td>
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+            >
+            {{$d->desc}}</td>
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+            >
+            {{ ($d->jk_id === 346) ? 'IBU' : 'BPK'}}</td>
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+          >MANDIRI</td>
+          <td
+            style=" font-weight: bold; line-height: 20px;text-align:center; "
+          >MADIUN</td>
         </tr>
       @endforeach
-    </tbody>
+    </thead>
   </table>
-@endif

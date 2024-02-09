@@ -62,7 +62,7 @@
   </tr>
 </table>
 <br/>
-<table width="700px" style="font-size:10px; border: none;" cellpadding="1" id="lastTable">
+<table width="700px" style="font-size:8px; border: none;" cellpadding="1" id="lastTable">
   <thead style="font-weight:semibold;">
     <tr style="border: none;">
       <td style="font-weight: bold; line-height: 20px;text-align:center; background-color: #c8daf8;">Komponen</td>
