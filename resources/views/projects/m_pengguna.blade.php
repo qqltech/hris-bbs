@@ -62,7 +62,7 @@
           <label class="font-semibold">NIK <label class="text-red-500 space-x-0 pl-0"></label></label>
           <FieldPopup 
               class="p-0 m-0 !mt-[9px]"
-              valueField="id" displayField="nomor_ktp"
+              valueField="id" displayField="kode"
               @input="nikChange"
               :value="values.m_kary_id" @input="(v)=>values.m_kary_id=v"
               :api="{
