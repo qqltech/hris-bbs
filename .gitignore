@@ -1,5 +1,6 @@
 /app/Models/BasicModels
 /public/uploads
+/public/models.json
 /vendor
 /.idea
 Homestead.json
