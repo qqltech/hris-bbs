@@ -79,3 +79,7 @@ onMounted(async () => {
     isRequesting.value = false
   }
 })
+
+const defaultImage = ()=>{
+  return store.server.url_backend+'/logo.png'
+}

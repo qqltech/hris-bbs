@@ -43,7 +43,7 @@ let tempPasfoto = ''
 
 const setStandartGaji = async () => {
   if(values.m_zona_id && values.grading_id){
-    const fixedParams = new URLSearchParams({where: `this.m_zona_id=${values.m_zona_id ?? 0} AND this.grading_id=${values.grading_id ?? 0}`})
+    const fixedParams = new URLSearchParams({simplest: true , where: `this.is_active='true' AND this.m_zona_id=${values.m_zona_id ?? 0} AND this.grading_id=${values.grading_id ?? 0}`})
     const res = await fetch(`${store.server.url_backend}/operation/m_standart_gaji` + '?' + fixedParams, {
       headers: {
         'Content-Type': 'Application/json',
@@ -54,7 +54,11 @@ const setStandartGaji = async () => {
     const resultJson = await res.json()
     const data = resultJson.data
     console.log(data,'halo')
-    values.m_standart_gaji_id = data[0]?.id
+    if(initialValues.m_standart_gaji_id === values.m_standart_gaji_id){
+      values.m_standart_gaji_id = initialValues.m_standart_gaji_id
+    }else{    
+      values.m_standart_gaji_id = data[0]?.id
+    }
   }
   
 }
@@ -132,6 +136,7 @@ const valuesPengalaman = reactive({
   no_tlp:null,
   posisi:null
 })
+
 
 onBeforeMount(async () => {
   if (isRead) {

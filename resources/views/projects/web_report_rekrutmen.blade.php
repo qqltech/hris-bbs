@@ -1,7 +1,7 @@
 @php
   $req = app()->request;
-  $periode_from = $req->periode_from ?? '2023-01-01';
-  $periode_to = $req->periode_to ?? '2023-12-30';
+  $periode_from = $req->periode_from ?? date('Y-m').'-01';
+  $periode_to = $req->periode_to ?? date('Y-m-d');
 
   $header = \DB::select("
     select tl.*, mg.value jenis_loker, mg1.value prioritas
@@ -70,7 +70,7 @@
           and mp.id = coalesce(?, mp.id)
   ", [ $h->id ?? 0, $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id ]);
       @endphp
-      <table width="100%" style="font-size:8px;" cellpadding="5">
+      <table width="100%" style="font-size:10px;" cellpadding="2">
         <thead style="font-weight:semibold;">
           <tr style="">
             <td style="border:0.5px solid black; font-weight: bold; text-align:center; background-color: #c6c6c6;">No</td>

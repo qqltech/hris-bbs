@@ -1,4 +1,3 @@
-
 @verbatim
 <div class="flex flex-col gap-y-3">
   <div class="flex gap-x-4 px-2">
@@ -263,7 +262,7 @@
         <!-- ACTION BUTTON START -->
         <div class="overflow-x-auto mt-6 mb-4 px-4" v-show="exportHtml">
           <hr>
-          <div id="exportTable" class="w-[200%] mt-6">
+          <div id="exportTable">
           </div>
         </div>
       </div>
