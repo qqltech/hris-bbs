@@ -119,16 +119,11 @@ class t_spd extends \App\Models\BasicModels\t_spd
             $interval = $this->hitungHari($arrayData['tgl_acara_awal'], $arrayData['tgl_acara_akhir']);
         }
 
-         if($arrayData["status"] === 'REVISED'){
+        $data = t_spd::where('id', $id)->first();
+        if($data["status"] === 'REVISED'){
             $status = 'IN APPROVAL';
         }
-
-        if (app()->request->header("Source") == "mobile") {
-            $data = t_spd::where('id', $id)->first();
-            if($data["status"] === 'REVISED'){
-                $status = 'IN APPROVAL';
-            }
-        }
+        
         $newArrayData  = array_merge( $arrayData,[
             'status' => $status ?? @$arrayData['status'],
             'interval' => @$interval ?? $data['interval'],
