@@ -158,7 +158,7 @@
         <!-- ACTION BUTTON START -->
         <div class="overflow-x-auto mt-6 mb-4 px-4" v-show="exportHtml">
           <hr>
-          <div id="exportTable" class="w-[200%] mt-6">
+          <div style="zoom: 110%" id="exportTable">
           </div>
         </div>
       </div>

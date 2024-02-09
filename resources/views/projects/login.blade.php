@@ -5,7 +5,7 @@
       <img src="https://server.qqltech.com:7005/uploads/m_file/1218523680954481:::7778903_3754379-removebg-preview 1.svg" class="w-[43.75rem] h-[29.16669rem]">
     </div>
     <form @submit="onLogin" class="flex flex-col h-[100%] space-y-6 bg-white px-[126px] justify-center w-full <md:h-screen px-[56px]">
-      <img src="https://server.qqltech.com:7005/uploads/m_file/0441131821255568:::Logo Success Jaya.png" class="w-[50%] mb-8">
+      <img src="https://server.qqltech.com:7005/logo-login.png" @error="defaultImage" class="w-[100px] mb-1">
       <h2 class="text-[22px] md:text-[28px] font-700">Welcome Back</h2>
       <h3 class="text-[16px] text-[#8F8F8F]">Silahkan masuk ke akun anda</h3>
         <FieldX :bind="{ readonly: false }"

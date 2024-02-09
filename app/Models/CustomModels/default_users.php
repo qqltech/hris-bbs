@@ -173,15 +173,26 @@ class default_users extends \App\Models\BasicModels\default_users
         }
 
         $hasher = app()->make("hash");
-        $this->where('id',auth()->user()->id)->update([
-            'password' => $hasher->make(req("password"))
-        ]);
+
+        if($req->email && $req->username){
+            $this->where('id',auth()->user()->id)->update([
+                'username' => $req->username,
+                'email' => $req->email,
+            ]);
+        }
+        
+        if(req("password")){
+            $this->where('id',auth()->user()->id)->update([
+                'password' => $hasher->make(req("password"))
+            ]);
+        }
 
         return response([
             'message' => 'Update password berhasil'
         ]);
 
     }
+
 
     public function scopePic($model){
 

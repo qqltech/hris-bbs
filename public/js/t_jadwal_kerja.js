@@ -198,27 +198,6 @@ async function getJamKerjaDefault() {
   }
 }
 
-function moveUp(idx){
-  if(idx <= 0) return
-  
-  // Remove the element from the old index
-  const removedElement = trx_dtl.items.splice(idx, 1)[0]
-
-  const newIndex = idx-1
-  // Insert the element at the new index
-  trx_dtl.items.splice(newIndex, 0, removedElement)
-}
-function moveDown(idx){
-  if(idx >= (trx_dtl.items.length-1)) return
-  
-  // Remove the element from the old index
-  const removedElement = trx_dtl.items.splice(idx, 1)[0]
-
-  const newIndex = idx+1
-  // Insert the element at the new index
-  trx_dtl.items.splice(newIndex, 0, removedElement)
-}
-
 function addRow() {
   const newItem = { 
     _id: ++_id.value,
@@ -226,39 +205,6 @@ function addRow() {
   trx_dtl.items.push(newItem)
 }
 
-function openSub(i) {
-  trx_dtl_sub.items = []
-  total_sub.value = 0
-  total_sub_text.value = 0
-  modalOpen.value = true
-  detailIdxSelected.value = i
-  trx_dtl_sub.items = trx_dtl.items[i]['m_spd_det_transport'] ?? []
-}
-
-function addRowSub(i) {
-  const newItem = { 
-    _id: ++_id.value,
-    zona_tujuan_id: null,
-    jenis_transport_id: null,
-    nama_transport: null,
-    biaya_transport: null,
-    keterangan: null
-  }
-  trx_dtl_sub.items.push(newItem)
-}
-
-const total_sub = ref(0)
-const total_sub_text = ref(0)
-function countSub() {
-  const total = trx_dtl_sub.items.reduce((acm, item) => {
-    return acm + item.biaya_transport;
-  }, 0);
-  total_sub.value = total
-  total_sub_text.value = total.toLocaleString('id-ID', {
-    style: 'currency',
-    currency: 'IDR'
-  });
-}
 function deleteAll(item) {
   swal.fire({
     icon: 'warning',
@@ -364,7 +310,9 @@ async function onSave() {
 }
 
 //  @else----------------------- LANDING
-
+function openReport() {
+  router.replace('/l_jadwal_kerja?menu_click=true')
+}
 const landing = reactive({
   actions: [
     {
@@ -439,7 +387,65 @@ const landing = reactive({
         router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
       }
     },
-      {
+    {
+      icon: 'tools',
+      show: (row) => row.status?.toUpperCase() != 'EXPIRED' ,
+      title: "Sesuaikan Jadwal",
+      class: 'bg-blue-400 text-light-100',
+      click(row) {
+        router.replace(`/t_jadwal_kerja_det/${row.id}?${tsId}`)
+      }
+    },
+    {
+      icon: 'times',
+      title: "Nonaktifkan Jadwal",
+      class: 'bg-rose-700 rounded-lg text-white',
+      show: (row) => row.status?.toUpperCase() === 'POSTED' ,
+      async click(row) {
+        swal.fire({
+          icon: 'warning',
+          text: 'Proses Data Ini?',
+          iconColor: '#1469AE',
+          confirmButtonColor: '#1469AE',
+
+          showDenyButton: true
+        }).then(async (res) => {
+          if (res.isConfirmed) {
+            try {
+              const dataURL = `${store.server.url_backend}/operation/t_jadwal_kerja/expired`
+              isRequesting.value = true
+              const res = await fetch(dataURL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'Application/json',
+                  Authorization: `${store.user.token_type} ${store.user.token}`
+                },
+                body: JSON.stringify({ id: row.id })
+              })
+              if (!res.ok) {
+                if ([400, 422].includes(res.status)) {
+                  const responseJson = await res.json()
+                  formErrors.value = responseJson.errors || {}
+                  throw new Error(responseJson.message || "Failed when trying to post data")
+                } else {
+                  throw new Error("Failed when trying to post data")
+                }
+              }
+              apiTable.value.reload()
+              // const resultJson = await res.json()
+            } catch (err) {
+              isBadForm.value = true
+              swal.fire({
+                icon: 'error',
+                text: err
+              })
+            }
+            isRequesting.value = false
+          }
+        })
+      }
+    },
+    {
       icon: 'location-arrow',
       title: "Post Data",
       class: 'bg-rose-700 rounded-lg text-white',

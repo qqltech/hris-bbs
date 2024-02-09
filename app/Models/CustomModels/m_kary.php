@@ -1406,4 +1406,30 @@ class m_kary extends \App\Models\BasicModels\m_kary
         return $this->helper->customResponse('Data pengalaman kerja berhasil dihapus');
     }
 
+    public function scopeKaryawanOffice($model)
+    {
+        return $model->join('m_general','m_general.id','m_kary.tipe_jam_kerja_id')
+            ->whereRaw("lower(m_general.code) = 'office'");
+    }
+
+    public function scopeKaryawanShift($model)
+    {
+        return $model->join('m_general','m_general.id','m_kary.tipe_jam_kerja_id')
+            ->whereRaw("lower(m_general.code) != 'office'")
+            ->orWhere('m_kary.tipe_jam_kerja_id',null);
+    }
+
+    public function scopeNotInGenerate($model)
+    {
+        $t_jadwal_kerja_id = app()->request->t_jadwal_kerja_id;
+
+        return $model
+        ->whereRaw("
+            m_kary.id not in(select d.m_kary_id from t_jadwal_kerja_det d 
+            join t_jadwal_kerja t on t.id = d.t_jadwal_kerja_id where t.status = 'POSTED')
+            or m_kary.id in(select d.m_kary_id from t_jadwal_kerja_det d 
+            join t_jadwal_kerja t on t.id = d.t_jadwal_kerja_id where t.id = ?)
+        ", [$t_jadwal_kerja_id ?? 0]);
+    }
+
 }

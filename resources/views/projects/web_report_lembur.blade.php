@@ -13,7 +13,7 @@
       left join m_divisi kdi on kdi.id = k.m_divisi_id 
       left join m_dept kde on kde.id = k.m_dept_id 
       where tl.tanggal BETWEEN ? AND ? and kd.id = coalesce(?,kd.id) and kdi.id = coalesce(?,kdi.id) and kde.id = coalesce(?,kde.id)
-      and k.m_posisi_id = coalesce(?, k.m_posisi_id) and k.id = coalesce(?, k.id) 
+      and k.m_posisi_id = coalesce(?, k.m_posisi_id) and k.id = coalesce(?, k.id) and tl.status = 'APPROVED'
   order by tl.id
 ", [ $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id, $req->m_kary_id ]);
 @endphp
@@ -24,7 +24,7 @@
 @endphp
 <span style="width:100%;text-align:center; font-size:10pt"> {{ $periode_from }} - {{ $periode_to }}</span><br/>
 <br/>
-<table width="100%" style="font-size:8px;" cellpadding="5">
+<table width="100%" style="font-size:8px;" cellpadding="2">
   <thead style="font-weight:semibold;">
     <tr style="">
       <td style="border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">No</td>

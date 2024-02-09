@@ -42,10 +42,10 @@
       })
       return
     }
-    if(!values.periode_from || !values.periode_to){
+    if(!values.f_id || !values.f_id){
       swal.fire({
         icon: 'error',
-        text: 'Harap Memilih Periode Dahulu!',
+        text: 'Harap pilih final gaji terlebih dahulu!',
       })
       return
     }
@@ -58,17 +58,9 @@
         tempGet.push(`export=pdf`)
       }
     }
-    if(values.periode_from){
-      let tempYear = values.periode_from.split('/')[2]
-      let tempMonth = values.periode_from.split('/')[1]
-      let tempDay = values.periode_from.split('/')[0]
-      tempGet.push(`periode_from=${tempYear}-${tempMonth}-${tempDay}`)
-    }
-    if(values.periode_to){
-      let tempYear2 = values.periode_to.split('/')[2]
-      let tempMonth2 = values.periode_to.split('/')[1]
-      let tempDay2 = values.periode_to.split('/')[0]
-      tempGet.push(`periode_to=${tempYear2}-${tempMonth2}-${tempDay2}`)
+
+    if(values.f_id){
+      tempGet.push(`f_id=${values.f_id}`)
     }
     if(values.m_dir_id){
       tempGet.push(`m_dir_id=${values.m_dir_id}`)
@@ -100,14 +92,6 @@
         exportHtml.value = true
         const tempDiv = document.createElement('div')
         tempDiv.innerHTML = html
-        const firstSpanElement = tempDiv.querySelector('span:first-of-type');
-        if (firstSpanElement) {
-          firstSpanElement.style.fontSize = '22px'
-        }
-        const tableElement = tempDiv.querySelector('table')
-        if (tableElement) {
-          tableElement.style.fontSize = '14px'
-        }
         const targetDiv = document.getElementById('exportTable')
         targetDiv.innerHTML = ''
         targetDiv.appendChild(tempDiv)
