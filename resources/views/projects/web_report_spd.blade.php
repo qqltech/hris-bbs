@@ -16,7 +16,7 @@
     left join m_zona zt on zt.id = t.m_zona_tujuan_id 
     left join m_lokasi l on l.id = t.m_lokasi_tujuan_id 
     left join default_users u on u.id = t.pic_id 
-    where upper(t.status) = 'APPROVED' and t.tanggal >= ? and t.tanggal <= ? and kd.id = coalesce(?,kd.id) and d.id = coalesce(?,d.id) and dp.id = coalesce(?,dp.id)
+    where upper(t.status) = 'APPROVED' and t.tanggal >= ? and t.tanggal <= ? and kd.id = coalesce(?,t.m_dir_id) and d.id = coalesce(?,t.m_divisi_id) and dp.id = coalesce(?,t.m_dept_id)
   ", [ $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id ]);
 @endphp
 <span style="width:100%;text-align:center;font-weight:bold;"> Perjalanan Dinas </span><br/>

@@ -389,7 +389,7 @@ const landing = reactive({
     },
     {
       icon: 'tools',
-      show: (row) => row.status?.toUpperCase() != 'EXPIRED' ,
+      show: (row) => row.status?.toUpperCase() != 'EXPIRED' && row['tipe_jam_kerja.code'] != 'OFFICE',
       title: "Sesuaikan Jadwal",
       class: 'bg-blue-400 text-light-100',
       click(row) {

@@ -67,7 +67,10 @@ onMounted(async ()=>{
   await loadData()
 })
 
+const loaderData = ref(false)
+
 const loadData = async () => {
+  loaderData.value = true
   if(openDateSelected.value){
     openDate(openDateSelected.value)
     return
@@ -84,12 +87,14 @@ const loadData = async () => {
   })
 
   isRequesting.value = false
+  loaderData.value = false
   const resultJson = await res.json()
   dataByDate.value = resultJson.data
 }
 
 const openDateSelected = ref(null)
 const openDate = async (date) => {
+  loaderData.value = true
   openDateSelected.value = date
   const dataURL = `${store.server.url_backend}/operation${endpointApi}/get_by_date`
   isRequesting.value = true
@@ -105,6 +110,7 @@ const openDate = async (date) => {
   })
 
   isRequesting.value = false
+   loaderData.value = false
   const resultJson = await res.json()
   dataByDateDetail.value = resultJson.data
 }

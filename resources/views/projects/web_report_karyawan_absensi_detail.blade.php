@@ -70,7 +70,7 @@
 
 
           // HITUNG TELAT CHECKIN
-          $checkin_result = '';
+          $checkin_result = @json_decode($dt->absensi)->checkin_time;
           if(@json_decode($dt->absensi)->checkin_time != null && @$jadwal->waktu_mulai){
             // Menghitung selisih waktu dalam detik
             $selisih_detik = $waktu_mulai - $waktu_checkin;
@@ -88,7 +88,7 @@
           }
 
           // HITUNG TELAT CHECKOUT
-          $checkout_result = '';
+          $checkout_result = @json_decode($dt->absensi)->checkout_time;
           $waktu_akhir = strtotime(@$jadwal->waktu_akhir);
           $waktu_checkout = strtotime(@json_decode($dt->absensi)->checkout_time);
 

@@ -43,7 +43,7 @@
   
 @endphp
 <p style="font-weight:bold; font-size: 12pt">Jadwal Kerja Karyawan Success Jaya Group</p>
-@if(!count($detail_hari))
+@if(!count(@$detail_hari ?? []))
   <i>Tidak ditemukan data jadwal kerja terkait</i>
 @else
   @foreach($jadwal_kerja_posted as $t)

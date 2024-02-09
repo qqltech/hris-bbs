@@ -65,13 +65,8 @@
       fa-icon="search" 
       :check="true" />
   </div>
+  <h2 v-if="loaderData" class="text-center"><span class="italic">Harap tunggu, kami sedang menyiapkan data untuk anda..</span> &#128522;</h2>
   <button  v-if="openDateSelected" @click="onBackReal" class="bg-blue-500 mb-2 text-white hover:bg-blue-600 rounded-[6px] py-2 px-[12.5px]">Kembail ke list</button>
-  <!-- <button  v-if="openDateSelected" @click="(d)=>{
-    dataByDateDetail = []
-    openDateSelected = null
-    headerValues.dept_id = null
-    headerValues.divisi_id = null
-  }" class="bg-blue-500 mb-2 text-white hover:bg-blue-600 rounded-[6px] py-2 px-[12.5px]">Kembail ke list</button> -->
   <h3 v-if="openDateSelected" class="font-semibold">Tanggal : {{openDateSelected}}</h3>
   <table class="table-auto w-full" v-if="openDateSelected && dataByDateDetail.length">
     <thead class="bg-blue-600 text-white ">
@@ -117,7 +112,7 @@
       </tr>
     </tbody>
   </table>
-  <table v-else class="table-auto w-full">
+  <table v-else v-if="!loaderData" class="table-auto w-full">
     <thead class="bg-blue-600 text-white ">
       <tr>
         <th class="border-1 border-gray-500 px-3 py-2">Hari</th>

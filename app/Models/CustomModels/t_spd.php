@@ -90,6 +90,7 @@ class t_spd extends \App\Models\BasicModels\t_spd
     public function createBefore($model, $arrayData, $metaData, $id = null)
     {
         $newArrayData = array_merge($arrayData, [
+            "m_dir_id" => m_divisi::where('id', @$arrayData['m_divisi_id'] ?? 0)->pluck('m_dir_id')->first(),
             "nomor" => $this->helper->generateNomor("KODE SPD"),
             "interval" => ($arrayData['tgl_acara_awal'] !== null && $arrayData['tgl_acara_akhir'] !== null ) ? $this->hitungHari($arrayData['tgl_acara_awal'], $arrayData['tgl_acara_akhir']) : null,
         ]);
@@ -118,6 +119,10 @@ class t_spd extends \App\Models\BasicModels\t_spd
             $interval = $this->hitungHari($arrayData['tgl_acara_awal'], $arrayData['tgl_acara_akhir']);
         }
 
+         if($arrayData["status"] === 'REVISED'){
+            $status = 'IN APPROVAL';
+        }
+
         if (app()->request->header("Source") == "mobile") {
             $data = t_spd::where('id', $id)->first();
             if($data["status"] === 'REVISED'){
@@ -125,7 +130,7 @@ class t_spd extends \App\Models\BasicModels\t_spd
             }
         }
         $newArrayData  = array_merge( $arrayData,[
-            'status' => $status ?? $data['status'],
+            'status' => $status ?? @$arrayData['status'],
             'interval' => @$interval ?? $data['interval'],
         ]);
 
