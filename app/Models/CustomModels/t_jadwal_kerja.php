@@ -34,14 +34,6 @@ class t_jadwal_kerja extends \App\Models\BasicModels\t_jadwal_kerja
                         "errors" => ["Detail baris $no, waktu akhir wajib di isi"]
                     ];
                 }
-                $check = t_jadwal_kerja_det_hari::join('t_jadwal_kerja as t','t.id','t_jadwal_kerja_det_hari.t_jadwal_kerja_id')
-                    ->whereRaw("(waktu_mulai <= ? and waktu_akhir >= ?) or (waktu_mulai <= ? and waktu_akhir >= ?) and t.status = 'POSTED'", [$d['waktu_mulai'],$d['waktu_mulai'], $d['waktu_akhir'],$d['waktu_akhir']])   
-                    ->exists();
-                if($check) {
-                    return [
-                        "errors" => ['Maaf detail hari tidak valid, salah satu jam kerja diatas berpotongan dengan jam jadwal kerja yang sudah ada !, silahkan nonaktifkan jadwal yang sudah ada untuk membuat jadwal baru dengan potongan jam yang sama']
-                    ];
-                }
             }
         }
 
