@@ -12,9 +12,12 @@
       left join m_divisi kdi on kdi.id = fd.m_kary_divisi_id 
       left join m_dept kde on kde.id = fd.m_kary_dept_id  
       where f.status = 'POSTED' 
-      and f.periode_awal >= ? and f.periode_akhir <= ? and kd.id = coalesce(?,kd.id) and kdi.id = coalesce(?,kdi.id) and kde.id = coalesce(?,kde.id)
-      and k.m_posisi_id = coalesce(?, k.m_posisi_id) and k.id = coalesce(?, k.id) 
-
+      and f.periode_awal >= ? and f.periode_akhir <= ? 
+      and case when kd.id is not null then kd.id = coalesce(?,kd.id) else true end
+      and case when kdi.id is not null then kdi.id = coalesce(?,kdi.id) else true end
+      and case when kde.id is not null then kde.id = coalesce(?,kde.id) else true end
+      and case when k.m_posisi_id is not null then k.m_posisi_id = coalesce(?,k.m_posisi_id) else true end
+      and case when k.id is not null then k.id = coalesce(?,k.id) else true end
   ", [ $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id, $req->m_kary_id ]);
 @endphp
 <span style="width:100%;text-align:center;font-weight:bold;"> Rekapitulasi Gaji </span><br/>
