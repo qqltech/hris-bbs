@@ -29,7 +29,6 @@
     order by k.tgl_masuk
 ", [ $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id]);
 @endphp
-    {{$additional}}
 
 <span style="width:100%;text-align:center;font-weight:bold;"> Karyawan Aktif </span><br/>
 <br/>
@@ -46,7 +45,6 @@
       <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Departemen</td>
       <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Posisi</td>
       <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Tgl Bergabung</td>
-      <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black; font-weight: bold; line-height: 20px;text-align:center; background-color: #c6c6c6;">Tgl Berhenti</td>
     </tr>
   </thead>
   <tbody>
@@ -65,7 +63,6 @@
       <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black;text-align:left;">{{ $d->dept }}</td>
       <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black;text-align:left;">{{ $d->posisi }}</td>
       <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black;text-align:left;">{{ $d->tgl_masuk }}</td>
-      <td style="padding-right: 5px; padding-left: 7px; border:0.5px solid black;text-align:left;">{{ $d->tgl_berhenti ?? '-' }}</td>
     </tr>
     @endforeach
   </tbody>
