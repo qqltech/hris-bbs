@@ -142,7 +142,15 @@ function saveSub() {
   const text = 'Lengkapi kolom dengan tanda bintang merah'
   let next = true
   trx_dtl_sub.items.forEach((item, i)=>{
-    if(!item.zona_tujuan_id || !item.jenis_transport_id || !item.nama_transport || !item.biaya_transport){
+    // if(!item.zona_tujuan_id || !item.jenis_transport_id || !item.nama_transport || !item.biaya_transport){
+    //    swal.fire({
+    //     icon: 'warning',
+    //     text: `Baris ${i+1}, `+text
+    //   })
+    //   next = false
+    //   return
+    // }
+    if(!item.jenis_transport_id || !item.nama_transport || !item.biaya_transport){
        swal.fire({
         icon: 'warning',
         text: `Baris ${i+1}, `+text

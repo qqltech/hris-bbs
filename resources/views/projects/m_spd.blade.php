@@ -319,7 +319,7 @@
                   <thead>
                     <tr class="border-y">
                       <td class="text-black font-bold text-capitalize px-2 text-left w-[5%]">No.</td>
-                      <td class="text-black font-bold text-capitalize px-0 text-left w-[20%]">Zona Tujuan <label class="text-red-500 space-x-0 pl-0">*</label></td>
+                      <!-- <td class="text-black font-bold text-capitalize px-0 text-left w-[20%]">Zona Tujuan <label class="text-red-500 space-x-0 pl-0">*</label></td> -->
                       <td class="text-black font-bold text-capitalize px-0 text-left w-[15%]">Jenis Transportasi <label class="text-red-500 space-x-0 pl-0">*</label></td>
                       <td class="text-black font-bold text-capitalize px-2 text-left w-[20%]">Transportasi  <label class="text-red-500 space-x-0 pl-0">*</label></td>
                       <td class="text-black font-bold text-capitalize px-2 text-left w-[20%]">Biaya Transportasi  <label class="text-red-500 space-x-0 pl-0">*</label></td>
@@ -330,7 +330,7 @@
                   <tbody>
                     <tr v-for="(a,i) in trx_dtl_sub.items" :key="a.id">
                       <td class="text-center">{{ i+1 }}</td>
-                      <td class="text-center">
+                      <!-- <td class="text-center">
                         <FieldSelect
                           class="w-full py-1 !mt-0"
                           :bind="{ disabled: !actionText, clearable:false }"
@@ -355,7 +355,7 @@
                               }
                           }"
                           fa-icon="search" :check="true" />
-                      </td>
+                      </td> -->
                       <td class="text-center">
                         <FieldSelect
                           class="w-full py-1 !mt-0"

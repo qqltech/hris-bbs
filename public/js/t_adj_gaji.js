@@ -68,9 +68,8 @@ function openDetail(i) {
   detailArrOpen.items = dataFormat
 
   dataFormat = detailArr.value[i]?.detail_adj?.length ? detailArr.value[i]?.detail_adj : dataFormat
-  dataFormat.filter(item => item.can_adjust === 1).forEach((v)=>{
+  dataFormat.filter(item => item.can_adjust == 1 ).forEach((v)=>{
     const formattedValue = parseFloat(v.value);
-
     // Push a new object with the formatted value
     detailArrAdjOpen.items.push({
       ...v,
@@ -157,7 +156,7 @@ onBeforeMount(async () => {
       let tempYear3 = initialValues.periode_akhir?.split('-')[0]
       let tempMonth3 = initialValues.periode_akhir?.split('-')[1]
       initialValues.periode_akhir = tempYear3+'-'+tempMonth3
-      detailArr.value = initialValues.t_final_gaji_det
+      detailArr.value = initialValues.t_final_gaji_det?.sort((a, b) => a.id - b.id)
       detailArr.value.forEach((items)=>{
         // console.log(items)
         items.karyawan = items['m_kary.nama_lengkap']
@@ -332,13 +331,24 @@ function deleteRow(item) {
 
 function saveModal() {
   // idxOpen.value
+  
+  console.log(detailArrAdjOpen.items)
   detailArrAdjOpen.items = detailArrAdjOpen.items.concat(totalAdjPPHOpen.value)
 
   // assign seq
+  // if(detailArrAdjOpen.items.length !== length){
+  //   detailArrAdjOpen.items.forEach((v,i)=>{
+  //     v.seq = i+1
+  //   })
+  // }
   detailArrAdjOpen.items.forEach((v,i)=>{
+    if(v == 0){
+      return
+    }
+    
     v.seq = i+1
   })
-
+  
   // assign for subdetail
   detailArr.value[idxOpen.value]['detail_adj'] = detailArrAdjOpen.items
 
@@ -393,21 +403,23 @@ async function onSave() {
         if(!v.detail_adj){
           v.detail_adj = v.detail_gaji
         }
-        v.detail_gaji.forEach((d,i)=>{
+        v.detail_gaji?.forEach((d,i)=>{
           d.seq = i+1
         })
-        v.t_final_gaji_det_rincian = v.detail_gaji
+        // v.t_final_gaji_det_rincian = v.detail_gaji
+        v.t_final_gaji_det_rincian = v.detail_adj
       })
       dataSave['periode_awal'] = dataSave['periode_awal'] +`-01`
       dataSave['periode_akhir'] = dataSave['periode_akhir'] +`-20`
       dataSave['t_final_gaji_det'] = detailArr.value
 
       try {
-        const dataURL = `${store.server.url_backend}/operation/t_final_gaji`
+       
         isRequesting.value = true
-
+        const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
+        const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         const res = await fetch(dataURL, {
-          method: 'POST',
+          method: isCreating ? 'POST' : 'PUT',
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`

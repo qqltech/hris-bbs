@@ -270,8 +270,7 @@ function onSave() {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true
-        values.status = values.status ? 'Aktif' : 'Tidak Aktif'
-
+        values.status = 'WORKING'
 
         const res = await fetch(dataURL, {
           method: isCreating ? 'POST' : 'PUT',

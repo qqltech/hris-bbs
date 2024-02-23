@@ -4,6 +4,26 @@
 
 
   $rekap = [];
+
+  if($tipe == 'Rekap Harian'){
+    $date = $req->date;
+    $dateArr = explode('/',$date);
+    $dateOK = $dateArr[2].'/'.$dateArr[1].'/'.$dateArr[0];
+
+    $rekap = \DB::select("
+      SELECT json_agg(json_build_object(
+          'm_kary_id', m_kary_id,
+          'default_user_id', default_user_id,
+          'kode', kode,
+          'nama_lengkap', nama_lengkap,
+          'dept', dept,
+          'absensi', absensi
+      )) AS att_report
+      FROM get_employee_attendance_report(?,?,?)",[$dateOK,$req->m_divisi_id,$req->m_dept_id]);
+
+      
+  }
+
   if($tipe === 'Rekap'){
     $periode_from = $req->periode_from;
     $periode_to = $req->periode_to;
@@ -53,7 +73,7 @@
   }
 @endphp
 <span style="width:100%;text-align:left;font-weight:bold;">Laporan Absensi Karyawan ({{$tipe}})</span><br>
-<span style="width:100%;text-align:left;font-weight:bold; font-size: 10pt !important"> Periode {{@$periode ?? ($periode_from. '-' .$periode_to)}}</span><br>
+<span style="width:100%;text-align:left;font-weight:bold; font-size: 10pt !important">{{@$periode ?? (@$periode_from ? (@$periode_from. '-' .@$periode_to) : $req->date) }}</span><br>
 @if(!$req->export == 'xls')
 <style>
 table {
@@ -82,6 +102,39 @@ td.text-right {
 @endif
 
 <br/>
+
+  @if($tipe === 'Rekap Harian')
+    <table style="border-collapse: collapse; width: 100%" cellpadding="1">
+      <thead >
+        <tr>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 5%;">No</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 10%;">NIK</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 15%;">Nama</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 15%;">Departemen</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 10%;">Status</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 8%;">Waktu Checkin</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 10%;">Kantor Checkin</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 8%;">Waktu Checkout</th>
+          <th style="font-size: 10px; background-color: #c6c6c6;border:0.5px solid black; width: 10%;">Kantor Checkout</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach(json_decode($rekap[0]->att_report) as $idx=>$dt)
+        <tr>
+          <td style="font-size: 10px; border:0.5px solid black; width: 5%;">{{$idx+1}}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 10%;">{{$dt->kode}}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 15%;">{{$dt->nama_lengkap}}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 15%;">{{$dt->dept}}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 10%; text-align: center">{{ $dt->absensi->status }}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 8%; text-align: center">{{ @$dt->absensi->checkin_time }}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 10%; text-align: center">{{ @$dt->absensi->checkin_region }}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 8%; text-align: center">{{ @$dt->absensi->checkout_time }}</td>
+          <td style="font-size: 10px; border:0.5px solid black; width: 10%; text-align: center">{{ @$dt->absensi->checkout_region }}</td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+  @endif
   @if($tipe === 'Rekap')
     <table v-else class="table-auto w-full" style="border-collapse: collapse;font-size: 8pt !important" cellpadding="2">
       <thead class="bg-[#c6c6c6]">

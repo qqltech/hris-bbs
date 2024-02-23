@@ -1000,8 +1000,8 @@
             "m_pengesahan_doc",
             "t_cuti",
             "m_periode",
-            "t_final_gaji",
             "m_kary_det_kartu",
+            "t_final_gaji",
             "t_potongan_det_bayar",
             "m_kary_det_pemb",
             "m_kary",
@@ -2482,242 +2482,6 @@
         "heirs": []
     },
     {
-        "model": "t_final_gaji",
-        "fullColumns": [
-            {
-                "name": "id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "nomor",
-                "type": "string",
-                "length": 50,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "m_comp_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": "1",
-                "comment": "{\"src\":\"m_comp.id\"}",
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "periode_awal",
-                "type": "date",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "periode_akhir",
-                "type": "date",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "total_pengeluaran_gaji",
-                "type": "decimal",
-                "length": null,
-                "unsigned": false,
-                "precision": 22,
-                "scale": 2,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "desc",
-                "type": "text",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "status",
-                "type": "string",
-                "length": 50,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": "DRAFT",
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "creator_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": "{\"src\":\"default_users.id\"}",
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "last_editor_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": "{\"src\":\"default_users.id\"}",
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "created_at",
-                "type": "datetime",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "updated_at",
-                "type": "datetime",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            }
-        ],
-        "columns": [
-            "id",
-            "nomor",
-            "m_comp_id",
-            "periode_awal",
-            "periode_akhir",
-            "total_pengeluaran_gaji",
-            "desc",
-            "status",
-            "creator_id",
-            "last_editor_id",
-            "created_at",
-            "updated_at"
-        ],
-        "is_view": false,
-        "config": {
-            "guarded": [
-                "id"
-            ],
-            "hidden": [],
-            "required": [
-                "periode_awal",
-                "periode_akhir",
-                "total_pengeluaran_gaji",
-                "desc"
-            ],
-            "createable": [
-                "nomor",
-                "m_comp_id",
-                "periode_awal",
-                "periode_akhir",
-                "total_pengeluaran_gaji",
-                "desc",
-                "status",
-                "creator_id",
-                "last_editor_id"
-            ],
-            "updateable": [
-                "nomor",
-                "m_comp_id",
-                "periode_awal",
-                "periode_akhir",
-                "total_pengeluaran_gaji",
-                "desc",
-                "status",
-                "creator_id",
-                "last_editor_id"
-            ],
-            "searchable": [
-                "id",
-                "nomor",
-                "m_comp_id",
-                "periode_awal",
-                "periode_akhir",
-                "total_pengeluaran_gaji",
-                "desc",
-                "status",
-                "creator_id",
-                "last_editor_id",
-                "created_at",
-                "updated_at"
-            ],
-            "deleteable": true,
-            "deleteOnUse": false,
-            "casts": {
-                "created_at": "datetime:d\/m\/Y H:i",
-                "updated_at": "datetime:d\/m\/Y H:i"
-            },
-            "rules": []
-        },
-        "details": [
-            "t_final_gaji_det",
-            "t_potongan_det_bayar"
-        ],
-        "heirs": []
-    },
-    {
         "model": "m_kary_det_kartu",
         "fullColumns": [
             {
@@ -3329,6 +3093,242 @@
             "rules": []
         },
         "details": [],
+        "heirs": []
+    },
+    {
+        "model": "t_final_gaji",
+        "fullColumns": [
+            {
+                "name": "id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "nomor",
+                "type": "string",
+                "length": 50,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "m_comp_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": "1",
+                "comment": "{\"src\":\"m_comp.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "periode_awal",
+                "type": "date",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "periode_akhir",
+                "type": "date",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "total_pengeluaran_gaji",
+                "type": "decimal",
+                "length": null,
+                "unsigned": false,
+                "precision": 22,
+                "scale": 2,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "desc",
+                "type": "text",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "status",
+                "type": "string",
+                "length": 50,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": "DRAFT",
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "creator_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "last_editor_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "created_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "updated_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            }
+        ],
+        "columns": [
+            "id",
+            "nomor",
+            "m_comp_id",
+            "periode_awal",
+            "periode_akhir",
+            "total_pengeluaran_gaji",
+            "desc",
+            "status",
+            "creator_id",
+            "last_editor_id",
+            "created_at",
+            "updated_at"
+        ],
+        "is_view": false,
+        "config": {
+            "guarded": [
+                "id"
+            ],
+            "hidden": [],
+            "required": [
+                "periode_awal",
+                "periode_akhir",
+                "total_pengeluaran_gaji",
+                "desc"
+            ],
+            "createable": [
+                "nomor",
+                "m_comp_id",
+                "periode_awal",
+                "periode_akhir",
+                "total_pengeluaran_gaji",
+                "desc",
+                "status",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "updateable": [
+                "nomor",
+                "m_comp_id",
+                "periode_awal",
+                "periode_akhir",
+                "total_pengeluaran_gaji",
+                "desc",
+                "status",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "searchable": [
+                "id",
+                "nomor",
+                "m_comp_id",
+                "periode_awal",
+                "periode_akhir",
+                "total_pengeluaran_gaji",
+                "desc",
+                "status",
+                "creator_id",
+                "last_editor_id",
+                "created_at",
+                "updated_at"
+            ],
+            "deleteable": true,
+            "deleteOnUse": false,
+            "casts": {
+                "created_at": "datetime:d\/m\/Y H:i",
+                "updated_at": "datetime:d\/m\/Y H:i"
+            },
+            "rules": []
+        },
+        "details": [
+            "t_final_gaji_det",
+            "t_potongan_det_bayar"
+        ],
         "heirs": []
     },
     {
@@ -5207,6 +5207,7 @@
             "t_perhitungan_gaji",
             "t_lembur",
             "t_jadwal_kerja_det",
+            "presensi_maksi_det",
             "t_sgp",
             "t_mutasi"
         ]
@@ -5540,6 +5541,7 @@
             "m_standart_gaji",
             "t_mutasi",
             "m_kary_det_pres",
+            "presensi_m_menu_maksi_det",
             "t_pelamar_det_org",
             "t_pelamar_det_org"
         ]
@@ -6168,12 +6170,12 @@
             "m_periode",
             "t_rpd_det",
             "t_rpd_det",
-            "t_final_gaji",
-            "t_final_gaji",
             "m_kary_det_kartu",
             "m_kary_det_kartu",
             "generate_num_log",
             "generate_num_log",
+            "t_final_gaji",
+            "t_final_gaji",
             "m_kary_det_pemb",
             "m_kary_det_pemb",
             "m_file",
@@ -6253,8 +6255,6 @@
             "generate_approval",
             "generate_approval",
             "generate_approval",
-            "t_final_gaji_det_rincian",
-            "t_final_gaji_det_rincian",
             "presensi_absensi",
             "presensi_absensi",
             "presensi_absensi",
@@ -6266,6 +6266,10 @@
             "m_role_access",
             "m_role_access",
             "m_role_access",
+            "t_final_gaji_det_rincian",
+            "t_final_gaji_det_rincian",
+            "presensi_maksi",
+            "presensi_maksi",
             "m_role_det",
             "m_role_det",
             "m_lokasi",
@@ -6280,6 +6284,8 @@
             "m_jam_kerja",
             "t_jadwal_kerja_det",
             "t_jadwal_kerja_det",
+            "presensi_maksi_det",
+            "presensi_maksi_det",
             "t_sgp",
             "t_sgp",
             "generate_approval_log",
@@ -6293,6 +6299,8 @@
             "m_spd_det_biaya",
             "m_tunj_kemahalan",
             "m_tunj_kemahalan",
+            "presensi_m_menu_maksi",
+            "presensi_m_menu_maksi",
             "t_pelamar_det_pend",
             "t_pelamar_det_pend",
             "m_knd_dinas",
@@ -6311,6 +6319,7 @@
             "t_mutasi",
             "m_kary_det_pres",
             "m_kary_det_pres",
+            "presensi_m_menu_maksi_det",
             "m_jarak_kota",
             "m_jarak_kota",
             "generate_approval_det",
@@ -18868,359 +18877,6 @@
         ]
     },
     {
-        "model": "t_final_gaji_det_rincian",
-        "fullColumns": [
-            {
-                "name": "id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "t_final_gaji_det_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": "{\"fk\":\"t_final_gaji_det.id\"}",
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "seq",
-                "type": "decimal",
-                "length": null,
-                "unsigned": false,
-                "precision": 8,
-                "scale": 2,
-                "fixed": false,
-                "default": "1",
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "name",
-                "type": "string",
-                "length": 191,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "label",
-                "type": "string",
-                "length": 191,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "type",
-                "type": "string",
-                "length": 191,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "factor",
-                "type": "string",
-                "length": 191,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "value_ref",
-                "type": "decimal",
-                "length": null,
-                "unsigned": false,
-                "precision": 22,
-                "scale": 2,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "value",
-                "type": "decimal",
-                "length": null,
-                "unsigned": false,
-                "precision": 22,
-                "scale": 2,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": true,
-                "rules": null
-            },
-            {
-                "name": "can_adjust",
-                "type": "boolean",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": true,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "detail",
-                "type": "json",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "deskripsi",
-                "type": "text",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "status",
-                "type": "string",
-                "length": 50,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": "DRAFT",
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "creator_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": "{\"src\":\"default_users.id\"}",
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "last_editor_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": "{\"src\":\"default_users.id\"}",
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "created_at",
-                "type": "datetime",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "updated_at",
-                "type": "datetime",
-                "length": null,
-                "unsigned": false,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": null,
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "t_potongan_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": "{\"src\":\"t_potongan.id\"}",
-                "nullable": false,
-                "rules": null
-            },
-            {
-                "name": "t_cuti_id",
-                "type": "bigint",
-                "length": null,
-                "unsigned": true,
-                "precision": 10,
-                "scale": 0,
-                "fixed": false,
-                "default": null,
-                "comment": "{\"src\":\"t_cuti.id\"}",
-                "nullable": false,
-                "rules": null
-            }
-        ],
-        "columns": [
-            "id",
-            "t_final_gaji_det_id",
-            "seq",
-            "name",
-            "label",
-            "type",
-            "factor",
-            "value_ref",
-            "value",
-            "can_adjust",
-            "detail",
-            "deskripsi",
-            "status",
-            "creator_id",
-            "last_editor_id",
-            "created_at",
-            "updated_at",
-            "t_potongan_id",
-            "t_cuti_id"
-        ],
-        "is_view": false,
-        "config": {
-            "guarded": [
-                "id"
-            ],
-            "hidden": [],
-            "required": [
-                "seq",
-                "label",
-                "type",
-                "factor",
-                "value"
-            ],
-            "createable": [
-                "t_final_gaji_det_id",
-                "seq",
-                "name",
-                "label",
-                "type",
-                "factor",
-                "value_ref",
-                "value",
-                "can_adjust",
-                "detail",
-                "deskripsi",
-                "status",
-                "creator_id",
-                "last_editor_id",
-                "t_potongan_id",
-                "t_cuti_id"
-            ],
-            "updateable": [
-                "t_final_gaji_det_id",
-                "seq",
-                "name",
-                "label",
-                "type",
-                "factor",
-                "value_ref",
-                "value",
-                "can_adjust",
-                "detail",
-                "deskripsi",
-                "status",
-                "creator_id",
-                "last_editor_id",
-                "t_potongan_id",
-                "t_cuti_id"
-            ],
-            "searchable": [
-                "id",
-                "t_final_gaji_det_id",
-                "seq",
-                "name",
-                "label",
-                "type",
-                "factor",
-                "value_ref",
-                "value",
-                "can_adjust",
-                "detail",
-                "deskripsi",
-                "status",
-                "creator_id",
-                "last_editor_id",
-                "created_at",
-                "updated_at",
-                "t_potongan_id",
-                "t_cuti_id"
-            ],
-            "deleteable": true,
-            "deleteOnUse": false,
-            "casts": {
-                "created_at": "datetime:d\/m\/Y H:i",
-                "updated_at": "datetime:d\/m\/Y H:i"
-            },
-            "rules": []
-        },
-        "details": [],
-        "heirs": []
-    },
-    {
         "model": "presensi_absensi",
         "fullColumns": [
             {
@@ -20779,6 +20435,541 @@
         },
         "details": [],
         "heirs": []
+    },
+    {
+        "model": "t_final_gaji_det_rincian",
+        "fullColumns": [
+            {
+                "name": "id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "t_final_gaji_det_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"fk\":\"t_final_gaji_det.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "seq",
+                "type": "decimal",
+                "length": null,
+                "unsigned": false,
+                "precision": 8,
+                "scale": 2,
+                "fixed": false,
+                "default": "1",
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "label",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "type",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "factor",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "value_ref",
+                "type": "decimal",
+                "length": null,
+                "unsigned": false,
+                "precision": 22,
+                "scale": 2,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "value",
+                "type": "decimal",
+                "length": null,
+                "unsigned": false,
+                "precision": 22,
+                "scale": 2,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "can_adjust",
+                "type": "boolean",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": true,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "detail",
+                "type": "json",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "deskripsi",
+                "type": "text",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "status",
+                "type": "string",
+                "length": 50,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": "DRAFT",
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "creator_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "last_editor_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "created_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "updated_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "t_potongan_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"t_potongan.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "t_cuti_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"t_cuti.id\"}",
+                "nullable": false,
+                "rules": null
+            }
+        ],
+        "columns": [
+            "id",
+            "t_final_gaji_det_id",
+            "seq",
+            "name",
+            "label",
+            "type",
+            "factor",
+            "value_ref",
+            "value",
+            "can_adjust",
+            "detail",
+            "deskripsi",
+            "status",
+            "creator_id",
+            "last_editor_id",
+            "created_at",
+            "updated_at",
+            "t_potongan_id",
+            "t_cuti_id"
+        ],
+        "is_view": false,
+        "config": {
+            "guarded": [
+                "id"
+            ],
+            "hidden": [],
+            "required": [
+                "seq",
+                "label",
+                "type",
+                "factor",
+                "value"
+            ],
+            "createable": [
+                "t_final_gaji_det_id",
+                "seq",
+                "name",
+                "label",
+                "type",
+                "factor",
+                "value_ref",
+                "value",
+                "can_adjust",
+                "detail",
+                "deskripsi",
+                "status",
+                "creator_id",
+                "last_editor_id",
+                "t_potongan_id",
+                "t_cuti_id"
+            ],
+            "updateable": [
+                "t_final_gaji_det_id",
+                "seq",
+                "name",
+                "label",
+                "type",
+                "factor",
+                "value_ref",
+                "value",
+                "can_adjust",
+                "detail",
+                "deskripsi",
+                "status",
+                "creator_id",
+                "last_editor_id",
+                "t_potongan_id",
+                "t_cuti_id"
+            ],
+            "searchable": [
+                "id",
+                "t_final_gaji_det_id",
+                "seq",
+                "name",
+                "label",
+                "type",
+                "factor",
+                "value_ref",
+                "value",
+                "can_adjust",
+                "detail",
+                "deskripsi",
+                "status",
+                "creator_id",
+                "last_editor_id",
+                "created_at",
+                "updated_at",
+                "t_potongan_id",
+                "t_cuti_id"
+            ],
+            "deleteable": true,
+            "deleteOnUse": false,
+            "casts": {
+                "created_at": "datetime:d\/m\/Y H:i",
+                "updated_at": "datetime:d\/m\/Y H:i"
+            },
+            "rules": []
+        },
+        "details": [],
+        "heirs": []
+    },
+    {
+        "model": "presensi_maksi",
+        "fullColumns": [
+            {
+                "name": "id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "presensi_m_menu_maksi_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"presensi_m_menu_maksi.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "tanggal",
+                "type": "date",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "lauk",
+                "type": "json",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "keterangan",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "creator_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "last_editor_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "created_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "updated_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            }
+        ],
+        "columns": [
+            "id",
+            "presensi_m_menu_maksi_id",
+            "tanggal",
+            "lauk",
+            "keterangan",
+            "creator_id",
+            "last_editor_id",
+            "created_at",
+            "updated_at"
+        ],
+        "is_view": false,
+        "config": {
+            "guarded": [
+                "id"
+            ],
+            "hidden": [],
+            "required": [
+                "tanggal",
+                "lauk"
+            ],
+            "createable": [
+                "presensi_m_menu_maksi_id",
+                "tanggal",
+                "lauk",
+                "keterangan",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "updateable": [
+                "presensi_m_menu_maksi_id",
+                "tanggal",
+                "lauk",
+                "keterangan",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "searchable": [
+                "id",
+                "presensi_m_menu_maksi_id",
+                "tanggal",
+                "lauk",
+                "keterangan",
+                "creator_id",
+                "last_editor_id",
+                "created_at",
+                "updated_at"
+            ],
+            "deleteable": true,
+            "deleteOnUse": false,
+            "casts": {
+                "created_at": "datetime:d\/m\/Y H:i",
+                "updated_at": "datetime:d\/m\/Y H:i"
+            },
+            "rules": []
+        },
+        "details": [],
+        "heirs": [
+            "presensi_maksi_det"
+        ]
     },
     {
         "model": "m_role_det",
@@ -22507,6 +22698,168 @@
         "heirs": []
     },
     {
+        "model": "presensi_maksi_det",
+        "fullColumns": [
+            {
+                "name": "id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "presensi_maksi_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"presensi_maksi.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "m_kary_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"m_kary.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "lauk",
+                "type": "json",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "creator_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "last_editor_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "created_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "updated_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            }
+        ],
+        "columns": [
+            "id",
+            "presensi_maksi_id",
+            "m_kary_id",
+            "lauk",
+            "creator_id",
+            "last_editor_id",
+            "created_at",
+            "updated_at"
+        ],
+        "is_view": false,
+        "config": {
+            "guarded": [
+                "id"
+            ],
+            "hidden": [],
+            "required": [
+                "lauk"
+            ],
+            "createable": [
+                "presensi_maksi_id",
+                "m_kary_id",
+                "lauk",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "updateable": [
+                "presensi_maksi_id",
+                "m_kary_id",
+                "lauk",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "searchable": [
+                "id",
+                "presensi_maksi_id",
+                "m_kary_id",
+                "lauk",
+                "creator_id",
+                "last_editor_id",
+                "created_at",
+                "updated_at"
+            ],
+            "deleteable": true,
+            "deleteOnUse": false,
+            "casts": {
+                "created_at": "datetime:d\/m\/Y H:i",
+                "updated_at": "datetime:d\/m\/Y H:i"
+            },
+            "rules": []
+        },
+        "details": [],
+        "heirs": []
+    },
+    {
         "model": "t_sgp",
         "fullColumns": [
             {
@@ -24198,6 +24551,172 @@
         "details": [],
         "heirs": [
             "m_standart_gaji"
+        ]
+    },
+    {
+        "model": "presensi_m_menu_maksi",
+        "fullColumns": [
+            {
+                "name": "id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "judul",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "deskripsi",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "is_active",
+                "type": "boolean",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": true,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "creator_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "last_editor_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "created_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "updated_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            }
+        ],
+        "columns": [
+            "id",
+            "judul",
+            "deskripsi",
+            "is_active",
+            "creator_id",
+            "last_editor_id",
+            "created_at",
+            "updated_at"
+        ],
+        "is_view": false,
+        "config": {
+            "guarded": [
+                "id"
+            ],
+            "hidden": [],
+            "required": [
+                "judul",
+                "is_active"
+            ],
+            "createable": [
+                "judul",
+                "deskripsi",
+                "is_active",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "updateable": [
+                "judul",
+                "deskripsi",
+                "is_active",
+                "creator_id",
+                "last_editor_id"
+            ],
+            "searchable": [
+                "id",
+                "judul",
+                "deskripsi",
+                "is_active",
+                "creator_id",
+                "last_editor_id",
+                "created_at",
+                "updated_at"
+            ],
+            "deleteable": true,
+            "deleteOnUse": false,
+            "casts": {
+                "created_at": "datetime:d\/m\/Y H:i",
+                "updated_at": "datetime:d\/m\/Y H:i"
+            },
+            "rules": []
+        },
+        "details": [],
+        "heirs": [
+            "presensi_maksi",
+            "presensi_m_menu_maksi_det"
         ]
     },
     {
@@ -27307,6 +27826,151 @@
         "details": [
             "t_jadwal_kerja_det"
         ],
+        "heirs": []
+    },
+    {
+        "model": "presensi_m_menu_maksi_det",
+        "fullColumns": [
+            {
+                "name": "id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "presensi_m_menu_maksi_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"presensi_m_menu_maksi.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "tipe_lauk_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"m_general.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "lauk",
+                "type": "string",
+                "length": 191,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": true,
+                "rules": null
+            },
+            {
+                "name": "creator_id",
+                "type": "bigint",
+                "length": null,
+                "unsigned": true,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": "{\"src\":\"default_users.id\"}",
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "created_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            },
+            {
+                "name": "updated_at",
+                "type": "datetime",
+                "length": null,
+                "unsigned": false,
+                "precision": 10,
+                "scale": 0,
+                "fixed": false,
+                "default": null,
+                "comment": null,
+                "nullable": false,
+                "rules": null
+            }
+        ],
+        "columns": [
+            "id",
+            "presensi_m_menu_maksi_id",
+            "tipe_lauk_id",
+            "lauk",
+            "creator_id",
+            "created_at",
+            "updated_at"
+        ],
+        "is_view": false,
+        "config": {
+            "guarded": [
+                "id"
+            ],
+            "hidden": [],
+            "required": [
+                "lauk"
+            ],
+            "createable": [
+                "presensi_m_menu_maksi_id",
+                "tipe_lauk_id",
+                "lauk",
+                "creator_id"
+            ],
+            "updateable": [
+                "presensi_m_menu_maksi_id",
+                "tipe_lauk_id",
+                "lauk",
+                "creator_id"
+            ],
+            "searchable": [
+                "id",
+                "presensi_m_menu_maksi_id",
+                "tipe_lauk_id",
+                "lauk",
+                "creator_id",
+                "created_at",
+                "updated_at"
+            ],
+            "deleteable": true,
+            "deleteOnUse": false,
+            "casts": {
+                "created_at": "datetime:d\/m\/Y H:i",
+                "updated_at": "datetime:d\/m\/Y H:i"
+            },
+            "rules": []
+        },
+        "details": [],
         "heirs": []
     },
     {

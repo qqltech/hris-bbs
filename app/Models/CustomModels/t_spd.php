@@ -29,6 +29,10 @@ class t_spd extends \App\Models\BasicModels\t_spd
             ->select('m_spd_det_biaya.total_biaya', 'm_spd_det_biaya.tipe_id', 'm_spd_det_biaya.keterangan', 'm_general.value as tipe_value')
             ->get();
 
+        if (app()->request->header("Source") == "mobile" || app()->request->detail) {
+            $row['pic.nama_lengkap'] = m_kary::where('id',$row['pic.m_kary_id'])->pluck('nama_lengkap')->first();
+        }
+
         return array_merge( $row, [
             'approval_note' => $approval ?? '',
             'nama_pic' => default_users::where('id', $row['pic_id'])->value('name') ?? '',
@@ -142,14 +146,6 @@ class t_spd extends \App\Models\BasicModels\t_spd
     {
         if (app()->request->header("Source") == "mobile") {
             $app = $this->createAppTicket($model->id);  
-        }
-    }
-
-
-    public function onRetrieved($model){
-        // inject pic name
-        if (app()->request->header("Source") == "mobile" || app()->request->detail) {
-            $model['pic.nama_lengkap'] = m_kary::where('id',$model['pic.m_kary_id'])->pluck('nama_lengkap')->first();
         }
     }
 

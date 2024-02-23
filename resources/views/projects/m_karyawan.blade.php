@@ -908,13 +908,10 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto Karyawan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <div class="relative col-span-12 flex items-center">
+              <div class="col-span-12 flex items-center">
                 <input :disabled="!actionText ? true : false" ref="refPasFoto" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.pas_foto}" id="inputPasFoto" @change="imageChange">
-                <svg v-show="formErrors.pas_foto" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                  <title class="" id="svg-inline--fa-title-TuHui35w8qVB">failed</title>
-                  <path class="" fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-                </svg>
+                
               </div>
               <img :src="urlPasFoto" class="col-span-12 !mt-0 w-[231px]">
             </div>
@@ -922,13 +919,10 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto KTP<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <div class="relative col-span-12 flex items-center">
+              <div class="col-span-12 flex items-center">
                 <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.ktp_foto}" id="inputKTPFoto" @change="imageChange">
-                <svg v-show="formErrors.ktp_foto" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                  <title class="" id="svg-inline--fa-title-TuHui35w8qVB">failed</title>
-                  <path class="" fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-                </svg>
+                
               </div>
               <img :src="urlKTPFoto" class="col-span-12 !mt-0 w-[231px]">
             </div>
@@ -954,13 +948,10 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto Kartu Keluarga<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <div class="relative col-span-12 flex items-center">
+              <div class="col-span-12 flex items-center">
                 <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.kk_foto}" id="inputKKFoto" @change="imageChange">
-                <svg v-show="formErrors.kk_foto" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                  <title class="" id="svg-inline--fa-title-TuHui35w8qVB">failed</title>
-                  <path class="" fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-                </svg>
+                
               </div>
               <img :src="urlKKFoto" class="col-span-12 !mt-0 w-[231px]">
             </div>
@@ -977,13 +968,10 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto NPWP<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <div class="relative col-span-12 flex items-center">
+              <div class="col-span-12 flex items-center">
                 <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.npwp_foto}" id="inputNPWPFoto" @change="imageChange">
-                <svg v-show="formErrors.kk_foto" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                  <title class="" id="svg-inline--fa-title-TuHui35w8qVB">failed</title>
-                  <path class="" fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-                </svg>
+                
               </div>
               <img :src="urlNPWPFoto" class="col-span-12 !mt-0 w-[231px]">
             </div>
@@ -1009,7 +997,7 @@
           <!-- <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto BPJS<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <div class="relative col-span-12 flex items-center">
+              <div class="col-span-12 flex items-center">
                 <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.bpjs_foto}" id="inputBPJSFoto" @change="imageChange">
                 <svg v-show="formErrors.bpjs_foto" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -1082,7 +1070,7 @@
                  accept="application/pdf" :check="false"  
               />
               
-              <!-- <div class="relative col-span-12 flex items-center">
+              <!-- <div class="col-span-12 flex items-center">
                 <input type="file" accept="application/pdf" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.berkas_lain}" id="inputBerkasLainFoto" @change="imageChange">
                 <svg v-show="formErrors.berkas_lain" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -1394,13 +1382,10 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Ijazah Terakhir<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <div class="relative col-span-12 flex items-center">
+              <div class="col-span-12 flex items-center">
                 <input :disabled="!actionText ? true : false" ref="fileIjz" type="file" accept="application/pdf" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrorsPend.ijazah_foto}" @change="fileIjazah" @input="(v)=>valuesPendidikan.ijazah_foto=v" >
-                <svg v-show="formErrorsPend.ijazah_foto" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                  <title class="" id="svg-inline--fa-title-TuHui35w8qVB">failed</title>
-                  <path class="" fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-                </svg>
+                
               </div>
             </div>
           </div>
@@ -2406,13 +2391,10 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Surat Refrensi<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <div class="relative col-span-12 flex items-center">
+              <div class="col-span-12 flex items-center">
                 <input :disabled="!actionText ? true : false" ref="fileSurat" type="file" accept="application/pdf" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrorsPK.surat_referensi}" @change="fileSrtRef" @input="(v)=>valuesPengalaman.surat_referensi=v" >
-                <svg v-show="formErrorsPK.surat_referensi" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                  <title class="" id="svg-inline--fa-title-TuHui35w8qVB">failed</title>
-                  <path class="" fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-                </svg>
+                
               </div>
             </div>
           </div>

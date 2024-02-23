@@ -147,7 +147,8 @@ class default_users extends \App\Models\BasicModels\default_users
                 if($k->kode){
                     $this->create([
                         'username' => $k->kode,
-                        'email' => $k->kode."@sjg.com",
+                        'name' => $k->nama_lengkap,
+                        'email' => $k->kode."@hris.com",
                         'password' => $hasher->make($k->kode),
                         'm_kary_id' => $k->id
                     ]);

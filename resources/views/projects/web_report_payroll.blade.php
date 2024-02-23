@@ -32,8 +32,8 @@ foreach ($raw as $row) {
     <tbody>
       <tr>
         <td>P</td>
-        <td>{{ $raw[0]->created_at}}</td>
-        <td>{{ $rekeningFrom[0]->value }}</td>
+        <td>{{ @$raw[0]->created_at }}</td>
+        <td>{{ @$rekeningFrom[0]->value }}</td>
         <td>{{count($raw)}}</td>
         <td>{{$totalGaji}}</td>
       </tr>

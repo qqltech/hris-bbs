@@ -375,7 +375,7 @@ class Frontend
                     when (select mr.is_superadmin from m_role mr 
                         join m_role_access mra on mr.id = mra.m_role_id
                         join default_users u on u.id = mra.user_id 
-                        where mra.user_id = ?) is null or false then 
+                        where mra.user_id = ?) is false then 
                         b.id in(select
                             rd.m_menu_id 
                             from m_role_det rd 

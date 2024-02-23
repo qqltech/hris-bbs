@@ -25,7 +25,7 @@
                 :hints="formErrors.tipe_report" 
                 :check="false"
                 label=""
-                :options="['Rekap','Detail']"
+                :options="['Rekap Harian','Rekap','Detail']"
                 placeholder="Pilih Tipe Report Absensi"
                 valueField="key" 
                 displayField="key"
@@ -49,44 +49,56 @@
             />
           </div>
           <div class="grid grid-cols-2 gap-2">
-              <div v-show="values.tipe_report === 'Rekap' || !values.tipe_report">
-                  <label class="font-semibold">Periode
-                      <label class="text-red-500 space-x-0 pl-0"></label>
-                  </label>
-                  <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
-                    class="w-full py-2 !mt-0"
-                    :value="values.periode_from" 
-                    :check="false" 
-                    type="month" 
-                    label=""
-                    @input="(v)=>{
-                      values.periode_from = v
-                    }" />
-              </div>
-              <div v-show="values.tipe_report === 'Rekap' || !values.tipe_report">
-                  <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
-                    class="w-full py-2 !mt-5"
-                    :value="values.periode_to" 
-                    :check="false" 
-                    type="month" 
-                    label=""
-                    @input="(v)=>{
-                      values.periode_to = v
-                    }" />
-              </div>
-              <div class="col-span-2" v-show="values.tipe_report === 'Detail'">
-                  <label class="font-semibold">Periode
-                  </label>
-                  <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
-                    class="w-full py-2 !mt-0"
-                    :value="values.periode" 
-                    :check="false" 
-                    type="month" 
-                    label=""
-                    @input="(v)=>{
-                      values.periode = v
+            <div v-if="values.tipe_report == 'Rekap Harian'">
+              <label class="font-semibold">Tanggal</label>
+              <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
+                class="w-full py-2 !mt-0"
+                :value="values.date" 
+                :check="false" 
+                type="date" 
+                label=""
+                @input="(v)=>{
+                  values.date = v
+                }" />
+            </div>
+            <div v-else v-show="values.tipe_report === 'Rekap' || !values.tipe_report">
+                <label class="font-semibold">Periode
+                    <label class="text-red-500 space-x-0 pl-0"></label>
+                </label>
+                <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
+                  class="w-full py-2 !mt-0"
+                  :value="values.periode_from" 
+                  :check="false" 
+                  type="month" 
+                  label=""
+                  @input="(v)=>{
+                    values.periode_from = v
                   }" />
-              </div>
+            </div>
+            <div v-show="values.tipe_report === 'Rekap' || !values.tipe_report">
+                <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
+                  class="w-full py-2 !mt-5"
+                  :value="values.periode_to" 
+                  :check="false" 
+                  type="month" 
+                  label=""
+                  @input="(v)=>{
+                    values.periode_to = v
+                  }" />
+            </div>
+            <div class="col-span-2" v-show="values.tipe_report === 'Detail'">
+                <label class="font-semibold">Periode
+                </label>
+                <FieldX :bind="{ readonly: openDateSelected ? true : false , required: true}" 
+                  class="w-full py-2 !mt-0"
+                  :value="values.periode" 
+                  :check="false" 
+                  type="month" 
+                  label=""
+                  @input="(v)=>{
+                    values.periode = v
+                }" />
+            </div>
           </div>
          
           <div>
@@ -112,7 +124,7 @@
                     params: {
                         single: true,
                         join: false,
-                        where: `this.m_dir_id=${values.m_dir_id ?? 0} AND this.is_active='true'`
+                        where: `this.is_active='true'`
                     }
                 }"
             />

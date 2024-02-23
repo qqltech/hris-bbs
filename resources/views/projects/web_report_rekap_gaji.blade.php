@@ -4,7 +4,7 @@
   $periode_to = $req->periode_to ?? '2023-12-30';
   $raw = \DB::select("
     select 
-      k.nik, k.nama_lengkap, kd.nama dir, kdi.nama divisi, kde.nama dept, fd.total_gaji, fd.total_tax, fd.netto, fd.periode_in_date , fd.periode 
+      k.nik, k.nama_lengkap, kd.nama dir, kdi.nama divisi, kde.nama dept, (fd.netto+fd.total_tax) total_gaji, fd.total_tax, fd.netto, fd.periode_in_date , fd.periode 
     from t_final_gaji_det fd
       join t_final_gaji f on fd.t_final_gaji_id = f.id
       join m_kary k on k.id = fd.m_kary_id 

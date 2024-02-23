@@ -1,7 +1,7 @@
 @php
   $req = app()->request;
-  $periode_from = $req->periode_from ?? '2023-01-01';
-  $periode_to = $req->periode_to ?? '2023-12-30';
+  $periode_from = $req->periode_from ?? date('Y-m').'-01';
+  $periode_to = $req->periode_to ?? date('Y-m-d');
   $raw = \DB::select("
     select 
     tl.tanggal, tl.jam_mulai, tl.jam_selesai, tl.nomor,tl.keterangan,tl.status,tl.no_doc, k.nik, k.nama_lengkap, kd.nama dir, kdi.nama div,kde.nama dept, mg.value tipe_lembur, mg1.value alasan  

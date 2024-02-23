@@ -51,6 +51,15 @@
         tempGet.push(`export=pdf`)
       }
     }
+    if(values.periode){
+      tempGet.push(`periode=${values.periode}`)
+    }
+    if(values.periode_to){
+      let tempYear2 = values.periode_to.split('/')[2]
+      let tempMonth2 = values.periode_to.split('/')[1]
+      let tempDay2 = values.periode_to.split('/')[0]
+      tempGet.push(`periode_to=${tempYear2}-${tempMonth2}-${tempDay2}`)
+    }
     if(values.m_dir_id){
       tempGet.push(`m_dir_id=${values.m_dir_id}`)
     }

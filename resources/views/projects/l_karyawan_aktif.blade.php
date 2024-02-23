@@ -143,6 +143,23 @@
                 }"
             />
           </div>
+          <div>
+              <label class="font-semibold">Periode
+                  <label class="text-red-500 space-x-0 pl-0"></label>
+              </label>
+              <FieldX 
+                  type="month"
+                  :bind="{ readonly: false }" 
+                  class="w-full py-2 !mt-0" 
+                  :value="values.periode" 
+                  label="" 
+                  placeholder="DD/MM/YY" 
+                  :errorText="formErrors.periode?'failed':''"
+                  @input="v=>values.periode=v" 
+                  :hints="formErrors.periode" 
+                  :check="false"
+              />
+        </div>
       </div>
         <div class="flex flex-row justify-end space-x-[20px] mt-[1em]">
           <button @click="onGenerate" class="bg-green-600 hover:bg-green-800 duration-300 text-white px-[36.5px] py-[12px] rounded-[6px] ">

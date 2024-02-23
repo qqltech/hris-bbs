@@ -313,7 +313,7 @@
                             </td>
                           <td class="text-right border border-gray-300 p-0" :class="a.factor == '=' ? 'font-bold bg-gray-200' : ''" >
                             <FieldNumber
-                              :bind="{ readonly: isRead}" class="!mt-0 flex justify-end !p-0"
+                              :bind="{ readonly: !actionText}" class="!mt-0 flex justify-end !p-0"
                               :value="detailArrAdjOpen.items[i]['value']" @input="(v)=>{
                                 detailArrAdjOpen.items[i]['value']=v 
                                 summaryAdj()
@@ -336,7 +336,7 @@
                         <td class="text-left border border-gray-300 p-1 font-bold bg-gray-200">Total Penyesuaian Gaji</td>
                         <td class="text-right border border-gray-300 p-0 font-bold bg-gray-200">
                           <FieldNumber
-                            :bind="{ readonly: true}" class="!mt-0 flex justify-end !p-0"
+                            :bind="{ readonly: !actionText}" class="!mt-0 flex justify-end !p-0"
                             :value="totalAdjOpen.value"
                             type="number"
                             label=""
@@ -380,7 +380,7 @@
               <button @click="closeModal" class="modal-button bg-red-500 hover:bg-red-600 text-white font-semibold ml-2 px-2 py-1 rounded-sm">
                 Tutup
               </button>
-              <button v-show="actionText" @click="saveModal" class="modal-button bg-blue-500 hover:bg-blue-600 text-white font-semibold ml-2 px-2 py-1 rounded-sm">
+              <button v-show="actionText" @click="saveModal(detailArrOpen.items.length)" class="modal-button bg-blue-500 hover:bg-blue-600 text-white font-semibold ml-2 px-2 py-1 rounded-sm">
                 Simpan
               </button>
             </div>

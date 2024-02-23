@@ -36,12 +36,20 @@
   const dataByDate = ref([])
   const dataByDateDetail = ref([])
 
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  const currentDate = `${day}/${month}/${year}`;
+
   const values = reactive({
     tipe: 'HTML',
-    tipe_report : 'Rekap',
+    tipe_report : 'Rekap Harian',
     periode_from : tempYear+'-'+tempMonth,
     periode_to : tempYear+'-'+tempMonth,
     periode : tempYear+'-'+tempMonth,
+    date: currentDate
   })
 
   const resetValuesPeriode = () => {
@@ -80,6 +88,12 @@
         tempGet.push(`export=xls`)
       }else if(values.tipe?.toLowerCase() === 'pdf'){
         tempGet.push(`export=pdf`)
+      }
+    }
+    if(values.tipe_report === 'Rekap Harian')
+    {
+      if(values.date){
+        tempGet.push(`date=${values.date}`)
       }
     }
     if(values.tipe_report === 'Rekap')

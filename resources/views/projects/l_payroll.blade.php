@@ -65,7 +65,7 @@
                 flex: 1,
                 field: 'desc',
                 wrapText:true,
-                headerName: 'Nama Karyawan',
+                headerName: 'Deskripsi',
                 sortable: false, resizable: true, filter: 'ColFilter',
                 cellClass: ['border-r', '!border-gray-200', 'justify-start']
               },
