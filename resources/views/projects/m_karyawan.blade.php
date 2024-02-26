@@ -883,7 +883,7 @@
               </div>
               <div class="grid grid-cols-12 col-span-6">
                 <label class="col-span-12">Tanggal Berhenti Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
-                <FieldX :bind="{ readonly: true, disabled: true }" type="date" class="col-span-12 !mt-0 w-full"
+                <FieldX :bind="{ readonly: !actionText, disabled: !actionText }" type="date" class="col-span-12 !mt-0 w-full"
                   :value="values.tgl_berhenti" label="" :errorText="formErrors.tgl_berhenti?'failed':''"
                   @input="v=>values.tgl_berhenti=v" :hints="formErrors.tgl_berhenti" :check="false"
                 />
