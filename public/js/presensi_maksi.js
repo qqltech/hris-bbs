@@ -80,11 +80,11 @@ onBeforeMount(async () => {
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
       initialValues = resultJson.data
-      initialValues.lauk?.forEach((items)=>{
-        items.__id = ++_id
-        detailArr.value = [items, ...detailArr.value]
-      })
-      detailArr.value = detailArr.value?.sort((a, b) => a.id - b.id)
+      // initialValues.lauk?.forEach((items)=>{
+      //   items.__id = ++_id
+      //   detailArr.value = [items, ...detailArr.value]
+      // })
+      detailArr.value = initialValues.lauk?.sort((a, b) => a.id - b.id)
     } catch (err) {
       isBadForm.value = true
       swal.fire({
