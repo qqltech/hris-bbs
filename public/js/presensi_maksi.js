@@ -52,7 +52,6 @@ async function getDetail(id) {
         items.__id = ++_id
         detailArr.value = [items, ...detailArr.value]
       })
-    values.lauk = JSON.stringify(resultJson.data?.presensi_m_menu_maksi_det)
   } catch (error) {
     console.error('Error fetching tunjangan kemahalan:', error);
   }
@@ -81,10 +80,11 @@ onBeforeMount(async () => {
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
       initialValues = resultJson.data
-      initialValues.presensi_makan_det?.forEach((items)=>{
+      initialValues.lauk?.forEach((items)=>{
         items.__id = ++_id
         detailArr.value = [items, ...detailArr.value]
       })
+      detailArr.value = detailArr.value?.sort((a, b) => a.id - b.id)
     } catch (err) {
       isBadForm.value = true
       swal.fire({
@@ -154,6 +154,7 @@ async function onSave() {
       try {
         values.is_active=(values.is_active===true)?1:0
         values.presensi_m_menu_maksi_det = detailArr.value
+        values.lauk = JSON.stringify(detailArr.value)
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true
