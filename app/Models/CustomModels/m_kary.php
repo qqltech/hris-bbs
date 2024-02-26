@@ -566,22 +566,22 @@ class m_kary extends \App\Models\BasicModels\m_kary
                         ->where('m_kary_id', $id_kary)
                         ->update([
                         "m_kary_id" => $id_kary,
-                        "ktp_no" => $req->ktp_no ?? null,
-                        "ktp_foto" => $fileName_ktp ?? $check->ktp_foto,
-                        "pas_foto" => $fileName_pas ?? $check->pas_foto,
-                        "kk_no" => $req->kk_no ?? null,
-                        "kk_foto" => $fileName_kk ?? $check->kk_foto,
-                        "npwp_no" => $req->npwp_no ?? null,
-                        "npwp_foto" => $fileName_npwp ?? $check->npwp_foto,
-                        "npwp_tgl_berlaku" => $req->npwp_tgl_berlaku ?? null,
-                        "bpjs_tipe_id" => $req->bpjs_tipe_id ?? null,
-                        "bpjs_no" => $req->bpjs_no ?? null,
-                        "bpjs_no_kesehatan" => $req->bpjs_no_kesehatan ?? $check->bpjs_no_kesehatan,
-                        "bpjs_no_ketenagakerjaan" => $req->bpjs_no_ketenagakerjaan ?? $check->bpjs_no_ketenagakerjaan,
-                        "bpjs_foto" => $fileName_bpjs ?? $check->bpjs_foto,
-                        "berkas_lain" => $fileName_berkas ?? $check->berkas_lain,
-                        "desc_file" => $req->desc_file ?? null,
-                    ]);             
+                        "ktp_no" => $req->ktp_no ?? @$check->ktp_no,
+                        "ktp_foto" => $fileName_ktp ?? @$check->ktp_foto,
+                        "pas_foto" => $fileName_pas ?? @$check->pas_foto,
+                        "kk_no" => $req->kk_no ?? @$check->kk_no,
+                        "kk_foto" => $fileName_kk ?? @$check->kk_foto,
+                        "npwp_no" => $req->npwp_no ?? @$check->npwp_no,
+                        "npwp_foto" => $fileName_npwp ?? @$check->npwp_foto,
+                        "npwp_tgl_berlaku" => $req->npwp_tgl_berlaku ?? @$check->npwp_tgl_berlaku,
+                        "bpjs_tipe_id" => $req->bpjs_tipe_id ?? @$check->bpjs_tipe_id,
+                        "bpjs_no" => $req->bpjs_no ?? @$check->bpjs_no,
+                        "bpjs_no_kesehatan" => $req->bpjs_no_kesehatan ?? @$check->bpjs_no_kesehatan,
+                        "bpjs_no_ketenagakerjaan" => $req->bpjs_no_ketenagakerjaan ?? @$check->bpjs_no_ketenagakerjaan,
+                        "bpjs_foto" => $fileName_bpjs ?? @$check->bpjs_foto,
+                        "berkas_lain" => $fileName_berkas ?? @$check->berkas_lain,
+                        "desc_file" => $req->desc_file ?? @$check->desc_file,
+                    ]);           
                 }else{
                         \DB::table('m_kary_det_kartu')->insert([
                             "m_kary_id" => $id_kary,

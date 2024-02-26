@@ -12,7 +12,7 @@ class presensimaksidet extends Migration
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
-            $table->bigInteger('presensi_maksi_id')->comment('{"src":"presensi_maksi.id"}')->nullable();
+            $table->bigInteger('presensi_maksi_id')->comment('{"fk":"presensi_maksi.id"}')->nullable();
             $table->bigInteger('m_kary_id')->comment('{"src":"m_kary.id"}')->nullable();
             $table->jsonb('lauk');
             $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
