@@ -28,7 +28,6 @@ let initialValues = {}
 const changedValues = []
 
 const values = reactive({
-  is_active:true,
   tanggal: new Date().toLocaleDateString('en-GB'),
 })
 
@@ -82,7 +81,7 @@ onBeforeMount(async () => {
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
       initialValues = resultJson.data
-      initialValues.presensi_m_menu_maksi_det?.forEach((items)=>{
+      initialValues.presensi_makan_det?.forEach((items)=>{
         items.__id = ++_id
         detailArr.value = [items, ...detailArr.value]
       })
@@ -293,6 +292,16 @@ const landing = reactive({
   //   cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
   // },
   {
+    headerName: 'Master Menu Makan Siang',
+    field: 'presensi_m_menu_maksi.judul',
+    filter: true,
+    sortable: true,
+    flex:2,
+    filter: 'ColFilter',
+    resizable: true,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
+  },
+  {
     field: 'tanggal',
     filter: true,
     sortable: true,
@@ -309,21 +318,6 @@ const landing = reactive({
     resizable: true,
     flex:1,
     cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
-  },
-  {
-    headerName: 'Status',
-    field: 'is_active',
-    filter: true,
-    // resizable: true,
-    // valueGetter: (p) => p.node.data['status'].toLowerCase()==='active'? 'Aktif':'Tidak Aktif',
-    sortable: true,
-    flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
-    cellRenderer: ({ value }) => {
-      return value === true
-        ? `<span class="text-green-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Active</span>`
-        : `<span class="text-gray-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Inactive</span>`
-    }
   },
   ]
 })
