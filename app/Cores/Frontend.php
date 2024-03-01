@@ -69,20 +69,50 @@ class Frontend
                 }
         ]);
 
+        $default_menu = \DB::table('m_general')->where('group','DEFAULT MENU')->pluck('value')->first();
+        $default_menu = explode(',',$default_menu);
+
+        $fix_default_menu = [];
+        foreach($default_menu as $dm){
+            if($dm == 'Pesan Makan Siang'){
+                $fix_default_menu[] = [
+                    'modul' => $dm,
+                    'text' => $dm,
+                    'path' => '/pesan_maksi',
+                    "truncatable" => false,
+                    "icon" => "cutlery",
+                    "description" => null,
+                    "endpoint" => "/pesan_maksi"
+                ];
+            }
+            if($dm == 'Profil'){
+                $fix_default_menu[] = [
+                    'modul' => $dm,
+                    'text' => $dm,
+                    'path' => '/account',
+                    "truncatable" => false,
+                    "icon" => "user",
+                    "description" => null,
+                    "endpoint" => "/account"
+                ];
+            }
+            if($dm == 'Perjalanan Dinas'){
+                $fix_default_menu[] = [
+                    'modul' => $dm,
+                    'text' => $dm,
+                    'path' => '/t_spd',
+                    "truncatable" => false,
+                    "icon" => "pencil",
+                    "description" => null,
+                    "endpoint" => "/t_spd"
+                ];
+            }
+        }
+
         $app->router->get('/frontend-menu', [
             'middleware' => ['auth:api'],
-            function () use ($instance) {
-                return count($instance->formatMenu($instance->getMenu())) ? $instance->formatMenu($instance->getMenu()) : [
-                    [
-                        'modul' => 'Profil',
-                        'text' => 'Profil',
-                        'path' => '/account',
-                        "truncatable" => false,
-                        "icon" => "user",
-                        "description" => null,
-                        "endpoint" => "/account"
-                    ]
-                ];
+            function () use ($instance, $fix_default_menu) {
+                return count($instance->formatMenu($instance->getMenu())) ? $instance->formatMenu($instance->getMenu()) : $fix_default_menu;
             }
         ]);
         $app->router->get('/frontend-menu/{name}', [

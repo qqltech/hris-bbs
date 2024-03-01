@@ -1,4 +1,4 @@
-<div class="h-87vh w-full  items-center rounded text-sm">
+<div class="h-87vh w-full  items-center rounded text-sm" v-if="store.user?.is_superadmin == true">
   <div class="grid grid-cols-4 gap-6 px-4 w-full">
     <div class="bg-white bg-opacity-80 hover:!bg-opacity-95 shadow-lg py-5 rounded-lg px-7 flex flex-col gap-2">
       <p>Total Divisi Aktif</p>

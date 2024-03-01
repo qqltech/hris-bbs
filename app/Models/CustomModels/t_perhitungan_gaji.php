@@ -22,7 +22,7 @@ class t_perhitungan_gaji extends \App\Models\BasicModels\t_perhitungan_gaji
     private function factorSalary($standart_gaji, $kary = null, $periode = null)
     {
         $firstDayOfMonth = "$periode-01";
-        $date = new \DateTime($firstDayOfMonth); // Your initial date
+        $date = new \DateTime($firstDayOfMonth);
 
         // Set the date to the last day of the month
         $date->modify('last day of this month');

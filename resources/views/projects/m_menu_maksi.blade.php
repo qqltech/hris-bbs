@@ -87,7 +87,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, i) in detailArr" :key="item.id" class="border-t" v-if="detailArr.length > 0">
+              <tr v-for="(item, i) in detailArr" :key="item.__id" class="border-t" v-if="detailArr.length > 0">
                 <td class="p-2 text-center border border-[#CACACA]">
                   {{ i + 1 }}.
                 </td>
@@ -97,16 +97,18 @@
                     :value="item.tipe_lauk_id" @input="v=>item.tipe_lauk_id=v"
                     :errorText="formErrors.tipe_lauk_id?'failed':''" 
                     :hints="formErrors.tipe_lauk_id" label=""
+                    @update:valueFull="(v)=>{
+                      item['tipe_lauk.value_2']=v.value_2
+                    }"
                     valueField="id" displayField="value"
                     :api="{
                         url: `${store.server.url_backend}/operation/m_general`,
                         headers: { 'Content-Type': 'Application/json', 
                         Authorization: `${store.user.token_type} ${store.user.token}`},
                         params: {
-                          simplest:true,
-                          transform:false,
-                          join:false,
-                          where: `this.group = 'TIPE LAUK'`
+                          join:true,
+                          where: `this.group = 'TIPE LAUK'`,
+                          selectfield: 'this.id,this.value,this.value_2'
                         }
                     }"
                     placeholder="Pilih Tipe" :check="false"

@@ -1074,3 +1074,28 @@ onActivated(() => {
 
 //  @endif -------------------------------------------------END
 watchEffect(()=>store.commit('set', ['isRequesting', isRequesting.value]))
+
+const videoElement = ref(null)
+const capturedImage = ref(null)
+async function capture() {
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoElement.value.videoWidth;
+    canvas.height = videoElement.value.videoHeight;
+    canvas.getContext('2d').drawImage(videoElement.value, 0, 0, canvas.width, canvas.height);
+    capturedImage.value = canvas.toDataURL('image/jpeg');
+  } catch (error) {
+    alert("Oh maaf, sepertinyßa kami tidak mendapatkan akses kamera anda");
+  }
+}
+onMounted(async()=>{
+  mountCam() 
+})
+async function mountCam() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    videoElement.value.srcObject = stream;
+  } catch (error) {
+    alert("Oh maaf, sepertinyßa kami tidak mendapatkan akses kamera anda");
+  }
+}

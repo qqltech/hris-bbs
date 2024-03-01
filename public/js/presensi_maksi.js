@@ -44,16 +44,18 @@ async function getDetail(id) {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to fetch tunjangan kemahalan data');
+      throw new Error('Failed to fetch get master data');
     }
 
     const resultJson = await response.json();
-    resultJson.data?.presensi_m_menu_maksi_det?.forEach((items)=>{
+    console.log(resultJson?.data)
+    return
+    resultJson?.data?.presensi_m_menu_maksi_det?.forEach((items)=>{
         items.__id = ++_id
         detailArr.value = [items, ...detailArr.value]
       })
   } catch (error) {
-    console.error('Error fetching tunjangan kemahalan:', error);
+    console.error('Error fetching get master:', error);
   }
   isRequesting.value = false
 }
@@ -80,11 +82,13 @@ onBeforeMount(async () => {
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
       initialValues = resultJson.data
-      // initialValues.lauk?.forEach((items)=>{
-      //   items.__id = ++_id
-      //   detailArr.value = [items, ...detailArr.value]
-      // })
-      detailArr.value = initialValues.lauk?.sort((a, b) => a.id - b.id)
+      initialValues.lauk?.sort((a, b) => a.id - b.id)
+      initialValues.lauk?.forEach((item, index) => {
+          item.__id = ++_id
+          detailArr.value.push(item)
+      })
+
+      detailArr.value.sort((a, b) => a.__id - b.__id)
     } catch (err) {
       isBadForm.value = true
       swal.fire({
