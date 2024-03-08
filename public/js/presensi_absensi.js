@@ -25,13 +25,13 @@ const isCheckin = ref()
 const isCheckout = ref(false)
 
 const openDateDetail = (e,item,check,data) => {
-  console.log(item,'as')
-  if(item.checkin_foto?.includes(`${store.server.url_backend}`)||item.checkout_foto?.includes(`${store.server.url_backend}`)){
-
-  }else{
+  if(!item.checkin_foto?.includes(`http`)){
     if(item.checkin_foto){    
       item.checkin_foto = `${store.server.url_backend}/${item.checkin_foto}`
     }
+    
+  }
+  if(!item.checkout_foto?.includes(`http`)){
     if(item.checkout_foto){
       item.checkout_foto = `${store.server.url_backend}/${item.checkout_foto}`
     }

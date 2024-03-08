@@ -25,6 +25,7 @@ onBeforeMount(()=>{
 
 let initialValues = {}
 const changedValues = []
+let resultValues = reactive({items:[]})
 
 const values = reactive({
 })
@@ -60,18 +61,7 @@ const loadInitalData = async ()=>{
     if (!res.ok) throw new Error("Failed when trying to read data")
     const resultJson = await res.json()
     initialValues = resultJson.data
-    initialValues?.group_data?.forEach((d)=>{
-      d['detail']?.forEach((drx)=>{
-        if(drx['tipe_lauk.value_2']?.toLowerCase() === 'single'){
-          if(drx['lauk']?.toLowerCase() === 'full' || drx['lauk']?.toLowerCase() === 'penuh'){
-            drx['check'] = true
-          }else{
-            return
-          }
-        }
-        drx['check'] = true
-      })
-    })
+   
   } catch (err) {
     isBadForm.value = true
     swal.fire({
@@ -117,13 +107,27 @@ const checkItemDetail = (idx, i)=>{
   loadDet()
 }
 
-let resultValues = reactive({items:[]})
 const loadDet = () =>{
-  const filteredArrResult = values?.group_data?.map(item => ({ ...item, detail: item.detail.filter(det => det.check) })).filter(item => !item?.not_check);
-  resultValues.items = filteredArrResult
-  filteredArrResult?.forEach((v)=>{
-    v.detail_text = v?.detail?.map(det => det.lauk).join(', ');
-  })
+  if(initialValues?.sudah_pesan){
+    resultValues.items = initialValues?.lauk
+  }else{
+    initialValues?.group_data?.forEach((d)=>{
+      d['detail']?.forEach((drx)=>{
+        if(drx['tipe_lauk.value_2']?.toLowerCase() === 'single'){
+          if(drx['lauk']?.toLowerCase() === 'full' || drx['lauk']?.toLowerCase() === 'penuh'){
+            // drx['check'] = true
+          }else{
+            return
+          }
+        }
+      })
+    })
+    const filteredArrResult = values?.group_data?.map(item => ({ ...item, detail: item.detail.filter(det => det.check) })).filter(item => !item?.not_check);
+    resultValues.items = filteredArrResult
+    filteredArrResult?.forEach((v)=>{
+      v.detail_text = v?.detail?.map(det => det.lauk).join(', ');
+    })
+  }
 }
 
 const checkItemDetailNotIn = (idx, i)=>{
@@ -144,7 +148,6 @@ async function onSave() {
     if (res.isConfirmed) {
       let arrResult = {"pesan": []};
 
-      const filteredArrResult = values.group_data.map(item => ({ ...item, detail: item.detail.filter(det => det.check) })).filter(item => !item?.not_check);
       try {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation/presensi_maksi_det/pesan_maksi`
@@ -157,7 +160,52 @@ async function onSave() {
           },
           body: JSON.stringify({
             presensi_maksi_id:initialValues.id,
-            pesan:filteredArrResult
+            pesan:resultValues.items
+          })
+        })
+        loadInitalData()
+        if (!res.ok) {
+          if ([400, 422].includes(res.status)) {
+            const responseJson = await res.json()
+            formErrors.value = responseJson.errors || {}
+            throw (responseJson.errors.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
+          } else {
+            throw ("Failed when trying to post data")
+          }
+        }
+      } catch (err) {
+        isBadForm.value = true
+        swal.fire({
+          icon: 'error',
+          text: err
+        })
+      }
+      isRequesting.value = false
+    }
+  })
+}
+
+async function onCancel() {
+  //values.tags = JSON.stringify(values.tags)
+  swal.fire({
+    icon: 'warning',
+    text: 'Kamu yakin akan membatalkan pesananmu ?',
+    showDenyButton: true
+  }).then(async (res) => {
+    if (res.isConfirmed) {
+
+      try {
+        const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
+        const dataURL = `${store.server.url_backend}/operation/presensi_maksi_det/cancel`
+        isRequesting.value = true
+        const res = await fetch(dataURL, {
+          method: isCreating ? 'POST' : 'PUT',
+          headers: {
+            'Content-Type': 'Application/json',
+            Authorization: `${store.user.token_type} ${store.user.token}`
+          },
+          body: JSON.stringify({
+            id:initialValues.id
           })
         })
         loadInitalData()

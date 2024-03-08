@@ -5,10 +5,10 @@
       <h1 class="text-xl font-semibold">Pesan Makan Siang</h1>
       <h2 class="text-md lg:pr-10 text-gray-700">{{values.day}}, {{values.tanggal}}</h2>
     </div>
-    <i class="text-gray-700">Keterangan : {{ values.keterangan ?? '-' }}</i>
+    <i class="text-gray-700" v-show="!values?.sudah_pesan">Keterangan : {{ values.keterangan ?? '-' }}</i>
     <div class="border-t-gray-300 border border-sm mt-2"></div>
   </div>
-  <div class=" mb-2 w-[50%] <md:w-[100%]">
+  <div class="mb-2 w-[50%] <md:w-[100%]">
     <h3 class="text-gray-700">Pesanan kamu</h3>
     <table v-if="resultValues.items?.length" class="text-gray-700 w-[100%]">
       <tr v-for="(item,idx) in resultValues.items" :key="idx">
@@ -18,8 +18,14 @@
     </table>
     <h4 v-else class="text-yellow-700 italic">Oops, kamu belum pesan makan, pilih menu dibawah ini untuk pesan makan</h3>
   </div>
+  <div v-if="values?.sudah_pesan" class="mt-2 <md:text-center">
+    <button @click="onCancel" class="bg-red-500 hover:bg-red-600 text-white px-[15px] py-[6px] rounded-md w-32">
+      <span>Batalkan Pesanan</span>
+    </button>
+    <p class="font-[10px] text-gray-400 mt-1">*pesanan masih bisa dibatlkan jika menu makan untuk besok belum ditutup oleh admin.</p>
+  </div>
   <hr>
-  <div v-if="values?.group_data?.length">
+  <div v-if="values?.group_data?.length && !values?.sudah_pesan">
     <h3 class="text-gray-700">Mau pesan makan apa ?</h3>
     <div>
       <div class="border rounded-md border-gray-200 p-4 shadow-xl">
@@ -48,7 +54,7 @@
     </div>
   </div>
   <div v-else>
-    <h4 v-else class="text-red-400 italic font-semibold">Maaf, belum ada menu makan</h3>
+    <h4 v-else class="text-red-400 italic font-semibold" v-show="!values?.sudah_pesan">Maaf, belum ada menu makan</h3>
   </div>
 </div>
 

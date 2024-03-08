@@ -3,7 +3,7 @@
   $tipe = $req->tipe_report;
 
   $rekap = [];
-  $periode = $req->periode.'-01';
+  $periode = $req->periode.'-'.date('d');
   $data = \DB::select("
      select * from employee_attendance_detail(?,?)
     ",[ $periode, $req->kary_id ]);

@@ -236,15 +236,17 @@ class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
         if ($distance) {
             $data["on_scope"] = true;
             $data["region"] = $distance->nama;
-            $data["checkout_lat"] = $distance->lat;
-            $data["checkout_long"] = $distance->long;
-            $data["checkout_address"] = $req->address;
+            $data["lat"] = $distance->lat;
+            $data["long"] = $distance->long;
+            $data["address"] = $req->address;
+            $data["office"] = $distance->nama;
         } else {
             $data["on_scope"] = false;
             $data["region"] = "Out Scope";
-            $data["checkout_lat"] = $req->lat;
-            $data["checkout_long"] = $req->long;
-            $data["checkout_address"] = $req->address;
+            $data["lat"] = $req->lat;
+            $data["long"] = $req->long;
+            $data["address"] = $req->address;
+            $data["office"] = null;
         }
         return $this->helper->customResponse("OK", 200, $data);
     }
@@ -279,11 +281,11 @@ class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
             $dt->catatan_in = @json_decode($dt->absensi)->catatan_in ?? null;
             $dt->catatan_out = @json_decode($dt->absensi)->catatan_out ?? null;
             $dt->checkin_lat = @json_decode($dt->absensi)->checkin_lat ?? null;
-            $dt->checkin_foto = @json_decode($dt->absensi)->checkin_foto ? url('').'/'.@json_decode($dt->absensi)->checkin_foto : null;
+            $dt->checkin_foto = ($inPic=@json_decode($dt->absensi)->checkin_foto) ? (str_contains($inPic,'http')?$inPic:url($inPic)) : null;
             $dt->checkin_long = @json_decode($dt->absensi)->checkin_long ?? null;
             $dt->checkin_time = @json_decode($dt->absensi)->checkin_time ?? null;
             $dt->checkout_lat = @json_decode($dt->absensi)->checkout_lat ?? null;
-            $dt->checkout_foto = @json_decode($dt->absensi)->checkout_foto ? url('').'/'.@json_decode($dt->absensi)->checkout_foto : null;
+            $dt->checkout_foto = ($outPic=@json_decode($dt->absensi)->checkout_foto) ? (str_contains($outPic,'http')?$outPic:url($outPic)) : null;
             $dt->checkout_long = @json_decode($dt->absensi)->checkout_long ?? null;
             $dt->checkout_time = @json_decode($dt->absensi)->checkout_time ?? null;
             $dt->checkin_region = @json_decode($dt->absensi)->checkin_region ?? null;

@@ -15,6 +15,7 @@ class presensimaksi extends Migration
             $table->bigInteger('presensi_m_menu_maksi_id')->comment('{"src":"presensi_m_menu_maksi.id"}')->nullable();
             $table->date('tanggal');
             $table->jsonb('lauk');
+            $table->string('status')->default('DRAFT')->nullable();
             $table->string('keterangan')->nullable();
             $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();

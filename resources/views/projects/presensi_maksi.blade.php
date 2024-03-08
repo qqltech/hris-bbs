@@ -29,13 +29,14 @@
           <div class="grid grid-cols-12 items-center gap-y-2">
             <label class="col-span-12">Master Menu Makan Siang<label class="text-red-500 space-x-0 pl-0"></label></label>
             <FieldSelect class="!mt-0 w-full col-span-12"
-              :bind="{ disabled: !actionText, clearable:false }"
+              :bind="{ disabled: !actionText }"
               :value="values.presensi_m_menu_maksi_id" @input="v=>values.presensi_m_menu_maksi_id=v"
               :errorText="formErrors.presensi_m_menu_maksi_id?'failed':''" 
               :hints="formErrors.presensi_m_menu_maksi_id" label=""
               @update:valueFull="(v)=>{
                 getDetail(v.id)
               }"
+              @input="getDetail()"
               valueField="id" displayField="judul"
               :api="{
                   url: `${store.server.url_backend}/operation/presensi_m_menu_maksi`,

@@ -27,13 +27,26 @@ onBeforeMount(()=>{
 let initialValues = {}
 const changedValues = []
 
+const today = new Date();
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+
+const day = tomorrow.getDate().toString().padStart(2, '0');
+const month = (tomorrow.getMonth() + 1).toString().padStart(2, '0');
+const year = tomorrow.getFullYear();
+
+const formattedDate = `${day}/${month}/${year}`;
+
+
 const values = reactive({
-  tanggal: new Date().toLocaleDateString('en-GB'),
+  tanggal: formattedDate
 })
 
-async function getDetail(id) {
+async function getDetail(id = null) {
+  detailArr.value = []
+  if(!id) return
+  isRequesting.value = true
   try {
-    isRequesting.value = true
     detailArr.value=[]
     const response = await fetch(`${store.server.url_backend}/operation/presensi_m_menu_maksi/${id}`,{
       method: 'GET',
@@ -48,8 +61,7 @@ async function getDetail(id) {
     }
 
     const resultJson = await response.json();
-    console.log(resultJson?.data)
-    return
+  
     resultJson?.data?.presensi_m_menu_maksi_det?.forEach((items)=>{
         items.__id = ++_id
         detailArr.value = [items, ...detailArr.value]
@@ -197,7 +209,7 @@ const landing = reactive({
       icon: 'trash',
       class: 'bg-red-600 text-light-100',
       title: "Hapus",
-      // show: () => store.user.data.username==='developer',
+      show: () => store.user.data.username==='developer',
       click(row) {
         swal.fire({
           icon: 'warning',
@@ -238,7 +250,7 @@ const landing = reactive({
       icon: 'eye',
       title: "Read",
       class: 'bg-green-600 text-light-100',
-      // show: (row) => (currentMenu?.can_read)||store.user.data.username==='developer',
+      show: (row) => row.status?.toUpperCase() !== 'CLOSED' ,
       click(row) {
         router.push(`${route.path}/${row.id}?`+tsId)
       }
@@ -247,9 +259,123 @@ const landing = reactive({
       icon: 'edit',
       title: "Edit",
       class: 'bg-blue-600 text-light-100',
-      // show: (row) => (currentMenu?.can_update)||store.user.data.username==='developer',
+      show: (row) => row.status?.toUpperCase() !== 'CLOSED' ,
       click(row) {
         router.push(`${route.path}/${row.id}?action=Edit&`+tsId)
+      }
+    },
+    {
+      icon: 'location-arrow',
+      title: "Post data",
+      class: 'bg-rose-700 rounded-lg text-white',
+      show: (row) => row.status?.toUpperCase() === 'DRAFT' ,
+      async click(row) {
+        swal.fire({
+          icon: 'warning',
+          text: 'POST data?',
+          iconColor: '#1469AE',
+          confirmButtonColor: '#1469AE',
+
+          showDenyButton: true
+        }).then(async (res) => {
+          if (res.isConfirmed) {
+            try {
+              const dataURL = `${store.server.url_backend}/operation/presensi_maksi/post`
+              isRequesting.value = true
+              const res = await fetch(dataURL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'Application/json',
+                  Authorization: `${store.user.token_type} ${store.user.token}`
+                },
+                body: JSON.stringify({ id: row.id })
+              })
+              if (!res.ok) {
+                if ([400, 422, 500].includes(res.status)) {
+                  const responseJson = await res.json()
+                  formErrors.value = responseJson.errors || {}
+                  throw (responseJson.message+ " "+responseJson.data.errorText || "Failed when trying to post data")
+                } else {
+                  throw ("Failed when trying to post data")
+                }
+              }
+              const responseJson = await res.json()
+              swal.fire({
+                icon: 'success',
+                text: responseJson.message
+              })
+              // const resultJson = await res.json()
+            } catch (err) {
+              isBadForm.value = true
+              swal.fire({
+                icon: 'error',
+                iconColor: '#1469AE',
+                confirmButtonColor: '#1469AE',
+                text: err
+              })
+            }
+            isRequesting.value = false
+
+            apiTable.value.reload()
+          }
+        })
+      }
+    },
+    {
+      icon: 'check',
+      title: "Closed post data",
+      class: 'bg-green-700 rounded-lg text-white',
+      show: (row) => row.status?.toUpperCase() === 'POSTED' ,
+      async click(row) {
+        swal.fire({
+          icon: 'warning',
+          text: 'CLOSED post data?',
+          iconColor: '#1469AE',
+          confirmButtonColor: '#1469AE',
+
+          showDenyButton: true
+        }).then(async (res) => {
+          if (res.isConfirmed) {
+            try {
+              const dataURL = `${store.server.url_backend}/operation/presensi_maksi/closed`
+              isRequesting.value = true
+              const res = await fetch(dataURL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'Application/json',
+                  Authorization: `${store.user.token_type} ${store.user.token}`
+                },
+                body: JSON.stringify({ id: row.id })
+              })
+              if (!res.ok) {
+                if ([400, 422, 500].includes(res.status)) {
+                  const responseJson = await res.json()
+                  formErrors.value = responseJson.errors || {}
+                  throw (responseJson.message+ " "+responseJson.data.errorText || "Failed when trying to post data")
+                } else {
+                  throw ("Failed when trying to post data")
+                }
+              }
+              const responseJson = await res.json()
+              swal.fire({
+                icon: 'success',
+                text: responseJson.message
+              })
+              // const resultJson = await res.json()
+            } catch (err) {
+              isBadForm.value = true
+              swal.fire({
+                icon: 'error',
+                iconColor: '#1469AE',
+                confirmButtonColor: '#1469AE',
+                text: err
+              })
+            }
+            isRequesting.value = false
+
+            apiTable.value.reload()
+          }
+        })
       }
     },
     {
@@ -259,7 +385,7 @@ const landing = reactive({
       click(row) {
         router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
       }
-    }
+    },
   ],
   api: {
     url: `${store.server.url_backend}/operation${endpointApi}`,
@@ -324,6 +450,23 @@ const landing = reactive({
     flex:1,
     cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
   },
+  {
+    headerName: 'Status',
+    field: 'status',
+    filter: true,
+    sortable: true,
+    filter: 'ColFilter',
+    resizable: true,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
+    cellRenderer: ({ value }) => {
+      let color = 'gray'
+      if(value == 'POSTED')
+        color = 'green'
+      else if(value == 'CLOSED')
+        color = 'red'
+    return `<span class="text-${color}-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">${value}</span>`
+  }}
   ]
 })
 

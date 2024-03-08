@@ -4,18 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class presensimmenumaksidet extends Migration
+class presensimaksijadwalambil extends Migration
 {
-    protected $tableName = "presensi_m_menu_maksi_det";
+    protected $tableName = "presensi_maksi_jadwal_ambil";
 
     public function up()
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
-            $table->bigInteger('presensi_m_menu_maksi_id')->comment('{"fk":"presensi_m_menu_maksi.id"}')->nullable();
-            $table->bigInteger('tipe_lauk_id')->comment('{"src":"m_general.id"}')->nullable();
-            $table->string('lauk');
+            $table->bigInteger('presensi_maksi_id')->comment('{"fk":"presensi_maksi.id"}')->nullable();
+            $table->integer('minggu_ke')->nullable();
+            $table->integer('bulan')->nullable();
+            $table->date('tanggal')->nullable();
+            $table->string('hari')->nullable();
+            $table->bigInteger('m_kary_id')->comment('{"src":"m_kary.id"}')->nullable();
             $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
+            $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->timestamps();
         });
 
