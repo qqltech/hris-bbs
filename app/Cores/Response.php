@@ -8,17 +8,17 @@ use App\Models\CustomModels\m_pengguna;
 class Response
 {
     public function store($model){
-        // $user_id = @$model['data']['id'] ?? 0;
-        // $is_superadmin = \DB::select("
-        //         select mr.is_superadmin from m_role mr 
-        //         join m_role_access mra on mr.id = mra.m_role_id
-        //         join default_users u on u.id = mra.user_id 
-        //         where mra.user_id = ? and mr.is_superadmin = true
-        //     ", [$user_id]);
-
-        //     $model['is_superadmin'] = count($is_superadmin) ? true : false;
 
         if(isset($model['platform'])){
+            if(!app()->request->Source == 'Mobile'){
+                $is_superadmin = \DB::select("
+                        select mr.is_superadmin from m_role mr 
+                        join m_role_access mra on mr.id = mra.m_role_id
+                        join default_users u on u.id = mra.user_id 
+                        where mra.user_id = ? and mr.is_superadmin = true
+                    ", [auth()->user()->id]);
+                    $model['is_superadmin'] = @count($is_superadmin) ? true : false;
+            }
             if(!$model['m_dir_id']){
                 $model['direktorat'] = 'ADMIN INSTANSI';
             }else{

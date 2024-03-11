@@ -2,7 +2,7 @@
 
 @verbatim
 <div class="bg-white p-6 rounded-xl flex justify-center flex-col">
-  <div class="grid grid-cols-2 lg:grid-cols-8 w-full text-sm overflow-x-auto">
+  <div class="grid grid-cols-2 w-full text-sm overflow-x-auto">
           <button
             class="block w-full flex items-center justify-center border-b-2 border-gray-100 p-3 hover:border-blue-600 hover:text-blue-600 duration-300"
             :class="{'border-blue-600 text-blue-600 font-bold': activeTabIndex === 0}"
@@ -19,7 +19,7 @@
           </button>
         </div>
   <div v-show="activeTabIndex === 0">
-    <h1 class="font-semibold text-xl mt-8 text-center">{{form.attending?.toLowerCase() === 'not attend' ? 'Presensi Checkin' : (form.attending?.toLowerCase() === 'working' ? 'Presensi Checkout' : 'Sudah Absen')}} </h1>
+    <h1 class="font-semibold text-xl mt-8 text-center">{{form.attending?.toLowerCase() === 'not attend' ? 'Absen Checkin' : (form.attending?.toLowerCase() === 'working' ? 'Absen Checkout' : 'Sudah Absen')}} </h1>
       <div class="mt-4 lg:mt-6">
         <video v-show="!isImage" v-if="form.attending?.toLowerCase() !== 'attend'" ref="videoElement" autoplay playsinline muted class="rounded-xl h-full lg:h-[20rem] m-auto"></video>
         <!-- <div v-if="isImage" class="bg-gray-600 rounded-xl"></div> -->

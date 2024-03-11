@@ -127,9 +127,17 @@ async function onSave() {
 watchEffect(()=>store.commit('set', ['isRequesting', isRequesting.value]))
 
 
+const tempDate = new Date()
+const listTahun = []
+const tempmonth = tempDate.getMonth() + 1
+const tempyear = tempDate.getFullYear()
 const form = reactive({
-
+  month: tempmonth,
+  year: tempyear 
 })
+for(let i = form.year; i >= 2010; i-- ){
+    listTahun.push(i)
+  }
 
 onBeforeUnmount(()=>{
   const stream = videoElement.value.srcObject
@@ -141,8 +149,17 @@ onBeforeUnmount(()=>{
 const videoElement = ref(null)
 const capturedImage = ref(null)
 const coordsLocation = ref()
+const listDetail = ref([])
 const isImage = ref(false)
 const formData = new FormData()
+const dataDetail = ref()
+const showModal = ref(false)
+
+async function tampilkanModal(data){
+  showModal.value = true
+  dataDetail.value = data
+  console.log(data,'cok')
+}
 
 async function capture() {
   try {
@@ -197,12 +214,29 @@ function updateTime() {
 
 setInterval(updateTime, 1000);
 
+var listMonths = [
+    { id: 1, name: "Januari" },
+    { id: 2, name: "Februari" },
+    { id: 3, name: "Maret" },
+    { id: 4, name: "April" },
+    { id: 5, name: "Mei" },
+    { id: 6, name: "Juni" },
+    { id: 7, name: "Juli" },
+    { id: 8, name: "Agustus" },
+    { id: 9, name: "September" },
+    { id: 10, name: "Oktober" },
+    { id: 11, name: "November" },
+    { id: 12, name: "Desember" }
+];
+
+
 
 onMounted(async()=>{
   isRequesting.value = true
   // mountCam() 
   await getLocation()
   await checkLastStatus()
+  await getDetailAbsen(form.year,form.month)
   const tempDate = new Date()
   const day = tempDate.getDate() 
   const monthName = ["Januari", "Februari", "Maret", "April","Mei", "Juni", "Juli", "Agustus","September", "Oktober", "November", "Desemeber"][tempDate.getMonth()]
@@ -221,6 +255,42 @@ function getLocation() {
       text: "Geolocation is not supported by this browser."
     })
   }
+}
+
+function removeStrip(data){
+  const tempTest = data?.split('-')
+  const monthName = ["Januari", "Februari", "Maret", "April","Mei", "Juni", "Juli", "Agustus","September", "Oktober", "November", "Desemeber"][tempTest[1]-1]
+  return `${tempTest[0]} ${monthName} ${tempTest[2]}`
+  // console.log(data)
+  // return data?.replace(/-/g,' ')
+}
+
+async function getDetailAbsen(year,month){
+  try{
+      const params = `${year}-${month}`
+      const res = await fetch(`${store.server.url_backend}/operation/presensi_absensi/get_absen?periode=${params}`, {
+        headers: {
+          'Content-Type': 'Application/json',
+          Authorization: `${store.user.token_type} ${store.user.token}`
+        },
+      })  
+      if (!res.ok) {
+        if ([400, 422].includes(res.status)) {
+          const responseJson = await res.json()
+          throw (responseJson.message || "Failed when trying to post data")
+        } else {
+          throw ("Failed when trying to post data")
+        }
+      }
+      const resultJson = await res?.json()
+      const data = resultJson.data
+      listDetail.value = data
+    }catch(err){
+      swal.fire({
+        icon: 'error',
+        text: err
+      })
+    }
 }
 
 async function checkLastStatus(){
@@ -291,10 +361,10 @@ async function postAttend(){
       iconColor: '#1469AE',
       confirmButtonColor: '#1469AE',
     }).then(async (res) => {
-      console.log(res)
       if (res.isConfirmed){
         await getLocation()
         await checkLastStatus()
+        await getDetailAbsen(form.year,form.month)
         isImage.value=false
       }
     })

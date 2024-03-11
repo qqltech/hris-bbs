@@ -21,3 +21,26 @@ const endpointApi = '/dashboard'
 onBeforeMount(()=>{
   document.title = 'Dashboard'
 })
+const is_superadmin = ref(false)
+const beforeLoad = ref(false)
+onMounted(async ()=>{
+  beforeLoad.value = true
+   try {
+      const dataURL = `${store.server.url_backend}/me`
+      isRequesting.value = true
+      const res = await fetch(dataURL, {
+        headers: {
+          'Content-Type': 'Application/json',
+          Authorization: `${store.user.token_type} ${store.user.token}`
+        },
+      })
+      const data = await res.json()
+      is_superadmin.value = data?.is_superadmin ?? false
+      if(data?.is_superadmin == false){
+        router.replace('/presensi_absen_online')
+      }
+    } catch (err) {
+      beforeLoad.value = false
+    }
+    beforeLoad.value = false
+})

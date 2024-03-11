@@ -11,10 +11,10 @@
   $kary_id = @json_decode(@$data[0]->kary)->m_kary_id ?? 0;
   $check_kary_jam_kerja_tipe = \DB::table('m_kary as k')->join('m_general as g','g.id','k.tipe_jam_kerja_id')
     ->where('k.id', $kary_id)->pluck('g.code')->first();
-
+  
   $rekap = \DB::select("
     select 
-      employee_attendance(?,k.id) absen,
+      employee_attendance(?,k.id, ?) absen,
       (select   
         TO_CHAR(INTERVAL '1 second' * AVG(EXTRACT(EPOCH FROM pa.checkin_time::TIME)), 'HH24:MI:SS')
         from presensi_absensi pa where pa.default_user_id = u.id and pa.checkin_time is not null and to_char(pa.tanggal,'mm') = '11')  checkin_avg,
@@ -28,7 +28,7 @@
         where k.is_active = true 
         and k.m_dept_id IS NOT NULL and k.m_dept_id != 0
         and k.id = COALESCE(?, k.id)
-        ",[ $periode, $kary_id ]);
+        ",[ $periode, $periode, $kary_id ]);
 
   $total_checkin_telat = 0;
   $total_checkout_lebih_awal = 0;
@@ -38,7 +38,7 @@
 @endphp
 <span style="font-weight:bold; font-size: 10pt"> Absensi Karyawan Detail</span><br/>
 <span style="font-weight:bold; font-size: 7pt"> {{ @json_decode(@$data[0]->kary)->nik }} - {{ @json_decode(@$data[0]->kary)->nama_lengkap }}</span><br/>
-<span style="font-weight:bold; font-size: 7pt"> Periode  {{$req->periode}}</span><br/></br></br>
+<span style="font-weight:bold; font-size: 7pt"> Periode  {{$periode}}</span><br/></br></br>
 <table style="width: 100%; font-size: 7pt" cellpadding="2">
   <thead class="bg-[#c6c6c6]">
     <tr>

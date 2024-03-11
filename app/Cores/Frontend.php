@@ -74,6 +74,17 @@ class Frontend
 
         $fix_default_menu = [];
         foreach($default_menu as $dm){
+            if($dm == 'Absen Online'){
+                $fix_default_menu[] = [
+                    'modul' => $dm,
+                    'text' => $dm,
+                    'path' => '/presensi_absen_online',
+                    "truncatable" => false,
+                    "icon" => "camera",
+                    "description" => null,
+                    "endpoint" => "/presensi_absen_online"
+                ];
+            }
             if($dm == 'Pesan Makan Siang'){
                 $fix_default_menu[] = [
                     'modul' => $dm,
