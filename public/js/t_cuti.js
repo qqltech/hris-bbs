@@ -509,7 +509,7 @@ const landing = reactive({
     cellClass: ['border-r', '!border-gray-200', 'justify-start']
   },
   {
-    field: 'm_kary.nama_depan',
+    field: 'm_kary.nama_lengkap',
     headerName: 'Nama Karyawan',
     filter: true,
     sortable: true,

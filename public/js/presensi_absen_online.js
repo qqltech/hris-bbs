@@ -166,6 +166,8 @@ async function capture() {
     const canvas = document.createElement('canvas');
     canvas.width = videoElement.value.videoWidth;
     canvas.height = videoElement.value.videoHeight;
+    canvas.getContext('2d').translate(canvas.width, 0);
+    canvas.getContext('2d').scale(-1, 1);
     canvas.getContext('2d').drawImage(videoElement.value, 0, 0, canvas.width, canvas.height);
     const captredImageSrc = canvas.toDataURL('image/jpeg');
     let imgElem = document.getElementById('imgElem');

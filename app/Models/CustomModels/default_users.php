@@ -51,9 +51,10 @@ class default_users extends \App\Models\BasicModels\default_users
         if(app()->request->header('Source') === 'mobile'){
             $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$model['m_kary_id'] ??0]);
             $data = json_decode($data[0]->employee_attendance);
-            $model['m_kary.cuti_sisa_panjang'] = $data->sisa_cuti_reguler ?? 0;
-            $model['m_kary.cuti_sisa_reguler'] = $data->sisa_cuti_masa_kerja ?? 0;
-            $model['m_kary.cuti_sisa_p24'] = $data->sisa_cuti_p24 ?? 0;
+            $model['m_kary.sisa_cuti_satu_hari'] = $data->sisa_cuti_satu_hari ?? 0;
+            $model['m_kary.sisa_cuti_setengah_hari'] = $data->sisa_cuti_setengah_hari ?? 0;
+            $model['m_kary.cuti_satu_hari'] = $data->cuti_satu_hari ?? 0;
+            $model['m_kary.cuti_setengah_hari'] = $data->cuti_setengah_hari ?? 0;
             $model['info_cuti'] = $data;
             
         }

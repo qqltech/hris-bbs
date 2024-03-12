@@ -62,12 +62,12 @@
           <label class="font-semibold">Karyawan<span class="text-red-500 space-x-0 pl-0">*</span></label>
           <FieldPopup :bind="{ readonly: !actionText }" class="w-full py-2 !mt-0" :value="values.m_kary_id"
             @input="(v)=>values.m_kary_id=v" :errorText="formErrors.m_kary_id?'failed':''" :hints="formErrors.m_kary_id"
-            valueField="id" displayField="nama_depan" :api="{
+            valueField="id" displayField="nama_lengkap" :api="{
                   url: `${store.server.url_backend}/operation/m_kary`,
                   headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
                   params: {
                     simplest:true,
-                    searchfield:'id, nama_depan, nik, m_divisi.nama, m_zona.nama, m_dir.nama',
+                    searchfield:'id, nama_lengkap, nik, m_divisi.nama, m_zona.nama, m_dir.nama',
                   }
                 }" placeholder="Pilih Karyawan" label="" :check="false" :columns="[
               {

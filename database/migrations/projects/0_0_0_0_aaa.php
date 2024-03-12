@@ -13,6 +13,7 @@ class aaa extends Migration
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
             $table->string('seq');
+            $table->string('seq2');
          
 
         });

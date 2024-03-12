@@ -21,7 +21,7 @@
   <div v-show="activeTabIndex === 0">
     <h1 class="font-semibold text-xl mt-8 text-center">{{form.attending?.toLowerCase() === 'not attend' ? 'Absen Checkin' : (form.attending?.toLowerCase() === 'working' ? 'Absen Checkout' : 'Sudah Absen')}} </h1>
       <div class="mt-4 lg:mt-6">
-        <video v-show="!isImage" v-if="form.attending?.toLowerCase() !== 'attend'" ref="videoElement" autoplay playsinline muted class="rounded-xl h-full lg:h-[20rem] m-auto"></video>
+        <video style="transform: scaleX(-1)" v-show="!isImage" v-if="form.attending?.toLowerCase() !== 'attend'" ref="videoElement" autoplay playsinline muted class="rounded-xl h-full lg:h-[20rem] m-auto"></video>
         <!-- <div v-if="isImage" class="bg-gray-600 rounded-xl"></div> -->
         <!-- <div v-else class="bg-gray-700 m-auto rounded-xl w-full h-full lg:w-[426px] lg:h-[320px]"></div> -->
         <img v-show="isImage" id="imgElem" class="w-full lg:max-w-[426px] max-h-[320px] m-auto rounded-xl"></img>

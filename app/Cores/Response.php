@@ -4,6 +4,7 @@ namespace App\Cores;
 use App\Models\CustomModels\m_dir;
 use App\Models\CustomModels\m_comp;
 use App\Models\CustomModels\m_pengguna;
+use App\Models\CustomModels\m_general;
 
 class Response
 {
@@ -26,7 +27,7 @@ class Response
             }
             $model['company'] = m_comp::where('id', @$model['m_comp_id'] ?? 9)->pluck('nama')->first();
             $model['m_kary_id'] = m_pengguna::where('default_user_id', $model['id'])->pluck('m_kary_id')->first();
-            $model['avatar'] = url('')."/sjg.png";
+            $model['avatar'] =  m_general::where('group','SETTING')->where('code','BRAND-LOGO-SMALL')->pluck('value')->first();
           
         }
         return $model;

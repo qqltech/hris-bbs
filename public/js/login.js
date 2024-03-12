@@ -13,9 +13,25 @@ const values = reactive({
 })
 const valuesRo = readonly(values)
 
-onBeforeMount(() => {
+const getBasic = ref({})
+
+onBeforeMount(async () => {
   store.isUsingLayout = false
-  document.title = 'HRIS | QQLTECH'
+  console.log("HM")
+  isRequesting.value = true
+    const result = await fetch(store.server.url_backend + `/public/m_general/get_basic`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'Application/json',
+      }
+    })
+    if (!result.ok) {
+      throw new Error(await result.text())
+    }
+    const data = await result.json();
+    getBasic.value = data?.data
+    document.title = getBasic.value?.brand_title
+
 })
 
 async function onLogin(e = null) {
@@ -75,7 +91,6 @@ onMounted(async () => {
       window.localStorage.user = JSON.stringify(tempJson)
       router.replace('/dashboard')
     } catch (err) { }
-
     isRequesting.value = false
   }
 })

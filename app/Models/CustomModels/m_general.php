@@ -159,5 +159,19 @@ class m_general extends \App\Models\BasicModels\m_general
 
     // select g.group from m_general g group by g.group
 
-    
+    public function public_get_basic($req){
+        // return response()->json(['a'=>m_general::first()]);
+
+        try{
+            $data = [
+                'brand_title' => $this->where('group','SETTING')->where('code','BRAND-TITLE')->pluck('value')->first(),
+                'brand_logo' => $this->where('group','SETTING')->where('code','BRAND-LOGO')->pluck('value')->first(),
+                'brand_logo_small' => $this->where('group','SETTING')->where('code','BRAND-LOGO-SMALL')->pluck('value')->first(),
+                'brand_bg' => $this->where('group','SETTING')->where('code','BRAND-BG')->pluck('value')->first(),
+            ];
+            return response(['data'=>$data]);
+        }catch(\Exception $e){
+            return response(['errors'=>$e], 500);
+        }
+    }
 }
