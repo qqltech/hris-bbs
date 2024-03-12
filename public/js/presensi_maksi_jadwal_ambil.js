@@ -34,18 +34,19 @@ const values = reactive({
 function onDetailAdd(selectedData) {
   console.log("test")
   console.log(selectedData)
-  console.log(detailArrKaryawan.value)
+  console.log(detailArrKaryawan.items)
   
-  const newData = {
-    id: selectedData.id,
-    nik: selectedData.nik || '', // Handle jika nik null
-    nama: selectedData.nama_lengkap || '', // Gunakan nama_lengkap jika ada, jika tidak, gunakan string kosong
-    m_dept_nama: selectedData['m_dept.nama'] || '', // Handle jika 'm_dept.nama' null
-  };
+  // const newData = {
+  //   id: selectedData.id,
+  //   nik: selectedData.nik || '', // Handle jika nik null
+  //   nama: selectedData.nama_lengkap || '', // Gunakan nama_lengkap jika ada, jika tidak, gunakan string kosong
+  //   m_dept_nama: selectedData['m_dept.nama'] || '', // Handle jika 'm_dept.nama' null
+  // };
 
-  console.log(newData)
+  // console.log(newData)
 
-  detailArrKaryawan.items.push(newData);
+  // detailArrKaryawan.items.push(selectedData);
+  detailArrKaryawan.items = selectedData;
 }
 
 watchEffect(()=>store.commit('set', ['isRequesting', isRequesting.value]))

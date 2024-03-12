@@ -173,7 +173,7 @@ const landing = reactive({
       icon: 'trash',
       class: 'bg-red-600 text-light-100',
       title: "Hapus",
-      show: () => store.user.data.username==='trial',
+      // show: () => store.user.data.username==='trial',
       click(row) {
         swal.fire({
           icon: 'warning',
@@ -218,7 +218,7 @@ const landing = reactive({
       icon: 'eye',
       title: "Read",
       class: 'bg-green-600 text-light-100',
-      show: (row) => (currentMenu?.can_read)||store.user.data.username==='trial',
+      // show: (row) => (currentMenu?.can_read)||store.user.data.username==='trial',
       click(row) {
         router.push(`${route.path}/${row.id}?ts=`+(Date.parse(new Date())))
       }
@@ -227,7 +227,7 @@ const landing = reactive({
       icon: 'edit',
       title: "Edit",
       class: 'bg-blue-600 text-light-100',
-      show: (row) => (currentMenu?.can_update)||store.user.data.username==='trial',
+      // show: (row) => (currentMenu?.can_update)||store.user.data.username==='trial',
       click(row) {
         router.push(`${route.path}/${row.id}?action=Edit&ts=`+(Date.parse(new Date())))
       }

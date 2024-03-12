@@ -28,7 +28,7 @@
         where k.is_active = true 
         and k.m_dept_id IS NOT NULL and k.m_dept_id != 0
         and k.id = COALESCE(?, k.id)
-        ",[ $periode, $periode, $kary_id ]);
+        ",[ $periode, date('Y-m-d'), $kary_id ]);
 
   $total_checkin_telat = 0;
   $total_checkout_lebih_awal = 0;

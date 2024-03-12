@@ -14,13 +14,12 @@
                   headers: {'Content-Type': 'Application/json', authorization: `${store.user.token_type} ${store.user.token}`},
                   params: { 
                     simplest: true,
-                    selectfield: 'id,nik,nama_lengkap,m_dept.nama',
-                    searchfield: 'nik,nama_lengkap,m_dept.nama'
+                    searchfield: 'nik,nama_lengkap'
                   },
                   onsuccess:(response)=>{
                     response.data = [...response.data].map((dt)=>{
                       Object.assign(dt,{
-                        can_create: true, can_update: true, can_delete: true, can_read: true, role_id: values.role_id
+                        can_create: true, can_update: true, can_delete: true, can_read: true
                       })
                       return dt
                     })
@@ -61,7 +60,14 @@
                     headerName:  'Nama Karyawan',
                     sortable: false, resizable: true, filter: false,
                     cellClass: ['border-r', '!border-gray-200', 'justify-center']
-                  },]"
+                  },
+                  {
+                    flex: 1,
+                    field: 'm_dept.nama',
+                    headerName:  'Departemen',
+                    sortable: false, resizable: true, filter: false,
+                    cellClass: ['border-r', '!border-gray-200', 'justify-center']
+                  }]"
                 >
                   <div class="flex justify-center w-full h-full items-center px-2 py-1.5 text-xs rounded text-white bg-blue-500 hover:bg-blue-700 hover:bg-blue-600 transition-all duration-200">
                     <icon fa="plus" size="sm mr-0.5"/> Pilih Karyawan
@@ -80,7 +86,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, i) in detailArrKaryawan" :key="item.__id" class="border-t" v-if="detailArrKaryawan > 0">
+              <tr v-for="(item, i) in detailArrKaryawan" :key="item.id" class="border-t" v-if="detailArrKaryawan.length">
                 <td class="p-2 text-center border border-[#CACACA]">
                   {{ i + 1 }}.
                 </td>
@@ -88,10 +94,10 @@
                   {{ item.nik }}
                 </td>
                 <td class="text-left border border-[#CACACA] px-2">
-                  {{ item.nama }}
+                  {{ item.nama_lengkap }}
                 </td>
                 <td class="text-left border border-[#CACACA] px-2">
-                  {{ item['m_dept_nama'] }}
+                  {{ item['m_dept.nama'] }}
                 </td>
                 <td class="p-2 border border-[#CACACA]">
                   <div class="flex justify-center">
