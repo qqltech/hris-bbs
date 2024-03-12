@@ -35,6 +35,7 @@ function onDetailAdd(selectedData) {
   console.log("test")
   console.log(selectedData)
   console.log(detailArrKaryawan.items)
+  console.log(detailArrKaryawan.value)
   
   // const newData = {
   //   id: selectedData.id,
@@ -45,8 +46,8 @@ function onDetailAdd(selectedData) {
 
   // console.log(newData)
 
-  // detailArrKaryawan.items.push(selectedData);
-  detailArrKaryawan.items = selectedData;
+  detailArrKaryawan.value.push(selectedData);
+  // detailArrKaryawan.items = selectedData;
 }
 
 watchEffect(()=>store.commit('set', ['isRequesting', isRequesting.value]))
