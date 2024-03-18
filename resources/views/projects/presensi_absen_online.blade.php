@@ -24,7 +24,7 @@
         <video style="transform: scaleX(-1)" v-show="!isImage" v-if="form.attending?.toLowerCase() !== 'attend'" ref="videoElement" autoplay playsinline muted class="rounded-xl h-full lg:h-[20rem] m-auto"></video>
         <!-- <div v-if="isImage" class="bg-gray-600 rounded-xl"></div> -->
         <!-- <div v-else class="bg-gray-700 m-auto rounded-xl w-full h-full lg:w-[426px] lg:h-[320px]"></div> -->
-        <img v-show="isImage" id="imgElem" class="w-full lg:max-w-[426px] max-h-[320px] m-auto rounded-xl"></img>
+        <img v-show="isImage" id="imgElem" class="w-full lg:max-w-[426px] h-full lg:max-h-[320px] m-auto rounded-xl"></img>
       </div>
       <div class="flex mt-4 justify-center space-x-4 lg:mt-6">
         <div v-show="form.attending?.toLowerCase() !== 'attend'">

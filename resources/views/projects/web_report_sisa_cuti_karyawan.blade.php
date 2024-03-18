@@ -4,7 +4,7 @@
 
   $rekap = [];
   $periode_asli = $req->periode;
-  $periode = $req->periode.'-01';
+  $periode = $req->periode.'-'.date('d');
   $data = \DB::select("
     select 
       employee_attendance(?,k.id) absen,

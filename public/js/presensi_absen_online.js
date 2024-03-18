@@ -249,13 +249,50 @@ onMounted(async()=>{
 })
 
 function getLocation() {
+  console.log(navigator.geolocation)
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(setPosition);
+    navigator.geolocation.getCurrentPosition(setPosition, showError);
   } else { 
     swal.fire({
       icon: 'error',
       text: "Geolocation is not supported by this browser."
     })
+  }
+}
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      // if (navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome')) {
+      //   swal.fire({
+      //     icon: 'error',
+      //     text: "Geolocation is not supported or denied by this browser. Please check your browser settings."
+      //   });
+      // } else {
+        swal.fire({
+          icon: 'error',
+          text: "Please enable location permissions to access your current location.",
+        });
+      // }
+      break;
+    case error.POSITION_UNAVAILABLE:
+      swal.fire({
+        icon: 'error',
+        text: "Location information is unavailable."
+      });
+      break;
+    case error.TIMEOUT:
+      swal.fire({
+        icon: 'error',
+        text: "The request to get user location timed out."
+      });
+      break;
+    case error.UNKNOWN_ERROR:
+      swal.fire({
+        icon: 'error',
+        text: "An unknown error occurred."
+      });
+      break;
   }
 }
 

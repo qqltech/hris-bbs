@@ -23,42 +23,83 @@ class default_users extends \App\Models\BasicModels\default_users
     public $createAdditionalData = ["creator_id" => "auth:id"];
     public $updateAdditionalData = ["last_editor_id" => "auth:id"];
 
-     public function onRetrieved($model)
+    public function transformRowData( array $row )
     {
+        $object = [];
         $req = app()->request;
         if($req->from == 'role_access'){
-            $model->is_superadmin = 
+            $object['is_superadmin'] = 
                 m_role_access::join('m_role as r','r.id','m_role_access.m_role_id')
-                ->where('m_role_access.user_id', $model->id)
+                ->where('m_role_access.user_id', $row['id'])
                 ->pluck('is_superadmin')->first();
             if($req->detail)
-                $model->detail =  m_role_access::join('m_role as r','r.id','m_role_access.m_role_id')
+                $object['detail'] =  m_role_access::join('m_role as r','r.id','m_role_access.m_role_id')
                 ->select("r.*")
-                ->where('m_role_access.user_id', $model->id)
+                ->where('m_role_access.user_id', $row['id'])
                 ->get();
         }
         if($req->withKary){
-            $kary = m_kary::find($model->m_kary_id);
-            $model->nama_lengkap = @$kary->nama_lengkap;
-            $model->m_kary_id = @$kary->id;
-            $model->kode = @$kary->kode;
-            $model->nik = @$kary->nik;
-            $model->divisi = @m_divisi::find($kary->m_divisi_id)->nama;
-            $model->dept = @m_dept::find($kary->m_dept_id)->nama;
+            $kary = m_kary::find($row['m_kary_id']);
+            $object['nama_lengkap'] = @$kary->nama_lengkap;
+            $object['m_kary_id'] = @$kary->id;
+            $object['kode'] = @$kary->kode;
+            $object['nik'] = @$kary->nik;
+            $object['divisi'] = @m_divisi::find($kary->m_divisi_id)->nama;
+            $object['dept'] = @m_dept::find($kary->m_dept_id)->nama;
         }
-        $model->atasan = m_kary::where('id',@$model['m_kary.atasan_id']??0)->pluck('nama_lengkap')->first();
+        $object['atasan'] = m_kary::where('id',@$row['m_kary.atasan_id']??0)->pluck('nama_lengkap')->first();
 
         if(app()->request->header('Source') === 'mobile'){
-            $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$model['m_kary_id'] ??0]);
+            $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$row['m_kary_id'] ??0]);
             $data = json_decode($data[0]->employee_attendance);
-            $model['m_kary.sisa_cuti_satu_hari'] = $data->sisa_cuti_satu_hari ?? 0;
-            $model['m_kary.sisa_cuti_setengah_hari'] = $data->sisa_cuti_setengah_hari ?? 0;
-            $model['m_kary.cuti_satu_hari'] = $data->cuti_satu_hari ?? 0;
-            $model['m_kary.cuti_setengah_hari'] = $data->cuti_setengah_hari ?? 0;
-            $model['info_cuti'] = $data;
+            $object['m_kary.sisa_cuti_satu_hari'] = $data->sisa_cuti_satu_hari ?? 0;
+            $object['m_kary.sisa_cuti_setengah_hari'] = $data->sisa_cuti_setengah_hari ?? 0;
+            $object['m_kary.cuti_satu_hari'] = $data->cuti_satu_hari ?? 0;
+            $object['m_kary.cuti_setengah_hari'] = $data->cuti_setengah_hari ?? 0;
+            $object['info_cuti'] = $data;
             
         }
+        $object['profil_image'] = url('').'/'.$row['profil_image'];
+        
+        return array_merge( $row, $object );
     }
+
+    // public function onRetrieved($model)
+    // {
+    //     $req = app()->request;
+    //     if($req->from == 'role_access'){
+    //         $model->is_superadmin = 
+    //             m_role_access::join('m_role as r','r.id','m_role_access.m_role_id')
+    //             ->where('m_role_access.user_id', $model->id)
+    //             ->pluck('is_superadmin')->first();
+    //         if($req->detail)
+    //             $model->detail =  m_role_access::join('m_role as r','r.id','m_role_access.m_role_id')
+    //             ->select("r.*")
+    //             ->where('m_role_access.user_id', $model->id)
+    //             ->get();
+    //     }
+    //     if($req->withKary){
+    //         $kary = m_kary::find($model->m_kary_id);
+    //         $model->nama_lengkap = @$kary->nama_lengkap;
+    //         $model->m_kary_id = @$kary->id;
+    //         $model->kode = @$kary->kode;
+    //         $model->nik = @$kary->nik;
+    //         $model->divisi = @m_divisi::find($kary->m_divisi_id)->nama;
+    //         $model->dept = @m_dept::find($kary->m_dept_id)->nama;
+    //     }
+    //     $model->atasan = m_kary::where('id',@$model['m_kary.atasan_id']??0)->pluck('nama_lengkap')->first();
+
+    //     if(app()->request->header('Source') === 'mobile'){
+    //         $data = \DB::select("select public.employee_attendance(?,?)",[Date('Y-m-d'),$model['m_kary_id'] ??0]);
+    //         $data = json_decode($data[0]->employee_attendance);
+    //         $model['m_kary.sisa_cuti_satu_hari'] = $data->sisa_cuti_satu_hari ?? 0;
+    //         $model['m_kary.sisa_cuti_setengah_hari'] = $data->sisa_cuti_setengah_hari ?? 0;
+    //         $model['m_kary.cuti_satu_hari'] = $data->cuti_satu_hari ?? 0;
+    //         $model['m_kary.cuti_setengah_hari'] = $data->cuti_setengah_hari ?? 0;
+    //         $model['info_cuti'] = $data;
+            
+    //     }
+    // }
 
     public function createBefore($model, $arrayData, $metaData, $id = null)
     {
@@ -86,12 +127,6 @@ class default_users extends \App\Models\BasicModels\default_users
         ];
     }
 
-    public function transformRowData( array $row )
-    {
-        return array_merge( $row, [
-            'profil_image' => url('').'/'.$row['profil_image']
-        ] );
-    }
     
 
     public function custom_update_foto_profil($req)
