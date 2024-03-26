@@ -165,7 +165,7 @@ const landing = reactive({
       icon: 'trash',
       class: 'bg-red-600 text-light-100',
       title: "Hapus",
-      show: () => store.user.data.direktorat==='ADMIN INSTANSI',
+      // show: () => store.user.data.direktorat==='ADMIN INSTANSI',
       click(row) {
         swal.fire({
           icon: 'warning',
@@ -206,7 +206,7 @@ const landing = reactive({
       icon: 'eye',
       title: "Read",
       class: 'bg-green-600 text-light-100',
-      show: () => store.user.data.direktorat==='ADMIN INSTANSI',
+      // show: () => store.user.data.direktorat==='ADMIN INSTANSI',
       click(row) {
         router.push(`${route.path}/${row.id}?`+tsId)
       }
@@ -215,7 +215,7 @@ const landing = reactive({
       icon: 'edit',
       title: "Edit",
       class: 'bg-blue-600 text-light-100',
-      show: () => store.user.data.direktorat==='ADMIN INSTANSI',
+      // show: () => store.user.data.direktorat==='ADMIN INSTANSI',
       click(row) {
         router.push(`${route.path}/${row.id}?action=Edit&`+tsId)
       }
@@ -224,7 +224,7 @@ const landing = reactive({
       icon: 'copy',
       title: "Copy",
       class: 'bg-gray-600 text-light-100',
-      show: () => store.user.data.direktorat==='ADMIN INSTANSI',
+      // show: () => store.user.data.direktorat==='ADMIN INSTANSI',
       click(row) {
         router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
       }

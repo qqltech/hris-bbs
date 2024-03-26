@@ -730,7 +730,7 @@ const addPengalaman = async () => {
       }
     }
   }
-  if(Object.keys(tempObj).length >= 1){
+  if(Object.keys(tempObj)?.length >= 1){
     formErrorsPK.value = tempObj
     swal.fire({
       icon: 'error',
@@ -810,7 +810,7 @@ async function onSave() {
         values.m_kary_det_pk = detailPengalaman.value
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         // console.log(values.m_kary_det_kartu.length)
-        if(isCreating || values.m_kary_det_kartu.length === 0){
+        if(isCreating || values.m_kary_det_kartu?.length === 0){
 
           values.m_kary_det_kartu = [{
             ktp_no: values.ktp_no,
@@ -852,6 +852,8 @@ async function onSave() {
           // values.m_kary_det_kartu[0].bpjs_no = values.bpjs_no
           values.m_kary_det_kartu[0].bpjs_no_kesehatan = values.bpjs_no_kesehatan
           values.m_kary_det_kartu[0].bpjs_no_ketenagakerjaan = values.bpjs_no_ketenagakerjaan
+          values.m_kary_det_kartu[0].berkas_lain = values.berkas_lain
+          values.m_kary_det_kartu[0].desc_file = values.desc_file
           // if(initialValues.m_kary_det_kartu[0].bpjs_foto !== tempBPJS){
           //   values.m_kary_det_kartu[0].bpjs_foto = tempBPJS
           // }
@@ -872,7 +874,7 @@ async function onSave() {
           if ([400, 422].includes(res.status)) {
             const responseJson = await res.json()
             formErrors.value = responseJson.errors || {}
-            throw (responseJson.errors.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
+            throw (responseJson.errors?.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
           } else {
             throw ("Failed when trying to post data")
           }

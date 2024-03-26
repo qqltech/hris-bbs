@@ -67,7 +67,7 @@
                 cellClass: ['border-r', '!border-gray-200', 'justify-center']
             }]"
         >
-            <div class="flex justify-center w-full h-full items-center px-2 py-1.5 text-xs rounded text-white bg-blue-500 hover:bg-blue-700 hover:bg-blue-600 transition-all duration-200" :class="{ 'animate-bounce': detailArrKaryawan.length < 1 }">
+            <div class="flex justify-center w-full h-full items-center px-2 py-1.5 text-xs rounded text-white bg-blue-500 hover:bg-blue-700 hover:bg-blue-600 transition-all duration-200" :class="{ 'animate-pulse': detailArrKaryawan.length < 1 }">
                 <icon fa="user" size="sm mr-0.5"/> Pilih Karyawan
             </div>
         </ButtonMultiSelect>
