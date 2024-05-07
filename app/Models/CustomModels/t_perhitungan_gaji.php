@@ -140,11 +140,11 @@ class t_perhitungan_gaji extends \App\Models\BasicModels\t_perhitungan_gaji
 
             $jml_hari_sebulan = $att->work_days_in_month;
             $tidak_masuk_kerja = $att->work_not_present;
-            $cuti_reguler = $att->cuti_reguler;
-            $sisa_cuti_reguler = $att->sisa_cuti_reguler;
-            $sisa_cuti_masa_kerja = $att->sisa_cuti_masa_kerja;
-            $potongan_cuti = $att->potongan_cuti;
-            $sisa_cuti = $sisa_cuti_reguler+$sisa_cuti_masa_kerja;
+            $cuti_reguler = @$att->cuti_reguler;
+            $sisa_cuti_reguler = @$att->sisa_cuti_reguler;
+            $sisa_cuti_masa_kerja = @$att->sisa_cuti_masa_kerja;
+            $potongan_cuti = @$att->potongan_cuti;
+            $sisa_cuti = @$sisa_cuti_reguler+$sisa_cuti_masa_kerja;
 
             // gaji perhari
             $gaji_per_hari = 0;
@@ -388,111 +388,127 @@ class t_perhitungan_gaji extends \App\Models\BasicModels\t_perhitungan_gaji
 
     public function salaryOfKary($id, $periode = null)
     {
-        $m_kary_id = $id;
-        $kary = m_kary::find($m_kary_id);
-        $m_standart_gaji = m_standart_gaji::find($kary->m_standart_gaji_id);
+        try{
+            $m_kary_id = $id;
+            $kary = m_kary::find($m_kary_id);
+            if(!@$kary->m_standart_gaji_id) return [
+                'm_kary_id'  => $m_kary_id,
+                'total_gaji' => 0,
+                'total_tax'  => 0,
+                'netto'      => 0,
+                'detail'     => []
+            ];
+            $m_standart_gaji = m_standart_gaji::find($kary->m_standart_gaji_id);
 
-        // default summary salary
-        $getBasicSalary = $this->factorSalary($m_standart_gaji, $kary, $periode);
-        $netto          = $this->summarySubSalary($getBasicSalary);
-        $getBasicSalary    = array_merge($getBasicSalary, [
-            [
-                'label'    => 'Total Gaji',
-                'factor'   => '=',
-                'value'    => $netto,
-                'type'     => '-'
-            ]
-        ]);
-
-        $nettoFinish    = $this->summarySubSalary($getBasicSalary);
-
-        // default summary tax
-        $arrPPH         = $this->countPPH21($kary, $netto);
-        $totalTax = @$arrPPH[0]['value'];
-        if(count($arrPPH)){
-            $getBasicSalary = array_merge($getBasicSalary, $arrPPH);
-            $nettoFinish    = $this->summarySubSalary($getBasicSalary);
+            // default summary salary
+            $getBasicSalary = $this->factorSalary($m_standart_gaji, $kary, $periode);
+            $netto          = $this->summarySubSalary($getBasicSalary);
             $getBasicSalary    = array_merge($getBasicSalary, [
                 [
-                    'label'    => 'Total Gaji (Setelah PPH 21)',
+                    'label'    => 'Total Gaji',
                     'factor'   => '=',
-                    'value'    => $nettoFinish,
+                    'value'    => $netto,
                     'type'     => '-'
                 ]
             ]);
-        }
 
-        return [
-            'm_kary_id'  => $m_kary_id,
-            'total_gaji' => $netto,
-            'total_tax'  => $totalTax,
-            'netto'      => $nettoFinish,
-            'detail'     => $getBasicSalary
-        ];
+            $nettoFinish    = $this->summarySubSalary($getBasicSalary);
+
+            // default summary tax
+            $arrPPH         = $this->countPPH21($kary, $netto);
+            $totalTax = @$arrPPH[0]['value'];
+            if(count($arrPPH)){
+                $getBasicSalary = array_merge($getBasicSalary, $arrPPH);
+                $nettoFinish    = $this->summarySubSalary($getBasicSalary);
+                $getBasicSalary    = array_merge($getBasicSalary, [
+                    [
+                        'label'    => 'Total Gaji (Setelah PPH 21)',
+                        'factor'   => '=',
+                        'value'    => $nettoFinish,
+                        'type'     => '-'
+                    ]
+                ]);
+            }
+
+            return [
+                'm_kary_id'  => $m_kary_id,
+                'total_gaji' => $netto,
+                'total_tax'  => $totalTax,
+                'netto'      => $nettoFinish,
+                'detail'     => $getBasicSalary
+            ];
+        } catch (\Exception $e) {
+            return $this->helper->responseCatch($e);
+        }
     }
 
     public function generateSalary()
     {
-        $req =  app()->request;
-        $kary = m_kary::selectRaw("m_kary.*,m_general.value periode_text, m_dir.nama dir, m_divisi.nama divisi, m_dept.nama dept")
-            ->leftJoin('m_dir','m_dir.id','m_kary.m_dir_id')
-            ->leftJoin('m_divisi','m_divisi.id','m_kary.m_divisi_id')
-            ->leftJoin('m_dept','m_dept.id','m_kary.m_divisi_id')
-            ->join('m_general','m_general.id','m_kary.periode_gaji_id')
-            ->whereRaw('m_kary.m_standart_gaji_id in(select s.id from m_standart_gaji s where s.is_active = true)');
+        try{
+            $req =  app()->request;
+            $kary = m_kary::selectRaw("m_kary.*,m_general.value periode_text, m_dir.nama dir, m_divisi.nama divisi, m_dept.nama dept")
+                ->leftJoin('m_dir','m_dir.id','m_kary.m_dir_id')
+                ->leftJoin('m_divisi','m_divisi.id','m_kary.m_divisi_id')
+                ->leftJoin('m_dept','m_dept.id','m_kary.m_divisi_id')
+                ->join('m_general','m_general.id','m_kary.periode_gaji_id')
+                ->whereRaw('m_kary.m_standart_gaji_id in(select s.id from m_standart_gaji s where s.is_active = true)');
 
-        if($req->m_dept_id) $kary = $kary->where('m_kary.m_dept_id', $req->m_dept_id);
-        if($req->m_divisi_id) $kary = $kary->where('m_kary.m_divisi_id', $req->m_divisi_id);
+            if($req->m_dept_id) $kary = $kary->where('m_kary.m_dept_id', $req->m_dept_id);
+            if($req->m_divisi_id) $kary = $kary->where('m_kary.m_divisi_id', $req->m_divisi_id);
 
-        $kary = $kary->get();
-        
-        $date_from = \DateTime::createFromFormat('Y-m-d', $req->periode_awal.'-20');
-        $date_to = \DateTime::createFromFormat('Y-m-d', $req->periode_akhir.'-20');
+            $kary = $kary->get();
+            
+            $date_from = \DateTime::createFromFormat('Y-m-d', $req->periode_awal.'-20');
+            $date_to = \DateTime::createFromFormat('Y-m-d', $req->periode_akhir.'-20');
 
-        // Menghitung jumlah bulan antara tanggal_awal dan tanggal_akhir
-        $interval = $date_from->diff($date_to);
-        $jumlah_bulan = (($interval->y) * 12) + ($interval->m);
+            // Menghitung jumlah bulan antara tanggal_awal dan tanggal_akhir
+            $interval = $date_from->diff($date_to);
+            $jumlah_bulan = (($interval->y) * 12) + ($interval->m);
 
-        $data = [];
-        for ($i = 0; $i <= $jumlah_bulan; $i++) {
 
-            $date = $date_from->format('Y-m-d');
-            foreach($kary as $key)
-            {
-                $gaji = $this->salaryOfKary($key->id, $date_from->format('Y-m'));
-                $data[] = [
-                    'm_kary_id'         => $key->id,
-                    'm_kary.nik'        => $key->nik,
-                    'm_kary_dir_id'     => $key->m_dir_id,
-                    'm_kary_dir.nama'   => $key->dir,
-                    'm_kary_divisi_id'  => $key->m_divisi_id,
-                    'm_kary_divisi.nama'=> $key->divisi,
-                    'm_kary_dept_id'    => $key->m_dept_id,
-                    'm_kary_dept.nama'  => $key->dept,
-                    'nik'               => $key->nik,
-                    'nama_lengkap'      => $key->nama_lengkap,
-                    'periode'           => $date_from->format('d-m-Y'),
-                    'periode_in_date'   => $date,
-                    'periode_id'        => $key->periode_gaji_id,
-                    'periode_text'      => $key->periode_text,
-                    'total_tax'         => $gaji['total_tax'] ?? 0,
-                    'total_gaji'        => $gaji['total_gaji'],
-                    'netto'             => $gaji['netto'],
-                    'detail_gaji'       => $gaji['detail'],
-                ];
+            $data = [];
+            for ($i = 0; $i <= $jumlah_bulan; $i++) {
+
+                $date = $date_from->format('Y-m-d');
+                foreach($kary as $key)
+                {
+                    $gaji = $this->salaryOfKary($key->id, $date_from->format('Y-m'));
+                    $data[] = [
+                        'm_kary_id'         => $key->id,
+                        'm_kary.nik'        => $key->nik,
+                        'm_kary_dir_id'     => $key->m_dir_id,
+                        'm_kary_dir.nama'   => $key->dir,
+                        'm_kary_divisi_id'  => $key->m_divisi_id,
+                        'm_kary_divisi.nama'=> $key->divisi,
+                        'm_kary_dept_id'    => $key->m_dept_id,
+                        'm_kary_dept.nama'  => $key->dept,
+                        'nik'               => $key->nik,
+                        'nama_lengkap'      => $key->nama_lengkap,
+                        'periode'           => $date_from->format('d-m-Y'),
+                        'periode_in_date'   => $date,
+                        'periode_id'        => $key->periode_gaji_id,
+                        'periode_text'      => $key->periode_text,
+                        'total_tax'         => $gaji['total_tax'] ?? 0,
+                        'total_gaji'        => $gaji['total_gaji'],
+                        'netto'             => $gaji['netto'],
+                        'detail_gaji'       => $gaji['detail'],
+                    ];
+                }
+
+                // Menambahkan satu bulan untuk iterasi berikutnya
+                $date_from->add(new \DateInterval('P1M'));
             }
+            
 
-            // Menambahkan satu bulan untuk iterasi berikutnya
-            $date_from->add(new \DateInterval('P1M'));
+            return $this->helper->customResponse('OK', 200, $data);
+        } catch (\Exception $e) {
+            return $this->helper->responseCatch($e);
         }
-        
-
-        return $this->helper->customResponse('OK', 200, $data);
     }
 
     public function public_generate()
     {
-        $data =  $this->salaryOfKary(8);
+        $data =  $this->salaryOfKary(app()->request->id ?? 8, '2024-03');
        
         return response(['msg'=>$data]);
     }

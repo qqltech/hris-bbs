@@ -2,9 +2,9 @@
 <div class="bg-white p-6 rounded-xl h-[570px]">
   <TableApi ref='apiTable' :api="landing.api" :columns="landing.columns" :actions="landing.actions">
     <template #header>
-      <RouterLink v-if="currentMenu?.can_create||true||store.user.data.username==='developer'"
+      <RouterLink
         :to="$route.path+'/create?'+(Date.parse(new Date()))"
-        class="bg-green-500 text-white hover:bg-green-600 rounded-[6px] py-2 px-[12.5px]">
+        class="bg-green-500 text-white hover:bg-green-600  font-semibold rounded-[4px] py-1 px-[10px]">
         Tambah
         <icon fa="plus" />
       </RouterLink>
@@ -17,12 +17,6 @@
 <div class="flex flex-col gap-y-3">
   <div class="flex gap-x-4 px-2">
     <div class="flex flex-col border rounded shadow-sm px-6 py-6 <md:w-full w-full bg-white">
-      <div class="mb-4">
-        <h1 class="text-[24px] mb-4 font-bold">
-          Form Transaksi Cuti
-        </h1>
-        <hr>
-      </div>
 
       <!-- HEADER START -->
       <div class="flex items-center mb-2 border-b pb-4">
@@ -49,7 +43,6 @@
       <!-- HEADER END -->
 
 
-
       <div class="grid <md:grid-cols-1 grid-cols-2 gap-2">
         <!-- START COLUMN -->
         <div>
@@ -60,7 +53,7 @@
         </div>
         <div>
           <label class="font-semibold">Karyawan<span class="text-red-500 space-x-0 pl-0">*</span></label>
-          <FieldPopup :bind="{ readonly: !actionText }" class="w-full py-2 !mt-0" :value="values.m_kary_id"
+          <FieldPopup :bind="{ readonly: !actionText || !store.user.data?.is_superadmin }" class="w-full py-2 !mt-0" :value="values.m_kary_id"
             @input="(v)=>values.m_kary_id=v" :errorText="formErrors.m_kary_id?'failed':''" :hints="formErrors.m_kary_id"
             valueField="id" displayField="nama_lengkap" :api="{
                   url: `${store.server.url_backend}/operation/m_kary`,
@@ -378,23 +371,20 @@
           :errorText="formErrors.catatan?'failed':''" @input="v=>values.catatan=v" :hints="formErrors.catatan"
           :check="false" label="" placeholder="Tuliskan catatan" />
       </div>
-      <div class="flex flex-row justify-end space-x-[20px] mt-[1em]">
-        <button v-show="route.query.is_approval" class="mx-1 bg-green-500 text-white hover:bg-green-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('approve')">
+       <div class="flex flex-row justify-end space-x-[20px] mt-[1em]">
+        <button v-show="route.query.is_approval" class="mx-1 bg-green-500 text-white hover:bg-green-600 rounded-[4px] px-[36.5px] py-[5px]" @click="onProcess('approve')">
               Approve
             </button>
-        <button v-show="route.query.is_approval" class="mx-1 bg-rose-500 text-white hover:bg-rose-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('reject')">
+        <button v-show="route.query.is_approval" class="mx-1 bg-rose-500 text-white hover:bg-rose-600 rounded-[4px] px-[36.5px] py-[5px]" @click="onProcess('reject')">
               Reject
             </button>
-        <button v-show="route.query.is_approval" class="mx-1 bg-amber-500 text-white hover:bg-amber-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('revise')">
+        <button v-show="route.query.is_approval" class="mx-1 bg-amber-500 text-white hover:bg-amber-600 rounded-[4px] px-[36.5px] py-[5px]" @click="onProcess('revise')">
               Revise
             </button>
-        <!-- <button v-show="values.status === 'DRAFT' && !actionText && !route.query.is_approval " @click="onPost" class="bg-orange-500 hover:bg-orange-600 text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Mengajukan Persetujuan
-          </button> -->
-        <button @click="onBack" class="bg-[#EF4444] hover:bg-[#ed3232] text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Batal
+        <button v-show="route.query.action?.toLowerCase() === 'verifikasi'" @click="posted" class="bg-orange-500 hover:bg-orange-600 text-white px-[36.5px] py-[5px] font-semibold rounded-[4px] ">
+            Posted
           </button>
-        <button v-show="actionText" @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[36.5px] py-[12px] rounded-[6px] ">
+        <button v-show="actionText" @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[36.5px] py-[5px] font-semibold rounded-[4px]">
             Simpan
           </button>
       </div>

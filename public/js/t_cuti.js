@@ -21,11 +21,13 @@ const is_to_upload = route.query.is_to_upload ? true : false
 let isApproved = ref(false)
 let modalOpen = ref(false)
 let isFinish = ref(false)
+const is_superadmin = ref(false);
 // ------------------------------ PERSIAPAN
 const endpointApi = '/t_cuti'
 onBeforeMount(() => {
   document.title = is_approval ? 'Approval Cuti' : 'Transaksi Cuti'
-
+  is_superadmin.value = store.user.data?.is_superadmin ?? false
+  console.log(store.user.data?.is_superadmin)
 })
 
 //  @if( $id )------------------- VALUES FORM ! PENTING JANGAN DIHAPUS
@@ -133,13 +135,15 @@ onBeforeMount(async () => {
   }
 })
 
-
+onMounted(()=>{
+  if(!is_superadmin.value){
+    values.m_kary_id = store.user.data?.m_kary_id
+  }
+})
 
 async function downloadDoc(){
    window.open(`${store.server.url_backend}/operation/t_cuti/cuti?id=${values.t_cuti_id}`)
 }
-
-
 
 function onBack() {
   if (!is_approval) {
@@ -400,7 +404,7 @@ const landing = reactive({
   icon: 'edit',
   title: "Edit",
   class: 'bg-blue-600 text-light-100',
-  show: (row) => row.status?.toUpperCase() === 'DRAFT' || row.status?.toUpperCase() === 'REVISED',
+  show: (row) => row.status?.toUpperCase() === 'DRAFT' || row.status?.toUpperCase() === 'REVISED' || (row.status?.toUpperCase() === 'IN APPROVAL' && store.user.data?.is_superadmin),
   click(row) {
     router.push(`${route.path}/${row.id}?action=Edit&` + tsId);
   }
@@ -480,8 +484,9 @@ const landing = reactive({
     },
     params: {
       simplest: true,
-            join: true,
-            searchfield: 'm_kary.nama_depan, alasan.value, tipe_cuti.value, date_from, date_to, status',
+      join: true,
+      searchfield: 'm_kary.nama_lengkap, alasan.value, tipe_cuti.value, date_from, date_to, status',
+      where: `${!store.user.data?.is_superadmin ? ('this.m_kary_id='+store.user.data?.m_kary_id ?? 0) : ''}`
     },
     onsuccess(response) {
       response.page = response.current_page

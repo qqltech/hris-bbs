@@ -29,8 +29,9 @@ const changedValues = []
 
 const values = reactive({
   is_active : true,
-  m_dir_id : store.user.data?.direktorat
+  m_dir_id : store.user.data?.m_dir_id
 })
+
 
 onBeforeMount(async () => {
   // tampilkan default direktorat dengan store user comp.nama
@@ -124,6 +125,9 @@ async function onSave() {
   //values.tags = JSON.stringify(values.tags)
       try {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
+    //   if (isNaN(values.m_dir_id)) {
+    //   throw "m_dir_id harus berisi sebuah angka."
+    // }
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true
          values.is_active = values.is_active ? 1 : 0

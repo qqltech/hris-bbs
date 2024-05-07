@@ -101,6 +101,40 @@ class default_users extends \App\Models\BasicModels\default_users
     //     }
     // }
 
+    public function custom_getHBDKaryawan($request){
+        try {
+                $today = \Carbon::today();
+
+                $karyawanHariIni = m_kary::leftJoin('default_users', 'm_kary.id', '=', 'default_users.m_kary_id')
+                    ->whereMonth('m_kary.tgl_lahir', $today->month)
+                    ->whereDay('m_kary.tgl_lahir', '>=', $today->day)
+                    ->select('m_kary.*', 'default_users.name as default_users_nama')
+                    ->get();
+                
+                $karyawanHariIni->each(function($karyawan) use ($today) {
+                    $tanggalLahir = \Carbon::parse($karyawan->tgl_lahir);
+
+                    $ulangTahunTahunIni = $tanggalLahir->copy()->year($today->year);
+
+                    $countdown = $today->diffInDays($ulangTahunTahunIni, false);
+
+                    $karyawan->countdown = $countdown;
+                });
+
+
+
+                return response()->json([
+                    'data' => $karyawanHariIni,
+                    'message' => 'Daftar karyawan yang ulang tahun hari ini',
+                ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat mendapatkan data karyawan yang ulang tahun hari ini',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function createBefore($model, $arrayData, $metaData, $id = null)
     {
         $check = $model->where("username", req("username"))->exists();
@@ -126,6 +160,7 @@ class default_users extends \App\Models\BasicModels\default_users
             ]),
         ];
     }
+
 
     
 
@@ -199,6 +234,20 @@ class default_users extends \App\Models\BasicModels\default_users
         return response(['m'=>$kary]);
     }
 
+    public function updateBefore( $model, $arrayData, $metaData, $id=null )
+    {
+        $hasher = app()->make("hash");
+        return [
+            "model" => $model,
+            "data" => array_merge($arrayData, [
+                "password" => $hasher->make(req("password")),
+            ]),
+        ];
+        $newArrayData  = array_merge( $arrayData,[] );
+       
+    }
+    
+
     public function custom_reset_password($req)
     {
          if (req("password") && !req("password_confirm")) {
@@ -212,14 +261,14 @@ class default_users extends \App\Models\BasicModels\default_users
         $hasher = app()->make("hash");
 
         if($req->email && $req->username){
-            $this->where('id',auth()->user()->id)->update([
+            \DB::table('default_users')->where('id',$req->id_user ?? auth()->user()->id)->update([
                 'username' => $req->username,
                 'email' => $req->email,
             ]);
         }
         
         if(req("password")){
-            $this->where('id',auth()->user()->id)->update([
+            \DB::table('default_users')->where('id',$req->id_user ?? auth()->user()->id)->update([
                 'password' => $hasher->make(req("password"))
             ]);
         }

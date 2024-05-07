@@ -115,7 +115,7 @@
               :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
               :value="values.grading_id" @input="v=>values.grading_id=v"
               :errorText="formErrors.grading_id?'failed':''" 
-              label="" placeholder="Pilih Zona"
+              label="" placeholder="Pilih Grading"
               :hints="formErrors.grading_id"
               :api="{
                   url: `${store.server.url_backend}/operation/m_general`,

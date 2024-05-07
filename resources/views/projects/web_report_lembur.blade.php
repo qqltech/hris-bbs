@@ -4,18 +4,24 @@
   $periode_to = $req->periode_to ?? date('Y-m-d');
   $raw = \DB::select("
     select 
-    tl.tanggal, tl.jam_mulai, tl.jam_selesai, tl.nomor,tl.keterangan,tl.status,tl.no_doc, k.nik, k.nama_lengkap, kd.nama dir, kdi.nama div,kde.nama dept, mg.value tipe_lembur, mg1.value alasan  
+    tl.tanggal, tl.jam_mulai, tl.jam_selesai, tl.nomor,tl.keterangan,tl.status,tl.no_doc, k.kode nik, k.nama_lengkap, kd.nama dir, kdi.nama div,kde.nama dept, mg.value tipe_lembur, mg1.value alasan  
     from t_lembur tl
       join m_kary k on k.id = tl.m_kary_id 
-      join m_general mg on mg.id = tl.tipe_lembur_id
-      join m_general mg1 on mg1.id = tl.alasan_id
+      left join m_general mg on mg.id = tl.tipe_lembur_id
+      left join m_general mg1 on mg1.id = tl.alasan_id
       left join m_dir kd on kd.id = k.m_dir_id 
       left join m_divisi kdi on kdi.id = k.m_divisi_id 
       left join m_dept kde on kde.id = k.m_dept_id 
-      where tl.tanggal BETWEEN ? AND ? and kd.id = coalesce(?,kd.id) and kdi.id = coalesce(?,kdi.id) and kde.id = coalesce(?,kde.id)
-      and k.m_posisi_id = coalesce(?, k.m_posisi_id) and k.id = coalesce(?, k.id) and tl.status = 'APPROVED'
+      where tl.tanggal BETWEEN ? AND ? 
+      and case when kd.id is not null then kd.id = coalesce(?,kd.id) else true end
+      and case when kdi.id is not null then kdi.id = coalesce(?,kdi.id) else true end
+      and case when kde.id is not null then kde.id = coalesce(?,kde.id) else true end
+      and case when k.m_posisi_id is not null then k.m_posisi_id = coalesce(?,k.m_posisi_id) else true end
+      and case when tl.tipe_lembur_id is not null then tl.tipe_lembur_id = coalesce(?,tl.tipe_lembur_id) else true end
+      and case when k.id is not null then k.id =  coalesce(?,k.id) else true end
+      and tl.status = 'APPROVED'
   order by tl.id
-", [ $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id, $req->m_kary_id ]);
+", [ $periode_from, $periode_to, $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id, $req->tipe_lembur_id, $req->m_kary_id ]);
 @endphp
 <span style="width:100%;text-align:center;font-weight:bold;"> Surat Perintah Lembur </span><br/>
 @php

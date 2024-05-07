@@ -23,16 +23,25 @@
       </div>
       <div class="grid <md:grid-cols-1 grid-cols-2 gap-2">
         <!-- START COLUMN -->
-        <div>
-          <label for="Direktorat" class="font-semibold select-all">Direktorat <span class="text-red-500 space-x-0 pl-0"></span></label>
-          <FieldX :bind="{ readonly: true }" class="w-full py-2 !mt-0"
-              :value="values.m_dir_id" :errorText="formErrors.m_dir_id?'failed':''"
-              @input="v=>values.m_dir_id=v" :hints="formErrors.m_dir_id" 
-              :check="false"
-              label=""
-              placeholder=""
-          />
-        </div>
+<div>
+  <label for="Direktorat" class="font-semibold select-all">Direktorat <span class="text-red-500 space-x-0 pl-0"></span></label>
+  <FieldSelect
+    :bind="{ disabled: true, clearable:false }" class="w-full py-2 !mt-0"
+    :value="values.m_dir_id" @input="v=>values.m_dir_id=v"
+    :errorText="formErrors.m_dir_id?'failed':''" 
+    label="" placeholder="Pilih Divisi"
+    :hints="formErrors.m_dir_id"
+    :api="{
+        url: `${store.server.url_backend}/operation/m_dir`,
+        headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
+        params: {
+          simplest:true,
+          where: `this.is_active = 'true'`
+        }
+    }"
+    valueField="id" displayField="nama" :check="false"
+  />
+</div>
         <div>
           <label class="font-semibold">Kode<span class="text-red-500 space-x-0 pl-0"></span></label>
           <FieldX :bind="{ readonly: true }" class="w-full py-2 !mt-0"

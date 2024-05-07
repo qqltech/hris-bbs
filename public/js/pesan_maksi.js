@@ -64,13 +64,13 @@ const loadInitalData = async ()=>{
    
   } catch (err) {
     isBadForm.value = true
-    swal.fire({
-      icon: 'error',
-      text: err,
-      allowOutsideClick: false,
-      confirmButtonText: 'Kembali',
-    })
-    isRequesting.value = false
+    // swal.fire({
+    //   icon: 'error',
+    //   text: err,
+    //   allowOutsideClick: false,
+    //   confirmButtonText: 'Kembali',
+    // })
+    // isRequesting.value = false
   }
 
   for (const key in initialValues) {

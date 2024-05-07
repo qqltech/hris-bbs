@@ -23,7 +23,7 @@ class tlembur extends Migration
             $table->bigInteger('alasan_id')->comment('{"src":"m_general.id"}');
             $table->string('no_doc')->nullable();
             $table->string('doc')->nullable();
-            $table->text('keterangan')->nullable();
+            $table->text('keterangan');
             $table->string('status',50)->default('DRAFT')->nullable();
             $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();

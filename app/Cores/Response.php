@@ -26,7 +26,6 @@ class Response
                 $model['direktorat'] = m_dir::where('id', @$model['m_dir_id'] ?? 9)->pluck('nama')->first();
             }
             $model['company'] = m_comp::where('id', @$model['m_comp_id'] ?? 9)->pluck('nama')->first();
-            $model['m_kary_id'] = m_pengguna::where('default_user_id', $model['id'])->pluck('m_kary_id')->first();
             $model['avatar'] =  m_general::where('group','SETTING')->where('code','BRAND-LOGO-SMALL')->pluck('value')->first();
           
         }

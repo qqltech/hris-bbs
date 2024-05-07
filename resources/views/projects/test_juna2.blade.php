@@ -1,7 +1,233 @@
 @if(!$req->has('id'))
 
 @verbatim
+<FieldSelect
+  :bind="{ disabled: !actionText, clearable:false }"
+  :value="values.name" @input="v=>values.name=v"
+  :errorText="formErrors.name?'failed':''" 
+  :hints="formErrors.name"
+  valueField="id" displayField="key"
+  :api="{
+      url: 'endpoint',
+      headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
+      params: {
+        simplest:true,
+        transform:false,
+        join:false
+      }
+  }"
+  placeholder="label" fa-icon="bookmark" :check="false"
+/>
+
+<TableStatic
+  customClass="h-50vh"
+  ref="detail" 
+  :value="detailArr" 
+  @input="onRetotal"
+  :columns="[{
+      headerName: 'No',
+      cellRenderer: !actionText?null:'ButtonGrid',
+      valueGetter:p=>p.node.rowIndex + 1,
+      cellRendererParams: !actionText?null:{
+        showValue: true,
+        icon: 'times',
+        class: 'btn-text-danger',
+        click:(app)=>{
+          if (app && app.params) {
+            const row = app.params.node.data
+            swal.fire({
+              icon: 'warning', showDenyButton: true,
+              text: `Hapus Baris ${app.params.node.rowIndex-(-1)}?`,
+            }).then((res) => {
+              if (res.isConfirmed) {
+                app.params.api.applyTransaction({ remove: [app.params.node.data] })
+              }
+            })
+          }
+        }
+      },
+      width: 60,
+      sortable: false, resizable: true, filter: false,
+      cellClass: ['justify-center', 'bg-gray-50']
+    },
+    {
+      flex: 1,
+      headerName: 'colname',
+      field: 'colname',
+      editable: true,
+      sortable: false, resizable: true, filter: false,
+      cellClass: ['!border-gray-200', 'justify-end'],
+      cellRenderer: (p) => parseFloat(p.value||0).toLocaleString('id'),
+      cellEditor: 'FieldNumber',
+      cellEditorParams: {
+        input(val, api){
+          api.data['colname']=val
+          $log(api.data['data-tes3'],'halo')
+        }
+      }
+    },
+    {
+      flex: 1,
+      headerName: 'test',
+      field: 'data-tes3',
+      editable: true,
+      sortable: false, resizable: true, filter: false,
+      cellClass: ['!border-gray-200', 'justify-end'],
+      cellEditor: 'FieldSelect', 
+      cellEditorParams:{
+        valueField:'text', 
+        displayField:'text',
+        options: ['Active','InActive'],
+        input(val, api){
+          $log(val.text,'halo')
+          val.text = val.text?.toLowerCase() === 'active' ? 1 : 0
+          api.data['data-tes3']=val.text
+          $log(api.data['data-tes3'],'halo')
+        }
+      }
+    }, 
+    {
+      flex: 1,
+      headerName: 'test',
+      field: 'data-tes',
+      editable: true,
+      sortable: false, resizable: true, filter: false,
+      cellClass: ['!border-gray-200', 'justify-end'],
+      cellEditor: 'FieldSelect', 
+      cellEditorParams:{
+        api: {
+          url: `${store.server.url_backend}/operation/m_divisi`,
+          headers: {
+            'Content-Type': 'Application/json',
+            Authorization: `${store.user.token_type} ${store.user.token}`
+          },
+          params: {
+            simplest: true,
+            where: `this.is_active = 'true'`
+          }
+        }
+      }
+    },
+    {
+      flex: 1,
+      headerName: 'test',
+      field: 'data-tes',
+      editable: true,
+      sortable: false, resizable: true, filter: false,
+      cellClass: ['!border-gray-200', 'justify-end'],
+      cellEditor: 'FieldPopup', 
+      cellEditorParams:{
+        
+        valueField:'id', 
+        displayField:'name',
+        api: {
+          url: `${store.server.url_backend}/operation/m_divisi`,
+          headers: {
+            'Content-Type': 'Application/json',
+            Authorization: `${store.user.token_type} ${store.user.token}`
+          },
+          params: {
+            simplest: true,
+            where: `this.is_active = 'true'`
+          }
+        },
+        columns: [{
+          headerName: 'No',
+          valueGetter:(p)=>p.node.rowIndex + 1,
+          width: 60,
+          sortable: false, resizable: false, filter: false,
+          cellClass: ['justify-center', 'bg-gray-50']
+        }],
+      }
+    },
+    ]"
+  >
+  <template #header></template>
+</TableStatic>
+<FieldPopup
+  :bind="{ readonly: !actionText }"
+  :value="values.name" @input="(v)=>values.name=v"
+  :errorText="formErrors.name?'failed':''" 
+  :hints="formErrors.name" 
+  valueField="id" displayField="key"
+  :api="{
+    url: 'endpoint',
+    headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
+    params: {
+      simplest:true,
+    }
+  }"
+  placeholder="label" fa-icon="bookmark" :check="false" 
+  :columns="[{
+    headerName: 'No',
+    valueGetter:(p)=>p.node.rowIndex + 1,
+    width: 60,
+    sortable: false, resizable: false, filter: false,
+    cellClass: ['justify-center', 'bg-gray-50']
+  },
+  {
+    flex: 1,
+    field: 'columnname',
+    headerName:  'Label Header Name',
+    sortable: false, resizable: true, filter: 'ColFilter',
+    cellClass: ['border-r', '!border-gray-200', 'justify-center']
+  }]"
+/>
+
+<!-- {
+      flex: 1,
+      headerName: 'test',
+      field: 'data-tes',
+      editable: true,
+      sortable: false, resizable: true, filter: false,
+      cellClass: ['!border-gray-200', 'justify-end'],
+      cellEditor: 'FieldSelect', 
+      cellEditorParams:{
+        options: ['ahahahaha','hehehehe'],
+        input(val, api){
+          $log(val)
+        }
+      }
+    }, -->
+ <FieldSelect
+  :bind="{ disabled: false, clearable:false }" class="col-span-12 !mt-0 w-full"
+  :value="values.m_divisi_id" @input="v=>values.m_divisi_id=v"
+  :errorText="formErrors.m_divisi_id?'failed':''" 
+  label="" placeholder="Pilih Divisi"
+  :hints="formErrors.m_divisi_id"
+  :api="{
+      url: `${store.server.url_backend}/operation/m_divisi`,
+      headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
+      params: {
+        simplest:true,
+        where: `this.is_active = 'true'`
+      }
+  }"
+  valueField="id" displayField="nama" :check="false"
+/>
 <div class="bg-white p-6 rounded-xl flex justify-center flex-col">
+  <div class="flex mb-3">
+  <span ref="labelNomer" class="!focus:border-blue-600 focus:shadow-md focus:bg-white transition-all duration-300 mr-[-2px] z-10 inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">+62</span>
+  <FieldX class="!m-0"
+  @focus="handleFocus"
+  type="number"
+    :bind="{ readonly: false, classes:0}"
+    :value="values.nomer_hp" @input="(v)=>values.nomer_hp=v"
+    placeholder="label" :check="false"
+  />
+
+</div>
+
+  <div class="grid grid-cols-2">
+    <div>
+    </div>
+    <input class="md:max-h-8.6 <md:max-h-10 w-full bg-white md:text-xs py-2.5 rounded input-target outline-none border !focus:border-blue-600 focus:shadow-md focus:bg-white transition-all duration-300 pl-2.2 pr-3" icon="phone">
+  </div>
+  <FieldGeo class="w-full !mt-0 col-span-12"
+      :bind="{ readonly: false, search:true}"  
+      geostring="POINT(112.427027	 -7.488075)" placeholder="Pilih Titik Lokasi" fa-icon="map-marker-alt" :check="false"
+    />
+  <iframe src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210101201653/PDF.pdf" width="700px" height="700px"></iframe>
   <div class="grid grid-cols-2 lg:grid-cols-8 w-full text-sm overflow-x-auto">
           <button
             class="block w-full flex items-center justify-center border-b-2 border-gray-100 p-3 hover:border-blue-600 hover:text-blue-600 duration-300"
@@ -265,3 +491,4 @@
 </div>
 @endverbatim
 @endif
+

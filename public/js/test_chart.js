@@ -68,6 +68,7 @@ const handleDateClick = (date) => {
 };
 
 onMounted(() => {
+  console.log(store.user,'cok')
   initializeCalendar();
 });
 

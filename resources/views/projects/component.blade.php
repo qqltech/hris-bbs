@@ -1,4 +1,17 @@
+
+@verbatim
 <div class="flex flex-col gap-y-3">
+  
+  <div class="flex p-2.5 items-center gap-4">
+    <p>Show Data :</p>
+    <div class="flex gap-2">
+      <button @click="filterShowData(true,1)" :class="activeBtn === 1?'bg-green-600 text-white hover:bg-green-400':'border border-green-600 text-green-600 bg-white  hover:bg-green-600 hover:text-white'" class="duration-300 transform hover:-translate-y-0.5 rounded-md py-1 px-2">Aktif</button>
+      <div class="flex my-auto h-4 w-0.5 bg-[#6E91D1]"></div>
+      <button @click="filterShowData(false,2)" :class="activeBtn === 2?'bg-red-600 text-white hover:bg-red-400':'border border-red-600 text-red-600 bg-white  hover:bg-red-600 hover:text-white'" class="duration-300 transform hover:-translate-y-0.5 rounded-md py-1 px-2">Inaktif</button>
+    </div>
+  </div>
+
+  
   <div class="flex gap-x-4 px-2">
     <div class="flex flex-col border rounded shadow-sm px-6 py-6 <md:w-full w-full bg-white">
     
@@ -114,6 +127,7 @@
             :bind="{ readonly: false }" placeholder="Masukan Nominal Uang" fa-icon="dollar" :check="false"
           />
         </div>
+
         <div class="p-4"> 
           <FieldSelect
             :value="values.dropdown"
@@ -130,6 +144,7 @@
             placeholder="Pilih Dropdown" fa-icon="bookmark" :check="false"
           />
         </div>
+
         <div class="p-4"> 
           <FieldPopup
             valueField="id" displayField="menu"
@@ -165,6 +180,8 @@
             ]"
           />
         </div>
+
+
         <div class="p-4">
           <FieldX :bind="{ readonly: false }" type="date" :value="values.date"
             @input="v=>values.date=v" 
@@ -242,11 +259,35 @@
               <icon fa="plus" size="sm mr-0.5"/> Pop Up Multi Select
             </div>
           </ButtonMultiSelect>
+          <FieldSelect
+            :bind="{ disabled: false,multiple:true }"
+            :value="values.dropdown"
+            @input="v=>values.dropdown=v" 
+            valueField="id" displayField="menu"
+            :api="{
+                url: `${store.server.url_backend}/operation/m_menu`,
+                headers: { 'Content-Type': 'Application/json', Authorization: `${store.user.token_type} ${store.user.token}`},
+                params: {
+                  single: true,
+                  join: false,
+                }
+            }"
+            placeholder="Pilih Dropdown" fa-icon="bookmark" :check="false"
+          />
           
         </div>
-
-
-
+      
+          <FieldX :bind="{ readonly: false }" :value="values.textarea"
+            @input="v=>values.textarea=v" 
+            placeholder="Masukan Kata Kata" :check="false"
+          />
+          <div class="min-h-[32.391px] w-full bg-white md:text-xs rounded input-target outline-none border !focus:border-blue-600 focus:shadow-md focus:bg-white transition-all duration-300 p-1">
+              <icon fa="bookmark" v-if="dataArr.length === 0"/>
+            <span class="inline-block bg-[#f0f0f0] text-[12px] mt-[4px] mx-[2px] px-[0.25em] rounded-[4px] border  border-gray-300 p-1" v-for="item in dataArr">
+              {{item.menu}}
+              <icon fa="times" @click="sliceArr(item)"class="text-[15px] font-semibold" style="cursor: pointer; color: red;"/>
+            </span>
+          </div>
       </div>
       <!--BUTTON-->
 
@@ -287,3 +328,5 @@
     </div>
   </div>
 </div>
+
+@endverbatim

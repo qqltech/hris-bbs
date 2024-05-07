@@ -140,15 +140,22 @@ function onReset() {
 }
 
 async function onSave() {
+  if(route.params.id == 'create') {
+    var dataURL = `${store.server.url_backend}/operation${endpointApi}`
+  } else {
+    var dataURL = `${store.server.url_backend}/operation${endpointApi}/reset_password?id_user=${route.params.id}`
+  }
   //values.tags = JSON.stringify(values.tags)
       try {
+
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
-        const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
+
+        // const dataURL = `${store.server.url_backend}/operation${endpointApi}/reset_password?id_user=${route.params.id}`
         isRequesting.value = true
         delete values.atasan
         values.is_active = values.is_active ? 1 : 0
         const res = await fetch(dataURL, {
-          method: isCreating ? 'POST' : 'PUT',
+          method: 'POST',
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`

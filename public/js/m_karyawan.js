@@ -1006,7 +1006,7 @@ const landing = reactive({
     cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
   },
   {
-    field: 'nomor_ktp',
+    field: 'nik',
     headerName:'No KTP',
     filter: true,
     sortable: true,

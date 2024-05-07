@@ -24,8 +24,14 @@ const formErrorsBhs = ref({})
 const formErrorsPK = ref({})
 const activeTabIndex = ref(0)
 const content = ref()
-
+const labelNomer = ref()
+const values = reactive({})
 const tsId = `ts=`+(Date.parse(new Date()))
+
+const handleFocus = () => {
+  labelNomer.value.focus()
+  console.log(document.activeElement)
+}
 
 // ------------------------------ PERSIAPAN
 const endpointApi = '/m_kary'
@@ -43,18 +49,6 @@ let tempNPWP = ''
 let tempKK = ''
 let tempPasfoto = ''
 
-
-const values = reactive({
-  is_active: 1,
-  direktorat: store.user.data?.direktorat,
-  cuti_p24: 0,
-  cuti_reguler: 0,
-  cuti_masa_kerja:0,
-  cuti_p24_terpakai:0,
-  sisa_cuti_reguler:0,
-  sisa_cuti_masa_kerja:0,
-
-})
 
 function onBack() {
   let isChanged = false

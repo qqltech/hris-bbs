@@ -5,7 +5,7 @@
     <div class="flex flex-col border rounded shadow-sm px-6 py-6 <md:w-full w-full bg-white">
       <div class="mb-4">
         <h1 class="text-[24px] mb-4 font-bold">
-          Laporan Jadwal Kerja
+          Laporan Slip Gaji
         </h1>
         <hr>
       </div>

@@ -75,6 +75,9 @@
     if(values.m_posisi_id){
       tempGet.push(`m_posisi_id=${values.m_posisi_id}`)
     }
+    if(values.tipe_lembur_id){
+      tempGet.push(`tipe_lembur_id=${values.tipe_lembur_id}`)
+    }
     if(values.m_kary_id){
       tempGet.push(`m_kary_id=${values.m_kary_id}`)
     }

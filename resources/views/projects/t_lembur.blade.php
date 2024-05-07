@@ -2,9 +2,9 @@
 <div class="bg-white p-6 rounded-xl h-[570px]">
   <TableApi ref='apiTable' :api="landing.api" :columns="landing.columns" :actions="landing.actions">
     <template #header>
-      <RouterLink v-if="currentMenu?.can_create||true||store.user.data.username==='developer'"
+      <RouterLink 
         :to="$route.path+'/create?'+(Date.parse(new Date()))"
-        class="bg-green-500 text-white hover:bg-green-600 rounded-[6px] py-2 px-[12.5px]">
+        class="bg-green-500 text-white hover:bg-green-600  font-semibold rounded-[4px] py-1 px-[10px]">
         Tambah
         <icon fa="plus" />
       </RouterLink>
@@ -17,13 +17,6 @@
 <div class="flex flex-col gap-y-3">
   <div class="flex gap-x-4 px-2">
     <div class="flex flex-col border rounded shadow-sm px-6 py-6 <md:w-full w-full bg-white">
-      <div class="mb-4">
-        <h1 class="text-[24px] mb-4 font-bold">
-          Form Transaksi Lembur
-        </h1>
-        <hr>
-      </div>
-
       <!-- HEADER START -->
       <div class="flex items-center mb-2 border-b pb-4">
         <button class="py-1 px-2 rounded transition-all text-blue-900 bg-white border border-blue-900 duration-300 hover:text-white hover:bg-blue-600" @click="onBack">
@@ -59,7 +52,7 @@
         </div>
         <div>
           <label class="font-semibold">Karyawan<span class="text-red-500 space-x-0 pl-0">*</span></label>
-          <FieldPopup :bind="{ readonly: !actionText }" class="w-full py-2 !mt-0" :value="values.m_kary_id"
+          <FieldPopup :bind="{ readonly: !actionText || !store.user.data?.is_superadmin }" class="w-full py-2 !mt-0" :value="values.m_kary_id"
             @input="(v)=>values.m_kary_id=v" :errorText="formErrors.m_kary_id?'failed':''" :hints="formErrors.m_kary_id"
             valueField="id" displayField="nama_depan" :api="{
                   url: `${store.server.url_backend}/operation/m_kary`,
@@ -163,38 +156,38 @@
             :value="values.tipe_lembur_id" @input="v=>values.tipe_lembur_id=v"
             :errorText="formErrors.tipe_lembur_id?'failed':''" :hints="formErrors.tipe_lembur_id" label=""
             placeholder="Alasan" valueField="id" displayField="value" :api="{
-url: `${store.server.url_backend}/operation/m_general`,
-headers: {
-'Content-Type': 'Application/json',
-Authorization: `${store.user.token_type} ${store.user.token}`
-},
-params: {
-simplest: true,
-transform: false,
-join: true,
- where:`this.group='TIPE LEMBUR' AND this.is_active='true'`,
-selectfield: 'this.id, this.code, this.value, this.is_active'
-}
-}" :check="false" />
+            url: `${store.server.url_backend}/operation/m_general`,
+            headers: {
+            'Content-Type': 'Application/json',
+            Authorization: `${store.user.token_type} ${store.user.token}`
+            },
+            params: {
+            simplest: true,
+            transform: false,
+            join: true,
+            where:`this.group='TIPE LEMBUR' AND this.is_active='true'`,
+            selectfield: 'this.id, this.code, this.value, this.is_active'
+            }
+            }" :check="false" />
         </div>
         <div>
           <label class="font-semibold">Alasan<span class="text-red-500 space-x-0 pl-0">*</span></label>
           <FieldSelect :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
             :value="values.alasan_id" @input="v=>values.alasan_id=v" :errorText="formErrors.alasan_id?'failed':''"
             :hints="formErrors.alasan_id" label="" placeholder="Alasan" valueField="id" displayField="value" :api="{
-url: `${store.server.url_backend}/operation/m_general`,
-headers: {
-'Content-Type': 'Application/json',
-Authorization: `${store.user.token_type} ${store.user.token}`
-},
-params: {
-simplest: true,
-transform: false,
-join: true,
- where:`this.group='ALASAN LEMBUR' AND this.is_active='true'`,
-selectfield: 'this.id, this.code, this.value, this.is_active'
-}
-}" :check="false" />
+              url: `${store.server.url_backend}/operation/m_general`,
+              headers: {
+              'Content-Type': 'Application/json',
+              Authorization: `${store.user.token_type} ${store.user.token}`
+              },
+              params: {
+              simplest: true,
+              transform: false,
+              join: true,
+              where:`this.group='ALASAN LEMBUR' AND this.is_active='true'`,
+              selectfield: 'this.id, this.code, this.value, this.is_active'
+              }
+              }" :check="false" />
         </div>
         <div>
           <label class="font-semibold">No.Dokumen<label class="text-red-500 space-x-0 pl-0"></label></label>
@@ -218,7 +211,7 @@ selectfield: 'this.id, this.code, this.value, this.is_active'
 
         <div>
           <label class="col-span-12">Keterangan<label class="text-red-500 space-x-0 pl-0"></label></label>
-          <FieldX :bind="{ readonly: false }" type='textarea' class="w-full py-2 !mt-0" :value="values.keterangan"
+          <FieldX :bind="{ readonly: !actionText }" type='textarea' class="w-full py-2 !mt-0" :value="values.keterangan"
             :errorText="formErrors.keterangan?'failed':''" @input="v=>values.keterangan=v"
             :hints="formErrors.keterangan" :check="false" label="" placeholder="Tuliskan keterangan" />
         </div>
@@ -336,23 +329,20 @@ selectfield: 'this.id, this.code, this.value, this.is_active'
 
 
       <!-- ACTION BUTTON START -->
-      <div class="flex flex-row justify-end space-x-[20px] mt-[5em]">
-        <button v-show="route.query.is_approval" class="mx-1 bg-green-500 text-white hover:bg-green-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('approve')">
+      <div class="flex flex-row justify-end space-x-[20px] mt-[1em]">
+        <button v-show="route.query.is_approval" class="mx-1 bg-green-500 text-white hover:bg-green-600 rounded-[4px] px-[36.5px] py-[5px]" @click="onProcess('approve')">
               Approve
             </button>
-        <button v-show="route.query.is_approval" class="mx-1 bg-rose-500 text-white hover:bg-rose-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('reject')">
+        <button v-show="route.query.is_approval" class="mx-1 bg-rose-500 text-white hover:bg-rose-600 rounded-[4px] px-[36.5px] py-[5px]" @click="onProcess('reject')">
               Reject
             </button>
-        <button v-show="route.query.is_approval" class="mx-1 bg-amber-500 text-white hover:bg-amber-600 rounded-lg py-[10px] px-[28px] " @click="onProcess('revise')">
+        <button v-show="route.query.is_approval" class="mx-1 bg-amber-500 text-white hover:bg-amber-600 rounded-[4px] px-[36.5px] py-[5px]" @click="onProcess('revise')">
               Revise
             </button>
-        <button v-show="route.query.action?.toLowerCase() === 'verifikasi'" @click="posted" class="bg-orange-500 hover:bg-orange-600 text-white px-[36.5px] py-[12px] rounded-[6px] ">
+        <button v-show="route.query.action?.toLowerCase() === 'verifikasi'" @click="posted" class="bg-orange-500 hover:bg-orange-600 text-white px-[36.5px] py-[5px] font-semibold rounded-[4px] ">
             Posted
           </button>
-        <button @click="onBack" class="bg-[#EF4444] hover:bg-[#ed3232] text-white px-[36.5px] py-[12px] rounded-[6px] ">
-            Batal
-          </button>
-        <button v-show="actionText" @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[36.5px] py-[12px] rounded-[6px] ">
+        <button v-show="actionText" @click="onSave" class="bg-[#10B981] hover:bg-[#0ea774] text-white px-[36.5px] py-[5px] font-semibold rounded-[4px]">
             Simpan
           </button>
       </div>

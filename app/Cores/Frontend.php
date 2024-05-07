@@ -107,15 +107,26 @@ class Frontend
                     "endpoint" => "/account"
                 ];
             }
-            if($dm == 'Perjalanan Dinas'){
+            if($dm == 'Lembur'){
                 $fix_default_menu[] = [
                     'modul' => $dm,
                     'text' => $dm,
-                    'path' => '/t_spd',
+                    'path' => '/t_lembur',
                     "truncatable" => false,
-                    "icon" => "pencil",
+                    "icon" => "hammer",
                     "description" => null,
-                    "endpoint" => "/t_spd"
+                    "endpoint" => "/t_lembur"
+                ];
+            }
+            if($dm == 'Cuti'){
+                $fix_default_menu[] = [
+                    'modul' => $dm,
+                    'text' => $dm,
+                    'path' => '/t_cuti',
+                    "truncatable" => false,
+                    "icon" => "calendar",
+                    "description" => null,
+                    "endpoint" => "/t_cuti"
                 ];
             }
         }

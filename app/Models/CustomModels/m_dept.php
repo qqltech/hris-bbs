@@ -14,17 +14,6 @@ class m_dept extends \App\Models\BasicModels\m_dept
     //public $createAdditionalData = ["creator_id"=>"auth:id"];
     //public $updateAdditionalData = ["last_editor_id"=>"auth:id"];
 
-    public function createBefore( $model, $arrayData, $metaData, $id=null )
-    {
-      $newArrayData  = array_merge( $arrayData,[
-        'm_dir_id' => auth()->user()->m_dir_id ?? 0
-      ] );
-      return [
-          "model"  => $model,
-          "data"   => $newArrayData,
-          // "errors" => ['error1']
-      ];
-    }
 
     public function scopeFilterDivisi($model)
     {

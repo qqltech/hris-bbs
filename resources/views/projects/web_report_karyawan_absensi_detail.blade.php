@@ -4,9 +4,10 @@
 
   $rekap = [];
   $periode = $req->periode.'-'.date('d');
+  $dateNow = date('Y-m-d');
   $data = \DB::select("
-     select * from employee_attendance_detail(?,?)
-    ",[ $periode, $req->kary_id ]);
+     select * from employee_attendance_detail(?,?,?)
+    ",[ $periode, $req->kary_id, $dateNow = date('Y-m-d')]);
   
   $kary_id = @json_decode(@$data[0]->kary)->m_kary_id ?? 0;
   $check_kary_jam_kerja_tipe = \DB::table('m_kary as k')->join('m_general as g','g.id','k.tipe_jam_kerja_id')

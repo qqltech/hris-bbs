@@ -172,6 +172,8 @@ async function generatePerhitungan() {
             const responseJson = await res.json()
             formErrors.value = responseJson.errors || {}
             throw (responseJson.errors.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
+          } else if(res.status == 500) {
+            throw ("Sesuatu yang salah terjadi, silahkan coba kembali nanti atau hubungi administrator")
           } else {
             throw ("Failed when trying to post data")
           }
@@ -180,10 +182,10 @@ async function generatePerhitungan() {
         const result = await res.json()
         const resultData = result.data
         if(!resultData?.length) {
-             swal.fire({
-          icon: 'warning',
-          text: "Tidak ditemukan data Perhitungan Gaji, pastikan karyawan sudah memiliki standar gaji"
-        })
+          swal.fire({
+            icon: 'warning',
+            text: "Tidak ditemukan data Perhitungan Gaji, pastikan karyawan sudah memiliki standar gaji"
+          })
         }
         resultData.forEach((item) => {
           item.id           = ++_id
@@ -196,7 +198,7 @@ async function generatePerhitungan() {
         isBadForm.value = true
         swal.fire({
           icon: 'error',
-          text: err
+          text: "Sesuatu yang salah terjadi, silahkan coba kembali nanti atau hubungi administrator"
         })
       }
       

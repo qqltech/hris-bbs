@@ -176,6 +176,32 @@
             />
           </div>
           <div>
+            <label class="font-semibold">Tipe Lembur</label>
+              <FieldSelect 
+                :bind="{ readonly: !actionText }" 
+                class="w-full py-2 !mt-0"
+                :value="values.tipe_lembur_id" 
+                :errorText="formErrors.tipe_lembur_id ? 'failed' : ''"
+                @input="v => values.tipe_lembur_id = v" 
+                :hints="formErrors.tipe_lembur_id" 
+                :check="false"
+                label=""
+                placeholder="Tipe Lembur"
+                valueField="id" 
+                displayField="value"
+                :api="{
+                    url: `${store.server.url_backend}/operation/m_general`,
+                    headers: { 
+                        'Content-Type': 'Application/json', 
+                        Authorization: `${store.user.token_type} ${store.user.token}`
+                    },
+                    params: {
+                        where: `this.is_active='true' and m_general.group = 'TIPE LEMBUR'`
+                    }
+                }"
+            />
+          </div>
+          <div>
             <label class="font-semibold">NIK</label>
             <FieldPopup
             :value="values.m_kary_id" 

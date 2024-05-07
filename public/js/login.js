@@ -17,7 +17,6 @@ const getBasic = ref({})
 
 onBeforeMount(async () => {
   store.isUsingLayout = false
-  console.log("HM")
   isRequesting.value = true
     const result = await fetch(store.server.url_backend + `/public/m_general/get_basic`, {
       method: 'GET',

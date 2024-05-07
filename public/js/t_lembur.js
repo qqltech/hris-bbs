@@ -27,12 +27,13 @@ let modalOpen = ref(false)
 let isFinish = ref(false)
 let isApproved = ref(false)
 
+const is_superadmin = ref(false);
 
 // ------------------------------ PERSIAPAN
 const endpointApi = '/t_lembur'
 onBeforeMount(() => {
   document.title = is_approval ? 'Approval Lembur' : 'Transaksi Lembur'
-
+  is_superadmin.value = store.user.data?.is_superadmin ?? false
 })
 
 //  @if( $id )------------------- VALUES FORM ! PENTING JANGAN DIHAPUS
@@ -42,10 +43,6 @@ const changedValues = []
 const values = reactive({
 
 })
-
-
-
-
 
 
 onBeforeMount(async () => {
@@ -124,6 +121,12 @@ onBeforeMount(async () => {
   }
 })
 
+onMounted(()=>{
+  if(!is_superadmin.value){
+    values.m_kary_id = store.user.data?.m_kary_id
+  }
+})
+
 function openModal(id) {
   dataLog.items = []
   modalOpen.value = true
@@ -176,28 +179,28 @@ function onSave() {
   try {
 
     values.status = (values.status === true) ? 'POSTED' : 'DRAFT'
-    if (values.jam_mulai && values.jam_selesai && values.jam_selesai < values.jam_mulai) {
-      isBadForm.value = true;
-      swal.fire({
-        icon: 'error',
-        text: 'Jam Selesai tidak boleh lebih kecil dari Jam Mulai',
-      });
-      return; 
-    }
+    // if (values.jam_mulai && values.jam_selesai && values.jam_selesai < values.jam_mulai) {
+    //   isBadForm.value = true;
+    //   swal.fire({
+    //     icon: 'error',
+    //     text: 'Jam Selesai tidak boleh lebih kecil dari Jam Mulai',
+    //   });
+    //   return; 
+    // }
 
 
-    const jamMulai = new Date(`2000-01-01 ${values.jam_mulai}`);
-    const jamSelesai = new Date(`2000-01-01 ${values.jam_selesai}`);
-    const selisihJam = (jamSelesai - jamMulai) / (1000 * 60 * 60); 
+    // const jamMulai = new Date(`2000-01-01 ${values.jam_mulai}`);
+    // const jamSelesai = new Date(`2000-01-01 ${values.jam_selesai}`);
+    // const selisihJam = (jamSelesai - jamMulai) / (1000 * 60 * 60); 
 
-    if (selisihJam > 5) {
-      isBadForm.value = true;
-      swal.fire({
-        icon: 'error',
-        text: 'Jam lembur tidak dapat melebihi 5 Jam',
-      });
-      return; 
-    }
+    // if (selisihJam > 5) {
+    //   isBadForm.value = true;
+    //   swal.fire({
+    //     icon: 'error',
+    //     text: 'Jam lembur tidak dapat melebihi 5 Jam',
+    //   });
+    //   return; 
+    // }
 
 
 
@@ -457,7 +460,8 @@ const landing = reactive({
     },
     params: {
       simplest: true,
-      searchfield: 'm_kary.nama_depan, tanggal, jam_mulai, jam_selesai, alasan.value, status',
+      searchfield: 'm_kary.nama_depan, tanggal, jam_mulai, jam_selesai, tipe_lembur.value, status',
+      where: `${!store.user.data?.is_superadmin ? ('this.m_kary_id='+store.user.data?.m_kary_id ?? 0) : ''}`
     },
     onsuccess(response) {
       response.page = response.current_page
@@ -485,7 +489,7 @@ const landing = reactive({
     cellClass: ['border-r', '!border-gray-200', 'justify-start']
   },
   {
-    field: 'm_kary.nama_depan',
+    field: 'm_kary.nama_lengkap',
     headerName: 'Nama Karyawan',
     filter: true,
     sortable: true,
@@ -525,8 +529,8 @@ const landing = reactive({
     cellClass: ['border-r', '!border-gray-200', 'justify-left']
   },
   {
-    field: 'alasan.value',
-    headerName: 'Alasan',
+    field: 'tipe_lembur.value',
+    headerName: 'Tipe Lembur',
     filter: true,
     sortable: true,
     flex: 1,

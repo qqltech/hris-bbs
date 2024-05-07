@@ -24,7 +24,7 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
     {
         $approval = generate_approval_log::where('trx_table', 't_cuti')->where('trx_id', $row['id']) ->orderBy('created_at', 'desc')->value('action_note');
         return array_merge( $row, [
-            'approval_note' => $approval ?? ''
+            'approval_note' => $approval ?? '-'
         ] );
     }
 
@@ -96,11 +96,11 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
         $interval_min = null;
 
         if (isset($arrayData['date_from']) && isset($arrayData['date_to']) && (!isset($arrayData['time_from']) || $arrayData['time_from'] === null || $arrayData['time_from'] === '') && (!isset($arrayData['time_to']) || $arrayData['time_to'] === null || $arrayData['time_to'] === '')) {
-            $interval = $this->hitungHari($arrayData['date_from'], $arrayData['date_to']);
+            $interval = @$this->hitungHari($arrayData['date_from'], $arrayData['date_to']) ?? 1;
         }
 
         if (isset($arrayData['time_from']) && isset($arrayData['time_to'])) {
-            $interval_min = $this->hitungMenit($arrayData['time_from'], $arrayData['time_to']);
+            $interval_min = @$this->hitungMenit($arrayData['time_from'], $arrayData['time_to']) ?? 1;
         }
 
         
@@ -112,8 +112,8 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
         if (app()->request->header("Source") == "mobile") {
             $newArrayData = array_merge($newArrayData, [
                 "status" => "IN APPROVAL",
-                "interval" => $interval,
-                "interval_min" => $interval_min
+                "interval" => @$interval,
+                "interval_min" => @$interval_min
             ]);
         }
 
@@ -131,11 +131,11 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
         $interval_min = null;
 
         if (isset($arrayData['date_from']) && isset($arrayData['date_to']) && (!isset($arrayData['time_from']) || $arrayData['time_from'] === null || $arrayData['time_from'] === '') && (!isset($arrayData['time_to']) || $arrayData['time_to'] === null || $arrayData['time_to'] === '')) {
-            $interval = $this->hitungHari($arrayData['date_from'], $arrayData['date_to']);
+            $interval = @$this->hitungHari($arrayData['date_from'], $arrayData['date_to']) ?? 1;
         }
 
         if (isset($arrayData['time_from']) && isset($arrayData['time_to'])) {
-            $interval_min = $this->hitungMenit($arrayData['time_from'], $arrayData['time_to']);
+            $interval_min = @$this->hitungMenit($arrayData['time_from'], $arrayData['time_to']) ?? 1;
         }
 
         if (app()->request->header("Source") == "mobile") {
@@ -145,9 +145,9 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
             }
         }
         $newArrayData  = array_merge( $arrayData,[
-            'status' => $status ?? $data['status'],
-            "interval" => $interval ?? $data['interval'],
-            "interval_min" => $interval_min ?? $data['interval_min'] 
+            'status' => @$status ?? @$arrayData['status'],
+            "interval" =>@ $interval ?? @$arrayData['interval'],
+            "interval_min" => @$interval_min ?? @$arrayData['interval_min'] 
         ]);
 
 

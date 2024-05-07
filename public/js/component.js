@@ -10,6 +10,35 @@ const apiTable = ref(null)
 const values = reactive({})
 let detailArr = ref([])
 
+
+// const checkFile = ref(false)
+// function checkValue (e){
+//   const files = e.target.files;
+//     const allowedTypes = ['application/pdf', 'image/png'];
+//     for (let i = 0; i < files.length; i++) {
+//         const file = files[i];
+//         if (!allowedTypes.includes(file.type)) {
+//           swal.fire({
+//               icon: 'error',
+//               text: 'File ' + file.name + ' tidak diizinkan. Harap unggah file dengan tipe yang sesuai.',
+//             })
+//             checkFile.value=true
+//             return;
+//         }
+//     }
+// }
+
+// Check Extension Upload onsave
+      // if(values.alamat){
+      //   const indexFile = values.alamat?.lastIndexOf('.')
+      //   const extensionFile = values.alamat?.slice(indexFile+1)
+      //   if(!['pdf','jpg'].includes(extensionFile?.toLowerCase())){
+      //     formErrors.value = {
+      //       alamat : ['Extension File Salah Harus PDF/JPG']}
+      //     throw ('File ' + values.alamat + ' tidak diizinkan. Harap unggah file dengan tipe yang sesuai.')
+      //   }
+      // }
+
 onBeforeMount(async () => {
       const dataURL = `${store.server.url_backend}/operation/m_menu`
 
@@ -42,10 +71,20 @@ onBeforeMount(async () => {
 function clearAll(){
   detailArr.value = []
 }
+let _id = 0
+let dataArr = ref([])
 
 function onDetailAdd(e){
-  console.log(e)
+  e.forEach(row=>{
+    row._id = _id++
+    dataArr.value.push(row)
+  })
+  console.log(dataArr.value)
 }
+function sliceArr(data){
+  dataArr.value = dataArr.value.filter((e) => e._id != data._id)
+}
+
 function addA(){
   detailArr.value.push({
     menu: values.username,
