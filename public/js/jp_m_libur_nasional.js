@@ -93,16 +93,7 @@ onBeforeMount(async () => {
   }
 })
 
-function centang() {
-  if (values.is_cuti_bersama) {
-    values.is_potong_cuti = false;
-  } else {
-    values.is_potong_cuti = true;
-  }
-}
-watchEffect(() => {
-  centang(); 
-});
+
 
 const onReset = async (alert = false) => {
   let next = false

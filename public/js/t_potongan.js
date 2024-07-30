@@ -312,16 +312,16 @@ const landing = reactive({
     resizable: true,
     cellClass: [ 'border-r', '!border-gray-200', 'justify-left']
   },
-  {
-    field: 'periode',
-    headerName: 'Periode',
-    filter: true,
-    sortable: true,
-    flex:1,
-    filter: 'ColFilter',
-    resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-left']
-  },
+  // {
+  //   field: 'periode',
+  //   headerName: 'Periode',
+  //   filter: true,
+  //   sortable: true,
+  //   flex:1,
+  //   filter: 'ColFilter',
+  //   resizable: true,
+  //   cellClass: [ 'border-r', '!border-gray-200', 'justify-left']
+  // },
   {
     field: 'keterangan',
     headerName: 'Keterangan',

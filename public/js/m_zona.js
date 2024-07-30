@@ -32,7 +32,6 @@ const values = reactive({
 
 let detail = reactive({ items: [] })
 const _id = ref(0)
-
 const addDetail = () => {
   const newItem = {
     _id: ++_id.value,

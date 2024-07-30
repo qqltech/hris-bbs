@@ -98,7 +98,7 @@ onBeforeMount(async () => {
         const resultJson = await res.json()
         initialValues = resultJson.data
         // logic Approved data
-        isApproved.value = resultJson?.data?.lembur_status == 'APPROVED' ? true : false
+        isApproved.value = resultJson?.data?.cuti_status == 'APPROVED' ? true : false
         console.log(resultJson?.data)
         console.log(isApproved.value)
       }
@@ -120,7 +120,6 @@ onBeforeMount(async () => {
     values[key] = initialValues[key]
   }
 })
-
 onMounted(()=>{
   if(!is_superadmin.value){
     values.m_kary_id = store.user.data?.m_kary_id

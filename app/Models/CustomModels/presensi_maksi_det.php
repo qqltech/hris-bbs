@@ -22,22 +22,22 @@ class presensi_maksi_det extends \App\Models\BasicModels\presensi_maksi_det
         $currentDate->modify('+1 day');
         $nextDay = $currentDate->format('Y-m-d');
 
-        $check_exists_maksi = presensi_maksi::where('id',$req->presensi_maksi_id)
-            ->where('status','POSTED')->where('presensi_maksi.tanggal', $nextDay)->exists();
+        // $check_exists_maksi = presensi_maksi::where('id',$req->presensi_maksi_id)
+        //     ->where('status','POSTED')->where('presensi_maksi.tanggal', $nextDay)->exists();
 
-        if(!$check_exists_maksi) return response([
-            'message' => 'Menu makan siang hari ini sudah tidak aktif',
-            'errors' => ['Menu makan siang hari ini sudah tidak aktif']
-        ], 422);
+        // if(!$check_exists_maksi) return response([
+        //     'message' => 'Menu makan siang hari ini sudah tidak aktif',
+        //     'errors' => ['Menu makan siang hari ini sudah tidak aktif']
+        // ], 422);
 
-        $check_exists = $this->join('presensi_maksi','presensi_maksi.id','presensi_maksi_det.presensi_maksi_id')
-            ->where('presensi_maksi_det.m_kary_id',$m_kary_id)
-            ->where('presensi_maksi.tanggal', $nextDay)->exists();
+        // $check_exists = $this->join('presensi_maksi','presensi_maksi.id','presensi_maksi_det.presensi_maksi_id')
+        //     ->where('presensi_maksi_det.m_kary_id',$m_kary_id)
+        //     ->where('presensi_maksi.tanggal', $nextDay)->exists();
 
-        if($check_exists) return response([
-            'message' => 'Anda sudah pesan makan hari ini, coba kembali besok - '.$m_kary_id,
-            'errors' => ['Anda sudah pesan makan hari ini, coba kembali besok']
-        ], 422);
+        // if($check_exists) return response([
+        //     'message' => 'Anda sudah pesan makan hari ini, coba kembali besok - '.$m_kary_id,
+        //     'errors' => ['Anda sudah pesan makan hari ini, coba kembali besok']
+        // ], 422);
 
         $this->create([
             'presensi_maksi_id' => $req->presensi_maksi_id,

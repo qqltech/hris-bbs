@@ -601,8 +601,7 @@ class Helper
 
         return $app;
     }
-
-
+    
     public function approvalOustanding()
     {
         $userAuth = auth()->user();

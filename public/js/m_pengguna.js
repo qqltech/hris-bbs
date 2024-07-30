@@ -261,7 +261,7 @@ const landing = reactive({
     },
     params: {
       simplest: true,
-      searchfield:'this.id, default_user.name, default_user.username, default_user.email',
+      searchfield:'this.id, this.name, this.username, , m_kary.kode, this.email',
     },
     onsuccess(response) {
       response.page = response.current_page
@@ -281,6 +281,16 @@ const landing = reactive({
   {
     headerName: 'Nama',
     field: 'name',
+    filter: true,
+    sortable: true,
+    flex:1,
+    filter: 'ColFilter',
+    resizable: true,
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'NIK',
+    field: 'm_kary.kode',
     filter: true,
     sortable: true,
     flex:1,

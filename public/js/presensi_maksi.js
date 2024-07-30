@@ -43,41 +43,41 @@ const values = reactive({
 })
 
 async function getDetail(id = null) {
-  detailArr.value = []
-  if(!id) return
-  isRequesting.value = true
-  try {
-    detailArr.value=[]
-    const response = await fetch(`${store.server.url_backend}/operation/presensi_m_menu_maksi/${id}`,{
-      method: 'GET',
-      headers: {
-        'Content-Type': 'Application/json',
-        Authorization: `${store.user.token_type} ${store.user.token}`
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch get master data');
-    }
-
-    const resultJson = await response.json();
-  
-    resultJson?.data?.presensi_m_menu_maksi_det?.forEach((items)=>{
-        items.__id = ++_id
-        detailArr.value = [items, ...detailArr.value]
+  if(!isRead){
+    detailArr.value = []
+    if(!id) return
+    isRequesting.value = true
+    try {
+      detailArr.value=[]
+      const response = await fetch(`${store.server.url_backend}/operation/presensi_m_menu_maksi/${id}`,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'Application/json',
+          Authorization: `${store.user.token_type} ${store.user.token}`
+        },
       })
-  } catch (error) {
-    console.error('Error fetching get master:', error);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch get master data');
+      }
+
+      const resultJson = await response.json();
+    
+      resultJson?.data?.presensi_m_menu_maksi_det?.forEach((items)=>{
+          items.__id = ++_id
+          detailArr.value = [items, ...detailArr.value]
+        })
+    } catch (error) {
+      console.error('Error fetching get master:', error);
+    }
+    isRequesting.value = false
   }
-  isRequesting.value = false
 }
 
+
+
 onBeforeMount(async () => {
-
-  // values.direktorat = store.user.data?.direktorat
-
   if (isRead) {
-    //  READ DATA
     try {
       const editedId = route.params.id
       const dataURL = `${store.server.url_backend}/operation${endpointApi}/${editedId}`
@@ -99,7 +99,6 @@ onBeforeMount(async () => {
           item.__id = ++_id
           detailArr.value.push(item)
       })
-
       detailArr.value.sort((a, b) => a.__id - b.__id)
     } catch (err) {
       isBadForm.value = true

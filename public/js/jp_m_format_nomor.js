@@ -285,6 +285,27 @@ async function onSave() {
       isRequesting.value = false
 }
 
+
+const activeBtn = ref()
+
+function filterShowData(params,noBtn){
+  if(activeBtn.value === noBtn){
+    activeBtn.value = null
+  }else{
+    activeBtn.value = noBtn
+  }
+  if(params){
+    landing.api.params.where = `this.is_active=true`
+  }else if(activeBtn.value == null){
+    // clear params filter
+    landing.api.params.where = null
+  }else{
+    landing.api.params.where = `this.is_active=false`
+  }
+
+  apiTable.value.reload()
+}
+
 //  @else----------------------- LANDING
 const landing = reactive({
   actions: [

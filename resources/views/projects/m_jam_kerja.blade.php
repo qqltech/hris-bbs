@@ -71,6 +71,7 @@
               :check="false"
             />
           </div>
+          
           <div class="col-span-1 md:col-span-1">
               <label class="font-semibold">Waktu Mulai<label class="text-red-500 space-x-0 pl-0">*</label></label>
                 <FieldX 
@@ -101,8 +102,9 @@
                   <label class="ml-2" for="hariberikutnya">Hari berikutnya</label>
               </div>
           </div>
+
           <div>
-          <label class="font-semibold">Keterangan<label class="text-red-500 space-x-0 pl-0"></label></label>
+          <label class="font-semibold">Keterangan Jam Kerja<label class="text-red-500 space-x-0 pl-0">*</label></label>
           <FieldX :bind="{ readonly: !actionText }" class="w-full py-2 !mt-0"
               :value="values.desc" :errorText="formErrors.desc?'failed':''"
               @input="v=>values.desc=v" :hints="formErrors.desc" 

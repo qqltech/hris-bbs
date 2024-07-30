@@ -89,14 +89,14 @@
               },
               {
                 flex: 1,
-                field: 'nik',
-                headerName:  'Kode',
+                field: 'kode',
+                headerName:  'NIK',
                 sortable: false, resizable: true, filter: 'ColFilter',
                 cellClass: ['border-r', '!border-gray-200', 'justify-center']
               },
               {
                 flex: 1,
-                field: 'nomor_ktp',
+                field: 'nik',
                 headerName: 'No KTP',
                 sortable: false, resizable: true, filter: 'ColFilter',
                 cellClass: ['border-r', '!border-gray-200', 'justify-center']

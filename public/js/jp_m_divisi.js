@@ -126,6 +126,34 @@ function onBack() {
 async function onSave() {
   //values.tags = JSON.stringify(values.tags)
       try {
+
+                    if (!values.m_dir_id && !values.nama) {
+      swal.fire({
+        icon: 'error',
+        title: 'Waduuh',
+        text: 'NAMA DAN DIREKTORAT WAJIB DI ISI',
+      });
+      return;
+    }
+
+    if (!values.m_dir_id) {
+      swal.fire({
+        icon: 'error',
+        title: 'Waduuh',
+        text: 'Jangan Lupa Isi From Direktorat',
+      });
+      return;
+    }
+    if (!values.nama) {
+      swal.fire({
+        icon: 'error',
+        title: 'Waduuh',
+        text: 'Jangan Lupa Isi From Nama',
+      });
+      return;
+    }
+
+
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true

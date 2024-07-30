@@ -77,6 +77,12 @@ class mkary extends Migration
 
             $table->bigInteger('tipe_jam_kerja_id')->comment('{"src":"m_general.id"}')->nullable();
             $table->bigInteger('t_jadwal_kerja_id')->comment('{"src":"m_general.id"}')->nullable();
+
+            $table->string('ig',100)->nullable();
+            $table->string('x',100)->nullable();
+            $table->string('facebook',100)->nullable();
+            $table->string('linkedin',100)->nullable();
+            $table->string('email',100)->nullable();
         });
 
         table_config($this->tableName, [

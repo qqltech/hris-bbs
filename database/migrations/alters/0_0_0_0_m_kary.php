@@ -12,8 +12,13 @@ class mkary extends Migration
         Schema::table($this->tableName, function (Blueprint $table) {
             //$table->string('_existColumnName_')->change();
             //$table->string('_columnName_');
-            // $table->dropColumn(['m_comp_id;nama_lengkap;kode;nik;tgl_masuk']);
-            $table->integer('limit_potong')->default(7)->nullable()->change();
+            $table->dropColumn(['ig','x','facebook','linkedin','email']);
+            // $table->integer('limit_potong')->default(7)->nullable()->change();
+            // $table->string('ig',100)->nullable();
+            // $table->string('x',100)->nullable();
+            // $table->string('facebook',100)->nullable();
+            // $table->string('linkedin',100)->nullable();
+            // $table->string('email',100)->nullable();
         });
     }
 }

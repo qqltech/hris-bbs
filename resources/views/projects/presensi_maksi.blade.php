@@ -77,7 +77,7 @@
             <button :disabled="!actionText" @click="addDetail" type="button" class="bg-[#005FBF] hover:bg-[#0055ab] text-white py-[7px] px-[10.5px] text-[12px] flex items-center justify-center space-x-2 rounded">
               <icon fa="plus" /> <span>Add to List</span></button>
         <div class="mt-4">
-          <table class="w-1/2 overflow-x-auto table-auto border border-[#CACACA]">
+          <table class="w-full overflow-x-auto table-auto border border-[#CACACA]">
             <thead>
               <tr class="border">
                 <td class="text-[#8F8F8F] font-semibold text-[14px] text-capitalize px-2 py-[14.5px] text-center w-[5%] border bg-[#f8f8f8] border-[#CACACA]">No.</td>
@@ -87,7 +87,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, i) in detailArr" :key="item.__id" class="border-t" v-if="detailArr.length > 0">
+              <tr v-for="(item, i) in detailArr" :key="item.__id" class="border-t" v-if="detailArr.length">
+                {{$log('asu')}}
                 <td class="p-2 text-center border border-[#CACACA]">
                   {{ i + 1 }}.
                 </td>
@@ -134,6 +135,7 @@
                 </td>
               </tr>
               <tr v-else class="text-center">
+                {{$log('jb')}}
                 <td colspan="7" class="py-[20px]">
                   No data to show
                 </td>

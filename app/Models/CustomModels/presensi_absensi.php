@@ -3,6 +3,7 @@
 namespace App\Models\CustomModels;
 use Illuminate\Support\Facades\Validator;
 use DB;
+use Carbon\Carbon;
 
 class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
 {
@@ -258,6 +259,64 @@ class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
         ];
         return $this->helper->customResponse("OK", 200, $data);
     }
+
+    public function custom_status_get_jadwal_kerja(){
+        $karyId = auth()->user()->m_kary_id;
+        $getTodayNum = Carbon::today()->dayOfWeek;
+        $startOfWeek = Carbon::today()->startOfWeek();
+        $endOfweek = Carbon::today()->endOfweek();
+        $now = Carbon::now();
+
+        $t_jadwal_kerja_det = t_jadwal_kerja_det::where('m_kary_id',$karyId)->whereHas('t_jadwal_kerja_det_hari',function($query) {
+            $query->whereIn('day_num',range(1,7));
+        })->with(['t_jadwal_kerja_det_hari.m_jam_kerja' => function($select){
+            $select->select('id','m_jam_kerja.is_hari_berikutnya');
+        }])->get([
+            'id','m_kary_id','t_jadwal_kerja_det_hari_id'
+        ]);
+
+
+        $t_jadwal_kerja_det = $t_jadwal_kerja_det->transform(function ($item){
+            $tanggal = Carbon::today()->startOfWeek()->addDays($item->t_jadwal_kerja_det_hari->day_num - 1)->toDateString();
+            $item->t_jadwal_kerja_det_hari->tanggal = $tanggal;
+            $waktu_mulai = $item->t_jadwal_kerja_det_hari->waktu_mulai;
+            $waktu_akhir = $item->t_jadwal_kerja_det_hari->waktu_akhir;
+            $item->start_work = Carbon::parse("$tanggal $waktu_mulai")->subHours(2)->toDateTimeString();
+            if($item->t_jadwal_kerja_det_hari->m_jam_kerja->is_hari_berikutnya == true){
+                $item->end_work = Carbon::parse("$tanggal $waktu_akhir")->addDay()->addHours(2)->toDateTimeString();
+            }else{
+                 $item->end_work = Carbon::parse("$tanggal $waktu_akhir")->toDateTimeString();
+            }
+            return $item;
+        });
+        
+        $startDayBeforeWeekend = $t_jadwal_kerja_det[6]['start_work'];
+        $EndDayBeforeWeekend = $t_jadwal_kerja_det[6]['end_work'];
+
+        $day_before = [
+        "start_work" => Carbon::parse($startDayBeforeWeekend)->subWeek()->toDateTimeString(),
+        "end_work" => Carbon::parse($EndDayBeforeWeekend)->subWeek()->toDateTimeString(),
+        ];
+
+        $t_jadwal_kerja_det->prepend($day_before);
+        
+        $getData = $t_jadwal_kerja_det->where('start_work', '<=', $now)
+                            ->where('end_work', '>=', $now)
+                            ->first();
+        if($getData){
+            $isPresent = $this->whereBetween('created_at', [$getData['start_work'],$getData['end_work']])->where('default_user_id', auth()->user()->id ?? 0)->pluck('status')->first() ?? 'NOT ATTEND';
+            $data = [
+                'status' => $isPresent 
+            ];
+        }else{
+            $data = [
+                'status' => "ATTEND" 
+            ];
+        }
+        return $this->helper->customResponse("OK", 200, $data);
+    }
+
+
     public function scopeFilter($model)
     {
         if(req('date_from') && req('date_to')){

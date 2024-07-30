@@ -73,11 +73,17 @@
             </div>
           </div>
         </div>
-        <div class="col-span-8 md:col-span-12">
+        
+        
+      
+    </div>
+      <!--BUTTON-->
+      <div class="w-full mt-5 ">
+              <div class="!w-full ">
             <button :disabled="!actionText" @click="addDetail" type="button" class="bg-[#005FBF] hover:bg-[#0055ab] text-white py-[7px] px-[10.5px] text-[12px] flex items-center justify-center space-x-2 rounded">
               <icon fa="plus" /> <span>Add to List</span></button>
         <div class="mt-4">
-          <table class="w-1/2 overflow-x-auto table-auto border border-[#CACACA]">
+          <table class="w-full overflow-x-auto table-auto border border-[#CACACA]">
             <thead>
               <tr class="border">
                 <td class="text-[#8F8F8F] font-semibold text-[14px] text-capitalize px-2 py-[14.5px] text-center w-[5%] border bg-[#f8f8f8] border-[#CACACA]">No.</td>
@@ -140,9 +146,9 @@
             </tbody>
           </table>
       </div>
-    </div>
-      <!--BUTTON-->
       </div>
+      </div>
+
       <div class="flex flex-row justify-end space-x-[20px] mt-[5em]">
             <button @click="onBack" class="bg-[#EF4444] hover:bg-[#ed3232] text-white px-[36.5px] py-[12px] rounded-[6px] w-32 ">
             Kembali

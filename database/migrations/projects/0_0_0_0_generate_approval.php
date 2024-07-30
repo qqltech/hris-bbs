@@ -25,6 +25,7 @@ class generateapproval extends Migration
             $table->string('trx_object')->nullable();
             $table->bigInteger('trx_creator_id')->nullable();
             $table->string('status')->default('PROGRESS')->nullable();
+            $table->bigInteger('last_approve_det_id')->comment('{"src":"generate_approval_det.id"}')->nullable();
             $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->timestamps();

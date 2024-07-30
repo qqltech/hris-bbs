@@ -126,6 +126,8 @@ function onBack() {
 
 async function onSave() {
   //values.tags = JSON.stringify(values.tags)
+      const isValid = validateTimes()
+        if (!isValid) return
       try {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
@@ -158,6 +160,32 @@ async function onSave() {
         })
       }
       isRequesting.value = false
+}
+
+const updateWaktuMulai = (value) => {
+  values.waktu_mulai = value
+}
+
+const updateWaktuAkhir = (value) => {
+  values.waktu_akhir = value
+}
+
+const validateTimes = () => {
+  const mulai = values.waktu_mulai
+  const akhir = values.waktu_akhir
+
+  formErrors.value.waktu_mulai = ''
+  formErrors.value.waktu_akhir = ''
+
+  if (mulai && akhir && mulai > akhir) {
+    swal.fire({
+      icon: 'error',
+      title: 'Validation Error',
+      text: 'Waktu Mulai tidak boleh melebihi Waktu Berakhir'
+    })
+    return false
+  }
+  return true
 }
 
 //  @else----------------------- LANDING

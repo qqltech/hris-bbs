@@ -25,7 +25,8 @@ class presensi_maksi extends \App\Models\BasicModels\presensi_maksi
         $check_exists = presensi_maksi_det::select('presensi_maksi_det.*')
             ->join('presensi_maksi','presensi_maksi.id','presensi_maksi_det.presensi_maksi_id')
             ->where('presensi_maksi_det.m_kary_id',$m_kary_id)
-            ->where('presensi_maksi.tanggal', $nextDay)->first();
+            ->where('presensi_maksi.tanggal', $nextDay)
+            ->first();
 
         if($check_exists){
             $check_exists->sudah_pesan = true;
