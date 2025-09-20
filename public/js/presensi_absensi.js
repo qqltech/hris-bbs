@@ -23,7 +23,6 @@ const detailDate = ref(null)
 const dataDetail = ref([])
 const isCheckin = ref()
 const isCheckout = ref(false)
-
 const openDateDetail = (e,item,check,data) => {
   if(!item.checkin_foto?.includes(`http`)){
     if(item.checkin_foto){    
@@ -61,36 +60,151 @@ const headerValues = reactive({
 })
 
 
+
+const formatDate = (year, month, day) => {
+    return `${year}-${month}-${String(day).padStart(2, '0')}`;
+};
+
+// function getWeekNow(tDay, lgth){
+//   let nowDay = parseInt(thisMonth.split('-')[2])
+//   let floorAvg = Math.floor(parseFloat(tDay??0)/lgth??4)
+//   let value
+//   if(floorAvg >= nowDay){
+//     value = 0
+//   }else if((floorAvg*2)>= nowDay && nowDay > floorAvg){
+//     value = 1
+//   }else if((floorAvg*3)>= nowDay && nowDay > (floorAvg*2)){
+//     value = 2
+//   }else if((floorAvg*4)>= nowDay && nowDay > (floorAvg*3)){
+//     value = 3
+//   }else if((floorAvg*5)>= nowDay && nowDay > (floorAvg*4)){
+//     value = 4
+//   }else if((floorAvg*6)>= nowDay && nowDay > (floorAvg*5)){
+//     value = 5
+//   }else{
+//     value = 6
+//   }
+//   return value
+// // totaldays % 4 = 7, apakah 7 < tanggal seakarang, kalau lebih kecil = minggu peertama   
+// // else if ((7*2  <= tanggal seakrang && tanggal sekarang > 7 = week 2))
+// // else if ((7*3  <= tanggal seakrang && tanggal sekarang > 7*2 = week 3))
+// // else week 4
+// }
+
+function getWeekNow(tDay, lgth) {
+  const nowDay = parseInt(thisMonth.split('-')[2]) // hari ini
+  const totalWeeks = lgth || 4
+  const daysPerWeek = Math.ceil((parseInt(tDay ?? 0)) / totalWeeks)
+
+  for (let i = 0; i < totalWeeks; i++) {
+    const min = i * daysPerWeek + 1
+    const max = (i + 1) * daysPerWeek
+    if (nowDay >= min && nowDay <= max) {
+      return i
+    }
+  }
+
+  return totalWeeks - 1
+}
+
+
+let weeks = [];
+const weeksOptions = ref([])
+async function dayPerWeek(paramsFunc){
+  const [yearPar,monthPar] = paramsFunc?.split('-')
+  weeks = []
+  weeksOptions.value = []
+  let totalDays = new Date(yearPar, monthPar, 0).getDate();
+
+  const daysPerWeek = 3;
+
+  const fullWeeks = Math.floor(totalDays / daysPerWeek);
+  const remainder = totalDays % daysPerWeek;
+
+  for (let i = 0; i < fullWeeks; i++) {
+    let startDay = i * daysPerWeek + 1;
+    let endDay = startDay + daysPerWeek - 1;
+    weeks.push({
+        week: `P${i + 1}`,
+        startDate: formatDate(yearPar, monthPar, startDay),
+        endDate: formatDate(yearPar, monthPar, endDay)
+    });
+  }
+
+  if (remainder > 0) {
+      let lastWeekIndex = weeks.length - 1;
+      let startDay = fullWeeks * daysPerWeek + 1;
+      let endDay = totalDays;
+      weeks[lastWeekIndex].endDate = formatDate(yearPar, monthPar, endDay);
+  }
+
+  let indexWeek = monthPar == tempMonth ? await getWeekNow(totalDays, weeks.length) : 0
+
+  let weeksMap = weeks.map(week => ({
+    value: week.startDate+'/'+week.endDate,
+    text: `${week.week} ${week.startDate}/${week.endDate}`
+  }));
+
+  weeksOptions.value = weeksMap
+  headerValues.weeks = weeksOptions.value[indexWeek]['value']
+  await loadData()
+}
+
+
 const dataByDate = ref([])
 const dataByDateDetail = ref([])
 onMounted(async ()=>{
-  await loadData()
+  dayPerWeek(tempYear+'-'+tempMonth)
 })
 
 const loaderData = ref(false)
+const processLoad = ref(0)
 
 const loadData = async () => {
+  processLoad.value = 0;
+  const interval = setInterval(() => {
+    processLoad.value++
+  }, 100);
+
   loaderData.value = true
   if(openDateSelected.value){
     openDate(openDateSelected.value)
     return
   }
-  const dataURL = `${store.server.url_backend}/operation${endpointApi}/get_by_daily`
-  isRequesting.value = true
+  try {
+    const dataURL = `${store.server.url_backend}/operation${endpointApi}/get_by_daily`
 
-  const fixedParams = new URLSearchParams(headerValues)
-  const res = await fetch(dataURL + '?' + fixedParams, {
-    headers: {
-      'Content-Type': 'Application/json',
-      Authorization: `${store.user.token_type} ${store.user.token}`
-    },
-  })
-
-  isRequesting.value = false
-  loaderData.value = false
-  const resultJson = await res.json()
-  dataByDate.value = resultJson.data
+    const fixedParams = new URLSearchParams(headerValues)
+    const res = await fetch(dataURL + '?' + fixedParams, {
+      headers: {
+        'Content-Type': 'Application/json',
+        Authorization: `${store.user.token_type} ${store.user.token}`
+      },
+    })
+    loaderData.value = false
+    const resultJson = await res.json()
+    if(resultJson.code == 200){
+      dataByDate.value = resultJson.data
+    }else{
+      return swal.fire({
+        icon: 'Perhatian',
+        text: resultJson.message,
+        allowOutsideClick: false,
+      })
+    }
+    clearInterval(interval);
+  } catch (err) {
+    isRequesting.value = false
+    swal.fire({
+      icon: 'Perhatian',
+      text: err,
+      allowOutsideClick: false,
+    })
+    clearInterval(interval);
+  }
+ 
 }
+
 
 const openDateSelected = ref(null)
 const openDate = async (date) => {
@@ -262,6 +376,7 @@ function onSave() {
       try {
         values.checkin_on_scope = values.checkin_on_scope ? 1 : 0
         values.checkout_on_scope = values.checkout_on_scope ? 1 : 0
+        // values.status='ATTEND'
         if(values.checkin_time && values.checkout_time){
           values.status='ATTEND'
         }else if(values.checkin_time && !values.checkout_time){
@@ -270,7 +385,7 @@ function onSave() {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true
-        values.status = 'WORKING'
+        // values.status = 'WORKING' 
 
         const res = await fetch(dataURL, {
           method: isCreating ? 'POST' : 'PUT',

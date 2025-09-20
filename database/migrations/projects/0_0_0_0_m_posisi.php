@@ -26,6 +26,7 @@ class mposisi extends Migration
             $table->bigInteger('tipe_bpjs_id')->comment('{"src":"m_general.id"}')->nullable();
             $table->decimal('potongan_bpjs',12 ,2 )->nullable();
             $table->text('desc')->nullable();
+            $table->boolean('is_head')->nullable();
             $table->boolean('is_active')->default(1);
             $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
             $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();

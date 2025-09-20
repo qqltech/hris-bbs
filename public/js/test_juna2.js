@@ -1,5 +1,5 @@
 import { useRouter, useRoute, RouterLink } from 'vue-router'
-import { ref, readonly, reactive, inject, onMounted, onBeforeMount,onBeforeUnmount, watchEffect, onActivated } from 'vue'
+import { ref, readonly, reactive, inject, onMounted, onBeforeMount, watchEffect, onActivated } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -8,47 +8,181 @@ const swal = inject('swal')
 
 const isRead = route.params.id && route.params.id !== 'create'
 const actionText = ref(route.params.id === 'create' ? 'Tambah' : route.query.action)
-const isProfile = ref(route.query.profile ? true : false)
 const isBadForm = ref(false)
 const isRequesting = ref(false)
 const modulPath = route.params.modul
+const isCreateEdit = route.params.id === 'create' || route.query.action === 'Edit'
 const currentMenu = store.currentMenu
 const apiTable = ref(null)
 const formErrors = ref({})
-const formErrorsPend = ref({})
-const formErrorsKel = ref({})
-const formErrorsPel = ref({})
-const formErrorsPres = ref({})
-const formErrorsOrg = ref({})
-const formErrorsBhs = ref({})
-const formErrorsPK = ref({})
-const activeTabIndex = ref(0)
-const content = ref()
-const labelNomer = ref()
-const values = reactive({})
 const tsId = `ts=`+(Date.parse(new Date()))
 
-const handleFocus = () => {
-  labelNomer.value.focus()
-  console.log(document.activeElement)
-}
-
 // ------------------------------ PERSIAPAN
-const endpointApi = '/m_kary'
+const endpointApi = '/presensi_lokasi'
 onBeforeMount(()=>{
-  document.title = 'Testing'
+  document.title = 'Master Lokasi'
 })
 
 //  @if( $id )------------------- VALUES FORM ! PENTING JANGAN DIHAPUS
 let initialValues = {}
 const changedValues = []
-const thisYear = new Date().getFullYear()
-let tempKTP = ''
-let tempBPJS = ''
-let tempNPWP = ''
-let tempKK = ''
-let tempPasfoto = ''
 
+const values = reactive({
+  is_active : true
+})
+
+const internalValue = ref(null);
+const flyLayer = ref(null)
+const marker = ref(null)
+const multiplePins = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: { id: 1, name: 'Pin 1' },
+      geometry: { type: 'Point', coordinates: [112.7067546, -7.2811848] },
+    },
+    {
+      type: 'Feature',
+      properties: { id: 2, name: 'Pin 3' },
+      geometry: { type: 'Point', coordinates: [106.6297, -6.9614] },
+    },
+    {
+      type: 'Feature',
+      properties: { id: 3, name: 'Pin 2' },
+      geometry: { type: 'Point', coordinates: [106.6298, -6.9415] },
+    },
+  ],
+};
+
+console.log(multiplePins.features)
+
+const propMap = reactive({
+  search: false,
+  center: [-7.3244677, 112.7550714],
+  zoom: 10,
+  editable: true,
+  value: multiplePins,
+});
+
+function onMapLoaded(e) {
+  Map.value = e.target;
+  internalValue.value = propMap.value;
+
+  placePinMap();
+}
+
+function placePinMap() {
+  if (!Map.value || !internalValue.value || Array.isArray(internalValue.value)) return;
+
+  if (typeof internalValue.value === 'string' && internalValue.value.includes('(')) {
+    internalValue.value = strToGeo(internalValue.value);
+  }
+
+  if (internalValue.value.type === 'FeatureCollection' && Array.isArray(internalValue.value.features)) {
+    if (flyLayer.value) {
+      Map.value.removeLayer(flyLayer.value);
+    }
+    flyLayer.value = window.L.geoJson(internalValue.value, {
+      markerEditor: true,
+      onEachFeature(feature, layer) {
+        if (propMap.readonly) return;
+
+        const labelText = feature.properties.name || 'No Name'; //ganti text disini sesuaikan dengan response be 
+        layer.bindTooltip(labelText, {
+          permanent: false,
+          direction: 'top', 
+        });
+
+        const labelElement = window.L.divIcon({
+          html: `<div style="color: black; font-size: 12px; text-align: center; white-space: nowrap; margin-top: 8px;">${labelText}</div>`,
+          className: 'custom-label',
+          iconSize: [0, 0],
+        });
+
+        const labelMarker = window.L.marker(layer.getLatLng(), { icon: labelElement }).addTo(Map.value);
+
+        if (propMap.editable) {
+          layer.options.draggable = false;
+
+          layer.on('dragend', function (e) {
+            const updatedFeature = e.target.toGeoJSON();
+            const featureIndex = internalValue.value.features.findIndex(
+              (f) => f.properties.id === updatedFeature.properties.id
+            );
+
+            if (featureIndex > -1) {
+              internalValue.value.features[featureIndex].geometry = updatedFeature.geometry;
+              const newLatLng = e.target.getLatLng();
+              labelMarker.setLatLng(newLatLng);
+            }
+          });
+        }
+      },
+    }).addTo(Map.value);
+
+    Map.value.flyToBounds(flyLayer.value.getBounds(), { duration: 1, maxZoom: 13 });
+  }
+}
+
+
+onBeforeMount(async () => {
+  // tampilkan default direktorat dengan store user comp.nama
+  // values.direktorat = store.user.data?.direktorat
+  if (isRead) {
+    //  READ DATA
+    try {
+      const editedId = route.params.id
+      const dataURL = `${store.server.url_backend}/operation${endpointApi}/${editedId}`
+      isRequesting.value = true
+     
+      const params = { join: true, transform: false }
+      const fixedParams = new URLSearchParams(params)
+      const res = await fetch(dataURL + '?' + fixedParams, {
+        headers: {
+          'Content-Type': 'Application/json',
+          Authorization: `${store.user.token_type} ${store.user.token}`
+        },
+      })
+      if (!res.ok) throw new Error("Failed when trying to read data")
+      const resultJson = await res.json()
+      initialValues = resultJson.data
+      initialValues.geo_checkin = `POINT(${initialValues.long} ${initialValues.lat})`
+    } catch (err) {
+      isBadForm.value = true
+      swal.fire({
+        icon: 'error',
+        text: err,
+        allowOutsideClick: false,
+        confirmButtonText: 'Kembali',
+      }).then(() => {
+        router.back()
+      })
+    }
+    isRequesting.value = false
+  }
+
+  for (const key in initialValues) {
+    values[key] = initialValues[key]
+  }
+  // if(values['m_dir.nama']){
+  //   values.direktorat = values['m_dir.nama']
+  // }
+})
+
+let _id = 0
+const detailArr = ref([])
+const addOtoritas = () => {
+  const tempItem = {
+    id: ++_id,
+    nama: values.nama,
+    akses: values.akses,
+    admin: values.admin
+  }
+  detailArr.value = [...detailArr.value, tempItem]
+  Object.keys(values).forEach(key => delete values[key]);
+  console.log(detailArr.value)
+}
 
 function onBack() {
   let isChanged = false
@@ -84,8 +218,10 @@ function onReset() {
 async function onSave() {
   //values.tags = JSON.stringify(values.tags)
       try {
+        const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
         isRequesting.value = true
+         values.is_active = values.is_active ? 1 : 0
         const res = await fetch(dataURL, {
           method: isCreating ? 'POST' : 'PUT',
           headers: {
@@ -95,7 +231,6 @@ async function onSave() {
           body: JSON.stringify(values)
         })
         if (!res.ok) {
-          // values.m_kary_det_kartu = []
           if ([400, 422].includes(res.status)) {
             const responseJson = await res.json()
             formErrors.value = responseJson.errors || {}
@@ -116,313 +251,166 @@ async function onSave() {
 }
 
 //  @else----------------------- LANDING
+const landing = reactive({
+  actions: [
+    {
+      icon: 'trash',
+      class: 'bg-red-600 text-light-100',
+      title: "Hapus",
+      // show: () => store.user.data.username==='developer',
+      click(row) {
+        swal.fire({
+          icon: 'warning',
+          text: 'Hapus Data Terpilih?',
+          confirmButtonText: 'Yes',
+          showDenyButton: true,
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const dataURL = `${store.server.url_backend}/operation${endpointApi}/${row.id}`
+              isRequesting.value = true
+              const res = await fetch(dataURL, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'Application/json',
+                  Authorization: `${store.user.token_type} ${store.user.token}`
+                }
+              })
+              if (!res.ok) {
+                const resultJson = await res.json()
+                throw (resultJson.message || "Failed when trying to remove data")
+              }
+              apiTable.value.reload()
+              // const resultJson = await res.json()
+            } catch (err) {
+              isBadForm.value = true
+              swal.fire({
+                icon: 'error',
+                text: err
+              })
+            }
+            isRequesting.value = false
+          }
+        })
+      }
+    },
+    {
+      icon: 'eye',
+      title: "Read",
+      class: 'bg-green-600 text-light-100',
+      // show: (row) => (currentMenu?.can_read)||store.user.data.username==='developer',
+      click(row) {
+        router.push(`${route.path}/${row.id}?`+tsId)
+      }
+    },
+    {
+      icon: 'edit',
+      title: "Edit",
+      class: 'bg-blue-600 text-light-100',
+      // show: (row) => (currentMenu?.can_update)||store.user.data.username==='developer',
+      click(row) {
+        router.push(`${route.path}/${row.id}?action=Edit&`+tsId)
+      }
+    },
+    {
+      icon: 'copy',
+      title: "Copy",
+      class: 'bg-gray-600 text-light-100',
+      click(row) {
+        router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
+      }
+    }
+  ],
+  api: {
+    url: `${store.server.url_backend}/operation${endpointApi}`,
+    headers: {
+      'Content-Type': 'Application/json',
+      authorization: `${store.user.token_type} ${store.user.token}`
+    },
+    params: {
+      simplest: true,
+      searchfield:'this.id, this.nama, this.lat, this.long',
+    },
+    onsuccess(response) {
+      response.page = response.current_page
+      response.hasNext = response.has_next
+      return response
+    }
+  },
+  columns: [{
+    headerName: 'No',
+    valueGetter: (params) => params.node.rowIndex + 1,
+    width: 60,
+    sortable: true,
+    resizable: true,
+    filter: true,
+    cellClass: ['justify-center', 'bg-gray-50', 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'Company',
+    field: 'comp.nama',
+    filter: true,
+    sortable: true,
+    flex:1,
+    filter: 'ColFilter',
+    resizable: true,
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'Nama',
+    field: 'nama',
+    filter: true,
+    sortable: true,
+    flex:1,
+    filter: 'ColFilter',
+    resizable: true,
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'Latitude',
+    field: 'lat',
+    filter: true,
+    sortable: true,
+    filter: 'ColFilter',
+    resizable: true,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'Longtitude',
+    field: 'long',
+    filter: true,
+    sortable: true,
+    filter: 'ColFilter',
+    resizable: true,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'Status',
+    field: 'is_active',
+    filter: true,
+    sortable: true,
+    filter: 'ColFilter',
+    resizable: true,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
+    cellRenderer: ({ value }) => {
+    return value === true
+      ? `<span class="text-green-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Active</span>`
+      : `<span class="text-gray-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Inactive</span>`
+  }},
+  ]
+})
+
+onActivated(() => {
+  //  reload table api landing
+  if (apiTable.value) {
+    if (route.query.reload) {
+      apiTable.value.reload()
+    }
+  }
+})
 
 //  @endif -------------------------------------------------END
 watchEffect(()=>store.commit('set', ['isRequesting', isRequesting.value]))
-
-
-const tempDate = new Date()
-const listTahun = []
-const tempmonth = tempDate.getMonth() + 1
-const tempyear = tempDate.getFullYear()
-const form = reactive({
-  month: tempmonth,
-  year: tempyear 
-})
-for(let i = form.year; i >= 2010; i-- ){
-    listTahun.push(i)
-  }
-
-onBeforeUnmount(()=>{
-  const stream = videoElement.value.srcObject
-  stream.getTracks()?.forEach((track)=>{
-      track.stop()
-    })
-})
-
-const videoElement = ref(null)
-const capturedImage = ref(null)
-const coordsLocation = ref()
-const listDetail = ref([])
-const isImage = ref(false)
-const formData = new FormData()
-const dataDetail = ref()
-const showModal = ref(false)
-
-async function tampilkanModal(data){
-  showModal.value = true
-  dataDetail.value = data
-  console.log(data,'cok')
-}
-
-async function capture() {
-  try {
-    const canvas = document.createElement('canvas');
-    canvas.width = videoElement.value.videoWidth;
-    canvas.height = videoElement.value.videoHeight;
-    canvas.getContext('2d').drawImage(videoElement.value, 0, 0, canvas.width, canvas.height);
-    const captredImageSrc = canvas.toDataURL('image/jpeg');
-    let imgElem = document.getElementById('imgElem');
-    imgElem.setAttribute('src', captredImageSrc);
-    isImage.value=true
-    const stream = videoElement.value.srcObject;
-    const capturedImageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
-    formData.append('foto', capturedImageBlob, 'captured_image.jpg');
-    // formData.forEach((value, key) => {
-    //   if (value instanceof File) {
-    //     console.log(`${key}: ${value.name} (${value.type}), ${value.size} bytes`);
-    //   } else {
-    //     console.log(`${key}: ${value}`);
-    //   }
-    // });
-    // capturedImage.value = formData
-    stream.getTracks()?.forEach((track)=>{
-      track.stop()
-    })
-    getLocation()
-  } catch (error) {
-    console.log(error)
-    alert("Oh maaf, sepertinyßa kami tidak mendapatkan akses kamera anda");
-  }
-}
-
-async function recapture(){
-  mountCam()
-  isImage.value = false
-}
-
-function updateTime() {
-    var now = new Date();
-    var hours = now.getHours();
-    var minutes = now.getMinutes();
-    var seconds = now.getSeconds();
-    
-    hours = (hours < 10) ? "0" + hours : hours;
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
-    
-    var currentTime = hours + ":" + minutes + ":" + seconds;
-    
-    form.currentTime = currentTime;
-}
-
-setInterval(updateTime, 1000);
-
-var listMonths = [
-    { id: 1, name: "Januari" },
-    { id: 2, name: "Februari" },
-    { id: 3, name: "Maret" },
-    { id: 4, name: "April" },
-    { id: 5, name: "Mei" },
-    { id: 6, name: "Juni" },
-    { id: 7, name: "Juli" },
-    { id: 8, name: "Agustus" },
-    { id: 9, name: "September" },
-    { id: 10, name: "Oktober" },
-    { id: 11, name: "November" },
-    { id: 12, name: "Desember" }
-];
-
-
-const detailArr = ref([
-  {
-    pend: ''
-  }
-])
-
-onMounted(async()=>{
-  isRequesting.value = true
-  // mountCam() 
-  // await getLocation()
-  // await checkLastStatus()
-  // await getDetailAbsen(form.year,form.month)
-  // const tempDate = new Date()
-  // const day = tempDate.getDate() 
-  // const monthName = ["Januari", "Februari", "Maret", "April","Mei", "Juni", "Juli", "Agustus","September", "Oktober", "November", "Desemeber"][tempDate.getMonth()]
-  // const year = tempDate.getFullYear() 
-  // form.tanggal = `${day} ${monthName} ${year}`  
-  // form.day = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][tempDate.getDay()]
-  isRequesting.value = false
-})
-
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(setPosition);
-  } else { 
-    swal.fire({
-      icon: 'error',
-      text: "Geolocation is not supported by this browser."
-    })
-  }
-}
-
-function removeStrip(data){
-  const tempTest = data?.split('-')
-  const monthName = ["Januari", "Februari", "Maret", "April","Mei", "Juni", "Juli", "Agustus","September", "Oktober", "November", "Desemeber"][tempTest[1]-1]
-  return `${tempTest[0]} ${monthName} ${tempTest[2]}`
-  // console.log(data)
-  // return data?.replace(/-/g,' ')
-}
-
-async function getDetailAbsen(year,month){
-  try{
-      const params = `${year}-${month}`
-      const res = await fetch(`${store.server.url_backend}/operation/presensi_absensi/get_absen?periode=${params}`, {
-        headers: {
-          'Content-Type': 'Application/json',
-          Authorization: `${store.user.token_type} ${store.user.token}`
-        },
-      })  
-      if (!res.ok) {
-        if ([400, 422].includes(res.status)) {
-          const responseJson = await res.json()
-          throw (responseJson.message || "Failed when trying to post data")
-        } else {
-          throw ("Failed when trying to post data")
-        }
-      }
-      const resultJson = await res?.json()
-      const data = resultJson.data
-      listDetail.value = data
-    }catch(err){
-      swal.fire({
-        icon: 'error',
-        text: err
-      })
-    }
-}
-
-async function checkLastStatus(){
-  try{
-    const res = await fetch(`${store.server.url_backend}/operation/presensi_absensi/status`, {
-      headers: {
-        'Content-Type': 'Application/json',
-        Authorization: `${store.user.token_type} ${store.user.token}`
-      },
-    })  
-    if (!res.ok) {
-      if ([400, 422].includes(res.status)) {
-        const responseJson = await res.json()
-        throw (responseJson.message || "Failed when trying to post data")
-      } else {
-        throw ("Failed when trying to post data")
-      }
-    }
-    const resultJson = await res?.json()
-    const data = resultJson.data
-    form.attending = data.status
-    if(form.attending?.toLowerCase() === 'attend'){
-      // const stream = videoElement.value.srcObject
-      // stream?.getTracks()?.forEach((track)=>{
-      //   track.stop()
-      // })
-    }else{
-      mountCam()
-    }
-  }catch(err){
-    swal.fire({
-      icon: 'error',
-      text: err
-    })
-  }
-}
-
-async function postAttend(){
-  try{
-    formData.append('lat', coordsLocation.value?.latitude)
-    formData.append('long', coordsLocation.value?.longitude)
-    formData.append('address', form.address)
-    let postData = {
-      foto: capturedImage.value,
-      lat: coordsLocation.value?.latitude,
-      long: coordsLocation.value?.longitude,
-      address: form.address
-    }
-    const res = await fetch(`${store.server.url_backend}/operation/presensi_absensi/${form.attending?.toLowerCase() === 'not attend' ? 'checkin' : 'checkout'}`, {
-      method: 'POST',
-        headers: {
-          Authorization: `${store.user.token_type} ${store.user.token}`
-        },
-        body: formData
-    })  
-    if (!res.ok) {
-      if ([400, 422].includes(res.status)) {
-        const responseJson = await res.json()
-        throw (responseJson.message || "Failed when trying to post data")
-      } else {
-        throw ("Failed when trying to post data")
-      }
-    }
-    const resultJson = await res?.json()
-    swal.fire({
-      icon: 'success',
-      text: resultJson.message,
-      iconColor: '#1469AE',
-      confirmButtonColor: '#1469AE',
-    }).then(async (res) => {
-      if (res.isConfirmed){
-        await getLocation()
-        await checkLastStatus()
-        await getDetailAbsen(form.year,form.month)
-        isImage.value=false
-      }
-    })
-  }catch(err){
-    swal.fire({
-      icon: 'error',
-      text: err
-    })
-  }
-}
-
-async function setPosition(position) {
-  coordsLocation.value = position?.coords
-  try{
-    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)  
-    const resultJson = await res?.json()
-    form.address = resultJson?.display_name
-    await getDistance(position.coords.latitude, position.coords.longitude)
-  }catch(err){
-    swal.fire({
-      icon: 'error',
-      text: err
-    })
-  }
-  
-}
-
-async function getDistance(lat,long){
-  try{
-    const res = await fetch(`${store.server.url_backend}/operation/presensi_absensi/distance_check?lat=${lat}&long=${long}`, {
-      headers: {
-        'Content-Type': 'Application/json',
-        Authorization: `${store.user.token_type} ${store.user.token}`
-      },
-    })  
-    if (!res.ok) {
-      if ([400, 422].includes(res.status)) {
-        const responseJson = await res.json()
-        throw (responseJson.message || "Failed when trying to post data")
-      } else {
-        throw ("Failed when trying to post data")
-      }
-    }
-    const resultJson = await res?.json()
-    const data = resultJson.data
-    form.distance_check = data?.on_scope
-  }catch(err){
-    swal.fire({
-      icon: 'error',
-      text: err
-    })
-  }
-}
-
-async function mountCam() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    videoElement.value.srcObject = stream;
-  } catch (error) {
-    alert("Oh maaf, sepertinyßa kami tidak mendapatkan akses kamera anda");
-  }
-}

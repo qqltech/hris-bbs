@@ -81,6 +81,75 @@ class presensi_maksi extends \App\Models\BasicModels\presensi_maksi
         return response(['data'=>$data]);
     }
 
+    public function custom_get_maksi_3hari()
+    {
+        $m_kary_id = auth()->user()->m_kary_id;
+
+        $today = new \DateTime();
+        $dayOfWeek = $today->format('N'); 
+
+       if ($dayOfWeek == 3) { // Rabu
+            $startDate = (clone $today)->modify('tomorrow')->format('Y-m-d'); // Kamis
+            $endDate   = (clone $today)->modify('next saturday')->format('Y-m-d'); // Sabtu
+        } elseif ($dayOfWeek == 6) { // Sabtu
+            $startDate = (clone $today)->modify('next monday')->format('Y-m-d'); // Senin
+            $endDate   = (clone $today)->modify('next wednesday')->format('Y-m-d'); // Rabu
+        } else {
+            $startDate = (clone $today)->modify('tomorrow')->format('Y-m-d');
+            $endDate   = $startDate; 
+        }
+
+
+        $check_exists_dates = presensi_maksi_det::select('presensi_maksi.tanggal')
+        ->join('presensi_maksi', 'presensi_maksi.id', '=', 'presensi_maksi_det.presensi_maksi_id')
+        ->where('presensi_maksi_det.m_kary_id', $m_kary_id)
+        ->whereBetween('presensi_maksi.tanggal', [$startDate, $endDate])
+        ->pluck('presensi_maksi.tanggal')
+        ->toArray();
+
+        $data = $this
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->where('presensi_maksi.status', 'POSTED')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        if ($data->isEmpty()) {
+            return response(['data' => ['sudah_pesan' => false]]);
+        }
+
+        $data->transform(function ($item) use ($check_exists_dates) {
+            $groupedData = array_reduce(@$item->lauk ?? [], function ($carry, $lauk) {
+                $key = @$lauk['tipe_lauk_id'];
+                if (!isset($carry[$key])) {
+                    $carry[$key] = $lauk;
+                }
+                return $carry;
+            }, []);
+            $group_data = array_values($groupedData);
+
+            $item->group_data = array_map(function ($itm) use ($item) {
+                $groupedDataLauk = array_filter(@$item->lauk ?? [], function ($l) use ($itm) {
+                    return $l['tipe_lauk_id'] == $itm['tipe_lauk_id'];
+                });
+                return [
+                    'tipe_lauk_id' => $itm['tipe_lauk_id'],
+                    'tipe_lauk' => m_general::where('id', $itm['tipe_lauk_id'])->pluck('value')->first(),
+                    'detail' => array_values($groupedDataLauk)
+                ];
+            }, $group_data);
+
+            unset($item->lauk);
+            $item->sudah_pesan = in_array($item->tanggal, $check_exists_dates);
+            return $item;
+        });
+
+        return response(['data' => $data]);
+
+    }
+
+
+
+
     public function custom_post($req)
     {
         $this->find($req->id)->update([

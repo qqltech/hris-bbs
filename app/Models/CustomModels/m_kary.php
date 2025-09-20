@@ -1432,4 +1432,9 @@ class m_kary extends \App\Models\BasicModels\m_kary
         ", [$t_jadwal_kerja_id ?? 0]);
     }
 
+    public function scopeHUT($model)
+    {
+        $model->whereRaw("to_char(m_kary.tgl_lahir, 'mm') = to_char(CURRENT_DATE + INTERVAL '1 day', 'mm')");
+    }
+
 }

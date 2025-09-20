@@ -5,100 +5,47 @@ const router = useRouter()
 const route = useRoute()
 const store = inject('store')
 const swal = inject('swal')
-
-const isRead = route.params.id && route.params.id !== 'create'
-const actionText = ref(route.params.id === 'create' ? 'Tambah' : route.query.action)
-const isBadForm = ref(false)
-const isRequesting = ref(false)
-const modulPath = route.params.modul
-const currentMenu = store.currentMenu
 const apiTable = ref(null)
-const formErrors = ref({})
-const tsId = `ts=`+(Date.parse(new Date()))
-const readValue = ref(true)
-const adjKary = ref(route.query.action?.toLowerCase() === 'adjusment' ? true : false)
 
-// ------------------------------ PERSIAPAN
-const endpointApi = '/t_cuti_adjustment'
-onBeforeMount(()=>{
-  document.title = 'Adjusment Cuti'
-})
+const values = reactive({})
+let detailArr = ref([])
 
 
-//  @if( $id )------------------- VALUES FORM ! PENTING JANGAN DIHAPUS
+// const checkFile = ref(false)aaaaaa
+// function checkValue (e){
+//   const files = e.target.files;
+//     const allowedTypes = ['application/pdf', 'image/png'];
+//     for (let i = 0; i < files.length; i++) {
+//         const file = files[i];
+//         if (!allowedTypes.includes(file.type)) {
+//           swal.fire({
+//               icon: 'error',
+//               text: 'File ' + file.name + ' tidak diizinkan. Harap unggah file dengan tipe yang sesuai.',
+//             })
+//             checkFile.value=true
+//             return;
+//         }
+//     }
+// }
 
-let initialValues = {}
-let tempInfo = {}
-const changedValues = []
-const informasiCuti = reactive({})
+// Check Extension Upload onsave
+      // if(values.alamat){
+      //   const indexFile = values.alamat?.lastIndexOf('.')
+      //   const extensionFile = values.alamat?.slice(indexFile+1)
+      //   if(!['pdf','jpg'].includes(extensionFile?.toLowerCase())){
+      //     formErrors.value = {
+      //       alamat : ['Extension File Salah Harus PDF/JPG']}
+      //     throw ('File ' + values.alamat + ' tidak diizinkan. Harap unggah file dengan tipe yang sesuai.')
+      //   }
+      // }asdsaasdasd
 
-const values = reactive({
-  date: new Date().toLocaleDateString('en-GB'),
-})
-
-const infoCuti = async (id) => {
-  tempInfo = {}
-  const dataURL = `${store.server.url_backend}/operation/m_kary/${id}`
-  const params = { join: true, transform: false, detail: true }
-  const fixedParams = new URLSearchParams(params)
-  const res = await fetch(dataURL + '?' + fixedParams, {
-    headers: {
-      'Content-Type': 'Application/json',
-      Authorization: `${store.user.token_type} ${store.user.token}`
-    },
-  })
-  if (!res.ok) throw new Error("Failed when trying to read data")
-  const resultJson = await res.json()
-  let tempValues = resultJson.data
-  if(tempValues.info_cuti){
-      for (let key in tempValues.info_cuti) {
-          if (tempValues.info_cuti.hasOwnProperty(key) && tempValues.info_cuti[key] === null) {
-              tempValues.info_cuti[key] = 0;
-          }
-      }
-    }
-  tempInfo = {...tempInfo, ...tempValues.info_cuti}
-  Object.assign(informasiCuti,tempValues.info_cuti)
-  Object.assign(values, tempValues.info_cuti)
-  console.log(values)
-  adjKary.value = true
-}
-
-const changeSisaCuti = async (data,value)=>{
-  parseInt(value??0)
-  if(data === '01'){
-    informasiCuti.sisa_cuti_satu_hari = tempInfo.sisa_cuti_satu_hari
-    informasiCuti.sisa_cuti_satu_hari = tempInfo.sisa_cuti_satu_hari +(value)
-  }else if(data === '02'){
-    informasiCuti.sisa_cuti_setengah_hari = tempInfo.sisa_cuti_setengah_hari
-    informasiCuti.sisa_cuti_setengah_hari = tempInfo.sisa_cuti_setengah_hari+(value)
-  }
-}
-
-const setNullInfoCuti = (v)=> {
-  if(v === '01'){
-    informasiCuti.sisa_cuti_satu_hari = tempInfo.sisa_cuti_satu_hari
-  }else if(v === '02'){
-    informasiCuti.sisa_cuti_setengah_hari = tempInfo.sisa_cuti_setengah_hari
-  }
-  if(values.value!==null){
-    values.value=null
-  }
-}
 onBeforeMount(async () => {
-  console.log(adjKary.value)
-    //  READ DATA
-    
-  if (isRead) {
-    try {
-      if(actionText.value === undefined){
-        readValue.value = true
-      }
-    isRequesting.value = true
-      const editedId = route.params.id
-      const dataURL = adjKary.value === true ? `${store.server.url_backend}/operation/m_kary/${editedId}` : `${store.server.url_backend}/operation${endpointApi}/${editedId}`
-      const params = { join: true, transform: false, ...(adjKary.value === true && { detail: true }) }
+      const dataURL = `${store.server.url_backend}/operation/m_menu`
+
+      const params = { join: true, transform: false }
       const fixedParams = new URLSearchParams(params)
+
+      // header
       const res = await fetch(dataURL + '?' + fixedParams, {
         headers: {
           'Content-Type': 'Application/json',
@@ -107,107 +54,50 @@ onBeforeMount(async () => {
       })
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
-      initialValues = resultJson.data
-      if(initialValues.info_cuti){
-          for (let key in initialValues.info_cuti) {
-              if (initialValues.info_cuti.hasOwnProperty(key) && initialValues.info_cuti[key] === null) {
-                  initialValues.info_cuti[key] = 0;
-              }
-          }
-        }
-        initialValues = {...initialValues, ...initialValues.info_cuti}
-        if(adjKary.value === true){        
-          initialValues.m_kary_id = initialValues.id
-        }
-        initialValues.tipe_key = initialValues['tipe_cuti.key']
-        infoCuti(initialValues.m_kary_id)
-    } catch (err) {
-      isBadForm.value = true
-      swal.fire({
-        icon: 'error',
-        text: err,
-        allowOutsideClick: false,
-        confirmButtonText: 'Kembali',
-      }).then(() => {
-        router.back()
+      const initialValues = resultJson.data
+      console.log(initialValues)
+      initialValues.forEach((d)=>{
+        detailArr.value.push(d)
       })
-    }
-    isRequesting.value = false
-  }
+      detailArr.value = resultJsonDet?.data ?? []
+    
+
   for (const key in initialValues) {
     values[key] = initialValues[key]
   }
-})
+}
+)
 
+function clearAll(){
+  detailArr.value = []
+}
+let _id = 0
+let dataArr = ref([])
 
-function onBack() {
-  adjKary.value === true ? router.replace('/m_karyawan') : router.replace('/' + modulPath)
+function onDetailAdd(e){
+  e.forEach(row=>{
+    row._id = _id++
+    dataArr.value.push(row)
+  })
+  console.log(dataArr.value)
+}
+function sliceArr(data){
+  dataArr.value = dataArr.value.filter((e) => e._id != data._id)
 }
 
-function onReset() {
-  swal.fire({
-    icon: 'warning',
-    text: 'Reset this form data?',
-    showDenyButton: true
-  }).then((res) => {
-    if (res.isConfirmed) {
-      for (const key in initialValues) {
-        values[key] = initialValues[key]
-      }
-    }
+function addA(){
+  detailArr.value.push({
+    menu: values.username,
+    project: 'HRIS 1.0'
   })
 }
 
-async function onSave() {
-  //values.tags = JSON.stringify(values.tags)
-      try {
-        const isCreating = ['Create','Copy','Tambah','Adjusment'].includes(actionText.value)
-        const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
-        isRequesting.value = true
-         values.is_active = values.is_active ? 1 : 0
-        for (const key in informasiCuti) {
-          if(['sisa_cuti_setengah_hari','sisa_cuti_satu_hari'].includes(key)){            
-            if (informasiCuti[key] != null && informasiCuti[key] != undefined && informasiCuti[key] < 0 ) {
-              throw(`Data Tidak Boleh Kurang Dari 0`)
-            } 
-          }
-        }
-        const res = await fetch(dataURL, {
-          method: isCreating ? 'POST' : 'PUT',
-          headers: {
-            'Content-Type': 'Application/json',
-            Authorization: `${store.user.token_type} ${store.user.token}`
-          },
-          body: JSON.stringify(values)
-        })
-        if (!res.ok) {
-          if ([400, 422].includes(res.status)) {
-            const responseJson = await res.json()
-            formErrors.value = responseJson.errors || {}
-            throw (responseJson.errors.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
-          } else {
-            throw ("Failed when trying to post data")
-          }
-        }
-        router.replace('/' + modulPath + '?reload='+(Date.parse(new Date())))
-      } catch (err) {
-        isBadForm.value = true
-        swal.fire({
-          icon: 'error',
-          text: err
-        })
-      }
-      isRequesting.value = false
-}
-
-//  @else----------------------- LANDING
-// LANDING LAMA 
 const landing = reactive({
+  //  ACTIONS sesuai priviledge user dan data
   actions: [
     {
       icon: 'trash',
       class: 'bg-red-600 text-light-100',
-      // show: (row) =>row.status?.toUpperCase() === 'DRAFT',
       title: "Hapus",
       // show: () => store.user.data.username==='developer',
       click(row) {
@@ -247,40 +137,37 @@ const landing = reactive({
       icon: 'eye',
       title: "Read",
       class: 'bg-green-600 text-light-100',
-      // show: (row) => (currentMenu?.can_read)||store.user.data.username==='developer',
+      // show: (row) => (currentMenu?.can_read)||store.user.data.username==='trial',
       click(row) {
-        router.push(`${route.path}/${row.id}?` + tsId)
+        router.push(`${route.path}/${row.id}?ts=`+(Date.parse(new Date())))
       }
     },
-  {
-    icon: 'edit',
-    title: "Edit",
-    class: 'bg-blue-600 text-light-100',
-    // show: (row) => row.status?.toUpperCase() === 'DRAFT' || row.status?.toUpperCase() === 'REVISED',
-    click(row) {
-      router.push(`${route.path}/${row.id}?action=Edit&` + tsId);
-    }
-  },
+    {
+      icon: 'edit',
+      title: "Edit",
+      class: 'bg-blue-600 text-light-100',
+      // show: (row) => (currentMenu?.can_update)||store.user.data.username==='developer',
+      click(row) {
+        router.push(`${route.path}/${row.id}?action=Edit&ts=`+(Date.parse(new Date())))
+      }
+    },
     {
       icon: 'copy',
       title: "Copy",
-            show: (row) => row.status?.toUpperCase() === 'DRAFT',
       class: 'bg-gray-600 text-light-100',
       click(row) {
-        router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
+        router.push(`${route.path}/${row.id}?action=Copy&ts=`+(Date.parse(new Date())))
       }
-    },
+    }
   ],
   api: {
-    url: `${store.server.url_backend}/operation${endpointApi}`,
+    url: `${store.server.url_backend}/operation/m_menu`,
     headers: {
       'Content-Type': 'Application/json',
       authorization: `${store.user.token_type} ${store.user.token}`
     },
     params: {
-      simplest: true,
-            join: true,
-            searchfield: 'm_kary.nama_lengkap, alasan.value, tipe_cuti.value, date_from, date_to, status',
+      simplest: true
     },
     onsuccess(response) {
       response.page = response.current_page
@@ -293,59 +180,53 @@ const landing = reactive({
     valueGetter: (params) => params.node.rowIndex + 1,
     width: 60,
     sortable: true,
-    resizable: true,
+    resizable: false,
     filter: true,
-    cellClass: ['justify-left', 'bg-gray-50', 'border-r', '!border-gray-200']
+    cellClass: ['justify-center', 'bg-gray-50', 'border-r', '!border-gray-200']
   },
   {
-    field: 'date',
-    headerName: 'Tanggal',
+    field: 'menu',
+    headerName: 'Nama Menu',
     filter: true,
     sortable: true,
-    flex: 1,
-    filter: 'ColFilter',
-    resizable: true,
-    cellClass: ['border-r', '!border-gray-200', 'justify-left']
+     filter: 'ColFilter',
+    resizable: false,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-center', 'capitalize']
   },
   {
-    field: 'm_kary.nama_lengkap',
-    headerName: 'Nama Karyawan',
+    field: 'path',
+    headerName: 'Path Menu',
     filter: true,
     sortable: true,
-    flex: 1,
-    filter: 'ColFilter',
-    resizable: true,
-    cellClass: ['border-r', '!border-gray-200', 'justify-start']
+     filter: 'ColFilter',
+    resizable: false,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-center', 'capitalize']
   },
   {
-    field: 'tipe_cuti.value',
-    headerName: 'Tipe Cuti',
+    field: 'project',
+    headerName: 'Nama Project',
     filter: true,
     sortable: true,
-    flex: 1,
-    filter: 'ColFilter',
-    resizable: true,
-    cellClass: ['border-r', '!border-gray-200', 'justify-left']
-  },{
-    field: 'value',
-    filter: true,
-    sortable: true,
-    flex: 1,
-    filter: 'ColFilter',
-    resizable: true,
-    cellClass: ['border-r', '!border-gray-200', 'justify-left']
+     filter: 'ColFilter',
+    resizable: false,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-center', 'capitalize']
   },
   {
-    field: 'keterangan',
+    field: 'modul',
+    headerName: 'Nama Modul',
     filter: true,
     sortable: true,
-    flex: 1,
-    filter: 'ColFilter',
-    resizable: true,
-    cellClass: ['border-r', '!border-gray-200', 'justify-left']
+     filter: 'ColFilter',
+    resizable: false,
+    flex:1,
+    cellClass: [ 'border-r', '!border-gray-200', 'justify-center', 'capitalize']
   },
   ]
 })
+
 onActivated(() => {
   //  reload table api landing
   if (apiTable.value) {
@@ -354,5 +235,3 @@ onActivated(() => {
     }
   }
 })
-//  @endif -------------------------------------------------END
-watchEffect(() => store.commit('set', ['isRequesting', isRequesting.value]))

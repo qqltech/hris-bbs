@@ -1,22 +1,28 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class presensimaksidet extends Migration
+class tlogbookd extends Migration
 {
-    protected $tableName = "presensi_maksi_det";
+    protected $tableName = "t_logbook_d";
 
     public function up()
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
-            $table->bigInteger('presensi_maksi_id')->comment('{"fk":"presensi_maksi.id"}')->nullable();
-            $table->bigInteger('m_kary_id')->comment('{"src":"m_kary.id"}')->nullable();
-            $table->jsonb('lauk');
-            $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
-            $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();
+            $table->bigInteger('t_logbook_id')->comment('{"fk":"t_logbook.id"}')->nullable();
+            $table->bigInteger('m_proyek_id')->comment('{"src":"m_proyek.id"}');
+            $table->string('task',200);
+            $table->string('status')->default("TODO");
+
+            //Penting
+            $table->bigInteger('creator_id')->nullable();
+            $table->bigInteger('last_editor_id')->nullable();
             $table->timestamps();
+            $table->bigInteger('deletor_id')->nullable();
+            $table->datetime('deleted_at')->nullable();
         });
 
         table_config($this->tableName, [

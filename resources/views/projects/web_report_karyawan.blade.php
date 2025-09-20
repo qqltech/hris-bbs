@@ -24,7 +24,7 @@
     and case when  k.m_dir_id is not null then k.m_dir_id = coalesce(?,k.m_dir_id) end
     and k.m_divisi_id = coalesce(?,k.m_divisi_id) 
     and k.m_dept_id = coalesce(?,k.m_dept_id) 
-    and case when k.m_posisi_id is not null then k.m_posisi_id = coalesce(?,k.m_posisi_id) end
+    <!-- and case when k.m_posisi_id is not null then k.m_posisi_id = coalesce(?,k.m_posisi_id) end -->
     $additional
     order by k.tgl_masuk
 ", [ $req->m_dir_id, $req->m_divisi_id, $req->m_dept_id, $req->m_posisi_id]);

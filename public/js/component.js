@@ -37,7 +37,7 @@ let detailArr = ref([])
       //       alamat : ['Extension File Salah Harus PDF/JPG']}
       //     throw ('File ' + values.alamat + ' tidak diizinkan. Harap unggah file dengan tipe yang sesuai.')
       //   }
-      // }
+      // }asdsaasdasd
 
 onBeforeMount(async () => {
       const dataURL = `${store.server.url_backend}/operation/m_menu`

@@ -93,6 +93,8 @@
         <!-- END COLUMN -->
       </div>
 
+      <!-- table -->
+
       <div class="p-4 flex items-end" v-if="actionText">
           <ButtonMultiSelect
           title="Tambah Akses"
@@ -285,6 +287,8 @@
           </TableStatic>
 
       </div>
+
+
         <!-- ACTION BUTTON START -->
         <div class="flex flex-row justify-end space-x-[20px] mt-[2em]">
           <button @click="onBack" class="bg-[#EF4444] hover:bg-[#ed3232] text-white px-[36.5px] py-[12px] rounded-[6px] ">

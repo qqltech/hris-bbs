@@ -81,7 +81,7 @@
               :check="false"
               />        
         </div>
-       
+
         <div >
            <label class="col-span-12">Status<label class="text-red-500 space-x-0 pl-0"></label></label>
             <FieldX :bind="{ readonly: true }" 
@@ -92,6 +92,7 @@
               :check="false"
               /> 
         </div>
+        
         <!-- END COLUMN -->
       </div>
       <div class="col-span-8 md:col-span-12 mt-5">

@@ -139,19 +139,37 @@ const checkItemDetailNotIn = (idx, i)=>{
 }
 
 async function onSave() {
-  //values.tags = JSON.stringify(values.tags)
+  // Validasi: pastikan ada item yang dipilih
+  if (!resultValues.items.length) {
+    return swal.fire({
+      icon: 'warning',
+      text: 'Harap tambahkan setidaknya satu pilihan lauk ',
+    });
+  }
+
+  // Validasi: pastikan semua detail_text terisi
+  const hasEmptyLauk = resultValues.items.some(item => !item.detail_text || item.detail_text.trim() === '');
+  if (hasEmptyLauk) {
+    return swal.fire({
+      icon: 'warning',
+      text: 'Harap pilih lauk terlebih dahulu.',
+    });
+  }
+
+  // Lanjutkan jika semua valid
   swal.fire({
     icon: 'warning',
-    text: 'Kamu yakin sudah memilih menu dengan benar ?',
+    text: 'Kamu yakin sudah memilih menu dengan benar?',
     showDenyButton: true
   }).then(async (res) => {
     if (res.isConfirmed) {
-      let arrResult = {"pesan": []};
+      let arrResult = { pesan: [] };
 
       try {
-        const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
-        const dataURL = `${store.server.url_backend}/operation/presensi_maksi_det/pesan_maksi`
-        isRequesting.value = true
+        const isCreating = ['Create', 'Copy', 'Tambah'].includes(actionText.value);
+        const dataURL = `${store.server.url_backend}/operation/presensi_maksi_det/pesan_maksi`;
+        isRequesting.value = true;
+
         const res = await fetch(dataURL, {
           method: isCreating ? 'POST' : 'PUT',
           headers: {
@@ -159,31 +177,32 @@ async function onSave() {
             Authorization: `${store.user.token_type} ${store.user.token}`
           },
           body: JSON.stringify({
-            presensi_maksi_id:initialValues.id,
-            pesan:resultValues.items
+            presensi_maksi_id: initialValues.id,
+            pesan: resultValues.items
           })
-        })
-        loadInitalData()
+        });
+
+        loadInitalData();
+
         if (!res.ok) {
-          if ([400, 422].includes(res.status)) {
-            const responseJson = await res.json()
-            formErrors.value = responseJson.errors || {}
-            throw (responseJson.errors.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
-          } else {
-            throw ("Failed when trying to post data")
-          }
+          const responseJson = await res.json();
+          formErrors.value = responseJson.errors || {};
+          throw (responseJson.message || "Terjadi kesalahan saat menyimpan data.");
         }
       } catch (err) {
-        isBadForm.value = true
+        isBadForm.value = true;
         swal.fire({
           icon: 'error',
           text: err
-        })
+        });
       }
-      isRequesting.value = false
+
+      isRequesting.value = false;
     }
-  })
+  });
 }
+
+
 
 async function onCancel() {
   //values.tags = JSON.stringify(values.tags)

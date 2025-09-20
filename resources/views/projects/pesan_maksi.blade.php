@@ -25,6 +25,26 @@
     <p class="font-[10px] text-gray-400 mt-1">*pesanan masih bisa dibatlkan jika menu makan untuk besok belum ditutup oleh admin.</p>
   </div>
   <hr>
+
+  <!-- 🔹 PILIHAN HARI PEMESANAN -->
+  <div v-if="availableDates.length">
+    <h3 class="text-gray-700 font-semibold mb-2">Pilih Hari Pemesanan</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div v-for="(dayItem, idx) in availableDates" :key="idx" class="p-4 border rounded shadow-md">
+        <h4 class="font-bold">{{ dayItem.day }}</h4>
+        <p class="text-gray-600">{{ dayItem.date }}</p>
+        <button @click="goToOrder(dayItem.iso)"
+          class="mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+          Pesan
+        </button>
+      </div>
+    </div>
+  </div>
+  <div v-else>
+    <p class="text-red-500 font-semibold italic">Pemesanan hanya dibuka setiap Rabu & Sabtu.</p>
+  </div>
+  <!-- 🔹 END PILIHAN HARI PEMESANAN -->
+
   <div v-if="values?.group_data?.length && !values?.sudah_pesan">
     <h3 class="text-gray-700">Mau pesan makan apa ?</h3>
     <div>
@@ -57,5 +77,4 @@
     <h4 v-else class="text-red-400 italic font-semibold" v-show="!values?.sudah_pesan">Maaf, belum ada menu makan</h3>
   </div>
 </div>
-
 @endverbatim

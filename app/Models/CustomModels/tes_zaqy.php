@@ -2,7 +2,7 @@
 
 namespace App\Models\CustomModels;
 
-class test_daniel_2 extends \App\Models\BasicModels\test_daniel_2
+class tes_zaqy extends \App\Models\BasicModels\tes_zaqy
 {    
     public function __construct()
     {

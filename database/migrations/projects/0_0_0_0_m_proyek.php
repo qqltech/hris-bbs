@@ -1,22 +1,26 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class presensimaksidet extends Migration
+class mproyek extends Migration
 {
-    protected $tableName = "presensi_maksi_det";
+    protected $tableName = "m_proyek";
 
     public function up()
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
-            $table->bigInteger('presensi_maksi_id')->comment('{"fk":"presensi_maksi.id"}')->nullable();
-            $table->bigInteger('m_kary_id')->comment('{"src":"m_kary.id"}')->nullable();
-            $table->jsonb('lauk');
-            $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
-            $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();
+            $table->string('proyek_nama', 200);
+            $table->string('proyek_kode', 20)->nullable();
+
+            // penting
+            $table->bigInteger('creator_id')->nullable();
+            $table->bigInteger('last_editor_id')->nullable();
             $table->timestamps();
+            $table->bigInteger('deletor_id')->nullable();
+            $table->datetime('deleted_at')->nullable();
         });
 
         table_config($this->tableName, [

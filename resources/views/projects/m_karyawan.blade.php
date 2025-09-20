@@ -90,7 +90,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Divisi<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="values.m_divisi_id" @input="v=>values.m_divisi_id=v"
                 :errorText="formErrors.m_divisi_id?'failed':''" 
                 @update:valueFull="(objVal)=>{
@@ -348,20 +348,22 @@
           <h2 class="font-bold text-[18px] col-span-8 md:col-span-6">Data Karyawan</h2>
           <div class="col-span-8 md:col-span-6">
           </div>
+
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">NIK<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="text" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }"  type="text" class="col-span-12 !mt-0 w-full"
                 :value="values.kode" label="" placeholder="Masukan Nomor Induk Karyawan" :errorText="formErrors.kode?'failed':''"
                 @input="v=>values.kode=v" :hints="formErrors.kode" :check="false"
               />
             </div>
           </div>
+
           <div class="col-span-8 md:col-span-6">
           <div class="grid grid-cols-12 items-center">
             <label class="col-span-12">Atasan<label class="text-red-500 space-x-0 pl-0">*</label></label>
             <FieldPopup
-              :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+              :bind="{ readonly: !actionText && !isProfile }" class="col-span-12 !mt-0 w-full"
               :value="values.atasan_id" @input="(v)=>values.atasan_id=v"
               :errorText="formErrors.atasan_id?'failed':''" 
               :hints="formErrors.atasan_id" 
@@ -434,11 +436,12 @@
             />
           </div>
         </div>
+
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Pilih Lokasi</span></label>
               <FieldSelect class="w-full !mt-0 col-span-12"
-                :bind="{ disabled: !actionText, clearable:false }"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }"
                 :value="values.presensi_lokasi_default_id" @input="v=>values.presensi_lokasi_default_id=v"
                 :errorText="formErrors.presensi_lokasi_default_id?'failed':''" 
                 :hints="formErrors.presensi_lokasi_default_id"
@@ -455,27 +458,25 @@
               />
             </div>
         </div>
-          <!-- <div class="col-span-8 md:col-span-6">
-            <div class="grid grid-cols-12 items-center">
-            </div>
-          </div> -->
+
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Karyawan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-6 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-6 !mt-0 w-full"
                 :value="values.nama_depan" label="" placeholder="Tuliskan Nama Depan" :errorText="formErrors.nama_depan?'failed':''"
                 @input="v=>values.nama_depan=v" :hints="formErrors.nama_depan" :check="false"
               />
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-6 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-6 !mt-0 w-full"
                 :value="values.nama_belakang" label="" placeholder="Tuliskan Nama Belakang" :errorText="formErrors.nama_belakang?'failed':''"
                 @input="v=>values.nama_belakang=v" :hints="formErrors.nama_belakang"  :check="false"
               />
             </div>
           </div>
+
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Panggilan Karyawan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-12 !mt-0 w-full"
                 :value="values.nama_panggilan" label="" placeholder="Tuliskan Nama Panggilan Karyawan" :errorText="formErrors.nama_panggilan?'failed':''"
                 @input="v=>values.nama_panggilan=v" :hints="formErrors.nama_panggilan" :check="false"
               />
@@ -485,7 +486,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Jenis Kelamin<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="values.jk_id" label="" placeholder="Pilih Jenis Kelamin" @input="v=>values.jk_id=v"
                 :errorText="formErrors.jk_id?'failed':''" 
                 :hints="formErrors.jk_id"
@@ -512,7 +513,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tempat, Tanggal Lahir<label class="text-red-500 space-x-0 pl-0">*</label></label>
                 <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-6 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-6 !mt-0 w-full"
                   :value="values.tempat_lahir" @input="v=>values.tempat_lahir=v"
                   :errorText="formErrors.tempat_lahir?'failed':''" 
                   :hints="formErrors.tempat_lahir" label="" placeholder="Pilih Kota"
@@ -533,7 +534,7 @@
                   }"
                   :check="false"
                 />
-              <FieldX :bind="{ readonly: !actionText }" type="date" class="col-span-6 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="date" class="col-span-6 !mt-0 w-full"
                 :value="values.tgl_lahir" label="" placeholder="Pilih Tanggal" :errorText="formErrors.tgl_lahir?'failed':''"
                 @input="v=>values.tgl_lahir=v" :hints="formErrors.tgl_lahir"  :check="false"
               />
@@ -542,7 +543,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Alamat Tinggal<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="textarea" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="textarea" class="col-span-12 !mt-0 w-full"
                 :value="values.alamat_domisili" label="" placeholder="Tuliskan Alamat" :errorText="formErrors.alamat_domisili?'failed':''"
                 @input="v=>values.alamat_domisili=v" :hints="formErrors.alamat_domisili" :check="false"
               />
@@ -552,7 +553,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Provinsi<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.provinsi_id" @input="v=>values.provinsi_id=v"
                   :errorText="formErrors.provinsi_id?'failed':''" 
                   @update:valueFull="(objVal)=>{
@@ -584,7 +585,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Kota<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.kota_id" @input="v=>values.kota_id=v"
                   :errorText="formErrors.kota_id?'failed':''" 
                   @update:valueFull="(objVal)=>{
@@ -616,7 +617,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Kecamatan<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.kecamatan_id" @input="v=>values.kecamatan_id=v"
                   :errorText="formErrors.kecamatan_id?'failed':''" 
                   @update:valueFull="(objVal)=>{
@@ -646,7 +647,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Kode Pos<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.kode_pos" label="" placeholder="Tuliskan Kode Pos" :errorText="formErrors.kode_pos?'failed':''"
                 @input="v=>values.kode_pos=v" :hints="formErrors.kode_pos" :check="false"
               />
@@ -655,7 +656,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. Telepon<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.no_tlp" label="" placeholder="Tuliskan Nomer Telepon" :errorText="formErrors.no_tlp?'failed':''"
                 @input="v=>values.no_tlp=v" :hints="formErrors.no_tlp" :check="false"
               />
@@ -664,7 +665,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. Telepon Lainnya</label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.no_tlp_lainnya" label="" placeholder="Tuliskan Nomer Telepon Lainnya" :errorText="formErrors.no_tlp_lainnya?'failed':''"
                 @input="v=>values.no_tlp_lainnya=v" :hints="formErrors.no_tlp_lainnya" :check="false"
               />
@@ -673,7 +674,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. Telepon Darurat<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.no_darurat" label="" placeholder="Tuliskan Nomer Telepon Darurat" :errorText="formErrors.no_darurat?'failed':''"
                 @input="v=>values.no_darurat=v" :hints="formErrors.no_darurat" :check="false"
               />
@@ -682,7 +683,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Kontak Darurat<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-12 !mt-0 w-full"
                 :value="values.nama_kontak_darurat" label="" placeholder="Tuliskan Nama Kontak Darurat" :errorText="formErrors.nama_kontak_darurat?'failed':''"
                 @input="v=>values.nama_kontak_darurat=v" :hints="formErrors.nama_kontak_darurat" :check="false"
               />
@@ -691,7 +692,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Hubungan Dengan Karyawan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-12 !mt-0 w-full"
                 :value="values.hub_dgn_karyawan" label="" placeholder="Tulis Hubungan Dengan Karyawan" :errorText="formErrors.hub_dgn_karyawan?'failed':''"
                 @input="v=>values.hub_dgn_karyawan=v" :hints="formErrors.hub_dgn_karyawan" :check="false"
               />
@@ -701,7 +702,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Agama<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.agama_id" @input="v=>values.agama_id=v"
                   :errorText="formErrors.agama_id?'failed':''" 
                   :hints="formErrors.agama_id" label="" placeholder="Pilih Agama"
@@ -728,7 +729,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Golongan Darah<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.gol_darah_id" @input="v=>values.gol_darah_id=v"
                   :errorText="formErrors.gol_darah_id?'failed':''" 
                   :hints="formErrors.gol_darah_id" label="" placeholder="Pilih Golongan Darah"
@@ -755,7 +756,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Status Pernikahan<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.status_nikah_id" @input="v=>values.status_nikah_id=v"
                   :errorText="formErrors.status_nikah_id?'failed':''" 
                   :hints="formErrors.status_nikah_id" label="" placeholder="Pilih Status Pernikahan"
@@ -782,7 +783,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Jumlah Tanggungan<label class="text-red-500 space-x-0 pl-0"></label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.tanggungan_id" @input="v=>values.tanggungan_id=v"
                   :errorText="formErrors.tanggungan_id?'failed':''" 
                   :hints="formErrors.tanggungan_id" label="" placeholder="Pilih Tanggungan"
@@ -808,93 +809,125 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Limit Potong<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.limit_potong" :errorText="formErrors.limit_potong?'failed':''"
                 @input="v=>values.limit_potong=v" :hints="formErrors.limit_potong" 
                 placeholder="Limit Potong" :check="false"
               />
             </div>
           </div>
-          <h2 class="font-bold text-[18px] col-span-8 md:col-span-6">Info Lain</h2>
+
+
+
+          <h2 class="font-bold text-[18px] col-span-8 md:col-span-6">Info Cuti</h2>
           <div class="col-span-8 md:col-span-6">
           </div>
+
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-1 ">
               <div class="grid grid-cols-12 col-span-6">
                 <label class="col-span-12">Jatah Cuti Tahunan<label class="text-red-500 space-x-0 pl-0"></label></label>
                 <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                  :value="values.cuti_reguler" label="" placeholder="Tuliskan Jatah Cuti Reguler" :errorText="formErrors.cuti_reguler?'failed':''"
-                  @input="v=>values.cuti_reguler=v" :hints="formErrors.cuti_reguler" :check="false"
+                  :value="values.cuti_1_hari" label="" placeholder="Tuliskan Jatah Cuti Reguler" :errorText="formErrors.cuti_1_hari?'failed':''"
+                  @input="v=>values.cuti_1_hari=v" :hints="formErrors.cuti_1_hari" :check="false"
                 />
               </div>
               <div class="grid grid-cols-12 col-span-6">
                 <label class="col-span-12">Sisa Cuti Tahunan<label class="text-red-500 space-x-0 pl-0"></label></label>
                 <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                  :value="values.sisa_cuti_reguler" label="" placeholder="Tuliskan Sisa Jatah Cuti Reguler" :errorText="formErrors.sisa_cuti_reguler?'failed':''"
-                  @input="v=>values.sisa_cuti_reguler=v" :hints="formErrors.sisa_cuti_reguler" :check="false"
+                  :value="values.sisa_cuti_1_hari" label="" placeholder="Tuliskan Sisa Jatah Cuti Reguler" :errorText="formErrors.sisa_cuti_1_hari?'failed':''"
+                  @input="v=>values.sisa_cuti_1_hari=v" :hints="formErrors.sisa_cuti_1_hari" :check="false"
                 />
               </div>
             </div>
           </div>
+
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-1 ">
               <div class="grid grid-cols-12 col-span-6">
-                <label class="col-span-12">Jatah Cuti Masa Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <label class="col-span-12">Jatah Cuti Setengah Hari<label class="text-red-500 space-x-0 pl-0"></label></label>
                 <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                  :value="values.cuti_masa_kerja" label="" :errorText="formErrors.cuti_masa_kerja?'failed':''"
-                  @input="v=>values.cuti_masa_kerja=v" :hints="formErrors.cuti_masa_kerja" :check="false"
+                  :value="values.cuti_setengah_hari" label="" :errorText="formErrors.cuti_setengah_hari?'failed':''"
+                  @input="v=>values.cuti_setengah_hari=v" :hints="formErrors.cuti_setengah_hari" :check="false"
                 />
               </div>
               <div class="grid grid-cols-12 col-span-6">
-                <label class="col-span-12">Sisa Cuti Masa Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <label class="col-span-12">Sisa Cuti Setengah Hari<label class="text-red-500 space-x-0 pl-0"></label></label>
                 <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                  :value="values.sisa_cuti_masa_kerja" label="" :errorText="formErrors.sisa_cuti_masa_kerja?'failed':''"
-                  @input="v=>values.sisa_cuti_masa_kerja=v" :hints="formErrors.sisa_cuti_masa_kerja" :check="false"
+                  :value="values.sisa_cuti_setengah_hari" label="" :errorText="formErrors.sisa_cuti_setengah_hari?'failed':''"
+                  @input="v=>values.sisa_cuti_setengah_hari=v" :hints="formErrors.sisa_cuti_setengah_hari" :check="false"
                 />
               </div>
             </div>
           </div>
+
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-1 ">
               <div class="grid grid-cols-12 col-span-6">
-                <label class="col-span-12">Jatah Cuti P24<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <label class="col-span-12">Cutih Tahunan Terpakai<label class="text-red-500 space-x-0 pl-0"></label></label>
                 <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                  :value="values.cuti_p24" label="" :errorText="formErrors.cuti_p24?'failed':''"
-                  @input="v=>values.cuti_p24=v" :hints="formErrors.cuti_p24" :check="false"
+                  :value="values.cuti_satu_hari_terpakai" label="" :errorText="formErrors.cuti_satu_hari_terpakai?'failed':''"
+                  @input="v=>values.cuti_satu_hari_terpakai=v" :hints="formErrors.cuti_satu_hari_terpakai" :check="false"
                 />
               </div>
               <div class="grid grid-cols-12 col-span-6">
-                <label class="col-span-12">Sisa Cuti P24<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <label class="col-span-12">Cuti 1/2 Hari Terpakai<label class="text-red-500 space-x-0 pl-0"></label></label>
                 <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
-                  :value="values.cuti_p24_terpakai" label="" :errorText="formErrors.cuti_p24_terpakai?'failed':''"
-                  @input="v=>values.cuti_p24_terpakai=v" :hints="formErrors.cuti_p24_terpakai" :check="false"
+                  :value="values.cuti_setengah_terpakai" label="" :errorText="formErrors.cuti_setengah_terpakai?'failed':''"
+                  @input="v=>values.cuti_setengah_terpakai=v" :hints="formErrors.cuti_setengah_terpakai" :check="false"
                 />
               </div>
             </div>
-          </div>     
+          </div>
+
           <div class="col-span-8 md:col-span-6">
+            <div class="grid grid-cols-12 items-center gap-1 ">
+              <div class="grid grid-cols-12 col-span-6">
+                <label class="col-span-12">Target Works Day bulan ini<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.work_days_in_month" label="" :errorText="formErrors.work_days_in_month?'failed':''"
+                  @input="v=>values.work_days_in_month=v" :hints="formErrors.work_days_in_month" :check="false"
+                />
+              </div>
+              <div class="grid grid-cols-12 col-span-6">
+                <label class="col-span-12">Telah Absen Masuk<label class="text-red-500 space-x-0 pl-0"></label></label>
+                <FieldX :bind="{ readonly: true }" type="number" class="col-span-12 !mt-0 w-full"
+                  :value="values.work_present" label="" :errorText="formErrors.work_present?'failed':''"
+                  @input="v=>values.work_present=v" :hints="formErrors.work_present" :check="false"
+                />
+              </div>
+            </div>
+          </div>
+   
+          <!-- <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center gap-1 ">
               <div class="grid grid-cols-12 col-span-6">
                 <label class="col-span-12">Tanggal Masuk Kerja<label class="text-red-500 space-x-0 pl-0">*</label></label>
-                <FieldX :bind="{ readonly: !actionText, disabled:!actionText }" type="date" class="col-span-12 !mt-0 w-full"
+                <FieldX :bind="{ readonly: !actionText && !isProfile, disabled:!actionText && !isProfile }" type="date" class="col-span-12 !mt-0 w-full"
                   :value="values.tgl_masuk" label="" :errorText="formErrors.tgl_masuk?'failed':''"
                   @input="v=>values.tgl_masuk=v" :hints="formErrors.tgl_masuk" :check="false"
                 />
               </div>
               <div class="grid grid-cols-12 col-span-6">
                 <label class="col-span-12">Tanggal Berhenti Kerja<label class="text-red-500 space-x-0 pl-0"></label></label>
-                <FieldX :bind="{ readonly: !actionText, disabled: !actionText }" type="date" class="col-span-12 !mt-0 w-full"
+                <FieldX :bind="{ readonly: !actionText && !isProfile, disabled: !actionText && !isProfile }" type="date" class="col-span-12 !mt-0 w-full"
                   :value="values.tgl_berhenti" label="" :errorText="formErrors.tgl_berhenti?'failed':''"
                   @input="v=>values.tgl_berhenti=v" :hints="formErrors.tgl_berhenti" :check="false"
                 />
               </div>
             </div>
-          </div>   
+          </div>    -->
+
+
+
+
+
+          
           
           <!-- <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Expired Cuti<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: !actionText, disabled: !actionText }" type="date" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile, disabled: !actionText && !isProfile }" type="date" class="col-span-12 !mt-0 w-full"
                 :value="values.exp_date_cuti" label="" :errorText="formErrors.exp_date_cuti?'failed':''"
                 @input="v=>values.exp_date_cuti=v" :hints="formErrors.exp_date_cuti" :check="false"
               />
@@ -909,7 +942,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto Karyawan<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <div class="col-span-12 flex items-center">
-                <input :disabled="!actionText ? true : false" ref="refPasFoto" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
+                <input :disabled="!actionText && !isProfile ? true : false" ref="refPasFoto" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.pas_foto}" id="inputPasFoto" @change="imageChange">
                 
               </div>
@@ -920,7 +953,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto KTP<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <div class="col-span-12 flex items-center">
-                <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
+                <input :disabled="!actionText && !isProfile ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.ktp_foto}" id="inputKTPFoto" @change="imageChange">
                 
               </div>
@@ -930,7 +963,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. KTP<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.ktp_no" label="" placeholder="Tuliskan Nomor Kartu Penduduk" :errorText="formErrors.ktp_no?'failed':''"
                 @input="v=>values.ktp_no=v" :hints="formErrors.ktp_no" :check="false"
               />
@@ -939,7 +972,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Alamat Sesuai KTP<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="textarea" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="textarea" class="col-span-12 !mt-0 w-full"
                 :value="values.alamat_asli" label="" placeholder="Tuliskan Alamat Sesuai KTP" :errorText="formErrors.alamat_asli?'failed':''"
                 @input="v=>values.alamat_asli=v" :hints="formErrors.alamat_asli" :check="false"
               />
@@ -949,7 +982,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto Kartu Keluarga<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <div class="col-span-12 flex items-center">
-                <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
+                <input :disabled="!actionText && !isProfile ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.kk_foto}" id="inputKKFoto" @change="imageChange">
                 
               </div>
@@ -959,7 +992,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. Kartu Keluarga<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.kk_no" label="" placeholder="Tuliskan Nomor Kartu Keluarga" :errorText="formErrors.kk_no?'failed':''"
                 @input="v=>values.kk_no=v" :hints="formErrors.kk_no" :check="false"
               />
@@ -969,7 +1002,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto NPWP<label class="text-red-500 space-x-0 pl-0"></label></label>
               <div class="col-span-12 flex items-center">
-                <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
+                <input :disabled="!actionText && !isProfile ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.npwp_foto}" id="inputNPWPFoto" @change="imageChange">
                 
               </div>
@@ -979,7 +1012,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. NPWP<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.npwp_no" label="" placeholder="Tuliskan Nomor Pokok Wajib Pajak" :errorText="formErrors.npwp_no?'failed':''"
                 @input="v=>values.npwp_no=v" :hints="formErrors.npwp_no" :check="false"
               />
@@ -988,7 +1021,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tanggal Berlaku NPWP<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="date" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="date" class="col-span-12 !mt-0 w-full"
                 :value="values.npwp_tgl_berlaku" label="" placeholder="Masukan Tanggal Berlaku NPWP" :errorText="formErrors.npwp_tgl_berlaku?'failed':''"
                 @input="v=>values.npwp_tgl_berlaku=v" :hints="formErrors.npwp_tgl_berlaku" :check="false"
               />
@@ -998,7 +1031,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Foto BPJS<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <div class="col-span-12 flex items-center">
-                <input :disabled="!actionText ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
+                <input :disabled="!actionText && !isProfile ? true : false" type="file" accept="image/*" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrors.bpjs_foto}" id="inputBPJSFoto" @change="imageChange">
                 <svg v-show="formErrors.bpjs_foto" class="svg-inline--fa fa-circle-exclamation fa-fw page-length-selector fa-md absolute right-2 fa-sm fa-fw text-red-400" aria-labelledby="svg-inline--fa-title-TuHui35w8qVB" data-prefix="fas" data-icon="circle-exclamation" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                   <title class="" id="svg-inline--fa-title-TuHui35w8qVB">failed</title>
@@ -1011,7 +1044,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. BPJS Kesehatan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.bpjs_no_kesehatan" label="" placeholder="Tuliskan Nomor BPJS" :errorText="formErrors.bpjs_no_kesehatan?'failed':''"
                 @input="v=>values.bpjs_no_kesehatan=v" :hints="formErrors.bpjs_no_kesehatan" :check="false"
               />
@@ -1020,7 +1053,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. BPJS Ketenagakerjaan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.bpjs_no_ketenagakerjaan" label="" placeholder="Tuliskan Nomor BPJS" :errorText="formErrors.bpjs_no_ketenagakerjaan?'failed':''"
                 @input="v=>values.bpjs_no_ketenagakerjaan=v" :hints="formErrors.bpjs_no_ketenagakerjaan" :check="false"
               />
@@ -1030,7 +1063,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tipe BPJS<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="values.bpjs_tipe_id" @input="v=>values.bpjs_tipe_id=v"
                   :errorText="formErrors.bpjs_tipe_id?'failed':''" 
                   :hints="formErrors.bpjs_tipe_id" label="" placeholder="Pilih Tipe BPJS"
@@ -1056,7 +1089,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Berkas Pendukung Lainnya<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldUpload class="col-span-12 !mt-0 w-full" :bind="{ readonly: !actionText }"
+              <FieldUpload class="col-span-12 !mt-0 w-full" :bind="{ readonly: !actionText && !isProfile }"
                 :value="values.berkas_lain" @input="(v)=>values.berkas_lain=v" :maxSize="10"
                 :reducerDisplay="val=>!val?null:val.split(':::')[val.split(':::').length-1]"
                 :api="{
@@ -1083,7 +1116,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Keterangan<label class="text-red-500 space-x-0 pl-0"></label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="textarea" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="textarea" class="col-span-12 !mt-0 w-full"
                 :value="values.desc_file" label="" placeholder="Tuliskan Keterangan" :errorText="formErrors.desc_file?'failed':''"
                 @input="v=>values.desc_file=v" :hints="formErrors.desc_file" :check="false"
               />
@@ -1096,7 +1129,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Ukuran Baju<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="values.uk_baju" @input="v=>values.uk_baju=v"
                 :errorText="formErrors.uk_baju?'failed':''" 
                 :hints="formErrors.uk_baju" label="" placeholder="Pilih Ukuran Baju"
@@ -1108,7 +1141,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Ukuran Celana<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.uk_celana" label="" placeholder="Tuliskan Ukuran Celana" :errorText="formErrors.uk_celana?'failed':''"
                 @input="v=>values.uk_celana=v" :hints="formErrors.uk_celana" :check="false"
               />
@@ -1117,7 +1150,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Ukuran Sepatu<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.uk_sepatu" label="" placeholder="Tuliskan Ukuran Sepatu" :errorText="formErrors.uk_sepatu?'failed':''"
                 @input="v=>values.uk_sepatu=v" :hints="formErrors.uk_sepatu" :check="false"
               />
@@ -1132,7 +1165,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Periode Gaji<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="values.periode_gaji_id" @input="v=>values.periode_gaji_id=v"
                 :errorText="formErrors.periode_gaji_id?'failed':''" 
                 :hints="formErrors.periode_gaji_id" label="" placeholder="Pilih Periode Gaji"
@@ -1158,7 +1191,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tipe Pembayaran<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="values.tipe_id" @input="v=>values.tipe_id=v"
                 :errorText="formErrors.tipe_id?'failed':''" 
                 :hints="formErrors.tipe_id" label="" placeholder="Pilih Tipe Pembayaran"
@@ -1184,7 +1217,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Metode Pembayaran<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="values.metode_id" @input="v=>values.metode_id=v"
                 :errorText="formErrors.metode_id?'failed':''" 
                 :hints="formErrors.metode_id" label="" placeholder="Pilih Metode Pembayaran"
@@ -1210,7 +1243,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Bank<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="values.bank_id" @input="v=>values.bank_id=v"
                 :errorText="formErrors.bank_id?'failed':''" 
                 :hints="formErrors.bank_id" label="" placeholder="Pilih Bank"
@@ -1235,7 +1268,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nomor Rekening<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="values.no_rek" label="" placeholder="Tuliskan Nomor Rekening" :errorText="formErrors.no_rek?'failed':''"
                 @input="v=>values.no_rek=v" :hints="formErrors.no_rek" :check="false"
               />
@@ -1244,7 +1277,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Atas Nama<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-12 !mt-0 w-full"
                 :value="values.atas_nama_rek" label="" placeholder="Tuliskan Atas Nama Pemilik Rekening" :errorText="formErrors.atas_nama_rek?'failed':''"
                 @input="v=>values.atas_nama_rek=v" :hints="formErrors.atas_nama_rek" :check="false"
               />
@@ -1259,7 +1292,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tingkat<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesPendidikan.tingkat_id" label="" placeholder="Pilih Tingkat" @input="v=>valuesPendidikan.tingkat_id=v"
                 :errorText="formErrorsPend.tingkat_id?'failed':''" 
                 @update:valueFull="(objVal)=>{
@@ -1289,7 +1322,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tahun Masuk<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 label="" placeholder="Pilih Tahun Masuk"
                 :value="valuesPendidikan.thn_masuk" @input="v=>valuesPendidikan.thn_masuk=v"
                 :options="ArrTahun" :errorText="formErrorsPend.thn_masuk?'failed':''" :hints="formErrorsPend.thn_masuk"
@@ -1300,7 +1333,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Sekolah<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-12 !mt-0 w-full"
                 :value="valuesPendidikan.nama_sekolah" label="" placeholder="Tuliskan Nama Sekolah" @input="v=>valuesPendidikan.nama_sekolah=v" :check="false"
                 :errorText="formErrorsPend.nama_sekolah?'failed':''" :hints="formErrorsPend.nama_sekolah"
               />
@@ -1310,7 +1343,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tahun Lulus<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesPendidikan.thn_lulus" label="" placeholder="Pilih Tahun Lulus" @input="v=>valuesPendidikan.thn_lulus=v"
                 :options="ArrTahun" :errorText="formErrorsPend.thn_lulus?'failed':''" :hints="formErrorsPend.thn_lulus"
                 valueField="key" displayField="key" :check="false"
@@ -1321,7 +1354,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Kota<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="valuesPendidikan.kota_id" @input="v=>valuesPendidikan.kota_id=v"
                   :errorText="formErrorsPend.kota_id?'failed':''" 
                   :hints="formErrorsPend.kota_id" label="" placeholder="Pilih Kota"
@@ -1347,7 +1380,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nilai<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" class="col-span-12 !mt-0 w-full"
                 :value="valuesPendidikan.nilai" label="" placeholder="Tuliskan Nilai" @input="v=>valuesPendidikan.nilai=v" :check="false"
                 :errorText="formErrorsPend.nilai?'failed':''" :hints="formErrorsPend.nilai"
               />
@@ -1356,7 +1389,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Jurusan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Jurusan" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Jurusan" class="col-span-12 !mt-0 w-full"
                 :value="valuesPendidikan.jurusan" :errorText="formErrorsPend.jurusan?'failed':''" :hints="formErrorsPend.jurusan"
                 @input="v=>valuesPendidikan.jurusan=v" :check="false"
               />
@@ -1368,11 +1401,11 @@
               <div class="col-span-12">
                 <div class="grid grid-cols-12">
                   <div class="flex items-center col-span-6">
-                    <input :disabled="!actionText ? true : false" type="radio" value="1" v-model="valuesPendidikan.is_pend_terakhir" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                    <input :disabled="!actionText && !isProfile ? true : false" type="radio" value="1" v-model="valuesPendidikan.is_pend_terakhir" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
                     <label for="aktif_status" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Iya</label>
                   </div>
                   <div class="flex items-center col-span-6">
-                    <input :disabled="!actionText ? true : false" type="radio" value="0" v-model="valuesPendidikan.is_pend_terakhir" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                    <input :disabled="!actionText && !isProfile ? true : false" type="radio" value="0" v-model="valuesPendidikan.is_pend_terakhir" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
                     <label for="tidak_aktif_status" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tidak</label>
                   </div>
                 </div>
@@ -1383,7 +1416,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Ijazah Terakhir<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <div class="col-span-12 flex items-center">
-                <input :disabled="!actionText ? true : false" ref="fileIjz" type="file" accept="application/pdf" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
+                <input :disabled="!actionText && !isProfile ? true : false" ref="fileIjz" type="file" accept="application/pdf" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrorsPend.ijazah_foto}" @change="fileIjazah" @input="(v)=>valuesPendidikan.ijazah_foto=v" >
                 
               </div>
@@ -1392,7 +1425,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Catatan</label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Catatan" type="textarea" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Catatan" type="textarea" class="col-span-12 !mt-0 w-full"
                 :value="valuesPendidikan.desc" :errorText="formErrorsPend.desc?'failed':''"
                 @input="v=>valuesPendidikan.desc=v" :hints="formErrorsPend.desc" :check="false"
               /> 
@@ -1405,9 +1438,9 @@
               :value="detailPendidikan"
               :columns="[{
                   headerName: 'No',
-                  cellRenderer: !actionText?null:'ButtonGrid',
+                  cellRenderer: !actionText && !isProfile?null:'ButtonGrid',
                   valueGetter:p=>p.node.rowIndex + 1,
-                  cellRendererParams: !actionText?null:{
+                  cellRendererParams: !actionText && !isProfile?null:{
                     showValue: true,
                     icon: 'times',
                     class: 'btn-text-danger',
@@ -1488,10 +1521,10 @@
                 ]"
               >
               <template #header>
-                <button :disabled="!actionText ? true : false" @click="addPendidikan" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="addPendidikan" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="plus" /> <span>Add to List</span>
                 </button>
-                <button :disabled="!actionText ? true : false" @click="detailPendidikan = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="detailPendidikan = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="trash" /> <span>Remove</span>
                 </button>
               </template>
@@ -1506,7 +1539,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Keluarga<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesKeluarga.keluarga_id" label="" placeholder="Pilih Keluarga" @input="v=>valuesKeluarga.keluarga_id=v"
                 :errorText="formErrorsKel.keluarga_id?'failed':''" :hints="formErrorsKel.keluarga_id"
                 @update:valueFull="(objVal)=>{
@@ -1534,7 +1567,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Nama" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Nama" class="col-span-12 !mt-0 w-full"
                 :value="valuesKeluarga.nama" @input="v=>valuesKeluarga.nama=v" :check="false"
                 :errorText="formErrorsKel.nama?'failed':''" :hints="formErrorsKel.nama"
               />
@@ -1544,7 +1577,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Pendidikan Terakhir<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesKeluarga.pend_terakhir_id" 
                 @update:valueFull="(objVal)=>{
                   valuesKeluarga.pendidikan = objVal.value
@@ -1574,7 +1607,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Pekerjaan<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesKeluarga.pekerjaan_id" 
                 @update:valueFull="(objVal)=>{
                   valuesKeluarga.pekerjaan = objVal.value
@@ -1605,7 +1638,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Jenis Kelamin<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesKeluarga.jk_id" 
                 @update:valueFull="(objVal)=>{
                   valuesKeluarga.jk = objVal.value
@@ -1634,7 +1667,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Usia<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Usia" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Usia" type="number" class="col-span-12 !mt-0 w-full"
                 :value="valuesKeluarga.usia" @input="v=>valuesKeluarga.usia=v" :check="false"
                 :errorText="formErrorsKel.usia?'failed':''" :hints="formErrorsKel.usia"
               />
@@ -1643,7 +1676,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Catatan</label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Catatan" type="textarea" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Catatan" type="textarea" class="col-span-12 !mt-0 w-full"
                 :value="valuesKeluarga.desc" @input="v=>valuesKeluarga.desc=v" :check="false"
                 :errorText="formErrorsKel.desc?'failed':''" :hints="formErrorsKel.desc"
               />
@@ -1655,9 +1688,9 @@
               :value="detailKeluarga"
               :columns="[{
                   headerName: 'No',
-                  cellRenderer: !actionText?null:'ButtonGrid',
+                  cellRenderer: !actionText && !isProfile?null:'ButtonGrid',
                   valueGetter:p=>p.node.rowIndex + 1,
-                  cellRendererParams: !actionText?null:{
+                  cellRendererParams: !actionText && !isProfile?null:{
                     showValue: true,
                     icon: 'times',
                     class: 'btn-text-danger',
@@ -1730,10 +1763,10 @@
                 ]"
               >
               <template #header>
-                <button :disabled="!actionText ? true : false" @click="addKeluarga" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="addKeluarga" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="plus" /> <span>Add to List</span>
                 </button>
-                <button :disabled="!actionText ? true : false" @click="detailKeluarga = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="detailKeluarga = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="trash" /> <span>Remove</span>
                 </button>
               </template>
@@ -1747,7 +1780,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Pelatihan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Nama Pelatihan" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Nama Pelatihan" class="col-span-12 !mt-0 w-full"
                 :value="valuesPelatihan.nama_pel" :errorText="formErrorsPel.nama_pel?'failed':''"
                 @input="v=>valuesPelatihan.nama_pel=v" :hints="formErrorsPel.nama_pel" :check="false"
               />
@@ -1757,7 +1790,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tahun<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" label="" placeholder="Pilih Tahun" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" label="" placeholder="Pilih Tahun" class="col-span-12 !mt-0 w-full"
                 :value="valuesPelatihan.tahun" @input="v=>valuesPelatihan.tahun=v"
                 :options="ArrTahun" :errorText="formErrorsPel.tahun?'failed':''" :hints="formErrorsPel.tahun"
                 valueField="key" displayField="key" :check="false"
@@ -1767,7 +1800,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Lembaga<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Nama Lembaga" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Nama Lembaga" class="col-span-12 !mt-0 w-full"
                 :value="valuesPelatihan.nama_lem" :errorText="formErrorsPel.nama_lem?'failed':''"
                 @input="v=>valuesPelatihan.nama_lem=v" :hints="formErrorsPel.nama_lem" :check="false"
               />
@@ -1777,7 +1810,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Kota<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="valuesPelatihan.kota_id" @input="v=>valuesPelatihan.kota_id=v"
                   :errorText="formErrorsPel.kota_id?'failed':''" 
                   @update:valueFull="(objVal)=>{
@@ -1810,9 +1843,9 @@
               :value="detailPelatihan"
               :columns="[{
                   headerName: 'No',
-                  cellRenderer: !actionText?null:'ButtonGrid',
+                  cellRenderer: !actionText && !isProfile?null:'ButtonGrid',
                   valueGetter:p=>p.node.rowIndex + 1,
-                  cellRendererParams: !actionText?null:{
+                  cellRendererParams: !actionText && !isProfile?null:{
                     showValue: true,
                     icon: 'times',
                     class: 'btn-text-danger',
@@ -1865,10 +1898,10 @@
                 ]"
               >
               <template #header>
-                <button :disabled="!actionText ? true : false" @click="addPelatihan" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="addPelatihan" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="plus" /> <span>Add to List</span>
                 </button>
-                <button :disabled="!actionText ? true : false" @click="detailPelatihan = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="detailPelatihan = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="trash" /> <span>Remove</span>
                 </button>
               </template>
@@ -1883,7 +1916,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tingkat<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" label="" placeholder="Pilih Tingkat" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" label="" placeholder="Pilih Tingkat" class="col-span-12 !mt-0 w-full"
                 :value="valuesPrestasi.tingkat_pres_id" 
                 @update:valueFull="(objVal)=>{
                   valuesPrestasi.tingkat = objVal.value
@@ -1913,7 +1946,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tahun<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" label="" placeholder="Pilih Tahun" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" label="" placeholder="Pilih Tahun" class="col-span-12 !mt-0 w-full"
                 :value="valuesPrestasi.tahun" @input="v=>valuesPrestasi.tahun=v"
                 :options="ArrTahun" :errorText="formErrorsPres.tahun?'failed':''" :hints="formErrorsPres.tahun"
                 valueField="key" displayField="key" :check="false"
@@ -1923,7 +1956,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Prestasi / Penghargaan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Prestasi / Penghargaan" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Prestasi / Penghargaan" class="col-span-12 !mt-0 w-full"
                 :value="valuesPrestasi.nama_pres" :errorText="formErrorsPres.nama_pres?'failed':''"
                 @input="v=>valuesPrestasi.nama_pres=v" :hints="formErrorsPres.nama_pres" :check="false"
               />
@@ -1936,9 +1969,9 @@
               :value="detailPrestasi"
               :columns="[{
                   headerName: 'No',
-                  cellRenderer: !actionText?null:'ButtonGrid',
+                  cellRenderer: !actionText && !isProfile?null:'ButtonGrid',
                   valueGetter:p=>p.node.rowIndex + 1,
-                  cellRendererParams: !actionText?null:{
+                  cellRendererParams: !actionText && !isProfile?null:{
                     showValue: true,
                     icon: 'times',
                     class: 'btn-text-danger',
@@ -1982,10 +2015,10 @@
                 ]"
               >
               <template #header>
-                <button :disabled="!actionText ? true : false" @click="addPrestasi" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="addPrestasi" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="plus" /> <span>Add to List</span>
                 </button>
-                <button :disabled="!actionText ? true : false" @click="detailPrestasi = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="detailPrestasi = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="trash" /> <span>Remove</span>
                 </button>
               </template>
@@ -1999,7 +2032,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Organisasi<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Nama Organisasi" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Nama Organisasi" class="col-span-12 !mt-0 w-full"
                 :value="valuesOrganisasi.nama" :errorText="formErrorsOrg.nama?'failed':''"
                 @input="v=>valuesOrganisasi.nama=v" :hints="formErrorsOrg.nama" :check="false"
               />
@@ -2009,7 +2042,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tahun<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" label="" placeholder="Pilih Tahun" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" label="" placeholder="Pilih Tahun" class="col-span-12 !mt-0 w-full"
                 :value="valuesOrganisasi.tahun" @input="v=>valuesOrganisasi.tahun=v"
                 :options="ArrTahun" :errorText="formErrorsOrg.tahun?'failed':''" :hints="formErrorsOrg.tahun"
                 valueField="key" displayField="key" :check="false"
@@ -2020,7 +2053,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Jenis Organisasi<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" label="" placeholder="Pilih Jenis Organisasi" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" label="" placeholder="Pilih Jenis Organisasi" class="col-span-12 !mt-0 w-full"
                 :value="valuesOrganisasi.jenis_org_id" @input="v=>valuesOrganisasi.jenis_org_id=v"
                 :errorText="formErrorsOrg.jenis_org_id?'failed':''" 
                 @update:valueFull="(objVal)=>{
@@ -2049,7 +2082,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Kota<label class="text-red-500 space-x-0 pl-0">*</label></label>
                 <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" label="" placeholder="Pilih Tingkat" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" label="" placeholder="Pilih Tingkat" class="col-span-12 !mt-0 w-full"
                   :value="valuesOrganisasi.kota_id" @input="v=>valuesOrganisasi.kota_id=v"
                   :errorText="formErrorsOrg.kota_id?'failed':''" 
                   :hints="formErrorsOrg.kota_id"
@@ -2078,7 +2111,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Posisi<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" class="col-span-12 !mt-0 w-full"
                 :value="valuesOrganisasi.posisi" label="" placeholder="Tuliskan Posisi" :errorText="formErrorsOrg.posisi?'failed':''"
                 @input="v=>valuesOrganisasi.posisi=v" :hints="formErrorsOrg.posisi" :check="false"
               />
@@ -2091,9 +2124,9 @@
               :value="detailOrganisasi"
               :columns="[{
                   headerName: 'No',
-                  cellRenderer: !actionText?null:'ButtonGrid',
+                  cellRenderer: !actionText && !isProfile?null:'ButtonGrid',
                   valueGetter:p=>p.node.rowIndex + 1,
-                  cellRendererParams: !actionText?null:{
+                  cellRendererParams: !actionText && !isProfile?null:{
                     showValue: true,
                     icon: 'times',
                     class: 'btn-text-danger',
@@ -2152,10 +2185,10 @@
                 ]"
               >
               <template #header>
-                <button :disabled="!actionText ? true : false" @click="addOrganisasi" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="addOrganisasi" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="plus" /> <span>Add to List</span>
                 </button>
-                <button :disabled="!actionText ? true : false" @click="detailOrganisasi = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="detailOrganisasi = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="trash" /> <span>Remove</span>
                 </button>
               </template>
@@ -2169,7 +2202,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Bahasa yang Dikuasai<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Bahasa Yang Dikuasai" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Bahasa Yang Dikuasai" class="col-span-12 !mt-0 w-full"
                 :value="valuesBahasa.bhs_dikuasai" :errorText="formErrorsBhs.bhs_dikuasai?'failed':''"
                 @input="v=>valuesBahasa.bhs_dikuasai=v" :hints="formErrorsBhs.bhs_dikuasai" :check="false"
               />
@@ -2178,7 +2211,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nilai Lisan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" label="" placeholder="Contoh: 89" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" label="" placeholder="Contoh: 89" class="col-span-12 !mt-0 w-full"
                 :value="valuesBahasa.nilai_lisan" :errorText="formErrorsBhs.nilai_lisan?'failed':''"
                 @input="v=>valuesBahasa.nilai_lisan=v" :hints="formErrorsBhs.nilai_lisan" :check="false"
               />
@@ -2187,7 +2220,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Level Lisan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Contoh: 3-Intermidate" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Contoh: 3-Intermidate" class="col-span-12 !mt-0 w-full"
                 :value="valuesBahasa.level_lisan" :errorText="formErrorsBhs.level_lisan?'failed':''"
                 @input="v=>valuesBahasa.level_lisan=v" :hints="formErrorsBhs.level_lisan" :check="false"
               />
@@ -2196,7 +2229,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nilai Tertulis<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" type="number" label="" placeholder="Contoh 89" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" type="number" label="" placeholder="Contoh 89" class="col-span-12 !mt-0 w-full"
                 :value="valuesBahasa.nilai_tertulis" :errorText="formErrorsBhs.nilai_tertulis?'failed':''"
                 @input="v=>valuesBahasa.nilai_tertulis=v" :hints="formErrorsBhs.nilai_tertulis" :check="false"
               />
@@ -2205,7 +2238,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Level Tertulis<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Contoh: 3-Intermidate" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Contoh: 3-Intermidate" class="col-span-12 !mt-0 w-full"
                 :value="valuesBahasa.level_tertulis" :errorText="formErrorsBhs.level_tertulis?'failed':''"
                 @input="v=>valuesBahasa.level_tertulis=v" :hints="formErrorsBhs.level_tertulis" :check="false"
               />
@@ -2218,9 +2251,9 @@
               :value="detailBahasa"
               :columns="[{
                   headerName: 'No',
-                  cellRenderer: !actionText?null:'ButtonGrid',
+                  cellRenderer: !actionText && !isProfile?null:'ButtonGrid',
                   valueGetter:p=>p.node.rowIndex + 1,
-                  cellRendererParams: !actionText?null:{
+                  cellRendererParams: !actionText && !isProfile?null:{
                     showValue: true,
                     icon: 'times',
                     class: 'btn-text-danger',
@@ -2281,10 +2314,10 @@
                 ]"
               >
               <template #header>
-                <button :disabled="!actionText ? true : false" @click="addBahasa" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="addBahasa" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="plus" /> <span>Add to List</span>
                 </button>
-                <button :disabled="!actionText ? true : false" @click="detailPengalaman = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="detailPengalaman = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="trash" /> <span>Remove</span>
                 </button>
               </template>
@@ -2298,7 +2331,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Nama Perusahaan<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Nama Perusahaan" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Nama Perusahaan" class="col-span-12 !mt-0 w-full"
                 :value="valuesPengalaman.instansi" :errorText="formErrorsPK.instansi?'failed':''"
                 @input="v=>valuesPengalaman.instansi=v" :hints="formErrorsPK.instansi" :check="false"
               />
@@ -2307,7 +2340,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Bidang Usaha<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Bidang Usaha" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Bidang Usaha" class="col-span-12 !mt-0 w-full"
                 :value="valuesPengalaman.bidang_usaha" :errorText="formErrorsPK.bidang_usaha?'failed':''"
                 @input="v=>valuesPengalaman.bidang_usaha=v" :hints="formErrorsPK.bidang_usaha" :check="false"
               />
@@ -2316,7 +2349,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">No. Telp<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan No Telp" type="number" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan No Telp" type="number" class="col-span-12 !mt-0 w-full"
                 :value="valuesPengalaman.no_tlp" :errorText="formErrorsPK.no_tlp?'failed':''"
                 @input="v=>valuesPengalaman.no_tlp=v" :hints="formErrorsPK.no_tlp" :check="false"
               />
@@ -2324,7 +2357,7 @@
           </div><div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Posisi<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Posisi" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Posisi" class="col-span-12 !mt-0 w-full"
                 :value="valuesPengalaman.posisi" :errorText="formErrorsPK.posisi?'failed':''"
                 @input="v=>valuesPengalaman.posisi=v" :hints="formErrorsPK.posisi" :check="false"
               />
@@ -2334,7 +2367,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tahun Masuk<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesPengalaman.thn_masuk" label="" placeholder="Pilih Tahun Masuk" @input="v=>valuesPengalaman.thn_masuk=v"
                 :options="ArrTahun" :errorText="formErrorsPK.thn_masuk?'failed':''" :hints="formErrorsPK.thn_masuk"
                 valueField="key" displayField="key" :check="false"
@@ -2345,7 +2378,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Tahun Keluar<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                 :value="valuesPengalaman.thn_keluar" label="" placeholder="Pilih Tahun Keluar" @input="v=>valuesPengalaman.thn_keluar=v"
                 :options="ArrTahun" :errorText="formErrorsPK.thn_keluar?'failed':''" :hints="formErrorsPK.thn_keluar"
                 valueField="key" displayField="key" :check="false"
@@ -2355,7 +2388,7 @@
           <div class="col-span-8 md:col-span-6">
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Alamat Kantor<label class="text-red-500 space-x-0 pl-0">*</label></label>
-              <FieldX :bind="{ readonly: !actionText }" label="" placeholder="Tuliskan Alamat Kantor" type="textarea" class="col-span-12 !mt-0 w-full"
+              <FieldX :bind="{ readonly: !actionText && !isProfile }" label="" placeholder="Tuliskan Alamat Kantor" type="textarea" class="col-span-12 !mt-0 w-full"
                 :value="valuesPengalaman.alamat_kantor" :errorText="formErrorsPK.alamat_kantor?'failed':''"
                 @input="v=>valuesPengalaman.alamat_kantor=v" :hints="formErrorsPK.alamat_kantor" :check="false"
               />
@@ -2365,7 +2398,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Kota<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <FieldSelect
-                  :bind="{ disabled: !actionText, clearable:false }" class="col-span-12 !mt-0 w-full"
+                  :bind="{ disabled: !actionText && !isProfile, clearable:false }" class="col-span-12 !mt-0 w-full"
                   :value="valuesPengalaman.kota_id" @input="v=>valuesPengalaman.kota_id=v"
                   :errorText="formErrorsPK.kota_id?'failed':''" 
                   :hints="formErrorsPK.kota_id" label="" placeholder="Pilih Kota"
@@ -2392,7 +2425,7 @@
             <div class="grid grid-cols-12 items-center">
               <label class="col-span-12">Surat Refrensi<label class="text-red-500 space-x-0 pl-0">*</label></label>
               <div class="col-span-12 flex items-center">
-                <input :disabled="!actionText ? true : false" ref="fileSurat" type="file" accept="application/pdf" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
+                <input :disabled="!actionText && !isProfile ? true : false" ref="fileSurat" type="file" accept="application/pdf" class="col-span-12 !mt-0 w-full border rounded-[0.25rem] text-[12px] py-[10px] px-[20px]"
                 :class="{'border-red-500': formErrorsPK.surat_referensi}" @change="fileSrtRef" @input="(v)=>valuesPengalaman.surat_referensi=v" >
                 
               </div>
@@ -2405,9 +2438,9 @@
               :value="detailPengalaman"
               :columns="[{
                   headerName: 'No',
-                  cellRenderer: !actionText?null:'ButtonGrid',
+                  cellRenderer: !actionText && !isProfile?null:'ButtonGrid',
                   valueGetter:p=>p.node.rowIndex + 1,
-                  cellRendererParams: !actionText?null:{
+                  cellRendererParams: !actionText && !isProfile?null:{
                     showValue: true,
                     icon: 'times',
                     class: 'btn-text-danger',
@@ -2474,10 +2507,10 @@
                 ]"
               >
               <template #header>
-                <button :disabled="!actionText ? true : false" @click="addPengalaman" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="addPengalaman" type="button" class="mr-[15px] bg-[#005FBF] hover:bg-[#0055ab] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="plus" /> <span>Add to List</span>
                 </button>
-                <button :disabled="!actionText ? true : false" @click="detailPengalaman = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
+                <button :disabled="!actionText && !isProfile ? true : false" @click="detailPengalaman = []" type="button" class="bg-[#DD4B39] hover:bg-[#da3c28] text-white py-[12px] px-[19.5px] flex items-center justify-center space-x-2 rounded">
                   <icon fa="trash" /> <span>Remove</span>
                 </button>
               </template>

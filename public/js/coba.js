@@ -1,66 +1,105 @@
-import { useRouter, useRoute, RouterLink } from 'vue-router'
-import { ref, readonly, reactive, inject, onMounted, onBeforeMount, onBeforeUnmount, watchEffect, onActivated } from 'vue'
+import { useRouter, useRoute, RouterLink } from 'vue-router';
+import { ref, readonly, reactive, inject, onMounted, onBeforeMount, watchEffect, onActivated , computed } from 'vue';
+const router = useRouter();
+const route = useRoute();
+const store = inject('store');
+const swal = inject('swal');
+const isRead = route.params?.id && route.params.id !== 'create';
+const actionText = ref(route.params?.id === 'create' ? 'Tambah' : route.query?.action);
+const isBadForm = ref(false);
+const isRequesting = ref(false);
+const modulPath = route.params?.modul;
+const isCreateEdit = route.params?.id === 'create' || route.query?.action === 'Edit';
+const currentMenu = store?.currentMenu;
+const apiTable = ref(null);
+const formErrors = ref({});
+const tsId = `ts=` + Date.parse(new Date());
 
-const router = useRouter()
-const route = useRoute()
-const store = inject('store')
-const swal = inject('swal')
-
-const isRead = route.params.id && route.params.id !== 'create'
-const actionText = ref(route.params.id === 'create' ? 'Tambah' : route.query.action)
-const isBadForm = ref(false)
-const isRequesting = ref(false)
-const modulPath = route.params.modul
-const currentMenu = store.currentMenu
-const apiTable = ref(null)
-const formErrors = ref({})
-const tsId = `ts=`+(Date.parse(new Date()))
 
 // ------------------------------ PERSIAPAN
-const endpointApi = '/m_general'
-onBeforeMount(()=>{
-  document.title = 'Master Grading'
-})
+const endpointApi = '/m_proyek';
+onBeforeMount(() => {
+  console.log("onBeforeMount is running");
+  document.title = 'Master Proyek';
+});
 
-//  @if( $id )------------------- JS CONTENT ! PENTING JANGAN DIHAPUS
+const selectedDate = ref(null);
+const currentDate = new Date();
+const currentMonth = ref(currentDate.getMonth());
+const currentYear = ref(currentDate.getFullYear());
 
-// HOT KEY
-onMounted(()=>{
-  window.addEventListener('keydown', handleKeyDown);
-})
-onBeforeUnmount(()=>{
-  window.removeEventListener('keydown', handleKeyDown);
-})
+const monthNames = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+const weekdays = ['Mng', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 
-const handleKeyDown = (event) => {
-  console.log(event)
-  if (event?.ctrlKey && event?.key === 's') {
-    event.preventDefault(); // Prevent the default behavior (e.g., saving the page)
-    onSave();
+const daysInMonth = computed(() => {
+  const days = new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
+  console.log("Days in month:", days);
+  return days;
+});
+
+const startDay = computed(() => {
+  const start = new Date(currentYear.value, currentMonth.value, 1).getDay();
+  console.log("Start day:", start);
+  return start;
+});
+
+const selectDate = (day) => {
+  console.log("Selecting date:", day);
+  selectedDate.value = new Date(currentYear.value, currentMonth.value, day);
+};
+
+const isSelected = (day) => {
+  const selected = selectedDate.value &&
+    selectedDate.value.getDate() === day &&
+    selectedDate.value.getMonth() === currentMonth.value &&
+    selectedDate.value.getFullYear() === currentYear.value;
+  console.log("Is selected:", selected);
+  return selected;
+};
+
+const prevMonth = () => {
+  if (currentMonth.value === 0) {
+    currentMonth.value = 11;
+    currentYear.value -= 1;
+  } else {
+    currentMonth.value -= 1;
   }
-}
+  console.log("Previous month:", currentMonth.value, currentYear.value);
+};
 
+const nextMonth = () => {
+  if (currentMonth.value === 11) {
+    currentMonth.value = 0;
+    currentYear.value += 1;
+  } else {
+    currentMonth.value += 1;
+  }
+  console.log("Next month:", currentMonth.value, currentYear.value);
+};
+
+
+
+//  @if( $id )------------------- VALUES FORM ! PENTING JANGAN DIHAPUS
 let initialValues = {}
 const changedValues = []
 
 const values = reactive({
-  is_active : 1,
-  key: 'GRADE',
-  group: 'GRADING',
+  is_active : true,
+  m_dir_id : store.user.data?.m_dir_id
 })
 
 
 onBeforeMount(async () => {
-  // tampilkan default direktorat dengan store user comp.nama
-  values.direktorat = store.user.data?.direktorat
   if (isRead) {
-    //  READ DATA
     try {
       const editedId = route.params.id
       const dataURL = `${store.server.url_backend}/operation${endpointApi}/${editedId}`
       isRequesting.value = true
-
-      const params = { join: false, transform: false }
+     
+      const params = { join: true, transform: false }
       const fixedParams = new URLSearchParams(params)
       const res = await fetch(dataURL + '?' + fixedParams, {
         headers: {
@@ -71,7 +110,6 @@ onBeforeMount(async () => {
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
       initialValues = resultJson.data
-      initialValues.is_active=initialValues.is_active?1:0
     } catch (err) {
       isBadForm.value = true
       swal.fire({
@@ -89,47 +127,50 @@ onBeforeMount(async () => {
   for (const key in initialValues) {
     values[key] = initialValues[key]
   }
+  // if(values['m_dir.nama']){
+  //   values.direktorat = values['m_dir.nama']
+  // }
 })
 
-const onReset = async (alert = false) => {
-  let next = false
-  if(alert){
-    swal.fire({
-      icon: 'warning',
-      text: 'Anda yakin akan mereset data ini?',
-      showDenyButton: true
-    }).then((res) => {
-      if (res.isConfirmed) {
-        if(isRead){
-          for (const key in initialValues) {
-            values[key] = initialValues[key]
-          }
-        }else{
-          for (const key in values) {
-            delete values[key]
-          }
-          defaultValues()
-        }
-      }
-    })
-  }
-  
-  setTimeout(()=>{
-    defaultValues() 
-  }, 100)
-}
+
 
 function onBack() {
+  let isChanged = false
+  for (const key in initialValues) {
+    if (values[key] !== initialValues[key]) {
+      isChanged = true
+      break;
+    }
+  }
+
+  if (!isChanged) {
     router.replace('/' + modulPath)
+    return
+  }
+
+      router.replace('/' + modulPath)
+}
+
+function onReset() {
+  swal.fire({
+    icon: 'warning',
+    text: 'Reset this form data?',
+    showDenyButton: true
+  }).then((res) => {
+    if (res.isConfirmed) {
+      for (const key in initialValues) {
+        values[key] = initialValues[key]
+      }
+    }
+  })
 }
 
 async function onSave() {
-  //values.tags = JSON.stringify(values.tags)
       try {
         const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
         const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
-        values.is_active = values.is_active ? 1 : 0
         isRequesting.value = true
+         values.is_active = values.is_active ? 1 : 0
         const res = await fetch(dataURL, {
           method: isCreating ? 'POST' : 'PUT',
           headers: {
@@ -159,25 +200,7 @@ async function onSave() {
 }
 
 //  @else----------------------- LANDING
-const activeBtn = ref()
 
-function filterShowData(params,noBtn){
-  if(activeBtn.value === noBtn){
-    activeBtn.value = null
-  }else{
-    activeBtn.value = noBtn
-  }
-  if(params){
-    landing.api.params.where = `this.is_active=true`
-  }else if(activeBtn.value == null){
-    // clear params filter
-    landing.api.params.where = null
-  }else{
-    landing.api.params.where = `this.is_active=false`
-  }
-
-  apiTable.value.reload()
-}
 
 const landing = reactive({
   actions: [
@@ -205,13 +228,8 @@ const landing = reactive({
                 }
               })
               if (!res.ok) {
-                if ([400, 422].includes(res.status)) {
-                  const responseJson = await res.json()
-                  formErrors.value = responseJson.errors || {}
-                  throw new Error(responseJson.message || "Failed when trying to post data")
-                } else {
-                  throw new Error("Failed when trying to post data")
-                }
+                const resultJson = await res.json()
+                throw (resultJson.message || "Failed when trying to remove data")
               }
               apiTable.value.reload()
               // const resultJson = await res.json()
@@ -262,8 +280,7 @@ const landing = reactive({
     },
     params: {
       simplest: true,
-      searchfield:'this.code, this.value',
-      where: `this.group='GRADING'`
+      searchfield:'this.id, this.nama, this.desc',
     },
     onsuccess(response) {
       response.page = response.current_page
@@ -281,38 +298,59 @@ const landing = reactive({
     cellClass: ['justify-center', 'bg-gray-50', 'border-r', '!border-gray-200']
   },
   {
-    field: 'code',
+    headerName: 'KATEGORI',
+    field: 'kategori.value',
     filter: true,
     sortable: true,
+    flex:1,
     filter: 'ColFilter',
     resizable: true,
-    flex:1,
-    cellClass: [ 'border-r', '!border-gray-200']
-  },
-  { 
-    headerName:'Nama Grade',
-    field: 'value',
-    filter: true,
-    sortable: true,
-    filter: 'ColFilter',
-    resizable: true,
-    flex:1,
     cellClass: [ 'border-r', '!border-gray-200']
   },
   {
-    headerName: 'Status',
-    field: 'is_active',
+    headerName: 'Nama Proyek',
+    field: 'proyek_nama',
+    filter: true,
+    sortable: true,
+    flex:1,
+    filter: 'ColFilter',
+    resizable: true,
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'Nama Customer',
+    field: 'cust_nama',
+    filter: true,
+    sortable: true,
+    flex:1,
+    filter: 'ColFilter',
+    resizable: true,
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  {
+    headerName: 'Keterangan',
+    field: 'desc',
     filter: true,
     sortable: true,
     filter: 'ColFilter',
     resizable: true,
     flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
-    cellRenderer: ({ value }) => {
-    return value === true
-      ? `<span class="text-green-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Active</span>`
-      : `<span class="text-gray-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Inactive</span>`
-  }},
+    cellClass: [ 'border-r', '!border-gray-200']
+  },
+  // {
+  //   headerName: 'Status',
+  //   field: 'is_active',
+  //   filter: true,
+  //   sortable: true,
+  //   filter: 'ColFilter',
+  //   resizable: true,
+  //   flex:1,
+  //   cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
+  //   cellRenderer: ({ value }) => {
+  //   return value === true
+  //     ? `<span class="text-green-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Active</span>`
+  //     : `<span class="text-gray-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Inactive</span>`
+  // }},
   ]
 })
 

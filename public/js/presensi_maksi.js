@@ -77,6 +77,11 @@ async function getDetail(id = null) {
 
 
 onBeforeMount(async () => {
+  function loadInitalData() {
+    values.tanggal = formattedDate
+    detailArr.value = []
+  }
+
   if (isRead) {
     try {
       const editedId = route.params.id

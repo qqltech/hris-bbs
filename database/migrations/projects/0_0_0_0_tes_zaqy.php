@@ -4,19 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class testdaniel extends Migration
+class teszaqy extends Migration
 {
-    protected $tableName = "test_daniel";
+    protected $tableName = "tes_zaqy";
 
     public function up()
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
 
-            $table->string('nama_barang');
-            $table->string('img_url');
-            $table->integer('qty');
-            $table->tinyInteger('status')->default(1);
+            $table->string('samplecolumn',100)->nullable();
 
             // $table->integer('creator_id')->nullable();
             // $table->integer('last_editor_id')->nullable();

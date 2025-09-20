@@ -29,26 +29,49 @@ class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
     public function custom_get_by_daily($req)
     {
         $req->month = $req->month.'-01';
-        $data = \DB::select("
-            SELECT json_agg(json_build_object(
-                'all_days_of_month', all_days_of_month,
-                'date_to_idn', date_to_idn,
-                'day_name_idn', day_name_idn,
-                'type', type,
-                'presentase', presentase,
-                'attend', attend,
-                'cuti', cuti,
-                'alpha', alpha,
-                'total_kary', total_kary
-            )) AS monthly_report
-            FROM generate_monthly_report(?,?,?)",[$req->month,$req->divisi_id,$req->dept_id]);
+        $weeks = $req->weeks;
+        $start_date = '';
+        $end_date = '';
+
+        $weeksArr = explode('/', $weeks);
+        if(count($weeksArr) > 1){
+            $start_date = $weeksArr[0];
+            $end_date = $weeksArr[1];
+            $data = \DB::select("
+                SELECT json_agg(json_build_object(
+                    'all_days_of_month', all_days_of_month,
+                    'date_to_idn', date_to_idn,
+                    'day_name_idn', day_name_idn,
+                    'type', type,
+                    'presentase', presentase,
+                    'attend', attend,
+                    'cuti', cuti,
+                    'alpha', alpha,
+                    'total_kary', total_kary
+                )) AS monthly_report
+                FROM generate_weekly_report(?,?,?,?)",[$start_date, $end_date,$req->divisi_id,$req->dept_id]);
+        }else{
+            $data = \DB::select("
+                SELECT json_agg(json_build_object(
+                    'all_days_of_month', all_days_of_month,
+                    'date_to_idn', date_to_idn,
+                    'day_name_idn', day_name_idn,
+                    'type', type,
+                    'presentase', presentase,
+                    'attend', attend,
+                    'cuti', cuti,
+                    'alpha', alpha,
+                    'total_kary', total_kary
+                )) AS monthly_report
+                FROM generate_monthly_report(?,?,?)",[$req->month,$req->divisi_id,$req->dept_id]);
+        }
+
         
         if(count($data)){   
             return $this->helper->customResponse('OK',200,json_decode($data[0]->monthly_report));
         }else{
             return $this->helper->customResponse('OK',200,[]);
         }
-
     }
 
     public function custom_get_by_date($req)

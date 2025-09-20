@@ -244,4 +244,44 @@ class t_jadwal_kerja extends \App\Models\BasicModels\t_jadwal_kerja
             );
         }
     }
+
+    public function custom_save_jadwal($req){
+        $data = collect($req);
+            foreach($data as $single){
+                $check = t_jadwal_kerja_det::firstOrCreate([
+                    't_jadwal_kerja_det_hari_id' => $single['t_jadwal_kerja_det_hari_id'],
+                    't_jadwal_kerja_id' => $single['t_jadwal_kerja_id'],
+                    'm_kary_id' => $single['m_kary_id']
+                ],[
+                    'm_dir_id' => $single['m_dir_id'],
+                    'm_divisi_id' => $single['m_divisi_id'],
+                    'm_dept_id' => $single['m_dept_id'],
+                ]);
+            }
+        return $this->helper->customResponse('Success', 201);        
+    }
+
+    public function custom_delete_jadwal($req){
+        $t_jadwal_det_head = $req;
+        $getData = t_jadwal_kerja_det::where('t_jadwal_kerja_det_hari_id',$t_jadwal_det_head['t_jadwal_kerja_det_hari_id'])
+        ->where('t_jadwal_kerja_id',$t_jadwal_det_head['t_jadwal_kerja_id'])
+        ->where('m_kary_id',$t_jadwal_det_head['m_kary_id'])->first();
+        if($getData){
+            $getData->delete();
+            return $this->helper->customResponse('Success', 200);
+        }else{
+            return $this->helper->customResponse('Not Found', 404);
+        }
+    }
+
+    public function custom_delete_jadwal_bulk($req){
+        $data = collect($req['items'])->pluck('id')->toArray();
+        try{
+            $check = t_jadwal_kerja_det::whereIn('id',$data)->delete();
+            return $this->helper->customResponse('Success', 200);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+
+    }
 }

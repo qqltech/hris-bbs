@@ -158,6 +158,7 @@
               fa-icon="lock"
           />
         </div>
+
         <div v-if="actionText">
           <label class="font-semibold">Konfirmasi Password<label class="text-red-500 space-x-0 pl-0"></label></label>
           <FieldX :bind="{ readonly: !actionText }" class="w-full py-2 !mt-0"
@@ -168,6 +169,7 @@
               fa-icon="lock"
           />
         </div>
+        
         <div class="flex flex-col gap-2">
           <label
             class="inline-block pl-[0.15rem] hover:cursor-pointer font-semibold"

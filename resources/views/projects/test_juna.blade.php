@@ -1,6 +1,12 @@
 @if(!$req->has('id'))
 
 @verbatim
+<FieldX :bind="{ readonly: !actionText }" type="range"
+  :value="form.name"
+  @input="v=>form.name=v" 
+  placeholder="label" fa-icon="bookmark" :check="false"
+/>
+
 <div class="bg-white p-6 rounded-xl flex justify-center flex-col">
   <div class="grid grid-cols-2 lg:grid-cols-8 w-full text-sm overflow-x-auto">
           <button

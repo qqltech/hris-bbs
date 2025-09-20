@@ -1,22 +1,27 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class presensimaksidet extends Migration
+class tlogbook extends Migration
 {
-    protected $tableName = "presensi_maksi_det";
+    protected $tableName = "t_logbook";
 
     public function up()
     {
         Schema::create($this->tableName, function (Blueprint $table) {
             $table->id()->from(1);
-            $table->bigInteger('presensi_maksi_id')->comment('{"fk":"presensi_maksi.id"}')->nullable();
-            $table->bigInteger('m_kary_id')->comment('{"src":"m_kary.id"}')->nullable();
-            $table->jsonb('lauk');
-            $table->bigInteger('creator_id')->comment('{"src":"default_users.id"}')->nullable();
-            $table->bigInteger('last_editor_id')->comment('{"src":"default_users.id"}')->nullable();
+            $table->bigInteger('m_kary_id')->comment('{"src":"m_kary.id"}');
+            $table->date('tanggal');
+            $table->string('keterangan',200)->nullable();
+            
+            //Penting
+            $table->bigInteger('creator_id')->nullable();
+            $table->bigInteger('last_editor_id')->nullable();
             $table->timestamps();
+            $table->bigInteger('deletor_id')->nullable();
+            $table->datetime('deleted_at')->nullable();
         });
 
         table_config($this->tableName, [
@@ -45,5 +50,30 @@ class presensimaksidet extends Migration
         //     \Cache::put($this->tableName, \DB::table($this->tableName)->get(), 60*30 );
         // }
         Schema::dropIfExists($this->tableName);
+    }
+
+    public function custom_post($request)
+    {
+        $data = $this->find($request->$id);
+        if (!$data) {
+            return response()->json(["message" => "Data not found"], 404);
+        }
+        if ($data->status === "DRAFT") {
+            // Change the status to post
+            $data->update([
+                "status" => "POSTED",
+            ]);
+            // $data->status = 'POSTED';
+            // $data->save();
+            return response()->json([
+                "message" => 'DRAFT status changed to "POSTED"',
+            ]);
+        } else {
+            // If the status is not draft, return a message
+            return response()->json(
+                ["message" => 'POSTED status is not "DRAFT"'],
+                400
+            );
+        }
     }
 }

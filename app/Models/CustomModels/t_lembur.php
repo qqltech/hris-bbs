@@ -91,7 +91,7 @@ class t_lembur extends \App\Models\BasicModels\t_lembur
         }
 
         $newArrayData  = array_merge( $arrayData,[
-            'status' => $status ?? $data->status,
+            'status' => $status ?? $arrayData['status'],
             'interval_min' => @$interval ?? $data->interval_min,
             "pic_id" => @app()->request->pic_id ?? auth()->user()->id,
         ]);
@@ -110,6 +110,15 @@ class t_lembur extends \App\Models\BasicModels\t_lembur
             $app = $this->createAppTicket($model->id);  
         }
     }
+
+    public function updateAfterTransaction( $newdata, $olddata, $data, $meta )
+    {
+        if (app()->request->header("Source") == "mobile") {
+            $app = $this->createAppTicket($newdata['id']);  
+        }
+    }
+    
+    
 
     // public function onRetrieved($model){
     //     // inject pic name

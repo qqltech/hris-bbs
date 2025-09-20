@@ -66,6 +66,13 @@
         tempGet.push(`export=pdf`)
       }
     }
+
+    const userAuth = localStorage.getItem('user');
+
+    tempGet.push('orientation=potrait')
+    tempGet.push(`infoprint=${JSON.parse(userAuth).data.name}`)
+
+
     const paramsGet = tempGet.join("&")
     if(values.tipe?.toLowerCase() !== 'html'){
       exportHtml.value = false

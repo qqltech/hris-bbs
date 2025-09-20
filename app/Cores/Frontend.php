@@ -74,6 +74,17 @@ class Frontend
 
         $fix_default_menu = [];
         foreach($default_menu as $dm){
+            if($dm == 'Notifikasi'){
+                $fix_default_menu[] = [
+                    'modul' => $dm,
+                    'text' => $dm,
+                    'path' => '/notifikasi',
+                    "truncatable" => false,
+                    "icon" => "bell",
+                    "description" => null,
+                    "endpoint" => "/notifikasi"
+                ];
+            }
             if($dm == 'Absen Online'){
                 $fix_default_menu[] = [
                     'modul' => $dm,
@@ -85,15 +96,15 @@ class Frontend
                     "endpoint" => "/presensi_absen_online"
                 ];
             }
-            if($dm == 'Pesan Makan Siang'){
+            if($dm == 'Pesan Makan Siang Baru'){
                 $fix_default_menu[] = [
                     'modul' => $dm,
                     'text' => $dm,
-                    'path' => '/pesan_maksi',
+                    'path' => '/pesan_maksi_3hari',
                     "truncatable" => false,
                     "icon" => "cutlery",
                     "description" => null,
-                    "endpoint" => "/pesan_maksi"
+                    "endpoint" => "/pesan_maksi_3hari"
                 ];
             }
             if($dm == 'Profil'){

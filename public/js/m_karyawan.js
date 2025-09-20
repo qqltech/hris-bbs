@@ -23,11 +23,11 @@ const formErrorsOrg = ref({})
 const formErrorsBhs = ref({})
 const formErrorsPK = ref({})
 const activeTabIndex = ref(0)
-const tsId = `ts=`+(Date.parse(new Date()))
+const tsId = `ts=` + (Date.parse(new Date()))
 
 // ------------------------------ PERSIAPAN
 const endpointApi = '/m_kary'
-onBeforeMount(()=>{
+onBeforeMount(() => {
   document.title = 'Master Karyawan'
 })
 
@@ -42,8 +42,8 @@ let tempKK = ''
 let tempPasfoto = ''
 
 const setStandartGaji = async () => {
-  if(values.m_zona_id && values.grading_id){
-    const fixedParams = new URLSearchParams({simplest: true , where: `this.is_active='true' AND this.m_zona_id=${values.m_zona_id ?? 0} AND this.grading_id=${values.grading_id ?? 0}`})
+  if (values.m_zona_id && values.grading_id) {
+    const fixedParams = new URLSearchParams({ simplest: true, where: `this.is_active='true' AND this.m_zona_id=${values.m_zona_id ?? 0} AND this.grading_id=${values.grading_id ?? 0}` })
     const res = await fetch(`${store.server.url_backend}/operation/m_standart_gaji` + '?' + fixedParams, {
       headers: {
         'Content-Type': 'Application/json',
@@ -53,14 +53,14 @@ const setStandartGaji = async () => {
     if (!res.ok) throw new Error("Failed when trying to read data")
     const resultJson = await res.json()
     const data = resultJson.data
-    console.log(data,'halo')
-    if(initialValues.m_standart_gaji_id === values.m_standart_gaji_id){
+    console.log(data, 'halo')
+    if (initialValues.m_standart_gaji_id === values.m_standart_gaji_id) {
       values.m_standart_gaji_id = initialValues.m_standart_gaji_id
-    }else{    
+    } else {
       values.m_standart_gaji_id = data[0]?.id
     }
   }
-  
+
 }
 
 const values = reactive({
@@ -68,75 +68,77 @@ const values = reactive({
   direktorat: store.user.data?.direktorat,
   cuti_p24: 0,
   cuti_reguler: 0,
-  cuti_masa_kerja:0,
-  cuti_p24_terpakai:0,
-  sisa_cuti_reguler:0,
-  sisa_cuti_masa_kerja:0,
+  cuti_masa_kerja: 0,
+  cuti_p24_terpakai: 0,
+  sisa_cuti_reguler: 0,
+  sisa_cuti_masa_kerja: 0,
 
 })
 
 const valuesPendidikan = reactive({
-  tingkat_id:null,
+  tingkat_id: null,
   thn_masuk: thisYear,
-  nama_sekolah:null,
-  thn_lulus:thisYear,
-  kota_id:null,
-  nilai:null,
-  jurusan:null,
-  is_pend_terakhir:null,
-  desc:null,
-  ijazah_foto:null
+  nama_sekolah: null,
+  thn_lulus: thisYear,
+  kota_id: null,
+  nilai: null,
+  jurusan: null,
+  is_pend_terakhir: null,
+  desc: null,
+  ijazah_foto: null
 })
 
 const valuesKeluarga = reactive({
   keluarga_id: null,
-  nama:null,
-  pend_terakhir_id:null,
-  pekerjaan_id:null,
-  jk_id:null,
-  usia:null,
-  desc:null
+  nama: null,
+  pend_terakhir_id: null,
+  pekerjaan_id: null,
+  jk_id: null,
+  usia: null,
+  desc: null
 })
 
 const valuesPelatihan = reactive({
   nama_pel: null,
-  tahun:thisYear,
-  nama_lem:null,
-  kota_id:null
+  tahun: thisYear,
+  nama_lem: null,
+  kota_id: null
 })
 
 const valuesPrestasi = reactive({
   tingkat_pres_id: null,
-  tahun:thisYear,
-  nama_pres:null
+  tahun: thisYear,
+  nama_pres: null
 })
 
 const valuesOrganisasi = reactive({
   nama: null,
-  tahun:thisYear,
-  jenis_org_id:null,
-  kota_id:null,
-  posisi:null
+  tahun: thisYear,
+  jenis_org_id: null,
+  kota_id: null,
+  posisi: null
 })
 
 const valuesBahasa = reactive({
   bhs_dikuasai: null,
-  nilai_lisan:null,
-  nilai_tertulis:null
+  nilai_lisan: null,
+  nilai_tertulis: null
 })
 
 const valuesPengalaman = reactive({
   instansi: null,
-  thn_masuk:thisYear,
-  thn_keluar:thisYear,
-  kota_id:null,
-  alamat_kantor:null,
-  surat_referensi:null,
-  bidang_usaha:null,
-  no_tlp:null,
-  posisi:null
+  thn_masuk: thisYear,
+  thn_keluar: thisYear,
+  kota_id: null,
+  alamat_kantor: null,
+  surat_referensi: null,
+  bidang_usaha: null,
+  no_tlp: null,
+  posisi: null
 })
 
+
+const detailArr_i_cuti = ref([])
 
 onBeforeMount(async () => {
   if (isRead) {
@@ -157,14 +159,38 @@ onBeforeMount(async () => {
       if (!res.ok) throw new Error("Failed when trying to read data")
       const resultJson = await res.json()
       initialValues = resultJson.data
-      if(initialValues.is_active){
+
+      console.log(initialValues.info_cuti)
+
+      if (initialValues.info_cuti) {
+        // Push the info_cuti to detailArr_i_cuti
+        detailArr_i_cuti.value.push(initialValues.info_cuti);
+
+        // Log the updated detailArr_i_cuti to the console
+        console.log('detailCuti', detailArr_i_cuti.value);
+
+
+        values.cuti_1_hari = initialValues.info_cuti.cuti_satu_hari; // Mapping cuti_satu_hari to cuti_1_hari
+        values.sisa_cuti_1_hari = initialValues.info_cuti.sisa_cuti_satu_hari; // Mapping sisa_cuti_satu_hari
+        values.cuti_setengah_hari = initialValues.info_cuti.cuti_setengah_hari; // Mapping cuti_setengah_hari
+        values.sisa_cuti_setengah_hari = initialValues.info_cuti.sisa_cuti_setengah_hari; // Mapping sisa_cuti_setengah_hari
+        values.cuti_setengah_terpakai = initialValues.info_cuti.cuti_terpakai; // Mapping cuti_terpakai
+        values.masa_kerja = initialValues.info_cuti.masa_kerja; // Mapping masa_kerja
+        values.remaining_days = initialValues.info_cuti.remaining_days; // Mapping remaining_days
+      }
+
+
+
+
+
+      if (initialValues.is_active) {
         initialValues.is_active = 'true' ? initialValues.is_active = 1 : initialValues.is_active = 0
       }
-      if(initialValues['tipe_jam_kerja.value'] == 'OFFICE'){
+      if (initialValues['tipe_jam_kerja.value'] == 'OFFICE') {
         getJadwalKerjaOffice()
       }
       initialValues['m_kary_det_pend']?.forEach(async (item) => {
-        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.tingkat_id}`,  {
+        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.tingkat_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -183,7 +209,7 @@ onBeforeMount(async () => {
         detailBahasa.value.push(item)
       })
       initialValues['m_kary_det_kel']?.forEach(async (item) => {
-        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.keluarga_id}`,  {
+        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.keluarga_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -192,7 +218,7 @@ onBeforeMount(async () => {
         if (!res.ok) throw new Error("Failed when trying to read data")
         const resultJson = await res.json()
         const tempinitialValues = resultJson.data
-        const res2 = await fetch(`${store.server.url_backend}/operation/m_general/${item.pend_terakhir_id}`,  {
+        const res2 = await fetch(`${store.server.url_backend}/operation/m_general/${item.pend_terakhir_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -201,7 +227,7 @@ onBeforeMount(async () => {
         if (!res2.ok) throw new Error("Failed when trying to read data")
         const resultJson2 = await res2.json()
         const tempinitialValues2 = resultJson2.data
-        const res3 = await fetch(`${store.server.url_backend}/operation/m_general/${item.jk_id}`,  {
+        const res3 = await fetch(`${store.server.url_backend}/operation/m_general/${item.jk_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -210,7 +236,7 @@ onBeforeMount(async () => {
         if (!res3.ok) throw new Error("Failed when trying to read data")
         const resultJson3 = await res3.json()
         const tempinitialValues3 = resultJson3.data
-        const res4 = await fetch(`${store.server.url_backend}/operation/m_general/${item.pekerjaan_id}`,  {
+        const res4 = await fetch(`${store.server.url_backend}/operation/m_general/${item.pekerjaan_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -226,13 +252,13 @@ onBeforeMount(async () => {
         item._id = ++_idKel
         detailKeluarga.value.push(item)
       })
-      
+
       initialValues['m_kary_det_pk']?.forEach((item) => {
         item._id = ++_idPk
         detailPengalaman.value.push(item)
       })
       initialValues['m_kary_det_org']?.forEach(async (item) => {
-        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.jenis_org_id}`,  {
+        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.jenis_org_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -241,7 +267,7 @@ onBeforeMount(async () => {
         if (!res.ok) throw new Error("Failed when trying to read data")
         const resultJson = await res.json()
         const tempinitialValues = resultJson.data
-        const res2 = await fetch(`${store.server.url_backend}/operation/m_general/${item.kota_id}`,  {
+        const res2 = await fetch(`${store.server.url_backend}/operation/m_general/${item.kota_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -256,7 +282,7 @@ onBeforeMount(async () => {
         detailOrganisasi.value.push(item)
       })
       initialValues['m_kary_det_pres']?.forEach(async (item) => {
-        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.tingkat_pres_id}`,  {
+        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.tingkat_pres_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -270,7 +296,7 @@ onBeforeMount(async () => {
         detailPrestasi.value.push(item)
       })
       initialValues['m_kary_det_pel']?.forEach(async (item) => {
-        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.kota_id}`,  {
+        const res = await fetch(`${store.server.url_backend}/operation/m_general/${item.kota_id}`, {
           headers: {
             'Content-Type': 'Application/json',
             Authorization: `${store.user.token_type} ${store.user.token}`
@@ -283,14 +309,14 @@ onBeforeMount(async () => {
         item._id = ++_idPel
         detailPelatihan.value.push(item)
       })
-      if(initialValues.info_cuti){
+      if (initialValues.info_cuti) {
         for (let key in initialValues.info_cuti) {
-            if (initialValues.info_cuti.hasOwnProperty(key) && initialValues.info_cuti[key] === null) {
-                initialValues.info_cuti[key] = 0;
-            }
+          if (initialValues.info_cuti.hasOwnProperty(key) && initialValues.info_cuti[key] === null) {
+            initialValues.info_cuti[key] = 0;
+          }
         }
       }
-      initialValues = {...initialValues, ...initialValues.info_cuti}
+      initialValues = { ...initialValues, ...initialValues.info_cuti }
     } catch (err) {
       isBadForm.value = true
       swal.fire({
@@ -308,7 +334,7 @@ onBeforeMount(async () => {
   for (const key in initialValues) {
     values[key] = initialValues[key]
   }
-  if(values.m_kary_det_pemb?.length > 0){
+  if (values.m_kary_det_pemb?.length > 0) {
     values.periode_gaji_id = values.m_kary_det_pemb[0].periode_gaji_id
     values.metode_id = values.m_kary_det_pemb[0].metode_id
     values.tipe_id = values.m_kary_det_pemb[0].tipe_id
@@ -316,7 +342,7 @@ onBeforeMount(async () => {
     values.atas_nama_rek = values.m_kary_det_pemb[0].atas_nama_rek
     values.no_rek = values.m_kary_det_pemb[0].no_rek
   }
-  if(values.m_kary_det_kartu?.length > 0){
+  if (values.m_kary_det_kartu?.length > 0) {
     values.ktp_no = values.m_kary_det_kartu[0].ktp_no
     values.kk_no = values.m_kary_det_kartu[0].kk_no
     values.npwp_no = values.m_kary_det_kartu[0].npwp_no
@@ -332,7 +358,7 @@ onBeforeMount(async () => {
     urlKKFoto.value = values.m_kary_det_kartu[0].kk_foto
     urlKTPFoto.value = values.m_kary_det_kartu[0].ktp_foto
     urlNPWPFoto.value = values.m_kary_det_kartu[0].npwp_foto
-   
+
     tempBPJS = values.m_kary_det_kartu[0].bpjs_foto
     tempNPWP = values.m_kary_det_kartu[0].npwp_foto
     tempPasfoto = values.m_kary_det_kartu[0].pas_foto
@@ -365,7 +391,7 @@ async function getJadwalKerjaOffice() {
     console.log(data?.data?.id)
     values.t_jadwal_kerja_id = data?.data?.id
     values.t_jadwal_kerja_ket = data?.data?.keterangan
-   } catch (error) {
+  } catch (error) {
     console.error('Error fetching tunjangan kemahalan:', error);
 
   }
@@ -374,13 +400,13 @@ const changeTipeJamKerja = (v) => {
   console.log(v)
   console.log("OK", v.value)
   values['tipe_jam_kerja.value'] = v.value
-  if(v.value?.toLowerCase() == 'office'){
-    if(initialValues.jadwal_kerja?.id){
+  if (v.value?.toLowerCase() == 'office') {
+    if (initialValues.jadwal_kerja?.id) {
       values.t_jadwal_kerja_id = initialValues.jadwal_kerja?.id
-    }else{
+    } else {
       getJadwalKerjaOffice()
     }
-    
+
   }
 }
 
@@ -393,10 +419,10 @@ const urlKKFoto = ref('')
 const urlNPWPFoto = ref('')
 const urlBPJSFoto = ref('')
 const urlImg = ref('')
-async function imageChange(e){
+async function imageChange(e) {
   const file = e.target.files
   // console.log(e.target.id)
-  if(file[0]){
+  if (file[0]) {
     const maxAllowedSize = 1 * 1024 * 1024;
     if (file[0].size >= maxAllowedSize) {
       swal.fire({
@@ -406,8 +432,7 @@ async function imageChange(e){
       e.target.value = null
       return
     }
-    if(e.target.id === 'inputPasFoto')
-    {
+    if (e.target.id === 'inputPasFoto') {
       var formData = new FormData()
       formData.append('file', file[0])
       // console.log(file[0])
@@ -418,12 +443,12 @@ async function imageChange(e){
         },
         body: formData
       })
-      if(res.ok){
+      if (res.ok) {
         tempPasfoto = file[0].name
         urlPasFoto.value = URL.createObjectURL(file[0])
       }
     }
-    else if(e.target.id === 'inputKTPFoto'){
+    else if (e.target.id === 'inputKTPFoto') {
       var formData = new FormData()
       formData.append('file', file[0])
       // console.log(file[0])
@@ -434,12 +459,12 @@ async function imageChange(e){
         },
         body: formData
       })
-      if(res.ok){
+      if (res.ok) {
         tempKTP = file[0].name
         urlKTPFoto.value = URL.createObjectURL(file[0])
       }
     }
-    else if(e.target.id === 'inputKKFoto'){
+    else if (e.target.id === 'inputKKFoto') {
       var formData = new FormData()
       formData.append('file', file[0])
       // console.log(file[0])
@@ -450,12 +475,12 @@ async function imageChange(e){
         },
         body: formData
       })
-      if(res.ok){
+      if (res.ok) {
         tempKK = file[0].name
         urlKKFoto.value = URL.createObjectURL(file[0])
       }
     }
-    else if(e.target.id === 'inputNPWPFoto'){
+    else if (e.target.id === 'inputNPWPFoto') {
       var formData = new FormData()
       formData.append('file', file[0])
       // console.log(file[0])
@@ -466,12 +491,12 @@ async function imageChange(e){
         },
         body: formData
       })
-      if(res.ok){
+      if (res.ok) {
         tempNPWP = file[0].name
         urlNPWPFoto.value = URL.createObjectURL(file[0])
       }
     }
-    else if(e.target.id === 'inputBPJSFoto'){
+    else if (e.target.id === 'inputBPJSFoto') {
       var formData = new FormData()
       formData.append('file', file[0])
       // console.log(file[0])
@@ -482,7 +507,7 @@ async function imageChange(e){
         },
         body: formData
       })
-      if(res.ok){
+      if (res.ok) {
         tempBPJS = file[0].name
         urlBPJSFoto.value = URL.createObjectURL(file[0])
       }
@@ -491,7 +516,7 @@ async function imageChange(e){
 }
 
 let ArrTahun = []
-for(let i = thisYear; i >= 1973; i--) {
+for (let i = thisYear; i >= 1973; i--) {
   ArrTahun.push(i)
 }
 
@@ -499,9 +524,9 @@ for(let i = thisYear; i >= 1973; i--) {
 let _idPend = 0
 const detailPendidikan = ref([])
 const fileIjz = ref(null)
-async function fileIjazah(e){
+async function fileIjazah(e) {
   const file = e.target.files
-  if(file[0]){
+  if (file[0]) {
     const maxAllowedSize = 1 * 1024 * 1024;
     if (file[0].size >= maxAllowedSize) {
       swal.fire({
@@ -514,13 +539,13 @@ async function fileIjazah(e){
     valuesPendidikan.ijazah_foto = file[0].name
     var formData = new FormData()
     formData.append('file', file[0])
-      const res = await fetch(`${store.server.url_backend}/operation/m_kary_det_pend/upload` + '?' + `field=ijazah_foto`, {
-        method: 'POST',
-        headers: {
-          Authorization: `${store.user.token_type} ${store.user.token}`
-        },
-        body: formData
-      })
+    const res = await fetch(`${store.server.url_backend}/operation/m_kary_det_pend/upload` + '?' + `field=ijazah_foto`, {
+      method: 'POST',
+      headers: {
+        Authorization: `${store.user.token_type} ${store.user.token}`
+      },
+      body: formData
+    })
     //   if(res.ok){
     //     const resData = await res.json()
     //     const data = resData.key
@@ -535,13 +560,13 @@ const addPendidikan = async () => {
   var tempObj = {}
   valuesPendidikan._id = ++_idPend
   for (const key in valuesPendidikan) {
-    if(key !== 'desc'){
+    if (key !== 'desc') {
       if (valuesPendidikan[key] == null) {
         tempObj[key] = ['Bidang ini wajib diisi']
       }
     }
   }
-  if(Object.keys(tempObj).length >= 1){
+  if (Object.keys(tempObj).length >= 1) {
     formErrorsPend.value = tempObj
     swal.fire({
       icon: 'error',
@@ -549,7 +574,7 @@ const addPendidikan = async () => {
     })
     return
   }
-  detailPendidikan.value = [...detailPendidikan.value, {...valuesPendidikan}]
+  detailPendidikan.value = [...detailPendidikan.value, { ...valuesPendidikan }]
   Object.keys(valuesPendidikan).forEach(key => valuesPendidikan[key] = null)
   fileIjz.value.value = null
   formErrorsPend.value = {}
@@ -565,13 +590,13 @@ const addKeluarga = async () => {
   var tempObj = {}
   valuesKeluarga._id = ++_idKel
   for (const key in valuesKeluarga) {
-    if(key !== 'desc'){
+    if (key !== 'desc') {
       if (valuesKeluarga[key] == null) {
         tempObj[key] = ['Bidang ini wajib diisi']
       }
     }
   }
-  if(Object.keys(tempObj).length >= 1){
+  if (Object.keys(tempObj).length >= 1) {
     formErrorsKel.value = tempObj
     swal.fire({
       icon: 'error',
@@ -579,7 +604,7 @@ const addKeluarga = async () => {
     })
     return
   }
-  detailKeluarga.value = [...detailKeluarga.value, {...valuesKeluarga}]
+  detailKeluarga.value = [...detailKeluarga.value, { ...valuesKeluarga }]
   Object.keys(valuesKeluarga).forEach(key => valuesKeluarga[key] = null)
   // gambarKK.value.value = null
   formErrorsKel.value = {}
@@ -592,13 +617,13 @@ const addPelatihan = async () => {
   var tempObj = {}
   valuesPelatihan._id = ++_idPel
   for (const key in valuesPelatihan) {
-    if(key !== 'catatan'){
+    if (key !== 'catatan') {
       if (valuesPelatihan[key] == null) {
         tempObj[key] = ['Bidang ini wajib diisi']
       }
     }
   }
-  if(Object.keys(tempObj).length >= 1){
+  if (Object.keys(tempObj).length >= 1) {
     formErrorsPel.value = tempObj
     swal.fire({
       icon: 'error',
@@ -606,7 +631,7 @@ const addPelatihan = async () => {
     })
     return
   }
-  detailPelatihan.value = [...detailPelatihan.value, {...valuesPelatihan}]
+  detailPelatihan.value = [...detailPelatihan.value, { ...valuesPelatihan }]
   Object.keys(valuesPelatihan).forEach(key => valuesPelatihan[key] = null)
   formErrorsPel.value = {}
   valuesPelatihan.tahun = thisYear
@@ -619,13 +644,13 @@ const addPrestasi = async () => {
   var tempObj = {}
   valuesPrestasi._id = ++_idPres
   for (const key in valuesPrestasi) {
-    if(key !== 'catatan'){
+    if (key !== 'catatan') {
       if (valuesPrestasi[key] == null) {
         tempObj[key] = ['Bidang ini wajib diisi']
       }
     }
   }
-  if(Object.keys(tempObj).length >= 1){
+  if (Object.keys(tempObj).length >= 1) {
     formErrorsPres.value = tempObj
     swal.fire({
       icon: 'error',
@@ -633,7 +658,7 @@ const addPrestasi = async () => {
     })
     return
   }
-  detailPrestasi.value = [...detailPrestasi.value, {...valuesPrestasi}]
+  detailPrestasi.value = [...detailPrestasi.value, { ...valuesPrestasi }]
   Object.keys(valuesPrestasi).forEach(key => valuesPrestasi[key] = null)
   formErrorsPres.value = {}
   valuesPrestasi.tahun = thisYear
@@ -646,13 +671,13 @@ const addOrganisasi = async () => {
   var tempObj = {}
   valuesOrganisasi._id = ++_idOrg
   for (const key in valuesOrganisasi) {
-    if(key !== 'catatan'){
+    if (key !== 'catatan') {
       if (valuesOrganisasi[key] == null) {
         tempObj[key] = ['Bidang ini wajib diisi']
       }
     }
   }
-  if(Object.keys(tempObj).length >= 1){
+  if (Object.keys(tempObj).length >= 1) {
     formErrorsOrg.value = tempObj
     swal.fire({
       icon: 'error',
@@ -660,7 +685,7 @@ const addOrganisasi = async () => {
     })
     return
   }
-  detailOrganisasi.value = [...detailOrganisasi.value, {...valuesOrganisasi}]
+  detailOrganisasi.value = [...detailOrganisasi.value, { ...valuesOrganisasi }]
   Object.keys(valuesOrganisasi).forEach(key => valuesOrganisasi[key] = null)
   formErrorsOrg.value = {}
   valuesOrganisasi.tahun = thisYear
@@ -673,13 +698,13 @@ const addBahasa = async () => {
   var tempObj = {}
   valuesBahasa._id = ++_idBhs
   for (const key in valuesBahasa) {
-    if(key !== 'catatan'){
+    if (key !== 'catatan') {
       if (valuesBahasa[key] == null) {
         tempObj[key] = ['Bidang ini wajib diisi']
       }
     }
   }
-  if(Object.keys(tempObj).length >= 1){
+  if (Object.keys(tempObj).length >= 1) {
     formErrorsBhs.value = tempObj
     swal.fire({
       icon: 'error',
@@ -687,7 +712,7 @@ const addBahasa = async () => {
     })
     return
   }
-  detailBahasa.value = [...detailBahasa.value, {...valuesBahasa}]
+  detailBahasa.value = [...detailBahasa.value, { ...valuesBahasa }]
   Object.keys(valuesBahasa).forEach(key => valuesBahasa[key] = null)
   formErrorsBhs.value = {}
 }
@@ -696,9 +721,9 @@ const addBahasa = async () => {
 let _idPk = 0
 const detailPengalaman = ref([])
 const fileSurat = ref(null)
-async function fileSrtRef(e){
+async function fileSrtRef(e) {
   const file = e.target.files
-  if(file[0]){
+  if (file[0]) {
     const maxAllowedSize = 1 * 1024 * 1024;
     if (file[0].size >= maxAllowedSize) {
       swal.fire({
@@ -711,26 +736,26 @@ async function fileSrtRef(e){
     valuesPengalaman.surat_referensi = file[0].name
     var formData = new FormData()
     formData.append('file', file[0])
-      const res = await fetch(`${store.server.url_backend}/operation/m_kary_det_pk/upload` + '?' + `field=surat_referensi`, {
-        method: 'POST',
-        headers: {
-          Authorization: `${store.user.token_type} ${store.user.token}`
-        },
-        body: formData
-      })
+    const res = await fetch(`${store.server.url_backend}/operation/m_kary_det_pk/upload` + '?' + `field=surat_referensi`, {
+      method: 'POST',
+      headers: {
+        Authorization: `${store.user.token_type} ${store.user.token}`
+      },
+      body: formData
+    })
   }
 }
 const addPengalaman = async () => {
   var tempObj = {}
   valuesPengalaman._id = ++_idPk
   for (const key in valuesPengalaman) {
-    if(key !== 'catatan'){
+    if (key !== 'catatan') {
       if (valuesPengalaman[key] == null) {
         tempObj[key] = ['Bidang ini wajib diisi']
       }
     }
   }
-  if(Object.keys(tempObj)?.length >= 1){
+  if (Object.keys(tempObj)?.length >= 1) {
     formErrorsPK.value = tempObj
     swal.fire({
       icon: 'error',
@@ -738,7 +763,7 @@ const addPengalaman = async () => {
     })
     return
   }
-  detailPengalaman.value = [...detailPengalaman.value, {...valuesPengalaman}]
+  detailPengalaman.value = [...detailPengalaman.value, { ...valuesPengalaman }]
   Object.keys(valuesPengalaman).forEach(key => valuesPengalaman[key] = null)
   fileSurat.value.value = null
   formErrorsPK.value = {}
@@ -761,7 +786,7 @@ function onBack() {
     return
   }
 
-      router.replace('/' + modulPath)
+  router.replace('/' + modulPath)
 }
 
 function onReset() {
@@ -780,114 +805,114 @@ function onReset() {
 
 async function onSave() {
   //values.tags = JSON.stringify(values.tags)
-      try {
-        
-        values.nama_lengkap = values.nama_depan + ' ' +values.nama_belakang
-        values.m_kary_det_pres = detailPrestasi.value
-        if(values.periode_gaji_id){
-          values.m_kary_det_pemb = [{
-            periode_gaji_id: values.periode_gaji_id,
-            metode_id: values.metode_id,
-            tipe_id: values.tipe_id,
-            bank_id: values.bank_id,
-            no_rek: values.no_rek,
-            atas_nama_rek: values.atas_nama_rek,
-            desc: values.desc,
-            is_active: values.periode_gaji_idtrue,
-          }]
-        }
-        // if(detailKeluarga.value.length === 0){
-        //   throw ("Tab Keluarga Tidak Boleh Kosong")
-        // }
-        // if(detailPendidikan.value.length === 0){
-        //   throw ("Tab Pendidikan Tidak Boleh Kosong")
-        // }
-        values.m_kary_det_kel = detailKeluarga.value
-        values.m_kary_det_org = detailOrganisasi.value
-        values.m_kary_det_bhs = detailBahasa.value
-        values.m_kary_det_pend = detailPendidikan.value
-        values.m_kary_det_pel = detailPelatihan.value
-        values.m_kary_det_pk = detailPengalaman.value
-        const isCreating = ['Create','Copy','Tambah'].includes(actionText.value)
-        // console.log(values.m_kary_det_kartu.length)
-        if(isCreating || values.m_kary_det_kartu?.length === 0){
+  try {
+    
+    values.nama_lengkap = (values.nama_depan ?? '') + ' ' + (values.nama_belakang ?? '')
+    values.m_kary_det_pres = detailPrestasi.value
+    if (values.periode_gaji_id) {
+      values.m_kary_det_pemb = [{
+        periode_gaji_id: values.periode_gaji_id,
+        metode_id: values.metode_id,
+        tipe_id: values.tipe_id,
+        bank_id: values.bank_id,
+        no_rek: values.no_rek,
+        atas_nama_rek: values.atas_nama_rek,
+        desc: values.desc,
+        is_active: values.periode_gaji_idtrue,
+      }]
+    }
+    // if(detailKeluarga.value.length === 0){
+    //   throw ("Tab Keluarga Tidak Boleh Kosong")
+    // }
+    // if(detailPendidikan.value.length === 0){
+    //   throw ("Tab Pendidikan Tidak Boleh Kosong")
+    // }
+    values.m_kary_det_kel = detailKeluarga.value
+    values.m_kary_det_org = detailOrganisasi.value
+    values.m_kary_det_bhs = detailBahasa.value
+    values.m_kary_det_pend = detailPendidikan.value
+    values.m_kary_det_pel = detailPelatihan.value
+    values.m_kary_det_pk = detailPengalaman.value
+    const isCreating = ['Create', 'Copy', 'Tambah'].includes(actionText.value)
+    // console.log(values.m_kary_det_kartu.length)
+    if (isCreating || values.m_kary_det_kartu?.length === 0) {
 
-          values.m_kary_det_kartu = [{
-            ktp_no: values.ktp_no,
-            ktp_foto: tempKTP,
-            pas_foto: tempPasfoto,
-            kk_no: values.kk_no,
-            kk_foto: tempKK,
-            npwp_no: values.npwp_no,
-            npwp_foto: tempNPWP,
-            npwp_tgl_berlaku: values.npwp_tgl_berlaku,
-            bpjs_tipe_id: values.bpjs_tipe_id,
-            bpjs_no_kesehatan: values.bpjs_no_kesehatan,
-            bpjs_no_ketenagakerjaan: values.bpjs_no_ketenagakerjaan,
-            // bpjs_no: values.bpjs_no,
-            // bpjs_foto: tempBPJS,
-            berkas_lain: values.berkas_lain,
-            desc_file: values.desc_file,
-            is_active: true
-          }]
-        }else{   
-          console.log(values.m_kary_det_kartu)
-          values.m_kary_det_kartu[0].ktp_no = values.ktp_no
-          if(initialValues.m_kary_det_kartu[0]?.ktp_foto !== tempKTP){
-            values.m_kary_det_kartu[0].ktp_foto = tempKTP
-          }
-          if(initialValues.m_kary_det_kartu[0]?.pas_foto !== tempPasfoto){
-            values.m_kary_det_kartu[0].pas_foto = tempPasfoto
-          }
-          values.m_kary_det_kartu[0].kk_no = values.kk_no
-          if(initialValues.m_kary_det_kartu[0]?.kk_foto !== tempKK){
-            values.m_kary_det_kartu[0].kk_foto = tempKK
-          }
-          values.m_kary_det_kartu[0].npwp_no = values.npwp_no
-          values.m_kary_det_kartu[0].npwp_tgl_berlaku = values.npwp_tgl_berlaku
-          if(initialValues.m_kary_det_kartu[0]?.npwp_foto !== tempNPWP){
-            values.m_kary_det_kartu[0].npwp_foto = tempNPWP
-          }
-          values.m_kary_det_kartu[0].bpjs_tipe_id = values.bpjs_tipe_id
-          // values.m_kary_det_kartu[0].bpjs_no = values.bpjs_no
-          values.m_kary_det_kartu[0].bpjs_no_kesehatan = values.bpjs_no_kesehatan
-          values.m_kary_det_kartu[0].bpjs_no_ketenagakerjaan = values.bpjs_no_ketenagakerjaan
-          values.m_kary_det_kartu[0].berkas_lain = values.berkas_lain
-          values.m_kary_det_kartu[0].desc_file = values.desc_file
-          // if(initialValues.m_kary_det_kartu[0].bpjs_foto !== tempBPJS){
-          //   values.m_kary_det_kartu[0].bpjs_foto = tempBPJS
-          // }
-
-        }
-        const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
-        isRequesting.value = true
-        const res = await fetch(dataURL, {
-          method: isCreating ? 'POST' : 'PUT',
-          headers: {
-            'Content-Type': 'Application/json',
-            Authorization: `${store.user.token_type} ${store.user.token}`
-          },
-          body: JSON.stringify(values)
-        })
-        if (!res.ok) {
-          // values.m_kary_det_kartu = []
-          if ([400, 422].includes(res.status)) {
-            const responseJson = await res.json()
-            formErrors.value = responseJson.errors || {}
-            throw (responseJson.errors?.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
-          } else {
-            throw ("Failed when trying to post data")
-          }
-        }
-        router.replace('/' + modulPath + '?reload='+(Date.parse(new Date())))
-      } catch (err) {
-        isBadForm.value = true
-        swal.fire({
-          icon: 'error',
-          text: err
-        })
+      values.m_kary_det_kartu = [{
+        ktp_no: values.ktp_no,
+        ktp_foto: tempKTP,
+        pas_foto: tempPasfoto,
+        kk_no: values.kk_no,
+        kk_foto: tempKK,
+        npwp_no: values.npwp_no,
+        npwp_foto: tempNPWP,
+        npwp_tgl_berlaku: values.npwp_tgl_berlaku,
+        bpjs_tipe_id: values.bpjs_tipe_id,
+        bpjs_no_kesehatan: values.bpjs_no_kesehatan,
+        bpjs_no_ketenagakerjaan: values.bpjs_no_ketenagakerjaan,
+        // bpjs_no: values.bpjs_no,
+        // bpjs_foto: tempBPJS,
+        berkas_lain: values.berkas_lain,
+        desc_file: values.desc_file,
+        is_active: true
+      }]
+    } else {
+      console.log(values.m_kary_det_kartu)
+      values.m_kary_det_kartu[0].ktp_no = values.ktp_no
+      if (initialValues.m_kary_det_kartu[0]?.ktp_foto !== tempKTP) {
+        values.m_kary_det_kartu[0].ktp_foto = tempKTP
       }
-      isRequesting.value = false
+      if (initialValues.m_kary_det_kartu[0]?.pas_foto !== tempPasfoto) {
+        values.m_kary_det_kartu[0].pas_foto = tempPasfoto
+      }
+      values.m_kary_det_kartu[0].kk_no = values.kk_no
+      if (initialValues.m_kary_det_kartu[0]?.kk_foto !== tempKK) {
+        values.m_kary_det_kartu[0].kk_foto = tempKK
+      }
+      values.m_kary_det_kartu[0].npwp_no = values.npwp_no
+      values.m_kary_det_kartu[0].npwp_tgl_berlaku = values.npwp_tgl_berlaku
+      if (initialValues.m_kary_det_kartu[0]?.npwp_foto !== tempNPWP) {
+        values.m_kary_det_kartu[0].npwp_foto = tempNPWP
+      }
+      values.m_kary_det_kartu[0].bpjs_tipe_id = values.bpjs_tipe_id
+      // values.m_kary_det_kartu[0].bpjs_no = values.bpjs_no
+      values.m_kary_det_kartu[0].bpjs_no_kesehatan = values.bpjs_no_kesehatan
+      values.m_kary_det_kartu[0].bpjs_no_ketenagakerjaan = values.bpjs_no_ketenagakerjaan
+      values.m_kary_det_kartu[0].berkas_lain = values.berkas_lain
+      values.m_kary_det_kartu[0].desc_file = values.desc_file
+      // if(initialValues.m_kary_det_kartu[0].bpjs_foto !== tempBPJS){
+      //   values.m_kary_det_kartu[0].bpjs_foto = tempBPJS
+      // }
+
+    }
+    const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
+    isRequesting.value = true
+    const res = await fetch(dataURL, {
+      method: isCreating ? 'POST' : 'PUT',
+      headers: {
+        'Content-Type': 'Application/json',
+        Authorization: `${store.user.token_type} ${store.user.token}`
+      },
+      body: JSON.stringify(values)
+    })
+    if (!res.ok) {
+      // values.m_kary_det_kartu = []
+      if ([400, 422].includes(res.status)) {
+        const responseJson = await res.json()
+        formErrors.value = responseJson.errors || {}
+        throw (responseJson.errors?.length ? responseJson.errors[0] : responseJson.message || "Failed when trying to post data")
+      } else {
+        throw ("Failed when trying to post data")
+      }
+    }
+    router.replace('/' + modulPath + '?reload=' + (Date.parse(new Date())))
+  } catch (err) {
+    isBadForm.value = true
+    swal.fire({
+      icon: 'error',
+      text: err
+    })
+  }
+  isRequesting.value = false
 }
 
 //  @else----------------------- LANDING
@@ -941,7 +966,7 @@ const landing = reactive({
       class: 'bg-green-600 text-light-100',
       // show: (row) => (currentMenu?.can_read)||store.user.data.username==='developer',
       click(row) {
-        router.push(`${route.path}/${row.id}?`+tsId)
+        router.push(`${route.path}/${row.id}?` + tsId)
       }
     },
     {
@@ -950,7 +975,7 @@ const landing = reactive({
       class: 'bg-blue-600 text-light-100',
       // show: (row) => (currentMenu?.can_update)||store.user.data.username==='developer',
       click(row) {
-        router.push(`${route.path}/${row.id}?action=Edit&`+tsId)
+        router.push(`${route.path}/${row.id}?action=Edit&` + tsId)
       }
     },
     {
@@ -958,17 +983,17 @@ const landing = reactive({
       title: "Copy",
       class: 'bg-gray-600 text-light-100',
       click(row) {
-        router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
+        router.push(`${route.path}/${row.id}?action=Copy&` + tsId)
       }
     },
-    {
-      icon: 'database',
-      title: "Adjusment Cuti",
-      class: 'bg-yellow-600 text-light-100',
-      click(row) {
-        router.replace(`/adj_cuti/${row.id}?action=Adjusment&`+tsId)
-      }
-    }
+    // {
+    //   icon: 'database',
+    //   title: "Adjusment Cuti",
+    //   class: 'bg-yellow-600 text-light-100',
+    //   click(row) {
+    //     router.replace(`/adj_cuti/${row.id}?action=Adjusment&`+tsId)
+    //   }
+    // }
   ],
   api: {
     url: `${store.server.url_backend}/operation${endpointApi}`,
@@ -978,7 +1003,7 @@ const landing = reactive({
     },
     params: {
       simplest: true,
-      searchfield:'this.id, this.nik, this.kode, atasan.nama_lengkap, this.nama_lengkap, m_dir.nama, m_dept.nama, this.alamat_domisili, this.no_tlp',
+      searchfield: 'this.id, this.nik, this.kode, atasan.nama_lengkap, this.nama_lengkap, m_dir.nama, m_dept.nama, this.alamat_domisili, this.no_tlp',
     },
     onsuccess(response) {
       response.page = response.current_page
@@ -997,43 +1022,43 @@ const landing = reactive({
   },
   {
     field: 'kode',
-    headerName:'NIK',
+    headerName: 'NIK',
     filter: true,
     sortable: true,
-    flex:1,
+    flex: 1,
     filter: 'ColFilter',
     resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
+    cellClass: ['border-r', '!border-gray-200', 'justify-start']
   },
   {
     field: 'nik',
-    headerName:'No KTP',
+    headerName: 'No KTP',
     filter: true,
     sortable: true,
-    flex:1,
+    flex: 1,
     filter: 'ColFilter',
     resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
+    cellClass: ['border-r', '!border-gray-200', 'justify-start']
   },
   {
     headerName: 'Nama',
     field: 'nama_lengkap',
     filter: true,
     sortable: true,
-    flex:1,
+    flex: 1,
     filter: 'ColFilter',
     resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
+    cellClass: ['border-r', '!border-gray-200', 'justify-start']
   },
   {
     field: 'atasan.nama_lengkap',
-    headerName:'Atasan',
+    headerName: 'Atasan',
     filter: true,
     sortable: true,
-    flex:1,
+    flex: 1,
     filter: 'ColFilter',
     resizable: true,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
+    cellClass: ['border-r', '!border-gray-200', 'justify-start']
   },
   {
     headerName: 'Departemen',
@@ -1042,8 +1067,8 @@ const landing = reactive({
     sortable: true,
     filter: 'ColFilter',
     resizable: true,
-    flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-start']
+    flex: 1,
+    cellClass: ['border-r', '!border-gray-200', 'justify-start']
   },
   {
     headerName: 'Status',
@@ -1052,8 +1077,8 @@ const landing = reactive({
     // resizable: true,
     // valueGetter: (p) => p.node.data['status'].toLowerCase()==='active'? 'Aktif':'Tidak Aktif',
     sortable: true,
-    flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
+    flex: 1,
+    cellClass: ['border-r', '!border-gray-200', 'justify-center'],
     cellRenderer: ({ value }) => {
       return value === true
         ? `<span class="text-green-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">Active</span>`
@@ -1073,4 +1098,4 @@ onActivated(() => {
 })
 
 //  @endif -------------------------------------------------END
-watchEffect(()=>store.commit('set', ['isRequesting', isRequesting.value]))
+watchEffect(() => store.commit('set', ['isRequesting', isRequesting.value]))

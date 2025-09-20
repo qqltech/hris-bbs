@@ -168,6 +168,13 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
         }
     }
 
+    public function updateAfterTransaction( $newdata, $olddata, $data, $meta )
+    {
+        if (app()->request->header("Source") == "mobile") {
+            $app = $this->createAppTicket($newdata['id']);  
+        }
+    }
+
     public function custom_send_approval()
     {
         $app = $this->createAppTicket(req("id"));
@@ -234,8 +241,8 @@ class t_cuti extends \App\Models\BasicModels\t_cuti
 
     private function createAppTicket($id)
     {
-        $tempId = $id;
-        $trx = \DB::table('t_cuti')->find($tempId);
+        $trx = $this->find($id);
+
         $conf = [
             "app_name" => "APPROVAL CUTI",
             "trx_id" => $trx->id,
