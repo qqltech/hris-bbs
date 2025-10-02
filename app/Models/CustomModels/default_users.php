@@ -23,6 +23,11 @@ class default_users extends \App\Models\BasicModels\default_users
     public $createAdditionalData = ["creator_id" => "auth:id"];
     public $updateAdditionalData = ["last_editor_id" => "auth:id"];
 
+    public function presensi_absensi() :\HasMany
+    {
+        return $this->HasMany('App\Models\BasicModels\presensi_absensi', 'default_user_id', 'id');
+    }
+
     public function transformRowData( array $row )
     {
         $object = [];

@@ -826,7 +826,8 @@ async function onSave() {
     // }
     // if(detailPendidikan.value.length === 0){
     //   throw ("Tab Pendidikan Tidak Boleh Kosong")
-    // }
+    // }]
+    values.can_outscope = values.can_outscope ? 1 : 0
     values.m_kary_det_kel = detailKeluarga.value
     values.m_kary_det_org = detailOrganisasi.value
     values.m_kary_det_bhs = detailBahasa.value
@@ -1069,6 +1070,17 @@ const landing = reactive({
     resizable: true,
     flex: 1,
     cellClass: ['border-r', '!border-gray-200', 'justify-start']
+  },
+  {
+    headerName: 'Can Outscope',
+    field: 'can_outscope',
+    filter: true,
+    sortable: true,
+    filter: 'ColFilter',
+    resizable: true,
+    flex: 1,
+    cellClass: ['border-r', '!border-gray-200', 'justify-start'],
+    valueGetter: (params) => params.data.can_outscope ? 'Ya' : 'Tidak'
   },
   {
     headerName: 'Status',

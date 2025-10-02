@@ -422,7 +422,11 @@ const landing = reactive({
       icon: 'location-arrow',
       title: "Send Approval",
       class: 'bg-rose-700 rounded-lg text-white',
-      show: (row) => row.status?.toUpperCase() === 'DRAFT' ,
+      show: (row) => {
+  const status = row.status?.toUpperCase()
+  return ['POSTED', 'REVISED'].includes(status)
+},
+
       async click(row) {
         swal.fire({
           icon: 'warning',

@@ -26,53 +26,213 @@ class presensi_absensi extends \App\Models\BasicModels\presensi_absensi
         $model->checkin_foto = url('').'/'.$model->checkin_foto;
     }
 
-    public function custom_get_by_daily($req)
-    {
-        $req->month = $req->month.'-01';
-        $weeks = $req->weeks;
-        $start_date = '';
-        $end_date = '';
+    // public function custom_get_by_daily($req)
+    // {
+    //     $req->month = $req->month.'-01';
+    //     $weeks = $req->weeks;
+    //     $start_date = '';
+    //     $end_date = '';
 
-        $weeksArr = explode('/', $weeks);
-        if(count($weeksArr) > 1){
-            $start_date = $weeksArr[0];
-            $end_date = $weeksArr[1];
-            $data = \DB::select("
-                SELECT json_agg(json_build_object(
-                    'all_days_of_month', all_days_of_month,
-                    'date_to_idn', date_to_idn,
-                    'day_name_idn', day_name_idn,
-                    'type', type,
-                    'presentase', presentase,
-                    'attend', attend,
-                    'cuti', cuti,
-                    'alpha', alpha,
-                    'total_kary', total_kary
-                )) AS monthly_report
-                FROM generate_weekly_report(?,?,?,?)",[$start_date, $end_date,$req->divisi_id,$req->dept_id]);
-        }else{
-            $data = \DB::select("
-                SELECT json_agg(json_build_object(
-                    'all_days_of_month', all_days_of_month,
-                    'date_to_idn', date_to_idn,
-                    'day_name_idn', day_name_idn,
-                    'type', type,
-                    'presentase', presentase,
-                    'attend', attend,
-                    'cuti', cuti,
-                    'alpha', alpha,
-                    'total_kary', total_kary
-                )) AS monthly_report
-                FROM generate_monthly_report(?,?,?)",[$req->month,$req->divisi_id,$req->dept_id]);
-        }
+    //     $weeksArr = explode('/', $weeks);
+    //     if(count($weeksArr) > 1){
+    //         $start_date = $weeksArr[0];
+    //         $end_date = $weeksArr[1];
+    //         $data = \DB::select("
+    //             SELECT json_agg(json_build_object(
+    //                 'all_days_of_month', all_days_of_month,
+    //                 'date_to_idn', date_to_idn,
+    //                 'day_name_idn', day_name_idn,
+    //                 'type', type,
+    //                 'presentase', presentase,
+    //                 'attend', attend,
+    //                 'cuti', cuti,
+    //                 'alpha', alpha,
+    //                 'total_kary', total_kary
+    //             )) AS monthly_report
+    //             FROM generate_weekly_report(?,?,?,?)",[$start_date, $end_date,$req->divisi_id,$req->dept_id]);
+    //     }else{
+    //         $data = \DB::select("
+    //             SELECT json_agg(json_build_object(
+    //                 'all_days_of_month', all_days_of_month,
+    //                 'date_to_idn', date_to_idn,
+    //                 'day_name_idn', day_name_idn,
+    //                 'type', type,
+    //                 'presentase', presentase,
+    //                 'attend', attend,
+    //                 'cuti', cuti,
+    //                 'alpha', alpha,
+    //                 'total_kary', total_kary
+    //             )) AS monthly_report
+    //             FROM generate_monthly_report(?,?,?)",[$req->month,$req->divisi_id,$req->dept_id]);
+    //     }
 
         
-        if(count($data)){   
-            return $this->helper->customResponse('OK',200,json_decode($data[0]->monthly_report));
-        }else{
-            return $this->helper->customResponse('OK',200,[]);
+    //     if(count($data)){   
+    //         return $this->helper->customResponse('OK',200,json_decode($data[0]->monthly_report));
+    //     }else{
+    //         return $this->helper->customResponse('OK',200,[]);
+    //     }
+    // }
+
+        public function custom_get_by_daily($req)
+    {
+        if ($req->weeks) {
+            [$startDate, $endDate] = explode("/", $req->weeks);
+        } else {
+            $startDate = Carbon::parse($req->month . "-01");
+            $endDate = Carbon::parse($req->month . "-03");
         }
+
+        $dates = [];
+        $current = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        while ($current->lte($end)) {
+            $dates[] = $current->format("Y-m-d");
+            $current->addDay();
+        }
+
+        $hariLibur = m_general::where("group", "HARI LIBUR")
+            ->pluck("value")
+            ->toArray();
+
+        $cutiBersama = m_libur_nasional::pluck("tanggal")
+            ->map(fn($t) => Carbon::parse($t)->format("Y-m-d"))
+            ->toArray();
+
+        $totalKary = default_users::whereHas("m_kary", function ($q) use (
+            $req
+        ) {
+            $q->where("is_active", true);
+            if ($req->divisi_id) {
+                $q->where("m_divisi_id", $req->divisi_id);
+            }
+            if ($req->dept_id) {
+                $q->where("m_dept_id", $req->dept_id);
+            }
+        })->count();
+
+        $result = [];
+
+        foreach ($dates as $index => $date) {
+            $carbonDate = Carbon::parse($date);
+            $dayNameIdn = $carbonDate->translatedFormat("l");
+            $dayNameIdn = ucfirst($dayNameIdn);
+
+            if (in_array($dayNameIdn, $hariLibur)) {
+                $type = "Hari Libur";
+            } elseif (in_array($carbonDate->format("Y-m-d"), $cutiBersama)) {
+                $type = "Cuti Bersama";
+            } else {
+                $type = "Hari Kerja";
+            }
+
+            $hadir = default_users::whereHas("m_kary", function ($q1) use (
+                $req
+            ) {
+                $q1->where("is_active", true);
+                if ($req->divisi_id) {
+                    $q1->where("m_divisi_id", $req->divisi_id);
+                }
+                if ($req->dept_id) {
+                    $q1->where("m_dept_id", $req->dept_id);
+                }
+            })
+                ->whereHas("presensi_absensi", function ($q) use ($date) {
+                    $q->where("tanggal", $date);
+                })
+                ->count();
+
+            $cuti = t_cuti::where("status", "APPROVED")
+                ->whereDate("date_from", ">=", $date)
+                ->whereDate("date_to", "<=", $date)
+                ->count();
+
+            $alpha = $totalKary - $hadir - $cuti;
+
+            $presentase = $totalKary > 0 ? ($hadir / $totalKary) * 100 : 0;
+
+            $result[] = [
+                "all_days_of_month" => $carbonDate->format("Y-m-d"),
+                "date_to_idn" => $carbonDate->format("d-m-Y"),
+                "day_name_idn" => $dayNameIdn,
+                "type" => $type,
+                "presentase" => $presentase,
+                "attend" => $hadir,
+                "cuti" => $cuti,
+                "alpha" => $alpha,
+                "total_kary" => $totalKary,
+            ];
+        }
+
+        return $this->helper->customResponse("OK", 200, $result);
     }
+
+    //     public function custom_get_by_date($req)
+    // {
+    //     $data = \DB::select(
+    //         "
+    //     SELECT json_agg(json_build_object(
+    //         'm_kary_id', m_kary_id,
+    //         'default_user_id', default_user_id,
+    //         'kode', kode,
+    //         'nama_lengkap', nama_lengkap,
+    //         'dept', dept,
+    //         'absensi', absensi
+    //     )) AS att_report
+    //     FROM get_employee_attendance_report(?,?,?)",
+    //         [$req->date, $req->divisi_id, $req->dept_id]
+    //     );
+
+    //     if (!count($data)) {
+    //         return $this->helper->customResponse("OK", 200, []);
+    //     }
+
+    //     $att_report = json_decode($data[0]->att_report);
+
+    //     $cutiAll = \DB::table("t_cuti")
+    //         ->select("m_kary_id", "date_from", "date_to")
+    //         ->where("status", "APPROVED")
+    //         ->whereDate("date_from", "<=", $req->date)
+    //         ->whereDate("date_to", ">=", $req->date)
+    //         ->get();
+
+    //     // $offAll = t_libur::with([
+    //     //     "t_libur_d" => function ($q) {
+    //     //         $q->select("id", "t_libur_id", "m_kary_id");
+    //     //     },
+    //     // ])
+    //     //     ->whereDate("tanggal_mulai", "<=", $req->date)
+    //     //     ->whereDate("tanggal_akhir", ">=", $req->date)
+    //     //     ->get();
+
+    //     foreach ($att_report as $report) {
+    //         if ($report->absensi->status === "NOT ATTEND") {
+    //             $report->absensi->created_at = "-";
+    //             $report->absensi->updated_at = "-";
+
+    //             $hasCuti = $cutiAll->contains(function ($c) use ($report) {
+    //                 return $c->m_kary_id == $report->m_kary_id;
+    //             });
+
+    //             // $hasOff = $offAll->contains(function ($off) use ($report) {
+    //             //     return collect($off->t_libur_d)->contains(
+    //             //         "m_kary_id",
+    //             //         $report->m_kary_id
+    //             //     );
+    //             // });
+
+    //             // if ($hasOff) {
+    //             //     $report->absensi->status = "OFF";
+    //             // } else
+    //             if ($hasCuti) {
+    //                 $report->absensi->status = "CUTI";
+    //             }
+    //         }
+    //     }
+
+    //     return $this->helper->customResponse("OK", 200, $att_report);
+    // }
 
     public function custom_get_by_date($req)
     {

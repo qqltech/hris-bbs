@@ -1,21 +1,43 @@
 @php
-  $req = app()->request;
-  $tipe = $req->tipe_report;
+use App\Models\CustomModels\m_kary;
 
+$req = app()->request;
+
+if ($req->filled('kary_id')) {
+    $ids = array_map('intval', explode(',', $req->kary_id));
+} else {
+    $ids = m_kary::query()
+        ->when($req->filled('m_divisi_id'), function ($q) use ($req) {
+            $q->where('m_divisi_id', $req->m_divisi_id);
+        })
+        ->when($req->filled('m_dept_id'), function ($q) use ($req) {
+            $q->where('m_dept_id', $req->m_dept_id);
+        })
+        ->pluck('id')
+        ->toArray();
+}
+@endphp
+
+@foreach($ids as $kary_id)
+<span style="font-weight:bold; font-size: 10pt"> Absensi Karyawan Detail</span><br/>
+@php
   $rekap = [];
-  $periode = $req->periode.'-'.date('d');
+  //$periode = $req->periode.'-'.date('d');
+
+  $date_start = Carbon\Carbon::parse($req->date_start)->format('Y-m-d');
+  $date_end = Carbon\Carbon::parse($req->date_end)->format('Y-m-d');
   $dateNow = date('Y-m-d');
-  $data = \DB::select("
-     select * from employee_attendance_detail(?,?,?)
-    ",[ $periode, $req->kary_id, $dateNow = date('Y-m-d')]);
   
-  $kary_id = @json_decode(@$data[0]->kary)->m_kary_id ?? 0;
+  $data = \DB::select("
+     select * from employee_attendance_detail_range(?,?,?)
+    ",[ $date_start, $date_end, $kary_id]);
+  
   $check_kary_jam_kerja_tipe = \DB::table('m_kary as k')->join('m_general as g','g.id','k.tipe_jam_kerja_id')
     ->where('k.id', $kary_id)->pluck('g.code')->first();
   
   $rekap = \DB::select("
     select 
-      employee_attendance(?,k.id, ?) absen,
+      employee_attendance_range(?,?,k.id) absen,
       (select   
         TO_CHAR(INTERVAL '1 second' * AVG(EXTRACT(EPOCH FROM pa.checkin_time::TIME)), 'HH24:MI:SS')
         from presensi_absensi pa where pa.default_user_id = u.id and pa.checkin_time is not null and to_char(pa.tanggal,'mm') = '11')  checkin_avg,
@@ -29,7 +51,7 @@
         where k.is_active = true 
         and k.m_dept_id IS NOT NULL and k.m_dept_id != 0
         and k.id = COALESCE(?, k.id)
-        ",[ $periode, date('Y-m-d'), $kary_id ]);
+        ",[ $date_start, $date_end, $kary_id ]);
 
   $total_checkin_telat = 0;
   $total_checkout_lebih_awal = 0;
@@ -37,17 +59,19 @@
   $total_checkout_telat = 0;
   
 @endphp
-<span style="font-weight:bold; font-size: 10pt"> Absensi Karyawan Detail</span><br/>
 <span style="font-weight:bold; font-size: 7pt"> {{ @json_decode(@$data[0]->kary)->nik }} - {{ @json_decode(@$data[0]->kary)->nama_lengkap }}</span><br/>
-<span style="font-weight:bold; font-size: 7pt"> Periode  {{$periode}}</span><br/></br></br>
+<span style="font-weight:bold; font-size: 7pt"> Periode  {{$date_start}} - {{$date_end}}</span><br/></br></br>
 <table style="width: 100%; font-size: 7pt" cellpadding="2">
   <thead class="bg-[#c6c6c6]">
     <tr>
       <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 15%;">Tanggal</th>
       <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 6%;">Tipe Hari</th>
       <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 8%; text-align: center;">Status</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 20%; text-align: center;">Checkin Time</th>
-      <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 20%; text-align: center;">Checkout Time</th>
+      <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 10%; text-align: center;">Checkin Time</th>
+      <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 10%; text-align: center;">Checkin Scope</th>
+      <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 10%; text-align: center;">Checkout Time</th>
+      <th style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; background-color: #c6c6c6; width: 10%; text-align: center;">Checkout Scope</th>
+
     </tr>
   </thead>
   <tbody>
@@ -108,16 +132,58 @@
               $checkout_result = @json_decode($dt->absensi)->checkout_time .(@$jadwal->waktu_akhir ?  ' / '. @$jadwal->waktu_akhir : '');
             }
           }
+          $absensi = json_decode($dt->absensi, true);
+          //dd($absensi);
+
+         $status = $absensi['status'] ?? '-';
+        $catatanIn = $absensi['catatan_in'] ?? '-';
+        $catatanOut = $absensi['catatan_out'] ?? '-';
+
+        $checkinScope = !is_null($absensi['checkin_on_scope'])
+            ? ($absensi['checkin_on_scope'] ? 'IN SCOPE' : 'OUT SCOPE')
+            : '-';
+
+        $checkoutScope = !is_null($absensi['checkout_on_scope'])
+            ? ($absensi['checkout_on_scope'] ? 'IN SCOPE' : 'OUT SCOPE')
+            : '-';
+
+          // setelah hitung $checkin_result / $checkout_result
+
+        // cek checkin_result dulu
+        $checkin_info  = '';
+        $checkout_info = '';
+
+        // … proses hitung checkin_result / checkout_result seperti biasa …
+
+        // bikin variabel info scope+catatan terpisah
+        if (!empty($checkin_result)) {
+            $scopeText  = $checkinScope ?: '';
+            $catatanText = $catatanIn ? ' | Catatan: '.$catatanIn : '';
+            $checkin_info = '<small>'.$scopeText.$catatanText.'</small>';
+        }
+
+        if (!empty($checkout_result)) {
+            $scopeText  = $checkoutScope ?: '';
+            $catatanText = $catatanOut ? ' | Catatan: '.$catatanOut : '';
+            $checkout_info = '<small>'.$scopeText.$catatanText.'</small>';
+        }
+
         @endphp
         <tr>
           <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 15%;">{{ $dt->day_name_idn }}, {{$dt->date_to_idn}}</td>
           <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 6%;">{{ $dt->type }}</td>
           <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 8%; text-align: center;">{{ @json_decode($dt->absensi)->status }}</td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 20%; text-align: center;">
+          <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 10%; text-align: center;">
             {!! $checkin_result !!}
           </td>
-          <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 20%; text-align: center;">
+          <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 10%; text-align: center;">
+            {!! $checkin_info !!}
+          </td>
+          <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 10%; text-align: center;">
             {!! $checkout_result !!}
+          </td>
+           <td style="border:0.5px solid black; padding: 2px; font-size: 7pt; border-collapse: collapse; width: 10%; text-align: center;">
+            {!! $checkout_info !!}
           </td>
         </tr>
     @endforeach
@@ -170,3 +236,7 @@
     </tr>
   </tbody>
 </table>
+@if(!$loop->last)
+  <div style="page-break-after: always;"></div>
+@endif
+@endforeach

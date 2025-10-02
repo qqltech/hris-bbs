@@ -20,7 +20,7 @@ const tsId = `ts=` + (Date.parse(new Date()))
 
 const is_approval = route.query.is_approval ? true : false
 const is_to_upload = route.query.is_to_upload ? true : false
-const paramLanding =  `this.lembur_status!='APPROVED'`
+const paramLanding = `this.lembur_status!='APPROVED'`
 
 
 let modalOpen = ref(false)
@@ -51,7 +51,7 @@ onBeforeMount(async () => {
 
   if (isRead) {
     //  READ DATA
- try {
+    try {
       let dataURL = ''
       let dataURLAprv = ''
       let resAprv = ''
@@ -120,8 +120,8 @@ onBeforeMount(async () => {
     values[key] = initialValues[key]
   }
 })
-onMounted(()=>{
-  if(!is_superadmin.value){
+onMounted(() => {
+  if (!is_superadmin.value) {
     values.m_kary_id = store.user.data?.m_kary_id
   }
 })
@@ -160,7 +160,7 @@ function onReset() {
   })
 }
 
-let dataLog = reactive({items:[]})
+let dataLog = reactive({ items: [] })
 async function loadLog(id) {
   const url = `${store.server.url_backend}/operation/t_lembur/log?id=${id}`
   const res = await fetch(url, {
@@ -205,7 +205,7 @@ function onSave() {
 
 
     const isCreating = ['Create', 'Copy', 'Tambah'].includes(actionText.value)
-        if (values.status === 'REVISED') {
+    if (values.status === 'REVISED') {
       values.status = 'DRAFT'; // Change status to DRAFT if it was REVISED
     }
     const dataURL = `${store.server.url_backend}/operation${endpointApi}${isCreating ? '' : ('/' + route.params.id)}`
@@ -283,7 +283,7 @@ function onProcess(typePar) {
         });
 
 
-        
+
 
         if (!res.ok) {
           const responseJson = await res.json();
@@ -328,7 +328,7 @@ const landing = reactive({
     {
       icon: 'trash',
       class: 'bg-red-600 text-light-100',
-      show: (row) =>row.status?.toUpperCase() === 'DRAFT',
+      show: (row) => row.status?.toUpperCase() === 'DRAFT',
       title: "Hapus",
       // show: () => store.user.data.username==='developer',
       click(row) {
@@ -368,7 +368,7 @@ const landing = reactive({
       icon: 'eye',
       title: "Read",
       class: 'bg-green-600 text-light-100',
-      
+
       // show: (row) => (currentMenu?.can_read)||store.user.data.username==='developer',
       click(row) {
         router.push(`${route.path}/${row.id}?` + tsId)
@@ -378,7 +378,7 @@ const landing = reactive({
       icon: 'edit',
       title: "Edit",
       class: 'bg-blue-600 text-light-100',
- show: (row) => row.status?.toUpperCase() === 'DRAFT' || row.status?.toUpperCase() === 'REVISED',
+      show: (row) => row.status?.toUpperCase() === 'DRAFT' || row.status?.toUpperCase() === 'REVISED',
       // show: (row) => (currentMenu?.can_update)||store.user.data.username==='developer',
       click(row) {
         router.push(`${route.path}/${row.id}?action=Edit&` + tsId)
@@ -388,16 +388,19 @@ const landing = reactive({
       icon: 'copy',
       title: "Copy",
       class: 'bg-gray-600 text-light-100',
-      show: (row) =>row.status?.toUpperCase() === 'DRAFT',
+      show: (row) => row.status?.toUpperCase() === 'DRAFT',
       click(row) {
-        router.push(`${route.path}/${row.id}?action=Copy&`+tsId)
+        router.push(`${route.path}/${row.id}?action=Copy&` + tsId)
       }
     },
-   {
+    {
       icon: 'location-arrow',
       title: "Send Approval",
       class: 'bg-rose-700 rounded-lg text-white',
-      show: (row) => row.status?.toUpperCase() === 'DRAFT' ,
+      show: (row) => {
+        const status = row.status?.toUpperCase()
+        return ['POSTED', 'REVISED'].includes(status)
+      },
       async click(row) {
         swal.fire({
           icon: 'warning',
@@ -423,7 +426,7 @@ const landing = reactive({
                 if ([400, 422, 500].includes(res.status)) {
                   const responseJson = await res.json()
                   formErrors.value = responseJson.errors || {}
-                  throw (responseJson.message+ " "+responseJson.data.errorText || "Failed when trying to post data")
+                  throw (responseJson.message + " " + responseJson.data.errorText || "Failed when trying to post data")
                 } else {
                   throw ("Failed when trying to post data")
                 }
@@ -460,7 +463,7 @@ const landing = reactive({
     params: {
       simplest: true,
       searchfield: 'm_kary.nama_depan, tanggal, jam_mulai, jam_selesai, tipe_lembur.value, status',
-      where: `${!store.user.data?.is_superadmin ? ('this.m_kary_id='+store.user.data?.m_kary_id ?? 0) : ''}`
+      where: `${!store.user.data?.is_superadmin ? ('this.m_kary_id=' + store.user.data?.m_kary_id ?? 0) : ''}`
     },
     onsuccess(response) {
       response.page = response.current_page
@@ -544,20 +547,21 @@ const landing = reactive({
     sortable: true,
     filter: 'ColFilter',
     resizable: true,
-    flex:1,
-    cellClass: [ 'border-r', '!border-gray-200', 'justify-center'],
+    flex: 1,
+    cellClass: ['border-r', '!border-gray-200', 'justify-center'],
     cellRenderer: ({ value }) => {
       let color = 'gray'
-      if(value == 'APPROVED')
+      if (value == 'APPROVED')
         color = 'green'
-      else if(value == 'IN APPROVAL')
+      else if (value == 'IN APPROVAL')
         color = 'blue'
-      else if(value == 'REVISED')
+      else if (value == 'REVISED')
         color = 'yellow'
-      else if(value == 'REJECTED')
+      else if (value == 'REJECTED')
         color = 'red'
-    return `<span class="text-${color}-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">${value}</span>`
-  }}]
+      return `<span class="text-${color}-500 rounded-md text-xs font-medium px-4 py-1 inline-block capitalize">${value}</span>`
+    }
+  }]
 })
 onActivated(() => {
   //  reload table api landing

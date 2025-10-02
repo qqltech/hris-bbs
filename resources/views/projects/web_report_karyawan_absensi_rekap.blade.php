@@ -7,7 +7,7 @@
   $dateNow = date('Y-m-d');
   $data = \DB::select("
     select 
-      employee_attendance(?,k.id, ?) absen,
+      employee_attendance(?,k.id) absen,
       (select   
         TO_CHAR(INTERVAL '1 second' * AVG(EXTRACT(EPOCH FROM pa.checkin_time::TIME)), 'HH24:MI:SS')
         from presensi_absensi pa where pa.default_user_id = u.id) checkin_avg,
@@ -24,7 +24,7 @@
         and k.m_dept_id = COALESCE(?, k.m_dept_id)
         and k.id = COALESCE(?, k.id)
         ",[
-          $periode, $dateNow, $req->m_divisi_id, $req->m_dept_id, $req->kary_id
+          $periode, $req->m_divisi_id, $req->m_dept_id, $req->kary_id
         ]);
   
 @endphp
